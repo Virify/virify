@@ -64,7 +64,7 @@ const generateWeightedListingTier = (): ListingTier => {
 };
 
 const generateRandomViews = () => {
-  return faker.number.int({ min: 0, max: 50 });
+  return faker.number.int({ min: 0, max: 30 });
 };
 
 // Common user agents for realistic seed data
@@ -136,7 +136,7 @@ export const generateListingViews = async (listingId: number): Promise<number> =
  * @returns Promise resolving to the number of impressions created
  */
 export const generateListingImpressions = async (listingId: number): Promise<number> => {
-  const impressionCount = faker.number.int({ min: 50, max: 500 }); // More impressions than views
+  const impressionCount = faker.number.int({ min: 10, max: 100 }); // More impressions than views
   const impressions = [];
   
   // Generate impressions spread out over the past 30 days
@@ -180,8 +180,8 @@ export const generateListingImpressions = async (listingId: number): Promise<num
 export const generateDailyListingStats = async (listingId: number, userId: number): Promise<number> => {
   const stats = [];
   
-  // Generate stats for the past 30 days
-  for (let daysAgo = 0; daysAgo < 30; daysAgo++) {
+  // Generate stats for the past 14 days
+  for (let daysAgo = 0; daysAgo < 14; daysAgo++) {
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
     date.setHours(0, 0, 0, 0); // Normalize to midnight
@@ -229,8 +229,8 @@ export const generateDailyListingStats = async (listingId: number, userId: numbe
 export const generateDailyUserStats = async (userId: number): Promise<number> => {
   const stats = [];
   
-  // Generate stats for the past 30 days
-  for (let daysAgo = 0; daysAgo < 30; daysAgo++) {
+  // Generate stats for the past 14 days
+  for (let daysAgo = 0; daysAgo < 14; daysAgo++) {
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
     date.setHours(0, 0, 0, 0); // Normalize to midnight
@@ -267,6 +267,31 @@ export const generateDailyUserStats = async (userId: number): Promise<number> =>
   return stats.length;
 };
 
+/**
+ * Simple concurrency limiter — run at most `concurrency` promises at once.
+ * Avoids P2028 (too many simultaneous transactions) while being faster than sequential.
+ */
+const createLimiter = (concurrency: number) => {
+  let active = 0;
+  const queue: (() => void)[] = [];
+  const next = () => {
+    if (queue.length && active < concurrency) {
+      active++;
+      queue.shift()!();
+    }
+  };
+  return <T>(fn: () => Promise<T>): Promise<T> =>
+    new Promise((resolve, reject) => {
+      queue.push(() => {
+        fn().then(resolve, reject).finally(() => {
+          active--;
+          next();
+        });
+      });
+      next();
+    });
+};
+
 // Types for batch creation
 interface ListingBatchItem {
   propertyId: number;
@@ -296,64 +321,62 @@ const generateBaseListingData = (propertyId: number, userId: number, isRental: b
 });
 
 /**
- * Batch create listings with their rental/sale records
- * Much faster than creating one at a time
+ * Batch create listings with their rental/sale records.
+ * Uses bounded concurrency (5 at a time) to avoid P2028 on Railway
+ * while being much faster than purely sequential creation.
  */
 export const batchCreateListings = async (items: ListingBatchItem[]): Promise<number[]> => {
   if (items.length === 0) return [];
 
-  const BATCH_SIZE = 50;
-  const createdListingIds: number[] = [];
-  const allAnalyticsPromises: Promise<unknown>[] = [];
+  // 5 concurrent listing creates — safe for Railway Prisma Postgres connection pool
+  const listingLimiter = createLimiter(5);
+  // 3 concurrent analytics workers — keeps DB load low during analytics phase
+  const analyticsLimiter = createLimiter(3);
 
-  for (let i = 0; i < items.length; i += BATCH_SIZE) {
-    const batch = items.slice(i, i + BATCH_SIZE);
-    
-    // Create listings in a transaction for each batch
-    const results = await prisma.$transaction(
-      batch.map(item => 
-        prisma.listing.create({
+  let created = 0;
+  const analyticsPromises: Promise<unknown>[] = [];
+
+  const allListings = await Promise.all(
+    items.map(item =>
+      listingLimiter(async () => {
+        const result = await prisma.listing.create({
           data: {
             ...generateBaseListingData(item.propertyId, item.userId, item.isRental, item.tier),
-            ...(item.isRental 
+            ...(item.isRental
               ? { rentalListing: { create: generateRentalObject() } }
               : { saleListing: { create: generateSaleObject() } }
             ),
           },
           select: { id: true, userId: true },
-        })
-      )
-    );
+        });
 
-    createdListingIds.push(...results.map(r => r.id));
-    
-    // Queue analytics for this batch (collected and awaited after all batches)
-    const batchIndex = Math.floor(i / BATCH_SIZE) + 1;
-    const batchAnalytics = Promise.all(
-      results.map(listing => 
-        Promise.all([
-          generateListingViews(listing.id),
-          generateListingImpressions(listing.id),
-          ...(listing.userId ? [generateDailyListingStats(listing.id, listing.userId)] : []),
-        ]).catch(err => console.error(`Analytics error for listing ${listing.id}:`, err))
-      )
-    ).then(() => {
-      console.log(`📊 Analytics generated for batch ${batchIndex}`);
-    });
+        // Start analytics immediately for this listing (don't wait for all listings first)
+        analyticsPromises.push(
+          analyticsLimiter(() =>
+            Promise.all([
+              generateListingViews(result.id),
+              generateListingImpressions(result.id),
+              ...(result.userId ? [generateDailyListingStats(result.id, result.userId)] : []),
+            ]).catch(err => console.error(`Analytics error for listing ${result.id}:`, err))
+          )
+        );
 
-    allAnalyticsPromises.push(batchAnalytics);
+        created++;
+        if (created % 200 === 0 || created === items.length) {
+          console.log(`  📦 Created ${created}/${items.length} listings...`);
+        }
 
-    if ((i + BATCH_SIZE) % 200 === 0 || i + BATCH_SIZE >= items.length) {
-      console.log(`  📦 Created ${Math.min(i + BATCH_SIZE, items.length)}/${items.length} listings...`);
-    }
-  }
+        return result;
+      })
+    )
+  );
 
   // Wait for all analytics to complete before returning so process.exit() doesn't kill them
-  console.log('⏳ Awaiting analytics generation for all batches...');
-  await Promise.all(allAnalyticsPromises);
+  console.log('⏳ Awaiting analytics generation...');
+  await Promise.all(analyticsPromises);
   console.log('✅ All analytics generated.');
 
-  return createdListingIds;
+  return allListings.map(r => r.id);
 };
 
 /**
