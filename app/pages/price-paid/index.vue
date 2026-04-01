@@ -14,10 +14,10 @@
             <AtomsInput v-model="searchQuery" type="text" placeholder="e.g., 'CF10 1AA' or 'cf101aa'" required class="| body-sm" :disabled="loading" @keyup.enter="search" />
           </div>
           <div class="price-paid__button">
-            <button class="| button button-secondary button-md" @click="search" :disabled="loading">
+            <UButton variant="solid" size="lg" icon="i-lucide-search" :disabled="loading" @click="search" class="button-secondary | font-bold text-white rounded-3xl body-md">
               <span v-if="loading">Searching...</span>
               <span v-else>Search</span>
-            </button>
+            </UButton>
           </div>
         </div>
       </AtomsHeroCard>
@@ -221,7 +221,7 @@ useSchemaOrg([
   &__search {
     display: flex;
     gap: var(--size-12);
-    align-items: baseline;
+    align-items: center;
     margin-top: var(--size-8);
     width: 100%;
   }
