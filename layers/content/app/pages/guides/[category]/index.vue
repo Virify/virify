@@ -2,6 +2,7 @@
   <div>
     <OrganismsBannerHero
       class="container"
+      compact
       :description="category?.description"
     >
       <template #top>

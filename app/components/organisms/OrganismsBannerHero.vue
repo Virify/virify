@@ -1,5 +1,5 @@
 <template>
-  <div class="banner-hero">
+  <div class="banner-hero" :class="{ 'banner-hero--compact': compact }">
     <div v-if="$slots.top" class="banner-hero__top">
       <slot name="top" />
     </div>
@@ -35,6 +35,7 @@
 <script setup lang="ts">
 defineProps<{
   description?: string
+  compact?: boolean
 }>()
 </script>
 
@@ -68,6 +69,18 @@ defineProps<{
     min-height: var(--banner-hero-min-height-desktop, 30em);
   }
 
+  &--compact {
+    --banner-hero-min-height-tablet: 16em;
+    --banner-hero-min-height-notebook: 18em;
+    --banner-hero-min-height-desktop: 20em;
+    --banner-hero-plant-width-tablet: 130px;
+    --banner-hero-plant-width-notebook: 200px;
+    --banner-hero-plant-width-desktop: 240px;
+    --banner-hero-person-width-tablet: 160px;
+    --banner-hero-person-width-notebook: 260px;
+    --banner-hero-person-width-desktop: 300px;
+  }
+
   &__top {
     position: absolute;
     top: var(--size-16);
@@ -93,17 +106,17 @@ defineProps<{
 
       @include mq.tablet {
         left: -20px;
-        width: 180px;
+        width: var(--banner-hero-plant-width-tablet, 180px);
       }
 
       @include mq.notebook {
         left: -40px;
-        width: 275px;
+        width: var(--banner-hero-plant-width-notebook, 275px);
       }
 
       @include mq.desktop {
         left: -45px;
-        width: 340px;
+        width: var(--banner-hero-plant-width-desktop, 340px);
       }
     }
 
@@ -134,16 +147,16 @@ defineProps<{
 
       @include mq.tablet {
         right: -40px;
-        width: 220px;
+        width: var(--banner-hero-person-width-tablet, 220px);
       }
 
       @include mq.notebook {
         right: -95px;
-        width: 350px;
+        width: var(--banner-hero-person-width-notebook, 350px);
       }
 
       @include mq.desktop {
-        width: 400px;
+        width: var(--banner-hero-person-width-desktop, 400px);
         right: -65px;
       }
     }
@@ -164,10 +177,15 @@ defineProps<{
 
   &__description {
     color: var(--monochrome-900);
+    font-weight: normal;
     max-width: 40ch;
-    margin: 0 auto;
+    margin: 0 auto var(--size-64);
     position: relative;
     z-index: 1;
+
+    @include mq.tablet {
+      margin-bottom: 0;
+    }
   }
 
   /* Caption used inside the #title slot (e.g. "Launching Summer 2026") */

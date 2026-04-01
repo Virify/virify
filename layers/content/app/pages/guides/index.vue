@@ -2,6 +2,7 @@
   <div>
     <OrganismsBannerHero
       class="container"
+      compact
       description="Complete step-by-step guides for buying, selling, and renting properties."
     >
       <template #top>
