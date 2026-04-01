@@ -166,6 +166,7 @@ function showErrors(errors?: ErrorBoxProp) {
     line-height: var(--lineheight-sm);
     font-size: var(--font-xs);
     text-align: left;
+    color: var(--monochrome-900);
 
     @include mq.tablet {
       font-size: var(--font-sm);

@@ -1,8 +1,7 @@
 <template>
-  <OrganismsBannerHero>
+  <OrganismsBannerHero caption="Launching Summer 2026">
     <template #title>
-      <span class="banner-hero__caption">Launching Summer 2026</span>
-      Join the waiting list for the property platform that works for everyone
+      <span>Join the waiting list for the property platform that works for everyone</span>
     </template>
 
     <HomepageSectionSignupForm />
