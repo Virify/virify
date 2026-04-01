@@ -126,7 +126,7 @@ const formatDisplayDate = (date: string | Date): string => {
   }
 
   &__item {
-    background: var(--background-200);
+    background: var(--background-100);
     border: 1px solid var(--monochrome-600);
     border-radius: var(--border-radius-lg);
     padding: var(--size-16);
@@ -173,7 +173,7 @@ const formatDisplayDate = (date: string | Date): string => {
 
     // No history item styling
     &--no-history {
-      background: var(--background-200);
+      background: var(--background-100);
       border: 1px dashed var(--monochrome-600);
       text-align: center;
     }

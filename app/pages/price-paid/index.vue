@@ -255,9 +255,9 @@ useSchemaOrg([
   &__item {
     width: 100%;
     padding: var(--size-32);
-    border-radius: var(--border-radius-lg);
-    border: 1px solid var(--monochrome-600);
-
+    background: var(--background-100);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   }
 
   &__loading {
