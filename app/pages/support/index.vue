@@ -1,18 +1,13 @@
 <template>
-  <UPageHero
-    :title="cmsData?.hero.title || 'Join the waiting list'"
-    :description="
-      cmsData?.hero.subtitle ||
-      'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'
-    "
-    headline="Virify Support & Help Center"
-    :ui="{
-      root: 'hero-background z-2',
-      headline: 'text-secondary',
-      title: 'title-2xl text-white!',
-      description: 'text-white body-lg',
-    }"
-  />
+  <OrganismsBannerHero
+    class="container"
+    compact
+    :description="cmsData?.hero.subtitle || 'Virify makes property search and marketing simple for everyone. With simple tools and smart, natural-language search with advanced filters to help you find exactly what you need.'"
+  >
+    <template #title>
+      Virify <span class="gradient-text">Support</span>
+    </template>
+  </OrganismsBannerHero>
   <!-- Faq section -->
   <UPageSection
     :title="cmsData.faqSection.title"
@@ -35,7 +30,7 @@
     :title="cmsData?.ourSupportSection.title"
     :description="cmsData?.ourSupportSection.subtitle"
     headline="How we can help you"
-    class="section-gradient"
+    class="p-index__hero-dark"
     :ui="{
       headline: 'text-secondary'
     }"
@@ -82,6 +77,7 @@
   <UPageSection
     :title="cmsData?.SupportFormSection.title"
     :description="cmsData?.SupportFormSection.description"
+    class="p-index__hero-dark"
     headline="Contact us"
     :ui="{
       root: 'section-gradient',
@@ -187,7 +183,7 @@
         :disabled="disableButton || isPending"
         block
         size="md"
-        class="font-bold button button-monochrome mt-3!"
+        class="font-bold button button-secondary mt-3!"
       />
     </UForm>
   </UPageSection>
@@ -206,7 +202,7 @@
         to: cmsData?.ctaSection.buttonLink || '/',
         size: 'lg',
         variant: 'solid',
-        class: 'font-bold button button-monochrome',
+        class: 'font-bold button button-secondary',
       },
     ]"
   />
