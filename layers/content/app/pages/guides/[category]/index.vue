@@ -19,7 +19,7 @@
       </template>
 
       <template #title>
-        <span class="gradient-text">{{ category?.title }}</span>
+        <span>{{ category?.title }}</span>
       </template>
     </OrganismsBannerHero>
 

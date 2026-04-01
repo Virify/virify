@@ -18,7 +18,7 @@
       </template>
 
       <template #title>
-        Virify <span class="gradient-text">Guides</span>
+        Virify <span>Guides</span>
       </template>
     </OrganismsBannerHero>
 
