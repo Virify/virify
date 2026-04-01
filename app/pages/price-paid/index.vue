@@ -1,14 +1,10 @@
 <template>
   <div class="price-paid-page">
-    <!-- Hero -->
+    <!-- Hero with search form inside -->
     <OrganismsBannerHero class="container" compact description="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address.">
-      <template #title> <span>Price Paid</span> Data </template>
-    </OrganismsBannerHero>
+      <template #title> <span class="gradient-text">Price Paid</span> Data </template>
 
-    <!-- Form + results (unchanged) -->
-    <div class="price-paid | container">
-      <AtomsHeroCard class="price-paid__hero">
-        <p class="| body-md">Enter a UK postcode and search for property sales history</p>
+      <div class="price-paid__search-form">
         <div class="price-paid__search">
           <div class="price-paid__input">
             <AtomsInput v-model="searchQuery" type="text" placeholder="e.g., 'CF10 1AA' or 'cf101aa'" required class="| body-sm" :disabled="loading" @keyup.enter="search" />
@@ -20,8 +16,11 @@
             </UButton>
           </div>
         </div>
-      </AtomsHeroCard>
+      </div>
+    </OrganismsBannerHero>
 
+    <!-- Results -->
+    <div class="price-paid | container">
       <div v-if="results.length > 0" class="price-paid__results">
         <ul class="price-paid__list">
           <li v-for="(result, index) in results" :key="index" class="price-paid__item">
@@ -207,15 +206,14 @@ useSchemaOrg([
 }
 
 .price-paid {
-  padding: var(--size-64) 0;
+  padding: var(--size-32) 0 var(--size-64);
 
-  &__hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    margin: auto;
-    max-width: 600px;
+  &__search-form {
+    width: min(100%, 540px);
+    margin: 0 auto;
+    margin-top: var(--size-16);
+    position: relative;
+    z-index: 1;
   }
 
   &__search {
