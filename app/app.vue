@@ -3,7 +3,8 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    
+
+    <SearchModal />
     <OrganismsGlobalNotificationHandler />
     <OrganismsGlobalCookieConsent />
   </UApp>

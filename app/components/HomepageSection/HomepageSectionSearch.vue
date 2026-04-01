@@ -5,6 +5,8 @@
       <span class="gradient-text"> Virify AI </span>
     </h1>
 
+    <OrganismsDockPopover class="homepage-section-search__search-dock" />
+
     <OrganismsDockBanner listingType="all" class="homepage-section-search__search-dock" />
   </div>
 </template>
