@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
   &__window {
     position: relative;
     width: min(calc(100% - var(--size-48)), 740px);
-    margin: 140px auto var(--size-48);
+    margin: 144px auto var(--size-48);
     border: 0;
     padding: 0;
     background: none;

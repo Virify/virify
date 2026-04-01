@@ -10,6 +10,10 @@
     </button>
 
     <div :id="menuId" class="header-mobile-nav__menu" :hidden="!isExpanded">
+      <div class="header-mobile-nav__menu-search | container">
+        <HeaderActionsSearch />
+      </div>
+
       <HeaderMobileMenu :menu class="header-mobile-nav__menu-list | container" />
     </div>
   </nav>
@@ -133,8 +137,24 @@ watch(isExpanded, (newState) => {
 
   &__menu-list {
     list-style: none;
-    padding: var(--size-24) var(--size-4) var(--size-48);
+    padding: 0 var(--size-4) var(--size-48);
     border: 0;
+  }
+
+  &__menu-search {
+    padding: var(--size-24) var(--size-4);
+
+    .header-actions-search {
+      font-size: var(--font-md);
+      padding: var(--size-8) var(--size-16);
+      width: 100%;
+      box-sizing: border-box;
+
+      .a-icon {
+        width: var(--size-24);
+        height: var(--size-24);
+      }
+    }
   }
 }
 </style>

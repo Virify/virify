@@ -5,6 +5,9 @@
         <HeaderDesktopLink v-if="type === 'link'" :href :label />
         <HeaderDesktopDropdown v-else-if="type === 'dropdown'" :label :href :children />
       </li>
+      <li class="header-desktop-nav__menu-spacer">
+        <HeaderActionsSearch show-shortcut />
+      </li>
     </ul>
   </nav>
 </template>
@@ -42,6 +45,10 @@ defineProps<Props>()
     align-items: center;
     justify-content: center;
     gap: var(--size-2);
+  }
+
+  &__menu-spacer {
+    padding-left: var(--size-16);
   }
 }
 </style>
