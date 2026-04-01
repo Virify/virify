@@ -13,15 +13,7 @@
         <SearchSkeleton v-if="isSearchLoading" />
       </div>
 
-      <template v-if="!isSearchLoading">
-        <h2 class="| title-md">Search</h2>
-
-        <p>Lorem ipsum dolor sit amet</p>
-
-        <button type="button" @click.prevent="animateFormToDock" class="| button">
-          Trigger search
-        </button>
-      </template>
+      <SearchModalForm v-if="!isSearchLoading" @trigger-search="animateFormToDock" />
     </div>
   </div>
 </template>
