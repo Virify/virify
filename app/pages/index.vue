@@ -27,7 +27,7 @@
     <UPageSection :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
       :description="cmsContent?.sellersBenefits.subtitle || ''" headline="You're in control" :ui="{
         root: '| container',
-        headline: 'text-secondary/90!',
+        headline: 'text-secondary',
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
       }">
       <template #body>
@@ -79,7 +79,9 @@
     ]" />
 
     <UPageSection :title="cmsContent?.earlyAccessBenefits.title" :description="cmsContent?.earlyAccessBenefits.subtitle"
-      headline="Early Access Benefits" class="p-index__hero-dark p-index__border-radius | container">
+      headline="Early Access Benefits" class="p-index__hero-dark p-index__border-radius | container" :ui="{
+        headline: 'text-secondary',
+      }">
       <template #features>
         <UPageCard v-for="(benefit, index) in cmsContent?.earlyAccessBenefits.benefits" :key="index"
           icon="i-lucide-info" :title="benefit.title" :description="benefit.description"
