@@ -11,17 +11,17 @@
 
     <a id="homepage-content" class="| inline-scroll-margin"></a>
 
+    <HomepageSectionAiScroller class="| container" />
+    
     <div class="p-index__bg-change">
-      <HomepageSectionAiScroller class="| container" />
+      <HomepageSectionMapScroller class="| container" />
     </div>
 
-    <HomepageSectionMapScroller class="| container" />
-
+    <HomepageSectionComms class="| container" />
+    
     <div class="p-index__bg-change">
-      <HomepageSectionComms class="| container" />
+      <HomepageSectionLocation class="| container" />
     </div>
-
-    <HomepageSectionLocation class="| container" />
 
     <!-- sellers section -->
     <UPageSection :title="cmsContent?.sellersBenefits.title || 'What we offer sellers'"
@@ -31,14 +31,17 @@
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
       }">
       <template #body>
-        <UPageCard v-for="(feature, index) in cmsContent?.sellersBenefits.features" :key="index" :title="feature.title"
-          :description="feature.description" variant="subtle" spotlight spotlight-color="secondary"
-          icon="i-lucide-chart-no-axes-gantt" :ui="{
-            root: 'ring-[#ccc]/60',
-            title: 'text-secondary/90!',
+        <UPageCard v-for="(feature, index) in cmsContent?.sellersBenefits.features" :key="index"
+          icon="i-lucide-chart-no-axes-gantt" :title="feature.title" :description="feature.description"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right" :ui="{
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'title-md text-white',
             leadingIcon: 'h-6 w-6 text-secondary',
-            description: 'body-sm',
-          }" />
+            description: 'body-sm text-(--monochrome-900)',
+            body: 'flex flex-col justify-evenly',
+          }">
+        </UPageCard>
       </template>
     </UPageSection>
 
@@ -50,16 +53,17 @@
         body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6',
       }">
       <template #body>
-        <UPageCard v-for="(feature, index) in cmsContent?.buyersBenefits.features" :key="index" :title="feature.title"
-          :description="feature.description" variant="subtle" spotlight spotlight-color="secondary"
-          icon="i-lucide-chart-no-axes-gantt" :ui="{
-            spotlight: 'bg-[#2b3945]!',
-            root: 'bg-secondary/50! ring-[#2b3945]/60',
-            container: 'border-secondary!',
-            title: 'text-secondary/90!',
-            leadingIcon: 'h-6 w-6 text-secondary',
-            description: 'body-sm',
-          }" />
+        <UPageCard v-for="(feature, index) in cmsContent?.buyersBenefits.features" :key="index"
+        icon="i-lucide-chart-no-axes-gantt" :title="feature.title" :description="feature.description"
+        class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right" :ui="{
+          root: 'bg-[#2b3945]! ring-0',
+          container: 'shadow-xl',
+          title: 'title-md',
+          leadingIcon: 'h-6 w-6 text-secondary',
+          description: 'body-sm',
+          body: 'flex flex-col justify-evenly',
+        }">
+        </UPageCard>
       </template>
     </UPageSection>
 
@@ -74,7 +78,7 @@
         icon: 'i-lucide-mail',
         size: 'xl',
         variant: 'solid',
-        class: 'font-bold button button-monochrome',
+        class: 'font-bold button button-secondary',
       },
     ]" />
 
@@ -132,8 +136,9 @@
 
     <!-- final cta section -->
     <UPageCTA :title="cmsContent?.finalCta.title" :description="cmsContent?.finalCta.description" :ui="{
-      root: 'rounded-none ring-0',
-    }" class="bg-[#2b3945] text-[#fff]" :links="[
+      root: 'rounded-none ring-0 bg-(--blue-200)!',
+      header: 'text-(--monochrome-900)',
+    }" :links="[
       {
         label: cmsContent?.finalCta.buttonText || 'Contact Us',
         color: 'neutral',
@@ -248,8 +253,8 @@ function showSignupForm() {
   &__bg-change {
 
     @include mq.tablet {
-      background-color: var(--background-300);
-      padding: 10ch 0;
+      background-color: var(--blue-200);
+      padding: var(--size-120) 0;
     }
   }
 }

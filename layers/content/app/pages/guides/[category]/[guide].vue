@@ -1,20 +1,32 @@
 <template>
-  <UBreadcrumb
-    :items="[
-      { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
-      { label: guide?.category?.title || '', to: guide?.category ? `/guides/${guide.category.slug.current}` : undefined, icon: 'i-lucide-book-open' },
-      { label: guide?.title || '', to: undefined, icon: 'i-lucide-file-text' }
-    ]"
-    :ui="{
-      linkLeadingIcon: 'text-secondary',
-      link: 'text-(--foreground-100)',
-      root: 'container'
-    }"
-    class="m-4"
-  />
-  
-  <UContainer class="max-w-[75ch] py-8">
-    <div class="relative w-full aspect-video rounded-lg overflow-hidden my-8">
+  <div>
+    <OrganismsBannerHero
+      class="container"
+      compact
+      :description="guide?.excerpt"
+    >
+      <template #top>
+        <UBreadcrumb
+          :items="[
+            { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
+            { label: guide?.category?.title || '', to: guide?.category ? `/guides/${guide.category.slug.current}` : undefined, icon: 'i-lucide-book-open' },
+            { label: guide?.title || '', to: undefined, icon: 'i-lucide-file-text' }
+          ]"
+          :ui="{
+            linkLeadingIcon: 'text-secondary',
+            link: 'text-white',
+          }"
+          class="text-white pt-2 pb-2"
+        />
+      </template>
+
+      <template #title>
+        {{ guide?.title }}
+      </template>
+    </OrganismsBannerHero>
+
+    <UContainer class="max-w-[75ch] py-8">
+      <div class="relative w-full aspect-video rounded-lg overflow-hidden my-8">
       <NuxtImg
         provider="sanity" 
         :src="guide?.heroImage?.asset._ref"
@@ -45,6 +57,7 @@
     </div>
     <SanityContent v-if="guide?.content" :blocks="guide?.content" />
   </UContainer>
+  </div>
 
 </template>
 
