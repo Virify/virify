@@ -20,6 +20,7 @@
         aria-label="A lady holding a ruler against a wall and measuring" />
     </div>
 
+    <span v-if="caption" class="banner-hero__caption">{{ caption }}</span>
     <h1 class="banner-hero__title | title-2xl lineheight-xs">
       <slot name="title" />
     </h1>
@@ -36,6 +37,7 @@
 defineProps<{
   description?: string
   compact?: boolean
+  caption?: string
 }>()
 </script>
 
@@ -178,7 +180,7 @@ defineProps<{
   &__description {
     color: var(--monochrome-900);
     font-weight: normal;
-    max-width: 40ch;
+    max-width: 60ch;
     margin: 0 auto var(--size-64);
     position: relative;
     z-index: 1;
@@ -188,14 +190,14 @@ defineProps<{
     }
   }
 
-  /* Caption used inside the #title slot (e.g. "Launching Summer 2026") */
   &__caption {
     display: block;
-    font-size: 0.6em;
-    line-height: var(--lineheight-xs);
-    font-weight: var(--font-semibold);
+    font-size: var(--font-lg);
+    font-weight: bold;
     color: var(--primary-400);
-    margin: 0 auto var(--size-16);
+    position: relative;
+    z-index: 1;
+    margin-bottom: var(--size-8);
   }
 }
 </style>

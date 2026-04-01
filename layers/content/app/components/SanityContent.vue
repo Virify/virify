@@ -173,7 +173,7 @@ const customComponents = {
   }
 
   h1 {
-    font-size: clamp(2rem, 5vw, 2.5rem);
+    font-size: clamp(1.5rem, 4vw, 2rem);
     margin-top: var(--size-64);
     margin-bottom: var(--size-24);
 
@@ -183,7 +183,7 @@ const customComponents = {
   }
 
   h2 {
-    font-size: clamp(1.75rem, 4vw, 2rem);
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
     margin-top: var(--size-56);
     margin-bottom: var(--size-20);
     padding-bottom: var(--size-8);
@@ -195,7 +195,7 @@ const customComponents = {
   }
 
   h3 {
-    font-size: clamp(1.375rem, 3vw, 1.5rem);
+    font-size: clamp(1.125rem, 2.5vw, 1.25rem);
     margin-top: var(--size-48);
     margin-bottom: var(--size-16);
 
@@ -205,7 +205,7 @@ const customComponents = {
   }
 
   h4 {
-    font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+    font-size: clamp(1rem, 2vw, 1.125rem);
     margin-top: var(--size-40);
     margin-bottom: var(--size-12);
   }
@@ -227,7 +227,7 @@ const customComponents = {
 
   p {
     margin-bottom: var(--size-20);
-    font-size: clamp(1rem, 2vw, 1.125rem);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
     line-height: 1.75;
     color: var(--foreground-100);
   }
@@ -245,7 +245,7 @@ const customComponents = {
       padding-left: var(--size-32);
       line-height: 1.75;
       color: var(--foreground-100);
-      font-size: clamp(1rem, 2vw, 1.125rem);
+      font-size: clamp(0.875rem, 1.5vw, 1rem);
 
       &::before {
         position: absolute;
