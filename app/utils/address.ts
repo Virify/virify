@@ -1,19 +1,20 @@
 import type { AddressParsed } from '~~/shared/types/address';
+import { capataliseWords } from './strings/string-format';
 
 export const parseAddress = (address: any, postcode: string): AddressParsed => {
   return {
-    number: address.building_number || address.sub_building_number || null,
-    flat: address.sub_building_number || null,
-    name: address.building_name || address.sub_building_name || null,
-    street: address.thoroughfare || address.street || null,
-    city: address.town_or_city || address.city || null,
-    locality: address.locality || address.village || address.district || null,
-    county: address.county || address.province || null,
-    district: address.district || null,
-    country: address.country || 'United Kingdom',
-    postcode: address.postcode || postcode,
-    fullAddress: address.formatted_address ? address.formatted_address.filter((part: string) => part && part.trim()).join(', ') : null,
-    lat: address.latitude || null,
-    lon: address.longitude || null,
+    number: address.buildingNumber || null,
+    flat: address.buildingName || null,
+    name: address.buildingName || null,
+    street: address.thoroughfareAndDescriptor || null,
+    city: capataliseWords(address.postTown || address.city),
+    locality: capataliseWords(address.dependentLocality),
+    county: capataliseWords(address.county || address.province),
+    district: null,
+    country: capataliseWords(address.country) || 'United Kingdom',
+    postcode: address.postCode || postcode,
+    fullAddress: capataliseWords(address.envelopeAddress?.summaryLine) || null,
+    lat: parseFloat(address.latitude) || null,
+    lon: parseFloat(address.longitude) || null,
   };
 };

@@ -117,11 +117,9 @@ const postcode = ref("");
 const lookupPending = ref(false);
 const foundAddresses = ref<{ label: string; value: string }[]>([]);
 const rawAddresses = ref<any[]>([]);
-const selectedAddress = ref("");
+const selectedAddress = ref<string | undefined>(undefined);
 const addressError = ref<string | undefined>(undefined);
-// Store lat/lon from response level (getaddress.io returns these at top level, not per-address)
-const responseLat = ref<number | null>(null);
-const responseLon = ref<number | null>(null);
+const postcodeCache = new Map<string, any[]>();
 
 const clearAddress = () => {
   emit("update:modelValue", {
@@ -142,21 +140,34 @@ const clearAddress = () => {
   postcode.value = "";
   foundAddresses.value = [];
   rawAddresses.value = [];
-  selectedAddress.value = "";
+  selectedAddress.value = undefined;
   addressError.value = undefined;
-  responseLat.value = null;
-  responseLon.value = null;
+};
+
+const setAddressResults = (data: any[]) => {
+  rawAddresses.value = data;
+  foundAddresses.value = data.map((addr: any) => ({
+    label: capataliseWords(addr.envelopeAddress.summaryLine) ?? addr.envelopeAddress.summaryLine,
+    value: addr.envelopeAddress.summaryLine,
+  }));
 };
 
 const lookupPostcode = async () => {
   addressError.value = undefined;
-  if (!postcode.value) {
+  const normalised = postcode.value.trim().toUpperCase();
+  if (!normalised) {
     addressError.value = "Please enter a postcode";
     return;
   }
 
+  const cached = postcodeCache.get(normalised);
+  if (cached) {
+    setAddressResults(cached);
+    return;
+  }
+
   const config = useRuntimeConfig();
-  const apiKey = config.public.GETADDRESS_IO_API_KEY;
+  const apiKey = config.public.EASYPOSTCODES_KEY;
   if (!apiKey) {
     addressError.value = "Address lookup service not configured";
     return;
@@ -164,19 +175,13 @@ const lookupPostcode = async () => {
 
   lookupPending.value = true;
   try {
-    const data: any = await $fetch(`https://api.getaddress.io/find/${postcode.value}?api-key=${apiKey}&expand=true`);
+    const data: any = await $fetch(`https://api.easypostcodes.com/addresses/${normalised}?includeGeo=true`, {
+      headers: { 'Key': apiKey },
+    });
 
-    if (data && data.addresses && data.addresses.length > 0) {
-       console.log(data)
-      // Store lat/lon from response level (getaddress.io returns these at top level)
-      responseLat.value = data.latitude ?? null;
-      responseLon.value = data.longitude ?? null;
-      rawAddresses.value = data.addresses;
-      foundAddresses.value = data.addresses.map((addr: any) => {
-        const fullString = addr.formatted_address.filter((s: string) => s).join(", ");
-        const label = `${fullString}, ${postcode.value.toUpperCase()}`;
-        return { label, value: label };
-      });
+    if (data && data.length > 0) {
+      postcodeCache.set(normalised, data);
+      setAddressResults(data);
     } else {
       addressError.value = "No addresses found for this postcode";
     }
@@ -188,23 +193,10 @@ const lookupPostcode = async () => {
 };
 
 const onAddressSelect = (value: string) => {
-  if (value) {
-    const selectedRaw = rawAddresses.value.find((addr: any) => {
-      const fullString = addr.formatted_address.filter((s: string) => s).join(", ");
-      const label = `${fullString}, ${postcode.value.toUpperCase()}`;
-      return label === value;
-    });
-
-    if (selectedRaw) {
-      // Inject lat/lon from response level before parsing
-      const addressWithCoords = {
-        ...selectedRaw,
-        latitude: responseLat.value,
-        longitude: responseLon.value,
-      };
-      const parsed = parseAddress(addressWithCoords, postcode.value);
-      emit("update:modelValue", parsed);
-    }
+  const selectedRaw = rawAddresses.value.find((addr: any) => addr.envelopeAddress?.summaryLine === value);
+  if (selectedRaw) {
+    const parsed = parseAddress(selectedRaw, postcode.value);
+    emit("update:modelValue", parsed);
   }
 };
 </script>
