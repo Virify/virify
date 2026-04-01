@@ -229,9 +229,14 @@ onBeforeUnmount(() => {
     background: none;
     overflow: visible;
     pointer-events: auto;
+    transition: transform var(--animation-slow) var(--ease-in-out);
 
     @include mq.tablet {
       margin-top: 160px;
+    }
+
+    @starting-style {
+      transform: translateY(var(--size-64))
     }
   }
 
