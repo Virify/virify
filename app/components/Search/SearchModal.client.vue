@@ -13,7 +13,7 @@
         <SearchSkeleton v-if="isSearchLoading" />
       </div>
 
-      <SearchModalForm v-if="!isSearchLoading" @trigger-search="animateFormToDock" />
+      <SearchModalForm v-if="!isSearchLoading" @animate-to-dock="animateFormToDock" />
     </div>
   </div>
 </template>
@@ -136,6 +136,11 @@ function resetAnimation() {
 async function animateFormToDock() {
   await runAnimation()
   await navigateTo('/search')
+
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  })
 
   hideModal()
   resetAnimation()
