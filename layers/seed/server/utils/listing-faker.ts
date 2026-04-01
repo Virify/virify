@@ -304,6 +304,7 @@ export const batchCreateListings = async (items: ListingBatchItem[]): Promise<nu
 
   const BATCH_SIZE = 50;
   const createdListingIds: number[] = [];
+  const allAnalyticsPromises: Promise<unknown>[] = [];
 
   for (let i = 0; i < items.length; i += BATCH_SIZE) {
     const batch = items.slice(i, i + BATCH_SIZE);
@@ -326,24 +327,31 @@ export const batchCreateListings = async (items: ListingBatchItem[]): Promise<nu
 
     createdListingIds.push(...results.map(r => r.id));
     
-    // Generate analytics in background for this batch
-    const analyticsPromises = results.map(listing => 
-      Promise.all([
-        generateListingViews(listing.id),
-        generateListingImpressions(listing.id),
-        ...(listing.userId ? [generateDailyListingStats(listing.id, listing.userId)] : []),
-      ]).catch(err => console.error(`Analytics error for listing ${listing.id}:`, err))
-    );
-    
-    // Don't await - let analytics run in background
-    Promise.all(analyticsPromises).then(() => {
-      console.log(`📊 Analytics generated for batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+    // Queue analytics for this batch (collected and awaited after all batches)
+    const batchIndex = Math.floor(i / BATCH_SIZE) + 1;
+    const batchAnalytics = Promise.all(
+      results.map(listing => 
+        Promise.all([
+          generateListingViews(listing.id),
+          generateListingImpressions(listing.id),
+          ...(listing.userId ? [generateDailyListingStats(listing.id, listing.userId)] : []),
+        ]).catch(err => console.error(`Analytics error for listing ${listing.id}:`, err))
+      )
+    ).then(() => {
+      console.log(`📊 Analytics generated for batch ${batchIndex}`);
     });
+
+    allAnalyticsPromises.push(batchAnalytics);
 
     if ((i + BATCH_SIZE) % 200 === 0 || i + BATCH_SIZE >= items.length) {
       console.log(`  📦 Created ${Math.min(i + BATCH_SIZE, items.length)}/${items.length} listings...`);
     }
   }
+
+  // Wait for all analytics to complete before returning so process.exit() doesn't kill them
+  console.log('⏳ Awaiting analytics generation for all batches...');
+  await Promise.all(allAnalyticsPromises);
+  console.log('✅ All analytics generated.');
 
   return createdListingIds;
 };
