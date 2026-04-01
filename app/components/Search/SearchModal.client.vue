@@ -1,19 +1,22 @@
 <template>
   <div popover ref="modal" id="universal-search" class="search-modal">
-    <button type="button" class="search-modal__backdrop" @click.prevent="hideModal" aria-label="Close popover"></button>
+    <div class="search-modal__window">
+      <button type="button" class="search-modal__backdrop" @click.prevent="hideModal"
+        aria-label="Close popover"></button>
 
-    <button v-if="!isSearchLoading" type="button" class="search-modal__close-button | button button-ghost button-sm"
-      @click.prevent="hideModal">
-      <AtomsIcon icon="arrow-left" />
-      Close search
-    </button>
+      <button v-if="!isSearchLoading" type="button" class="search-modal__close-button | button button-ghost button-sm"
+        @click.prevent="hideModal">
+        <AtomsIcon icon="arrow-left" />
+        Close search
+      </button>
 
-    <div class="search-modal__content">
-      <div class="search-modal__pseudo-background | elevate-300" ref="backdrop">
-        <SearchSkeleton v-if="isSearchLoading" />
+      <div class="search-modal__content">
+        <div class="search-modal__pseudo-background | elevate-300" ref="backdrop">
+          <SearchSkeleton v-if="isSearchLoading" />
+        </div>
+
+        <SearchModalForm v-if="!isSearchLoading" @animate-to-dock="animateFormToDock" />
       </div>
-
-      <SearchModalForm v-if="!isSearchLoading" @animate-to-dock="animateFormToDock" />
     </div>
   </div>
 </template>
@@ -169,15 +172,67 @@ onBeforeUnmount(() => {
 @use "#styles/_utils/media" as mq;
 
 .search-modal {
-  width: min(calc(100% - var(--size-48)), 740px);
-  margin: 140px auto var(--size-32);
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  background: none;
   border: 0;
   padding: 0;
-  background: none;
-  overflow: visible;
+  margin: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  pointer-events: none;
 
-  @include mq.tablet {
-    margin: 160px auto var(--size-32);
+  // Use a button for additional backdrop to allow manually closing
+  &__backdrop {
+    cursor: pointer;
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+  }
+
+  &::backdrop {
+    background: var(--background-200);
+    transition: opacity var(--animation-slow) var(--ease-in-out);
+
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
+  &__backdrop,
+  &::backdrop {
+    // @TODO probably want to align these with the header
+    top: 60px;
+
+    @include mq.tablet {
+      top: 64px;
+    }
+
+    @include mq.notebook {
+      top: 68px;
+    }
+
+    @media (min-height: 940px) {
+      top: 78px;
+    }
+  }
+
+  &__window {
+    position: relative;
+    width: min(calc(100% - var(--size-48)), 740px);
+    margin: 140px auto var(--size-48);
+    border: 0;
+    padding: 0;
+    background: none;
+    overflow: visible;
+    pointer-events: auto;
+
+    @include mq.tablet {
+      margin-top: 160px;
+    }
   }
 
   &__close-button {
@@ -212,10 +267,11 @@ onBeforeUnmount(() => {
     transition: background-color, inset;
     transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-in-out);
-    inset: calc(0px - var(--size-16));
+    inset: calc(0px - var(--size-12));
 
     @include mq.tablet {
       border-radius: var(--border-radius-3xl);
+      inset: calc(0px - var(--size-16));
     }
 
     @starting-style {
@@ -223,38 +279,13 @@ onBeforeUnmount(() => {
       inset: 0;
     }
   }
+}
 
-  // Do not use native backdrop because we want to prevent content
-  // behind the backdrop being clickable
-  &::backdrop {
-    display: none;
-  }
+html {
+  scrollbar-gutter: stable;
 
-  &__backdrop {
-    cursor: pointer;
-    position: fixed;
-    inset: 0;
-    top: 60px;
-    background: var(--background-200);
-    transition: opacity var(--animation-slow) var(--ease-in-out);
-    z-index: -1;
-
-    @starting-style {
-      opacity: 0;
-    }
-
-    // @TODO probably want to align these with the header
-    @include mq.tablet {
-      top: 64px;
-    }
-
-    @include mq.notebook {
-      top: 68px;
-    }
-
-    @media (min-height: 940px) {
-      top: 78px;
-    }
+  &:has(.search-modal:popover-open) {
+    overflow: hidden;
   }
 }
 </style>
