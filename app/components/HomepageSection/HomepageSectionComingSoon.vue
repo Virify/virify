@@ -20,7 +20,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-const title = 'A smarter, completely free way to buy, sell and rent';
+const title = 'A smarter way to buy, sell and rent property, coming soon.';
 const description = 'Whether you\'re searching for your next home, selling privately, or an estate agent seeking a simpler, more cost-effective platform, join our waiting list for exclusive early access and updates. We\'re free to use at launch — supporting users while times are tough — and will remain so for the near future.';
 </script>
 
