@@ -171,6 +171,7 @@ const hasLocation = computed(() => {
     transition: height, margin;
     transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-in-out);
+    transition-delay: var(--animation-medium);
     overflow: clip;
     overflow-x: visible;
 

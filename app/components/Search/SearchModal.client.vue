@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
   margin: 0;
   overflow: auto;
   overscroll-behavior: contain;
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges;
   pointer-events: none;
 
   // Use a button for additional backdrop to allow manually closing
@@ -222,6 +222,7 @@ onBeforeUnmount(() => {
     overflow: visible;
     pointer-events: auto;
     transition: transform var(--animation-slow) var(--ease-in-out);
+    transition-delay: var(--animation-fast);
 
     @include mq.tablet {
       margin-top: 160px;
@@ -262,8 +263,9 @@ onBeforeUnmount(() => {
     border-radius: var(--border-radius-2xl);
     z-index: -1;
     transition: background-color, inset;
-    transition-duration: var(--animation-slow);
+    transition-duration: var(--animation-subtle);
     transition-timing-function: var(--ease-in-out);
+    transition-delay: var(--animation-fast);
     inset: calc(0px - var(--size-12));
 
     @include mq.tablet {
@@ -278,11 +280,7 @@ onBeforeUnmount(() => {
   }
 }
 
-html {
-  scrollbar-gutter: stable;
-
-  &:has(.search-modal:popover-open) {
-    overflow: hidden;
-  }
+html:has(.search-modal:popover-open) {
+  overflow: hidden;
 }
 </style>
