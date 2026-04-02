@@ -36,14 +36,14 @@
           description="View and manage your saved properties"
           icon="i-lucide-heart"
           to="/dashboard/favourites"
-          spotlight
-          spotlight-color="secondary"
-          variant="subtle"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'text-muted-foreground body-xs',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         />
         <UPageCard
@@ -51,29 +51,29 @@
           description="Review your property notes and annotations"
           icon="i-lucide-sticky-note"
           to="/dashboard/notes"
-          spotlight
-          spotlight-color="secondary"
-          variant="subtle"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'text-muted-foreground body-xs',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         />
         <UPageCard
           title="Search Properties"
           description="Find your perfect home with our search tools"
           icon="i-lucide-search"
-          spotlight
-          spotlight-color="secondary"
           to="/search"
-          variant="subtle"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'text-muted-foreground body-xs',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         />
         <UPageCard
@@ -81,14 +81,14 @@
           description="Track your property enquiries and responses"
           icon="i-lucide-mail"
           to="/dashboard/enquiries"
-          spotlight
-          spotlight-color="secondary"
-          variant="subtle"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'text-muted-foreground body-xs',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         />
       </div>
