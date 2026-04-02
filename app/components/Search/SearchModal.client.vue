@@ -221,15 +221,9 @@ onBeforeUnmount(() => {
     background: none;
     overflow: visible;
     pointer-events: auto;
-    transition: transform var(--animation-slow) var(--ease-in-out);
-    transition-delay: var(--animation-fast);
 
     @include mq.tablet {
       margin-top: 160px;
-    }
-
-    @starting-style {
-      transform: translateY(var(--size-64))
     }
   }
 
@@ -243,7 +237,7 @@ onBeforeUnmount(() => {
     background: none;
     color: currentColor;
     animation: fadeUp var(--animation-slow) var(--ease-in-out);
-    animation-delay: var(--animation-fast);
+    animation-delay: var(--animation-slow);
     animation-fill-mode: both;
 
     &:hover {

@@ -1,11 +1,11 @@
 <template>
   <section class="o-dock-banner | flow flow-lg">
-    <div class="o-dock-banner__form-height" role="presentation">
-      <MoleculesAiSearchFormLocation class="o-dock-banner__form" @location-selected="showModal" />
+    <div ref="form" class="o-dock-banner__form-height" role="presentation">
+      <MoleculesAiSearchFormLocation class="o-dock-banner__form" @location-selected="showModalFromElement" />
     </div>
 
     <AtomsButton v-if="hasLocation" class="o-dock-banner__toggle | button-full button-xs" type="button"
-      @click.prevent="showModal">
+      @click.prevent="showModalFromElement">
       Expand form
     </AtomsButton>
   </section>
@@ -15,8 +15,12 @@
 /**
  *  Show modal
  */
+const $form = useTemplateRef('form')
 const { showModal } = useGlobalSearch()
 
+function showModalFromElement() {
+  showModal($form.value)
+}
 
 /**
  *  Fetch filters
