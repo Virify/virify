@@ -47,7 +47,7 @@ const hasLocation = computed(() => {
   position: relative;
 
   &__form-height {
-    height: 7em;
+    height: 6em;
     overflow: visible;
 
     @include mq.tablet {

@@ -38,7 +38,7 @@
 
   &__search-dock {
     width: min(100%, 740px);
-    margin: 0 auto;
+    margin: 0 auto var(--size-48);
   }
 
   &__search-title {
