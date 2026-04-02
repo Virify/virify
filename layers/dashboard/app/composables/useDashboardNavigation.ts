@@ -17,15 +17,15 @@ export function useDashboardNavigation() {
         text: "Dashboard Home",
       },
     },
-    {
-      label: "Pricing & Tiers",
-      icon: "i-lucide-badge-pound-sterling",
-      tooltip: {
-        text: "See our pricing and plans",
-      },
-      type: "link",
-      to: "/dashboard/tiers",
-    },
+    // {
+    //   label: "Pricing & Tiers",
+    //   icon: "i-lucide-badge-pound-sterling",
+    //   tooltip: {
+    //     text: "See our pricing and plans",
+    //   },
+    //   type: "link",
+    //   to: "/dashboard/tiers",
+    // },
     {
       label: "Listings",
       icon: "i-lucide-house-heart",

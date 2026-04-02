@@ -18,11 +18,6 @@
 
     <template #body>
       <MoleculesDashboardPriceTier @select-tier="handleCreateListing" />
-      <h2 class="title-xs mb-0! flex items-center gap-2">
-        Quick analytics
-        <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
-      </h2>
-      <OrganismsDashboardAnalyticsCard />
 
       <!-- Quick Actions Grid -->
       <h2 class="title-xs mb-0! flex items-center gap-2">
@@ -92,6 +87,14 @@
           }"
         />
       </div>
+      
+      <h2 class="title-xs mb-0! flex items-center gap-2">
+        Quick analytics
+        <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
+      </h2>
+      <OrganismsDashboardAnalyticsCard />
+
+      
 
       <ClientOnly>
         <UAccordion

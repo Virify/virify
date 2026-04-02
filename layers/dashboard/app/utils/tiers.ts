@@ -2,7 +2,9 @@ export const basicFeatures: string[] = [
   'Listing creator tools',
   'Up to 8 images',
   'Verified identification and property ownership',
-  'Basic analytics'
+  'Analytics',
+  'Support for all',
+  'Carousel listing cards',
 ];
 
 export const professionalFeatures: string[] = [
@@ -26,9 +28,10 @@ export const premiumFeatures: string[] = [
 export const tableTiers = ref<any[]>([
   {
     id: 'basic',
-    title: 'Basic',
-    description: 'Entry level listing',
+    title: 'Personal',
+    description: 'Free to use',
     price: 'Free',
+    highlight: true,
     button: {
       label: 'Create Listing',
       color: 'neutral',
@@ -40,8 +43,7 @@ export const tableTiers = ref<any[]>([
     id: 'premium',
     title: 'Premium',
     description: 'Enhanced visibility',
-    price: 'Free',
-    highlight: true,
+    price: 'Coming soon',
     variant: 'subtle',
     button: {
       label: 'Create Listing',
@@ -54,7 +56,7 @@ export const tableTiers = ref<any[]>([
     id: 'professional',
     title: 'Professional',
     description: 'Professional features',
-    price: 'Free',
+    price: 'Coming soon',
     variant: 'soft',
     button: {
       label: 'Create Listing',
@@ -72,7 +74,7 @@ export const tableSections = ref([
       {
         title: 'Maximum photos',
         tiers: {
-          basic: '5',
+          basic: '8',
           premium: '50',
           professional: '20'
         }

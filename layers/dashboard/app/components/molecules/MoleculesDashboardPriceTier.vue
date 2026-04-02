@@ -1,10 +1,10 @@
 <template>
-  <UPageColumns class="max-w-500 items-center">
+  <!-- <UPageColumns> -->
+  <div>
     <UPricingPlan
-      title="Basic"
-      description="Entry level tier"
-      badge="Most value"
-      variant="soft"
+      title="Personal Tier"
+      badge="Free to use"
+      variant="subtle"
       price="Free"
       :ui="{
         title: 'title-sm mb-0!',
@@ -25,8 +25,9 @@
         class: ' body-sm cursor-pointer',
         onClick: () => emit('select-tier', ListingTier.BASIC),
       }"
+      class="w-full self-center max-w-200 mx-auto mb-8"
     />
-    <UPricingPlan
+    <!-- <UPricingPlan
       title="Premium"
       description="Enhanced visibility"
       price="Free"
@@ -77,8 +78,9 @@
         class: ' body-sm text-white! cursor-pointer',
         onClick: () => emit('select-tier', ListingTier.FEATURED),
       }"
-    />
-  </UPageColumns>
+    /> -->
+  </div>
+  <!-- </UPageColumns> -->
 </template>
 
 <script setup lang="ts">
@@ -90,6 +92,6 @@ const emit = defineEmits<{
 
 // Format features from tiers.ts config for UPricingPlan
 const basicFeaturesFormatted = basicFeatures.map((f: string) => ({ title: f }));
-const premiumFeaturesFormatted = premiumFeatures.map((f: string) => ({ title: f }));
-const professionalFeaturesFormatted = professionalFeatures.map((f: string) => ({ title: f }));
+// const premiumFeaturesFormatted = premiumFeatures.map((f: string) => ({ title: f }));
+// const professionalFeaturesFormatted = professionalFeatures.map((f: string) => ({ title: f }));
 </script>
