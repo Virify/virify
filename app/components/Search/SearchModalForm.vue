@@ -171,7 +171,8 @@ const hasLocation = computed(() => {
     transition: height, margin;
     transition-duration: var(--animation-slow);
     transition-timing-function: var(--ease-in-out);
-    overflow: hidden;
+    overflow: clip;
+    overflow-x: visible;
 
     @starting-style {
       height: 0;
