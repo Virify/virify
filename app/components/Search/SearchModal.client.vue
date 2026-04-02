@@ -1,5 +1,5 @@
 <template>
-  <div popover ref="modal" id="universal-search" class="search-modal">
+  <div popover ref="modal" :id="popoverId" class="search-modal">
     <div class="search-modal__window">
       <button type="button" class="search-modal__backdrop" @click.prevent="hideModal"
         aria-label="Close popover"></button>
@@ -22,15 +22,7 @@
 </template>
 
 <script setup lang="ts">
-const $modal = useTemplateRef('modal')
-
-function showModal() {
-  $modal.value?.showPopover()
-}
-
-function hideModal() {
-  $modal.value?.hidePopover()
-}
+const { popoverId, showModal, hideModal } = useGlobalSearch()
 
 /**
  *  Animate to dock when search is triggered

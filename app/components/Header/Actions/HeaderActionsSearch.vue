@@ -1,5 +1,5 @@
 <template>
-  <button popovertarget="universal-search" class="header-actions-search | body-xs" :class="{
+  <button type="button" @click.prevent="showModal" class="header-actions-search | body-xs" :class="{
     'header-actions-search--shortcut': showShortcut
   }">
     <span role="presentation" class="header-actions-search__text">
@@ -21,6 +21,8 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   showShortcut: false
 })
+
+const { showModal } = useGlobalSearch()
 </script>
 
 <style lang="scss">
