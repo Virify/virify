@@ -4,7 +4,7 @@
       <MoleculesAiSearchFormLocation class="o-dock-banner__form" @location-selected="showModal" />
     </div>
 
-    <AtomsButton v-if="hasLocation && !isExpanded" class="o-dock-banner__toggle | button-full button-xs" type="button"
+    <AtomsButton v-if="hasLocation" class="o-dock-banner__toggle | button-full button-xs" type="button"
       @click.prevent="showModal">
       Expand form
     </AtomsButton>
@@ -12,25 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
-
-interface Props {
-  listingType?: ListingType;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  listingType: 'all'
-});
-
 /**
  *  Show modal
  */
 const { showModal } = useGlobalSearch()
 
-/**
- *  Toggle filters as visible
- */
-const isExpanded = shallowRef(false)
 
 /**
  *  Fetch filters
@@ -47,15 +33,6 @@ const hasLocation = computed(() => {
 
   return import.meta.client && !!location
 })
-
-/**
- *  Close form on click outside
- */
-const $dock = useTemplateRef('$dock')
-
-onClickOutside($dock, () => (
-  isExpanded.value = false
-))
 
 </script>
 
