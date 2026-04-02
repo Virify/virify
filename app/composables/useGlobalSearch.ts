@@ -65,7 +65,7 @@ export function useGlobalSearch() {
     ], {
       duration: 200,
       delay: 150,
-      fill: 'both',
+      fill: 'backwards',
       easing: 'cubic-bezier(0, 0.7, 0.5, 1)'
     })
   }
