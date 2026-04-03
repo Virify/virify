@@ -34,7 +34,7 @@ const { showModal } = useGlobalSearch()
   align-items: center;
   font-weight: var(--font-bold);
   background: var(--background-200);
-  border: 1px solid var(--blue-600);
+  border: 1px solid light-dark(var(--blue-600), var(--blue-500));
   line-height: var(--lineheight-sm);
   border-radius: var(--border-radius-lg);
   transition: border-color var(--animation-fast) var(--ease-in-out);
@@ -46,7 +46,7 @@ const { showModal } = useGlobalSearch()
   }
 
   &:hover {
-    border-color: var(--blue-500);
+    border-color: var(--blue-600);
   }
 
   &__text {
@@ -66,8 +66,8 @@ const { showModal } = useGlobalSearch()
     align-items: center;
     gap: 0.25ch;
     padding: var(--size-4) var(--size-8);
-    background: var(--blue-700);
-    border: 1px solid var(--blue-600);
+    background: light-dark(var(--blue-700), var(--blue-400));
+    border: 1px solid light-dark(var(--blue-600), var(--blue-500));
     border-radius: var(--border-radius-md);
   }
 }
