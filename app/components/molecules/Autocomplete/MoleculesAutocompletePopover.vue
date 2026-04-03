@@ -235,8 +235,8 @@ const highlightedIndex = shallowRef(-1)
 const $root = useTemplateRef('root')
 
 // Auto-complete navigation
-function navigateAutocompleteSuggetions(e: KeyboardEvent) {
   if (!locationSuggestions.value?.length) return
+function navigateAutocompleteSuggestions(e: KeyboardEvent) {
 
   // Handle selections
   if (highlightedIndex.value && e.key === 'Enter') {
@@ -286,11 +286,11 @@ watch(() => props.searchValue, () => {
 })
 
 onMounted(() => {
-  window.addEventListener('keydown', navigateAutocompleteSuggetions)
+  window.addEventListener('keydown', navigateAutocompleteSuggestions)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', navigateAutocompleteSuggetions)
+  window.removeEventListener('keydown', navigateAutocompleteSuggestions)
 })
 
 </script>
