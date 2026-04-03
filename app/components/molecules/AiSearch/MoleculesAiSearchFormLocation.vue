@@ -6,7 +6,7 @@
 
         <input ref="$searchInput" type="text" class="m-ai-search-form-location__input | body-md"
           placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
-          @input="updateAutocompleteValue" @focus="showPopover" :autofocus="!!focusOnMount" />
+          @input="updateAutocompleteValue" @focus="showPopover" />
 
         <AtomsSelect name="radius" id="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
@@ -31,17 +31,6 @@
 
 <script setup lang="ts">
 import { onClickOutside, useDebounceFn } from "@vueuse/core";
-
-/**
- *  Allow focus on mount
- */
-interface Props {
-  focusOnMount?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  focusOnMount: false
-})
 
 /**
  *  Emits

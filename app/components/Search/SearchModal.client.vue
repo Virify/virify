@@ -1,15 +1,6 @@
 <template>
-  <div popover ref="modal" :id="popoverId" class="search-modal">
-    <div class="search-modal__window">
-      <button type="button" class="search-modal__backdrop" @click.prevent="hideModal"
-        aria-label="Close popover"></button>
-
-      <button v-if="!isSearchLoading" type="button" class="search-modal__close-button | button button-ghost button-sm"
-        @click.prevent="hideModal">
-        <AtomsIcon icon="arrow-left" />
-        Close search
-      </button>
-
+  <div popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
+    <div class="search-modal__window" ref="modal-content">
       <div class="search-modal__content">
         <div class="search-modal__pseudo-background | elevate-300" ref="backdrop">
           <SearchSkeleton v-if="isSearchLoading" />
@@ -17,12 +8,41 @@
 
         <SearchModalForm v-if="!isSearchLoading" @animate-to-dock="animateFormToDock" />
       </div>
+
+      <button type="button" class="search-modal__backdrop" @click.prevent="hideModal" aria-hidden
+        tabindex="-1"></button>
+
+      <button v-if="!isSearchLoading" type="button" class="search-modal__close-button | button button-ghost button-sm"
+        @click.prevent="hideModal">
+        <AtomsIcon icon="arrow-left" />
+        Close search
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
+
 const { popoverId, showModal, hideModal } = useGlobalSearch()
+
+/**
+ *  Activate focus trap on open, close
+ */
+const $modalContent = useTemplateRef('modal-content')
+const { hasFocus, activate, deactivate } = useFocusTrap($modalContent)
+
+async function toggleFocusTrap(event: ToggleEvent) {
+  const { newState } = asObject(event)
+
+  if (newState === 'open') {
+    activate()
+
+    return
+  }
+
+  deactivate()
+}
 
 /**
  *  Animate to dock when search is triggered

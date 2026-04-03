@@ -1,6 +1,6 @@
 <template>
   <div role="presentation" class="| flow flow-lg">
-    <MoleculesAiSearchFormLocation :focus-on-mount="!hasLocation" />
+    <MoleculesAiSearchFormLocation />
 
     <OrganismsFilterSwitcher v-if="hasLocation" class="search-form-modal__switcher">
       <template v-slot:traditional>
