@@ -17,7 +17,7 @@
 /**
  *  Toggle between search variant
  */
-const searchType = ref('ai');
+const searchType = useState("search-type", () => "ai");
 
 const toggleSearchType = [
   { value: "Traditional", key: "traditional" },
