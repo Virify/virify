@@ -243,7 +243,6 @@ onBeforeUnmount(() => {
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-  pointer-events: none;
 
   // Use a button for additional backdrop to allow manually closing
   &__backdrop {
