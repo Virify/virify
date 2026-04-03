@@ -16,8 +16,12 @@ export function useGlobalSearch() {
 
   /**
    *  Show modal
+   *
+   *  @TODO - casting initEl to make it more convenient to put inline
+   *          is a bit lazy. Maybe have separate functions for it initEl
+   *          exists?
    */
-  function showModal(initEl?: HTMLElement | null) {
+  function showModal(initEl?: HTMLElement | null | Event) {
     if (!import.meta.client) return
 
     const popoverEl = __getModalElement()
