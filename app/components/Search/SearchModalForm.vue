@@ -1,20 +1,20 @@
 <template>
-  <div role="presentation" class="| flow flow-lg">
-    <MoleculesAiSearchFormLocation />
-
+  <div role="presentation" class="search-form-modal">
     <OrganismsFilterSwitcher v-if="hasLocation" class="search-form-modal__switcher">
       <template v-slot:traditional>
         <OrganismsTraditionalSearchFormSkeleton v-if="isTraditionalFormLoading" />
 
         <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
-          @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
+          @submit-search="traditionalSearchSubmit" class="search-form-modal__toggle-content" />
       </template>
 
       <template v-slot:ai>
         <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit"
-          @reset-search="searchReset" :loading="isChecking" class="search-modal-form__toggle-content" />
+          @reset-search="searchReset" :loading="isChecking" />
       </template>
     </OrganismsFilterSwitcher>
+
+    <MoleculesAiSearchFormLocation class="search-form-modal__location" />
   </div>
 </template>
 
@@ -152,11 +152,21 @@ const hasLocation = computed(() => {
 </script>
 
 <style lang="scss">
+@use '#styles/_utils/media' as mq;
+
 .search-form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-16);
+
+  &__location {
+    order: 1;
+  }
 
   &__switcher {
     interpolate-size: allow-keywords;
 
+    order: 2;
     height: calc-size(max-content, size);
     transition: height, margin;
     transition-duration: var(--animation-slow);
@@ -168,6 +178,14 @@ const hasLocation = computed(() => {
     @starting-style {
       height: 0;
       margin: 0;
+    }
+  }
+
+  &__toggle-content {
+    padding: 0 var(--size-6) var(--size-6);
+
+    @include mq.small-tablet {
+      padding: 0 var(--size-16) var(--size-16);
     }
   }
 }
