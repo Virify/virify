@@ -15,23 +15,6 @@ body {
   @include mq.superultrawide {
     font-size: 1.125em;
   }
-
-  &:has(.search-modal:popover-open, .o-dialog[open]) {
-    overflow: hidden;
-
-    /**
-     *  @TODO - maybe want to set an explicit root ID to make sure this
-     *          is a bit more stable - can be done by adding:
-     *
-     *             rootAttrs: { id: 'my-id' }
-     *
-     *          in the Nuxt config at /nuxt.config.ts
-     */
-    #__nuxt {
-      scrollbar-gutter: stable;
-      overflow: hidden;
-    }
-  }
 }
 
 @media (prefers-color-scheme: dark) {

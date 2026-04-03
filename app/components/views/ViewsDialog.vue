@@ -89,6 +89,7 @@ watch(useRoute(), close)
   box-sizing: border-box;
   background: transparent;
   scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
 .o-dialog[open] {
