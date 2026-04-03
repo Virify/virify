@@ -167,7 +167,7 @@ const lookupPostcode = async () => {
   }
 
   const config = useRuntimeConfig();
-  const apiKey = config.public.EASYPOSTCODES_KEY;
+  const apiKey = config.public.EASYPOSTCODES_KEY as string;
   if (!apiKey) {
     addressError.value = "Address lookup service not configured";
     return;
