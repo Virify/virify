@@ -3,6 +3,7 @@
  */
 export function useModeration() {
   const isChecking = ref(false)
+  const { getImageUrls } = useCloudflare()
 
   async function moderate(body: { text?: string; images?: string[] }): Promise<{ safe: boolean; reason?: string }> {
     isChecking.value = true
@@ -41,10 +42,13 @@ export function useModeration() {
 
   /**
    * Check if image content is appropriate (e.g. listing photos)
+   * @param imageIds - Cloudflare image IDs
+   * @param variant - Image variant to fetch (defaults to 'public')
    */
-  async function checkImages(images: string[]): Promise<{ safe: boolean; reason?: string }> {
-    if (!images || images.length === 0) return { safe: true }
+  async function checkImages(imageIds: string[], variant = 'public'): Promise<{ safe: boolean; reason?: string }> {
+    if (!imageIds || imageIds.length === 0) return { safe: true }
 
+    const images = getImageUrls(imageIds, variant)
     const result = await moderate({ images })
     return result.safe ? result : {
       safe: false,
@@ -54,8 +58,12 @@ export function useModeration() {
 
   /**
    * Check both text and images together
+   * @param text - Text content to check
+   * @param imageIds - Cloudflare image IDs
+   * @param variant - Image variant to fetch (defaults to 'public')
    */
-  async function checkContent(text: string, images: string[]): Promise<{ safe: boolean; reason?: string }> {
+  async function checkContent(text: string, imageIds: string[], variant = 'public'): Promise<{ safe: boolean; reason?: string }> {
+    const images = getImageUrls(imageIds, variant)
     const result = await moderate({ text, images })
     return result.safe ? result : {
       safe: false,

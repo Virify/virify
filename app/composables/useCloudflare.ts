@@ -34,6 +34,25 @@ export const useCloudflare = () => {
   const isUploading = ref(false);
   const uploadError = ref<string | null>(null);
   const toast = useToast();
+  const { public: { CF_ACCOUNT_HASH } } = useRuntimeConfig();
+
+  /**
+   * Get the delivery URL for a Cloudflare image
+   * @param id - Cloudflare image ID
+   * @param variant - Image variant (defaults to 'public')
+   */
+  const getImageUrl = (id: string, variant = 'public'): string => {
+    return `https://imagedelivery.net/${CF_ACCOUNT_HASH}/${id}/${variant}`;
+  };
+
+  /**
+   * Get delivery URLs for multiple Cloudflare images
+   * @param ids - Array of Cloudflare image IDs
+   * @param variant - Image variant (defaults to 'public')
+   */
+  const getImageUrls = (ids: string[], variant = 'public'): string[] => {
+    return ids.map(id => getImageUrl(id, variant));
+  };
 
   /**
    * Upload an image to Cloudflare using direct upload
@@ -133,6 +152,8 @@ export const useCloudflare = () => {
   return {
     isUploading: isUploading as Ref<boolean>,
     uploadError: uploadError as Ref<string | null>,
+    getImageUrl,
+    getImageUrls,
     uploadImage,
     uploadImages,
     deleteImage,
