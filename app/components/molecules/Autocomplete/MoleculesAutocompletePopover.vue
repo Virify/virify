@@ -1,12 +1,12 @@
 <template>
-  <div class="m-autocomplete-popover | flow elevate-200">
+  <div ref="root" class="m-autocomplete-popover | flow elevate-200">
     <template v-if="searchValue && !suppressAutocomplete && !hideAutocomplete">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Suggestions</h3>
 
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
         v-slot="{ option, rowClass, actionClass, index }">
         <button type="button" :class="[rowClass, {
-          selected: index === currentHighlightedIndex
+          selected: index === highlightedIndex
         }]" @click.prevent="setLocation(option)">
           {{ option.place_name_en || option.place_name }}
         </button>
@@ -231,15 +231,30 @@ const autocompleteFeedback = computed(() => {
 /**
  *  a11y selection
  */
-const currentHighlightedIndex = shallowRef(-1)
+const highlightedIndex = shallowRef(-1)
+const $root = useTemplateRef('root')
 
 // Auto-complete navigation
 function navigateAutocompleteSuggetions(e: KeyboardEvent) {
-  const suggestionCount = locationSuggestions.value.length
-  const arrowKeys = ['ArrowUp', 'ArrowDown']
+  if (!locationSuggestions.value?.length) return
+
+  // Handle selections
+  if (highlightedIndex.value && e.key === 'Enter') {
+    e.preventDefault()
+
+    // Get current button
+    const selected = $root.value?.querySelector('button.selected')
+
+    // If button exists, click it
+    if (isElement(selected)) {
+      selected.click()
+    }
+
+    return
+  }
 
   // Ignore if no suggestions, or keys are not up/down on arrow pad
-  if (!suggestionCount || !arrowKeys.includes(e.key)) {
+  if (!['ArrowUp', 'ArrowDown'].includes(e.key)) {
     return
   }
 
@@ -248,26 +263,26 @@ function navigateAutocompleteSuggetions(e: KeyboardEvent) {
 
   // Move down
   if (e.key === 'ArrowDown') {
-    currentHighlightedIndex.value++
+    highlightedIndex.value++
 
-    if (currentHighlightedIndex.value >= suggestionCount) {
-      currentHighlightedIndex.value = 0
+    if (highlightedIndex.value >= locationSuggestions.value.length) {
+      highlightedIndex.value = 0
     }
 
     return
   }
 
   // Move up
-  currentHighlightedIndex.value--
+  highlightedIndex.value--
 
-  if (currentHighlightedIndex.value < 0) {
-    currentHighlightedIndex.value = suggestionCount - 1
+  if (highlightedIndex.value < 0) {
+    highlightedIndex.value = locationSuggestions.value.length - 1
   }
 }
 
 // Reset count on value change
 watch(() => props.searchValue, () => {
-  currentHighlightedIndex.value = -1
+  highlightedIndex.value = -1
 })
 
 onMounted(() => {
