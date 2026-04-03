@@ -1,5 +1,5 @@
 <template>
-  <div ref="root" popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
+  <div popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
     <div class="search-modal__window" ref="modal-content">
       <div class="search-modal__content">
         <div class="search-modal__pseudo-background | elevate-300" ref="backdrop">
@@ -183,29 +183,45 @@ onBeforeUnmount(() => {
 /**
  *  Hide menu on scroll
  */
-const $root = useTemplateRef('root')
-const MAX_SCROLL = 80;
+const MAX_SCROLL = 300;
 
 function updateBackdropOpacity() {
-  if (!$root.value) return
+  const rootEl = getRootElement()
 
-  const scrollTop = $root.value.scrollTop || 0
+  if (!isElement(rootEl)) return
+
+  const scrollTop = rootEl.scrollTop || 0
   const scrollOpacity = Math.min(MAX_SCROLL, scrollTop) / MAX_SCROLL
-  const scrollEase = 1 - (Math.pow(1 - scrollOpacity, 3))
+  const scrollEase = Math.min(1.6 - (Math.pow(1 - scrollOpacity, 3)), 1)
 
-  $root.value.style.setProperty('--backdrop-opacity', String(scrollEase))
+  rootEl.style.setProperty('--backdrop-opacity', String(scrollEase || 0))
+}
+
+/**
+ *  @TODO
+ *  Originally used const rootEl = useTemplateRef here, but it was not
+ *  always available onMounted and had to use await nextTick() to make
+ *  sure the element was available. So defaulting to getElementById
+ *  instead and can revisit later to go back to the Vue way of doing it
+ */
+function getRootElement() {
+  return document.getElementById(popoverId)
 }
 
 onMounted(async () => {
-  await nextTick()
+  const rootEl = getRootElement()
 
-  $root.value?.addEventListener('scroll', updateBackdropOpacity, {
+  updateBackdropOpacity()
+
+  rootEl?.addEventListener('scroll', updateBackdropOpacity, {
     passive: true
   })
 })
 
 onBeforeUnmount(() => {
-  $root.value?.removeEventListener('scroll', updateBackdropOpacity)
+  const rootEl = getRootElement()
+
+  rootEl?.removeEventListener('scroll', updateBackdropOpacity)
 })
 
 </script>
