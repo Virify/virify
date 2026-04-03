@@ -1,5 +1,5 @@
 <template>
-  <div popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
+  <div ref="root" popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
     <div class="search-modal__window" ref="modal-content">
       <div class="search-modal__content">
         <div class="search-modal__pseudo-background | elevate-300" ref="backdrop">
@@ -180,12 +180,42 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', showUniversalSearch)
 })
 
+/**
+ *  Hide menu on scroll
+ */
+const $root = useTemplateRef('root')
+const MAX_SCROLL = 80;
+
+function updateBackdropOpacity() {
+  if (!$root.value) return
+
+  const scrollTop = $root.value.scrollTop || 0
+  const scrollOpacity = Math.min(MAX_SCROLL, scrollTop) / MAX_SCROLL
+  const scrollEase = 1 - (Math.pow(1 - scrollOpacity, 3))
+
+  $root.value.style.setProperty('--backdrop-opacity', String(scrollEase))
+}
+
+onMounted(async () => {
+  await nextTick()
+
+  $root.value?.addEventListener('scroll', updateBackdropOpacity, {
+    passive: true
+  })
+})
+
+onBeforeUnmount(() => {
+  $root.value?.removeEventListener('scroll', updateBackdropOpacity)
+})
+
 </script>
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
 .search-modal {
+  --backdrop-opacity: 0;
+
   position: fixed;
   width: 100%;
   height: 100%;
@@ -204,33 +234,20 @@ onBeforeUnmount(() => {
     cursor: pointer;
     position: fixed;
     inset: 0;
+    right: 20px; // @TODO probably want to get this programmatically
     z-index: -1;
+    background: var(--background-200);
+    opacity: var(--backdrop-opacity);
   }
 
   &::backdrop {
+    inset: 0;
+    top: var(--header-height);
     background: var(--background-200);
     transition: opacity var(--animation-slow) var(--ease-in-out);
 
     @starting-style {
       opacity: 0;
-    }
-  }
-
-  &__backdrop,
-  &::backdrop {
-    // @TODO probably want to align these with the header
-    top: 60px;
-
-    @include mq.tablet {
-      top: 64px;
-    }
-
-    @include mq.notebook {
-      top: 68px;
-    }
-
-    @media (min-height: 940px) {
-      top: 78px;
     }
   }
 
