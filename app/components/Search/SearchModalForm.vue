@@ -4,17 +4,7 @@
 
     <OrganismsFilterSwitcher v-if="hasLocation" class="search-form-modal__switcher">
       <template v-slot:traditional>
-        <!-- @TODO put in a nicer skeleton loader here -->
-        <template v-if="isTraditionalFormLoading">
-          <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
-            <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-          </div>
-
-          <div class="o-dock-banner__toggle-content-loader">
-            <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-          </div>
-        </template>
-        <!-- @TODO end -->
+        <OrganismsTraditionalSearchFormSkeleton v-if="isTraditionalFormLoading" />
 
         <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
           @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
