@@ -177,6 +177,9 @@ async function setLocationFromSaved(option: Partial<UserLocation>) {
 async function setLocation(option: MaybeRef<GeocodingFeature>) {
   const rawOption = unref(option)
 
+  // Reset any autocomplete suggestions
+  resetHighlightedIndex()
+
   // Enhance location with boundary polygon before adding to history
   const enhancedLocation = await enhanceWithBoundaryPolygon(rawOption)
     .catch(() => rawOption)
@@ -234,12 +237,17 @@ const autocompleteFeedback = computed(() => {
 const highlightedIndex = shallowRef(-1)
 const $root = useTemplateRef('root')
 
+// Reset highlighted index
+function resetHighlightedIndex() {
+  highlightedIndex.value = -1
+}
+
 // Auto-complete navigation
-  if (!locationSuggestions.value?.length) return
 function navigateAutocompleteSuggestions(e: KeyboardEvent) {
+  if (!hideAutocomplete || !locationSuggestions.value?.length) return
 
   // Handle selections
-  if (highlightedIndex.value && e.key === 'Enter') {
+  if (highlightedIndex.value !== -1 && e.key === 'Enter') {
     e.preventDefault()
 
     // Get current button
@@ -281,9 +289,7 @@ function navigateAutocompleteSuggestions(e: KeyboardEvent) {
 }
 
 // Reset count on value change
-watch(() => props.searchValue, () => {
-  highlightedIndex.value = -1
-})
+watch(() => props.searchValue, resetHighlightedIndex)
 
 onMounted(() => {
   window.addEventListener('keydown', navigateAutocompleteSuggestions)
