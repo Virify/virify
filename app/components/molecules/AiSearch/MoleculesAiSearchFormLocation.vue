@@ -8,7 +8,7 @@
           placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
           @input="updateAutocompleteValue" @focus="showPopover" />
 
-        <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+        <AtomsSelect name="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
           v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
@@ -23,7 +23,7 @@
       </client-only>
     </div>
 
-    <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+    <AtomsSelect name="radius" aria-label="Location radius"
       class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
       v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
   </form>
