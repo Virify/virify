@@ -24,7 +24,7 @@ const initialQuery = ref('')
  *  Fetch filters
  */
 const { searchState, isLoading, setSearchType, setResults, setSearchPending, setQueryAnalysis } = useSearchState()
-const { checkContent, isChecking } = useModeration()
+const { checkText, isChecking } = useModeration()
 const toast = useToast()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
@@ -72,7 +72,7 @@ async function aiSearchSubmit(query: string) {
   }
 
   // Check content moderation before proceeding
-  const { safe, reason } = await checkContent(query)
+  const { safe, reason } = await checkText(query)
   if (!safe) {
     toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
     return

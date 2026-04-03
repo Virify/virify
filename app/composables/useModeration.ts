@@ -4,33 +4,21 @@
 export function useModeration() {
   const isChecking = ref(false)
 
-  /**
-   * Check if text content is appropriate
-   * Returns true if safe, false if flagged
-   */
-  async function checkContent(text: string): Promise<{ safe: boolean; reason?: string }> {
-    if (!text || text.trim().length === 0) {
-      return { safe: true }
-    }
-
+  async function moderate(body: { text?: string; images?: string[] }): Promise<{ safe: boolean; reason?: string }> {
     isChecking.value = true
-
     try {
-      const response = await $fetch('/api/moderation', {
+      const response = await useRequestFetch()('/api/moderation', {
         method: 'POST',
-        body: { text }
+        body,
       })
 
       if (response.flagged) {
-        return {
-          safe: false,
-          reason: 'Your search contains inappropriate content. Please try a different search.'
-        }
+        return { safe: false }
       }
 
       return { safe: true }
     } catch (error) {
-      // Fail open - if moderation fails, allow the search
+      // Fail open - if moderation fails, allow the content
       console.error('[Moderation] Check failed:', error)
       return { safe: true }
     } finally {
@@ -38,8 +26,47 @@ export function useModeration() {
     }
   }
 
+  /**
+   * Check if text content is appropriate (e.g. search queries, descriptions)
+   */
+  async function checkText(text: string): Promise<{ safe: boolean; reason?: string }> {
+    if (!text || text.trim().length === 0) return { safe: true }
+
+    const result = await moderate({ text })
+    return result.safe ? result : {
+      safe: false,
+      reason: 'Your search contains inappropriate content. Please try a different search.',
+    }
+  }
+
+  /**
+   * Check if image content is appropriate (e.g. listing photos)
+   */
+  async function checkImages(images: string[]): Promise<{ safe: boolean; reason?: string }> {
+    if (!images || images.length === 0) return { safe: true }
+
+    const result = await moderate({ images })
+    return result.safe ? result : {
+      safe: false,
+      reason: 'One or more images contain inappropriate content and cannot be uploaded.',
+    }
+  }
+
+  /**
+   * Check both text and images together
+   */
+  async function checkContent(text: string, images: string[]): Promise<{ safe: boolean; reason?: string }> {
+    const result = await moderate({ text, images })
+    return result.safe ? result : {
+      safe: false,
+      reason: 'Content contains inappropriate material.',
+    }
+  }
+
   return {
+    checkText,
+    checkImages,
     checkContent,
-    isChecking: readonly(isChecking)
+    isChecking: readonly(isChecking),
   }
 }
