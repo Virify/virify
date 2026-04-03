@@ -46,7 +46,7 @@ const { showModal } = useGlobalSearch()
   }
 
   &:hover {
-    border-color: var(--blue-600);
+    border-color: light-dark(var(--blue-500), var(--blue-600));
   }
 
   &__text {
