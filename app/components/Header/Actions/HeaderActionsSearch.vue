@@ -8,7 +8,7 @@
     </span>
 
     <span v-if="showShortcut" class="header-actions-search__shortcut">
-      &#x2318; + K
+      <AtomsMetaKey class="header-actions-search__shortcut-key" /> + K
     </span>
   </button>
 </template>
@@ -23,6 +23,7 @@ withDefaults(defineProps<Props>(), {
 })
 
 const { showModal } = useGlobalSearch()
+
 </script>
 
 <style lang="scss">
@@ -52,20 +53,22 @@ const { showModal } = useGlobalSearch()
     display: flex;
     align-items: center;
     gap: var(--size-6);
+
+    .a-icon {
+      display: block;
+      width: var(--size-20);
+      height: var(--size-20);
+    }
   }
 
   &__shortcut {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.25ch;
     padding: var(--size-4) var(--size-8);
     background: var(--blue-700);
     border: 1px solid var(--blue-600);
     border-radius: var(--border-radius-md);
-  }
-
-  .a-icon {
-    display: block;
-    width: var(--size-20);
-    height: var(--size-20);
   }
 }
 </style>
