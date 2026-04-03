@@ -30,7 +30,7 @@ const { popoverId, showModal, hideModal } = useGlobalSearch()
  *  Activate focus trap on open, close
  */
 const $modalContent = useTemplateRef('modal-content')
-const { hasFocus, activate, deactivate } = useFocusTrap($modalContent)
+const { activate, deactivate } = useFocusTrap($modalContent)
 
 async function toggleFocusTrap(event: ToggleEvent) {
   const { newState } = asObject(event)
