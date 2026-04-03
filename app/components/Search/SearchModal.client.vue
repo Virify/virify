@@ -270,6 +270,7 @@ onBeforeUnmount(() => {
     position: relative;
     width: 100%;
     margin: 0 auto;
+    z-index: 2;
   }
 
   &__pseudo-background {
