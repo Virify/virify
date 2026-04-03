@@ -3,7 +3,7 @@
  */
 export function useModeration() {
   const isChecking = ref(false)
-  const { getImageUrls } = useCloudflare()
+  const { getImageUrls, deleteImages } = useCloudflare()
 
   async function moderate(body: { text?: string; images?: string[] }): Promise<{ safe: boolean; reason?: string }> {
     isChecking.value = true
@@ -42,6 +42,7 @@ export function useModeration() {
 
   /**
    * Check if image content is appropriate (e.g. listing photos)
+   * Automatically deletes flagged images from Cloudflare
    * @param imageIds - Cloudflare image IDs
    * @param variant - Image variant to fetch (defaults to 'public')
    */
@@ -50,14 +51,21 @@ export function useModeration() {
 
     const images = getImageUrls(imageIds, variant)
     const result = await moderate({ images })
-    return result.safe ? result : {
-      safe: false,
-      reason: 'One or more images contain inappropriate content and cannot be uploaded.',
+
+    if (!result.safe) {
+      await deleteImages(imageIds)
+      return {
+        safe: false,
+        reason: 'One or more images contain inappropriate content and cannot be uploaded.',
+      }
     }
+
+    return { safe: true }
   }
 
   /**
    * Check both text and images together
+   * Automatically deletes flagged images from Cloudflare
    * @param text - Text content to check
    * @param imageIds - Cloudflare image IDs
    * @param variant - Image variant to fetch (defaults to 'public')
@@ -65,10 +73,16 @@ export function useModeration() {
   async function checkContent(text: string, imageIds: string[], variant = 'public'): Promise<{ safe: boolean; reason?: string }> {
     const images = getImageUrls(imageIds, variant)
     const result = await moderate({ text, images })
-    return result.safe ? result : {
-      safe: false,
-      reason: 'Content contains inappropriate material.',
+
+    if (!result.safe) {
+      await deleteImages(imageIds)
+      return {
+        safe: false,
+        reason: 'Content contains inappropriate material.',
+      }
     }
+
+    return { safe: true }
   }
 
   return {
