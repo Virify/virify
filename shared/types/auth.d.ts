@@ -10,5 +10,6 @@ declare module "#auth-utils" {
     membershipEndDate?: Date | null;
     role?: Role;
     activated?: ActivationStatus;
+    avatar?: string;
   }
 }
