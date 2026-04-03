@@ -4,8 +4,10 @@
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Suggestions</h3>
 
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
-        v-slot="{ option, rowClass, actionClass }">
-        <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
+        v-slot="{ option, rowClass, actionClass, index }">
+        <button type="button" :class="[rowClass, {
+          selected: index === currentHighlightedIndex
+        }]" @click.prevent="setLocation(option)">
           {{ option.place_name_en || option.place_name }}
         </button>
 
@@ -225,6 +227,57 @@ const autocompleteFeedback = computed(() => {
 
   return `No matches for "${searchValue}"`
 })
+
+/**
+ *  a11y selection
+ */
+const currentHighlightedIndex = shallowRef(-1)
+
+// Auto-complete navigation
+function navigateAutocompleteSuggetions(e: KeyboardEvent) {
+  const suggestionCount = locationSuggestions.value.length
+  const arrowKeys = ['ArrowUp', 'ArrowDown']
+
+  // Ignore if no suggestions, or keys are not up/down on arrow pad
+  if (!suggestionCount || !arrowKeys.includes(e.key)) {
+    return
+  }
+
+  // Prevent scrolling
+  e.preventDefault()
+
+  // Move down
+  if (e.key === 'ArrowDown') {
+    currentHighlightedIndex.value++
+
+    if (currentHighlightedIndex.value >= suggestionCount) {
+      currentHighlightedIndex.value = 0
+    }
+
+    return
+  }
+
+  // Move up
+  currentHighlightedIndex.value--
+
+  if (currentHighlightedIndex.value < 0) {
+    currentHighlightedIndex.value = suggestionCount - 1
+  }
+}
+
+// Reset count on value change
+watch(() => props.searchValue, () => {
+  currentHighlightedIndex.value = -1
+})
+
+onMounted(() => {
+  window.addEventListener('keydown', navigateAutocompleteSuggetions)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', navigateAutocompleteSuggetions)
+})
+
 </script>
 
 <style lang="scss">
