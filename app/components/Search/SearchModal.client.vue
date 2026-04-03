@@ -275,8 +275,4 @@ onBeforeUnmount(() => {
     }
   }
 }
-
-html:has(.search-modal:popover-open) {
-  overflow: hidden;
-}
 </style>
