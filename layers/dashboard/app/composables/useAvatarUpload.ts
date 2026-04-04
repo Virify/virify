@@ -31,6 +31,7 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
   const avatarFile = ref<File | undefined>(undefined)
   const avatarPreview = ref<string | undefined>(undefined)
   const avatarRemoving = ref(false)
+  const avatarModerating = ref(false)
 
   /** Persists the avatar URL (or empty string to clear) to the database */
   async function saveAvatarToDb(url: string) {
@@ -62,9 +63,9 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
       await saveAvatarToDb('')
       await refreshSession()
 
-      toast.add({ title: 'Avatar removed', color: 'success' })
+      toast.add({ title: 'Avatar removed', color: 'success', icon: 'i-lucide-check-circle' })
     } catch {
-      toast.add({ title: 'Error', description: 'Failed to remove avatar', color: 'error' })
+      toast.add({ title: 'Error', description: 'Failed to remove avatar', color: 'error', icon: 'i-lucide-circle-alert' })
     } finally {
       avatarRemoving.value = false
     }
@@ -75,14 +76,14 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
 
     // Validate format
     if (!ACCEPTED_AVATAR_TYPES.includes(file.type)) {
-      toast.add({ title: 'Invalid file type', description: 'Please upload a JPEG, PNG or WebP image.', color: 'error' })
+      toast.add({ title: 'Invalid file type', description: 'Please upload a JPEG, PNG or WebP image.', color: 'error', icon: 'i-lucide-circle-alert' })
       avatarFile.value = undefined
       return
     }
 
     // Validate size
     if (file.size > MAX_AVATAR_SIZE) {
-      toast.add({ title: 'File too large', description: 'Please upload an image smaller than 2MB.', color: 'error' })
+      toast.add({ title: 'File too large', description: 'Please upload an image smaller than 2MB.', color: 'error', icon: 'i-lucide-circle-alert' })
       avatarFile.value = undefined
       return
     }
@@ -99,9 +100,11 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
     }
 
     // 2. Moderate — auto-deletes from Cloudflare if flagged
+    avatarModerating.value = true
     const { safe, reason } = await checkImages([uploaded.id])
+    avatarModerating.value = false
     if (!safe) {
-      toast.add({ title: 'Image rejected', description: reason, color: 'error' })
+      toast.add({ title: 'Image rejected', description: reason, color: 'error', icon: 'i-lucide-circle-alert' })
       avatarFile.value = undefined
       avatarPreview.value = undefined
       return
@@ -117,13 +120,14 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
     }
     state.avatar = url
     avatarPreview.value = undefined
-    toast.add({ title: 'Avatar updated', color: 'success' })
+    toast.add({ title: 'Avatar updated', color: 'success', icon: 'i-lucide-check-circle' })
   })
 
   return {
     avatarFile,
     avatarPreview,
     avatarUploading,
+    avatarModerating,
     avatarRemoving,
     removeAvatar,
   }
