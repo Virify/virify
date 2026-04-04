@@ -18,7 +18,7 @@ export default defineNuxtPlugin(() => {
     immediate: false,
     autoClose: false,
     autoReconnect: {
-      retries: 3,
+      retries: (retried) => loggedIn.value && retried < 3,
       delay: 1000,
       onFailed() {
         console.warn("Failed to reconnect WebSocket after 3 attempts.");
@@ -155,7 +155,7 @@ export default defineNuxtPlugin(() => {
 
         // Trigger browser desktop notification if the user has enabled it
         // Suppress if the page is currently focused (in-app toast already shown)
-        if (canDesktop.value && Notification.permission === 'granted' && document.visibilityState === 'hidden') {
+        if (canDesktop.value && 'Notification' in window && Notification.permission === 'granted' && document.visibilityState === 'hidden') {
           const body = [
             notification.message,
             notification.listingAddress ? notification.listingAddress : null,
@@ -187,9 +187,11 @@ export default defineNuxtPlugin(() => {
 
     watch(
       () => loggedIn.value,
-      (newUser) => {
-        if (newUser && ws.status.value === "CLOSED") {
+      (isLoggedIn) => {
+        if (isLoggedIn && ws.status.value === "CLOSED") {
           ws.open();
+        } else if (!isLoggedIn && ws.status.value !== "CLOSED") {
+          ws.close();
         }
       },
       { immediate: true }

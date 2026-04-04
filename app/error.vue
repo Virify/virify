@@ -1,6 +1,16 @@
 <script setup lang="ts">
 const error = useError();
 
+// TODO: Remove after hotfix/homepage-500 is resolved
+console.error('[Error Page]', {
+  statusCode: error.value?.statusCode,
+  statusMessage: error.value?.statusMessage,
+  message: error.value?.message,
+  stack: error.value?.stack,
+  data: error.value?.data,
+  url: error.value?.url,
+});
+
 const errorTitle = computed(() => {
   switch (error.value?.statusCode) {
     case 404:

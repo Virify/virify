@@ -43,8 +43,9 @@ export const useNotificationPreferences = createSharedComposable(() => {
 
   // Browser Notification API permission status (client-only)
   const browserPermission = ref<NotificationPermission | null>(null);
+  const notificationsSupported = import.meta.client && 'Notification' in window;
 
-  if (import.meta.client) {
+  if (import.meta.client && notificationsSupported) {
     browserPermission.value = Notification.permission;
 
     // When user enables desktop notifications, request browser permission
