@@ -15,7 +15,7 @@
       </div>
 
       <div class="o-results__grid">
-        <PropertyCardRoot v-for="result of paginatedResults" :key="result.id" v-bind="mapToCardProps(result)" />
+        <PropertyCardRoot v-for="result of paginatedResults" :key="result.listingId" v-bind="result" />
       </div>
 
       <MoleculesPaginator v-if="requiresPagnination" :current-page="currentPage" :items-per-page="RESULTS_PER_PAGE"
@@ -98,7 +98,19 @@ const paginatedResults = computed(() => {
   if (!resultsLength.value) return []
 
   // Else return sliced results
-  return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value)
+  //
+  // @TODO - we probably want to have `.map(mapToCardProps)` earlier in
+  //         the lifecycle of data processing. Having this here means we
+  //         are re-formatting every time someone paginates, meaning a
+  //         user might end up formatting the same thing multiple times
+  //         if navigating back/forth. If we format earlier - maybe even
+  //         using the fetch(..., { transform: () => ... })) function -
+  //         we can optimise this even further and make data processing
+  //         even more simple
+  //
+  //         Leaving here for now as this works more than well enough
+  //         for the time being
+  return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value).map(mapToCardProps)
 })
 
 /**
