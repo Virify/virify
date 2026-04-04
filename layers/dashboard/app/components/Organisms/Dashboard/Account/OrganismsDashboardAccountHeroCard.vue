@@ -9,7 +9,7 @@
       title: 'title-sm',
     }">
     <div class="lg:col-span-1 flex justify-start lg:justify-end h-full lg:items-end w-full">
-      <UButton variant="solid" :disabled="disable" color="secondary" :label="label" size="md" :ui="{
+      <UButton variant="solid" :disabled="disable" :loading="loading" color="secondary" :label="label" size="md" :ui="{
         base: 'disabled:cursor-not-allowed!',
         label: 'text-(--monochrome-900) body-sm',
       }" type="submit" />
@@ -22,5 +22,6 @@
     description: string,
     label: string,
     disable?: boolean,
+    loading?: boolean,
   }>();
 </script>

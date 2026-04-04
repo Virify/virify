@@ -546,3 +546,39 @@ export async function updateUserSecurityById(id: number, email?: string, passwor
 export function isActive(user: UserWithVerification): boolean {
   return user.verification?.activated === 'UNVERIFIED' || user.verification?.activated === 'ACTIVATED';
 }
+
+/**
+ * Fetches a user's email address and notification preferences in a single query.
+ * Returns null if the user is not found.
+ */
+export async function getUserNotificationPreferences(userId: number) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      email: true,
+      preferences: {
+        select: {
+          notificationPreferences: {
+            select: {
+              receiveEmailNotifications: true,
+              receivePushNotifications: true,
+              receiveDesktopNotifications: true,
+            },
+            take: 1,
+          },
+        },
+      },
+    },
+  });
+
+  if (!user) return null;
+
+  const prefs = user.preferences?.notificationPreferences?.[0];
+
+  return {
+    email: user.email,
+    receiveEmailNotifications: prefs?.receiveEmailNotifications ?? true,
+    receivePushNotifications: prefs?.receivePushNotifications ?? true,
+    receiveDesktopNotifications: prefs?.receiveDesktopNotifications ?? true,
+  };
+}

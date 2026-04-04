@@ -2,6 +2,8 @@ import * as z from "zod";
 import { nanoid } from "nanoid";
 import { createConversation } from "~~/layers/database/server/utils/conversation";
 import { createEnquiryNotification } from "~~/layers/database/server/utils/notification";
+import { getUserNotificationPreferences } from "~~/layers/database/server/utils/user";
+import { sendEnquiryNotificationEmail } from "~~/layers/email/server/email/send-enquiry-notification";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
 
@@ -14,11 +16,11 @@ const conversationSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
-  const { sendMessage, createNewConversationMessage, createAggregateUpdateMessage, createNotificationNewMessage, isUserViewingConversation } = useWebSocketServer();
+  const { sendMessage, createNewConversationMessage, createAggregateUpdateMessage, createNotificationNewMessage, isUserViewingConversation, isUserOnline } = useWebSocketServer();
   
   try {
     const { listingId, receiverId, message } = await readValidatedBody(event, conversationSchema.parse);
-
+    const config = useRuntimeConfig();
     const userId = user.id;
 
     if (!userId) {
@@ -61,7 +63,7 @@ export default defineEventHandler(async (event) => {
         id: listing.id,
         price: listing.price ? Number(listing.price) : null,
         address: listing.property?.address?.fullAddress || null,
-        image: getMainImageUrl(listing.property),
+        image: getMainImageUrl(listing.property, config.public.CF_ACCOUNT_HASH as string, 'public'),
         isRental: !!listing.rentalListing,
       };
     }
@@ -93,6 +95,26 @@ export default defineEventHandler(async (event) => {
     if (createdNotification) {
       const notifMsg = createNotificationNewMessage(createdNotification, receiverId);
       sendMessage(notifMsg);
+    }
+
+    // 4. Send offline email if recipient is not connected to WebSocket
+    if (!isUserOnline(receiverId)) {
+      const recipientPrefs = await getUserNotificationPreferences(receiverId);
+      if (recipientPrefs?.receiveEmailNotifications) {
+        const baseUrl = config.public.EMAIL_BASE_URL;
+        sendEnquiryNotificationEmail({
+          to: recipientPrefs.email,
+          senderName: conversation.sender?.username || 'Someone',
+          message,
+          conversationUrl: `${baseUrl}/dashboard/enquiries/${conversation.id}`,
+          isReply: false,
+          listing: listingData ? {
+            address: listingData.address || '',
+            price: listingData.price ? `£${listingData.price.toLocaleString()}` : undefined,
+            image: listingData.image ?? undefined,
+          } : undefined,
+        }).catch((err) => console.error('Failed to send enquiry notification email:', err));
+      }
     }
 
     return conversation;
