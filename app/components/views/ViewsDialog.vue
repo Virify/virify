@@ -1,6 +1,6 @@
 <template>
   <Teleport to="#teleports">
-    <dialog ref="$dialog" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
+    <dialog ref="root" class="o-dialog" :class="dialog?.wrapperClassName" @close="afterClosed">
       <button class="o-dialog-backdrop" role="none" tabindex="-1" @click.prevent="handleBackdropClick"></button>
 
       <section v-if="dialog" class="o-dialog-window" :class="dialog.className">
@@ -16,34 +16,32 @@
 </template>
 
 <script setup>
-import { useScrollLock } from '@vueuse/core'
-
-const $dialog = useTemplateRef('$dialog')
-const body = ref(null)
+const $root = useTemplateRef('root')
 
 /**
  *  Monitor changes in dialog content
  */
 const { dialog, hideDialog } = useDialog()
-const isLocked = useScrollLock(body)
 
-onMounted(() => {
-  body.value = document.body
-  watchEffect(() => {
-    if (!dialog.value) {
-      $dialog.value.close()
-    } else {
-      $dialog.value.showModal()
-    }
-    isLocked.value = !!dialog.value
-  })
+watchEffect(() => {
+  if (dialog.value) {
+    open()
+
+    return
+  }
+
+  close()
 })
 
 /**
  *  Run the native dialog close function
  */
 function close() {
-  $dialog.value?.close()
+  $root.value?.close()
+}
+
+function open() {
+  $root.value?.showModal()
 }
 
 /**
@@ -51,8 +49,8 @@ function close() {
  * of backdrop-close (backdropClose: false) then do nothing.
  */
 function handleBackdropClick() {
-  if (!dialog?.value) return
-  if (dialog.value.backdropClose === false) return
+  if (!dialog?.value || dialog.value.backdropClose === false) return
+
   close()
 }
 
@@ -77,11 +75,6 @@ watch(useRoute(), close)
 @use '#styles/_utils/functions' as fn;
 @use '#styles/_utils/media' as mq;
 
-html,
-body {
-  scrollbar-gutter: stable;
-}
-
 .o-dialog {
   position: fixed;
   inset: 0;
@@ -96,6 +89,7 @@ body {
   box-sizing: border-box;
   background: transparent;
   scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
 .o-dialog[open] {

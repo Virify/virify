@@ -97,7 +97,7 @@ export default defineCachedEventHandler(async () => {
     },
     {
       id: "property-info",
-      label: "Property Information",
+      label: "Tools",
       type: "dropdown",
       children: [
         {
@@ -117,7 +117,7 @@ export default defineCachedEventHandler(async () => {
     },
     {
       id: "contact",
-      label: "Contact Us",
+      label: "Contact",
       href: "/contact/",
       type: "link",
     },

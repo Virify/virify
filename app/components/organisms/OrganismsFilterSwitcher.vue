@@ -1,12 +1,7 @@
 <template>
   <div class="o-property-filter">
-    <MoleculesSwitcher
-      name="search-type"
-      legend="Change search type"
-      :options="toggleSearchType"
-      v-model="searchType"
-      class="o-property-filter__switcher | gradient-box"
-    />
+    <MoleculesSwitcher name="search-type" legend="Change search type" :options="toggleSearchType" v-model="searchType"
+      init-selected="ai" class="o-property-filter__switcher | gradient-box" />
 
     <template v-if="searchType === 'traditional'">
       <slot name="traditional"></slot>

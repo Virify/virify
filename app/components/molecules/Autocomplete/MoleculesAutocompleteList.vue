@@ -2,6 +2,7 @@
   <ul class="m-autocomplete-list | r-body-md-xs">
     <li v-for="option, index of options" class="m-autocomplete-list__row" :key="index">
       <slot v-bind="{
+        index,
         option,
         rowClass: 'm-autocomplete-list__select',
         actionClass: 'm-autocomplete-list__action'
@@ -47,8 +48,9 @@ defineProps<Props<T>>()
       border-top: 1px solid var(--border-color-200);
     }
 
-    &:has(.m-autocomplete-list__select:hover) {
-      background: var(--background-200);
+    &:has(.m-autocomplete-list__select:hover),
+    &:has(.selected) {
+      background: var(--background-300);
     }
   }
 

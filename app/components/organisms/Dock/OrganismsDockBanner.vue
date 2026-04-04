@@ -1,276 +1,31 @@
 <template>
-  <section class="o-dock-banner__scrollbox" :class="{
-    'o-dock-banner__scrollbox--fullscreen': isExpandedWithLocation
-  }" role="presentation">
-    <div class="o-dock-banner__backdrop" :class="{ 'o-dock-banner__backdrop--visible': isExpandedWithLocation }">
+  <section class="o-dock-banner | flow flow-lg">
+    <div ref="form" class="o-dock-banner__form-height" role="presentation">
+      <MoleculesAiSearchFormLocation class="o-dock-banner__form" @location-selected="showModalFromElement" />
     </div>
 
-    <div class="o-dock-banner__form-height" role="presentation" v-bind="$attrs">
-      <div ref="$dock" tabindex="-1" class="o-dock-banner" @focusin="showExpandedForm">
-        <div class="o-dock-banner__pseudo-border | elevate-300" :class="{
-          'o-dock-banner__pseudo-border--hidden': !hasLocation
-        }" aria-hidden="true" ref="$backdrop">
-          <OrganismsDockMenuSkeleton v-if="isSearchLoading" class="o-dock-banner__pseudo-border-skeleton" />
-        </div>
-
-        <section class="o-dock-banner__fader | flow flow-lg" :hidden="isSearchLoading">
-          <MoleculesAiSearchFormLocation />
-
-          <client-only>
-            <Transition v-show="isExpandedWithLocation" name="o-dock-banner">
-
-              <OrganismsFilterSwitcher>
-                <template v-slot:traditional>
-                  <!-- @TODO put in a nicer skeleton loader here -->
-                  <template v-if="isTraditionalFormLoading">
-                    <div class="o-dock-banner__toggle-content-loader o-dock-banner__toggle-content-loader--dark">
-                      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-                    </div>
-
-                    <div class="o-dock-banner__toggle-content-loader">
-                      <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
-                    </div>
-                  </template>
-                  <!-- @TODO end -->
-
-                  <LazyOrganismsTraditionalSearchForm @is-loaded="hideTraditionalFormLoader"
-                    @submit-search="traditionalSearchSubmit" class="o-dock-banner__toggle-content" />
-                </template>
-
-                <template v-slot:ai>
-                  <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset
-                    @submit-search="aiSearchSubmit" @reset-search="searchReset" :loading="isChecking"
-                    class="o-dock-banner__toggle-content" />
-                </template>
-              </OrganismsFilterSwitcher>
-            </Transition>
-          </client-only>
-
-          <AtomsButton v-if="hasLocation && !isExpanded"
-            class="o-dock-banner__toggle | button-bordered button-full button-xs" type="button"
-            @click.prevent="showExpandedForm">
-            Expand form
-          </AtomsButton>
-        </section>
-      </div>
-    </div>
+    <AtomsButton v-if="hasLocation" class="o-dock-banner__toggle | button-full button-xs" type="button"
+      @click.prevent="showModalFromElement">
+      Expand form
+    </AtomsButton>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
-
-interface Props {
-  listingType?: ListingType;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  listingType: 'all'
-});
-
 /**
- *  Disable auto-inherited attributes
+ *  Show modal
  */
-defineOptions({
-  inheritAttrs: false
-})
+const $form = useTemplateRef('form')
+const { showModal } = useGlobalSearch()
 
-/**
- *  Manage lazy hydration
- */
-const isTraditionalFormLoading = ref(true)
-
-function hideTraditionalFormLoader() {
-  isTraditionalFormLoading.value = false
-}
-
-/**
- *  Animate dock to final position
- */
-const isSearchLoading = ref(false)
-const $backdrop = useTemplateRef('$backdrop')
-
-async function animateFormToDock() {
-  const backdropEl = $backdrop.value
-
-  // If backdrop is not an element, something is wrong
-  if (!isElement(backdropEl)) return
-
-  // Set 'searching' to be 'true'
-  isSearchLoading.value = true
-
-  // Get starting width, height and position of backdrop
-  const { width, height, bottom } = backdropEl.getBoundingClientRect()
-
-  // Set backdrop position to be fixed, with appropriate width, height
-  backdropEl.style.transition = 'none'
-  backdropEl.style.inset = 'unset'
-  backdropEl.style.position = 'fixed'
-  backdropEl.style.bottom = (window.innerHeight - bottom) + 'px'
-  backdropEl.style.left = '50%'
-  backdropEl.style.transform = 'translateX(-50%)'
-  backdropEl.style.width = width + 'px'
-  backdropEl.style.height = height + 'px'
-
-  // Get responsive sizes for final position
-  const finalAnimationState = {
-    width: '880px',
-    height: '63px',
-    bottom: '23px'
-  }
-
-  // Adjust final sizes based on screen size (hacky AF, but simplest way
-  // to do this)
-  const windowWidth = window.innerWidth
-
-  if (windowWidth < 1280) {
-    finalAnimationState.width = Math.min(800, windowWidth - 31) + 'px'
-  }
-  if (windowWidth < 1024) {
-    finalAnimationState.bottom = '16px'
-  }
-  if (windowWidth < 768) {
-    finalAnimationState.width = '450px'
-    finalAnimationState.height = '86px'
-    finalAnimationState.bottom = '10px'
-  }
-  if (windowWidth < 560) {
-    finalAnimationState.width = windowWidth - 23 + 'px'
-  }
-
-  // Return promise for animation
-  return new Promise(async (resolve, reject) => {
-    const animation = await backdropEl.animate([finalAnimationState], {
-      duration: 300,
-      easing: 'cubic-bezier(0.2, 1.1, 0.8, 1)',
-      fill: 'forwards'
-    })
-
-    // When finished, resolve
-    animation.onfinish = () => {
-      resolve(true)
-    }
-
-    // If cancelled, reject
-    animation.oncancel = () => {
-      reject(false)
-    }
-  })
-}
-
-/**
- *  Reset loading state after navigation
- */
-onMounted(() => {
-  isSearchLoading.value = false
-})
-
-/**
- *  Toggle filters as visible
- */
-const isExpanded = shallowRef(false)
-
-function showExpandedForm() {
-  isExpanded.value = true
+function showModalFromElement() {
+  showModal($form.value)
 }
 
 /**
  *  Fetch filters
  */
-const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
-const { checkText, isChecking } = useModeration()
-const toast = useToast()
-
-const initialQuery = computed(() => {
-  const { query } = asObject(searchState.value)
-
-  return query
-})
-
-async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location } = asObject(searchState.value)
-
-  if (!location) {
-    return
-  }
-
-  try {
-    await animateFormToDock()
-    setSearchPending(true)
-
-    // Build query analysis from form data for filter badges
-    const queryAnalysis = buildQueryAnalysisFromFormData(formData)
-
-    // Set search parameters and navigate instead of fetching here
-    // The search page will handle the fetch
-    searchState.value = {
-      ...asObject(searchState.value),
-      searchType: 'traditional',
-      traditionalSearchForm: formData,
-      queryAnalysis,
-      results: [], // Clear old results
-      hasSearched: false
-    }
-
-    // Navigate to search results page
-    await navigateTo('/search')
-
-  } catch (error) {
-    console.error('Traditional search error:', error)
-    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
-    setSearchPending(false)
-  }
-}
-
-async function aiSearchSubmit(query: string) {
-  setListingType(props.listingType)
-
-  const { location, radius, listingType } = asObject(searchState.value)
-
-  if (!location) {
-    return
-  }
-
-  // Check content moderation before proceeding
-  const { safe, reason } = await checkText(query)
-  if (!safe) {
-    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
-    return
-  }
-
-  try {
-    await animateFormToDock()
-    setSearchPending(true)
-
-    // Set search parameters and navigate instead of fetching here
-    // The search page will handle the fetch
-    searchState.value = {
-      ...asObject(searchState.value),
-      searchType: 'ai',
-      query,
-      listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
-      radius: radius ?? 5,
-      results: [], // Clear old results
-      hasSearched: false
-    }
-
-    // Navigate to search results page
-    await navigateTo('/search')
-
-    window.scrollTo({
-      top: 0,
-      behavior: "instant"
-    })
-  } catch (error) {
-    console.error('AI search error:', error)
-    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
-    setSearchPending(false)
-  }
-};
-
-function searchReset() {
-  setQuery('')
-}
+const { searchState } = useSearchState()
 
 /**
  *  Disable filters button if no location is added - to avoid hydration
@@ -283,52 +38,6 @@ const hasLocation = computed(() => {
   return import.meta.client && !!location
 })
 
-/**
- *  Simplify tracking isExpandedWithLocation
- */
-const isExpandedWithLocation = computed(() => {
-  return hasLocation.value && isExpanded.value
-})
-
-/**
- *  Close form on click outside
- */
-const $dock = useTemplateRef('$dock')
-
-onClickOutside($dock, () => {
-  isExpanded.value = false
-})
-
-/**
- *  Animate menu to scrollbox
- */
-watch(isExpandedWithLocation, async () => {
-  const dockWrapper = $dock.value
-
-  // If not an element, something has gone wrong. Abort
-  if (!isElement(dockWrapper)) return
-
-  // Get distance before any DOM updates
-  const { top: start } = dockWrapper.getBoundingClientRect()
-
-  // Await next tick
-  await nextTick()
-
-  // Get new distance
-  const { top: end } = dockWrapper.getBoundingClientRect()
-
-  // Calculate distance moved
-  const distanceMoved = end - start
-
-  // Animate element
-  dockWrapper.animate([
-    { transform: `translateY(${0 - distanceMoved}px)` },
-    { transform: 'none' },
-  ], {
-    duration: 200,
-    easing: 'cubic-bezier(0, 0.7, 0.5, 1)'
-  })
-})
 </script>
 
 <style lang="scss">
@@ -336,49 +45,9 @@ watch(isExpandedWithLocation, async () => {
 
 .o-dock-banner {
   position: relative;
-  z-index: 2;
-  text-align: left;
-
-  &__backdrop {
-    position: fixed;
-    inset: 0;
-    background: var(--background-200);
-    opacity: 0;
-    z-index: -1;
-    pointer-events: none;
-    transition: opacity var(--animation-slow);
-
-    &--visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-  }
-
-  &__scrollbox {
-    display: contents;
-
-    &--fullscreen {
-      display: block;
-      position: fixed;
-      inset: 0;
-      overflow: auto;
-      overscroll-behavior: contain;
-      scrollbar-width: none;
-      z-index: 10;
-    }
-  }
-
-  &__scrollbox--fullscreen &__form-height {
-    margin-top: 70px;
-    max-width: calc(100vw - var(--size-48));
-
-    @include mq.tablet {
-      margin-top: 120px;
-    }
-  }
 
   &__form-height {
-    height: 7em;
+    height: 6em;
     overflow: visible;
 
     @include mq.tablet {
@@ -386,47 +55,23 @@ watch(isExpandedWithLocation, async () => {
     }
   }
 
-  &__pseudo-border {
-    position: absolute;
-    z-index: -1;
-    inset: calc(0px - var(--size-12));
-    background: var(--background-100);
-    border-radius: var(--border-radius-2xl);
-    transition: box-shadow, inset, opacity;
-    transition-duration: var(--animation-slow);
-    transition-timing-function: var(--ease-in-out);
-    overflow: hidden;
-
-    @include mq.tablet {
-      border-radius: var(--border-radius-3xl);
-      inset: calc(0px - var(--size-16));
-    }
-
-    &--hidden {
-      box-shadow: none;
-      opacity: 0;
-      inset: 0;
-    }
-  }
-
-  &__pseudo-border-skeleton {
-    padding: var(--size-12);
-    height: 100%;
-    box-sizing: border-box;
-  }
-
-  &__fader {
-    min-width: 0;
-    transition: opacity var(--animation-medium) var(--ease-out);
-
-    &[disabled] {
-      opacity: 0;
-      pointer-events: none;
-    }
+  &__form {
+    position: relative;
+    z-index: 2;
   }
 
   &__toggle {
-    margin-top: var(--size-16);
+    position: absolute;
+    top: calc(100% + var(--size-16));
+    left: 0;
+    margin: 0;
+    color: var(--foreground-100);
+    background-color: var(--background-100);
+    transition: background-color var(--animation-fast) var(--ease-in-out);
+
+    &:hover {
+      background-color: var(--background-300);
+    }
 
     &--expanded {
       margin-top: var(--size-36);
@@ -472,25 +117,5 @@ watch(isExpandedWithLocation, async () => {
       color: var(--monochrome-900);
     }
   }
-}
-
-/**
- *  Toggle transitions
- */
-.o-dock-banner-enter-active,
-.o-dock-banner-leave-active {
-  interpolate-size: allow-keywords;
-
-  height: calc-size(max-content, size);
-  transition: height, margin;
-  transition-duration: var(--animation-slow);
-  transition-timing-function: var(--ease-out);
-  overflow: hidden;
-}
-
-.o-dock-banner-leave-to,
-.o-dock-banner-enter-from {
-  margin: 0;
-  height: 0;
 }
 </style>

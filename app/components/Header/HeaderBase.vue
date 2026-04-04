@@ -1,5 +1,5 @@
 <template>
-  <div class="header-base" ref="$header">
+  <div id="__header" class="header-base" ref="$header">
     <header class="header-base__inner | container">
       <LazyHeaderMobileRoot class="header-base__nav header-base__nav--mobile" hydrate-on-visible :menu="mainMenu" />
 
@@ -22,6 +22,8 @@
       </template>
     </header>
   </div>
+
+  <span role="presentation" class="header-base__spacer"></span>
 </template>
 
 <script setup lang="ts">
@@ -68,18 +70,8 @@ onBeforeUnmount(() => {
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
-.header-base {
+:root {
   --header-height: 60px;
-
-  position: sticky;
-  top: 0;
-  display: flex;
-  align-items: center;
-  background: var(--background-200);
-  height: var(--header-height);
-  padding: 0;
-  z-index: 9;
-  transition: box-shadow var(--animation-subtle) var(--ease-in-out);
 
   @include mq.tablet {
     --header-height: 64px;
@@ -92,6 +84,19 @@ onBeforeUnmount(() => {
       --header-height: 78px;
     }
   }
+}
+
+.header-base {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  display: flex;
+  align-items: center;
+  background: var(--background-200);
+  height: var(--header-height);
+  padding: 0;
+  z-index: 9;
+  transition: box-shadow var(--animation-subtle) var(--ease-in-out);
 
   &__inner {
     display: flex;
@@ -148,6 +153,11 @@ onBeforeUnmount(() => {
         display: block;
       }
     }
+  }
+
+  &__spacer {
+    display: block;
+    height: var(--header-height);
   }
 }
 </style>

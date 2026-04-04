@@ -56,9 +56,9 @@ export default defineEventHandler(async (event) => {
 
     // Fetch listings with or without pagination
     const shouldPaginate = page && limit;
-    const listings = shouldPaginate 
-      ? await fetchPaginatedListings(whereClause, page, limit)
-      : await fetchListings(whereClause);
+    const listings = shouldPaginate
+      ? await fetchPaginatedListingsForCard(whereClause, page, limit)
+      : await fetchListingsForCard(whereClause);
 
     const resultsWithListingType = listings.map((listing) => ({
       ...listing,

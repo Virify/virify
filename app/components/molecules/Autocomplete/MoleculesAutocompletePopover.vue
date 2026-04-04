@@ -1,11 +1,13 @@
 <template>
-  <div class="m-autocomplete-popover | flow elevate-200">
+  <div ref="root" class="m-autocomplete-popover | flow elevate-200">
     <template v-if="searchValue && !suppressAutocomplete && !hideAutocomplete">
       <h3 class="m-autocomplete-popover__title | title-3xs faded-text">Suggestions</h3>
 
       <MoleculesAutocompleteList v-if="locationSuggestions?.length" :options="locationSuggestions"
-        v-slot="{ option, rowClass, actionClass }">
-        <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
+        v-slot="{ option, rowClass, actionClass, index }">
+        <button type="button" :class="[rowClass, {
+          selected: index === highlightedIndex
+        }]" @click.prevent="setLocation(option)">
           {{ option.place_name_en || option.place_name }}
         </button>
 
@@ -175,6 +177,9 @@ async function setLocationFromSaved(option: Partial<UserLocation>) {
 async function setLocation(option: MaybeRef<GeocodingFeature>) {
   const rawOption = unref(option)
 
+  // Reset any autocomplete suggestions
+  resetHighlightedIndex()
+
   // Enhance location with boundary polygon before adding to history
   const enhancedLocation = await enhanceWithBoundaryPolygon(rawOption)
     .catch(() => rawOption)
@@ -225,6 +230,75 @@ const autocompleteFeedback = computed(() => {
 
   return `No matches for "${searchValue}"`
 })
+
+/**
+ *  a11y selection
+ */
+const highlightedIndex = shallowRef(-1)
+const $root = useTemplateRef('root')
+
+// Reset highlighted index
+function resetHighlightedIndex() {
+  highlightedIndex.value = -1
+}
+
+// Auto-complete navigation
+function navigateAutocompleteSuggestions(e: KeyboardEvent) {
+  if (!hideAutocomplete || !locationSuggestions.value?.length) return
+
+  // Handle selections
+  if (highlightedIndex.value !== -1 && e.key === 'Enter') {
+    e.preventDefault()
+
+    // Get current button
+    const selected = $root.value?.querySelector('button.selected')
+
+    // If button exists, click it
+    if (isElement(selected)) {
+      selected.click()
+    }
+
+    return
+  }
+
+  // Ignore if no suggestions, or keys are not up/down on arrow pad
+  if (!['ArrowUp', 'ArrowDown'].includes(e.key)) {
+    return
+  }
+
+  // Prevent scrolling
+  e.preventDefault()
+
+  // Move down
+  if (e.key === 'ArrowDown') {
+    highlightedIndex.value++
+
+    if (highlightedIndex.value >= locationSuggestions.value.length) {
+      highlightedIndex.value = 0
+    }
+
+    return
+  }
+
+  // Move up
+  highlightedIndex.value--
+
+  if (highlightedIndex.value < 0) {
+    highlightedIndex.value = locationSuggestions.value.length - 1
+  }
+}
+
+// Reset count on value change
+watch(() => props.searchValue, resetHighlightedIndex)
+
+onMounted(() => {
+  window.addEventListener('keydown', navigateAutocompleteSuggestions)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', navigateAutocompleteSuggestions)
+})
+
 </script>
 
 <style lang="scss">

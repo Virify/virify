@@ -55,7 +55,7 @@
       </div>
 
       <div v-if="!disabledInteractions" class="property-card-root__footer" aria-role="presentation">
-        <PropertyCardSeller :name="sellerName" />
+        <PropertyCardSeller :name="sellerName" :profile-image="sellerImage" />
 
         <div role="presentation" class="property-card-root__footer-text">
           <span role="presentation" class="property-card-root__footer-name | body-xs">
@@ -162,7 +162,6 @@ const timeAgo = computed(() => {
 </script>
 
 <style lang="scss">
-@use "#styles/_utils/media" as mq;
 @use "#styles/_utils/functions" as fn;
 
 @mixin small-card {
@@ -216,6 +215,10 @@ const timeAgo = computed(() => {
   &__price-amount {
     margin: var(--size-4) 0;
     line-height: 1;
+
+    @include small-card {
+      font-size: var(--title-sm);
+    }
   }
 
   &__price-frequency {

@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="hidePopover" class="| flow">
+  <form @submit.prevent="hidePopover" class="| flow" tabindex="-1" @keydown.escape="hidePopover">
     <div role="presentation" ref="$location" class="m-ai-search-form-location__container | flow flow-lg">
       <fieldset class="m-ai-search-form-location__fieldset | gradient-box">
         <legend class="| visually-hidden">Location</legend>
@@ -8,7 +8,7 @@
           placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
           @input="updateAutocompleteValue" @focus="showPopover" />
 
-        <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+        <AtomsSelect name="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
           v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
@@ -23,7 +23,7 @@
       </client-only>
     </div>
 
-    <AtomsSelect name="radius" id="radius" aria-label="Location radius"
+    <AtomsSelect name="radius" aria-label="Location radius"
       class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
       v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
   </form>
@@ -31,6 +31,11 @@
 
 <script setup lang="ts">
 import { onClickOutside, useDebounceFn } from "@vueuse/core";
+
+/**
+ *  Emits
+ */
+const emit = defineEmits(['location-selected'])
 
 /**
  *  Set autocomplete value
@@ -87,6 +92,15 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
 
   // Update global state
   setLocation(enhancedLocation, hidePopover)
+
+  // Close popover
+  hidePopover()
+
+  // Let DOM refresh before showing modal, so location popover is closed
+  await nextTick()
+
+  // Emit event to parent
+  emit('location-selected')
 }
 
 /**
@@ -161,6 +175,8 @@ onMounted(() => {
   }
 
   &__popover {
+    text-align: left;
+
     @include mq.not-tablet {
       margin: 0;
 
