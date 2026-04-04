@@ -19,6 +19,6 @@ export default defineEventHandler(async (event) => {
   return preferences ?? {
     receiveEmailNotifications: true,
     receivePushNotifications: true,
-    receiveDesktopNotifications: true,
+    receiveDesktopNotifications: false,
   };
 });

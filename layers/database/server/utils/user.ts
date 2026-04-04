@@ -573,12 +573,12 @@ export async function getUserNotificationPreferences(userId: number) {
 
   if (!user) return null;
 
-  const prefs = user.preferences?.notificationPreferences?.[0];
+  const prefs = user.preferences?.[0]?.notificationPreferences?.[0];
 
   return {
     email: user.email,
     receiveEmailNotifications: prefs?.receiveEmailNotifications ?? true,
     receivePushNotifications: prefs?.receivePushNotifications ?? true,
-    receiveDesktopNotifications: prefs?.receiveDesktopNotifications ?? true,
+    receiveDesktopNotifications: prefs?.receiveDesktopNotifications ?? false,
   };
 }

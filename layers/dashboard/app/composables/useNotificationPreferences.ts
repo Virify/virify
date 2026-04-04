@@ -15,7 +15,7 @@ export const useNotificationPreferences = createSharedComposable(() => {
   const state = reactive<Schema>({
     receiveEmailNotifications: true,
     receivePushNotifications: true,
-    receiveDesktopNotifications: true,
+    receiveDesktopNotifications: false,
   });
 
   watch(
