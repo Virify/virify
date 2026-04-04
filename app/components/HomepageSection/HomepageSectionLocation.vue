@@ -49,9 +49,9 @@ const contentSection = [
   gap: var(--size-32);
   align-items: center;
   justify-content: center;
+  color: var(--monochrome-900);
 
   @include mq.tablet {
-    margin-top: var(--size-120);
     grid-template-columns: 1fr 1fr;
     gap: var(--size-56);
     align-items: flex-start;

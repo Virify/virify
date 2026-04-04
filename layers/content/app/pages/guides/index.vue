@@ -1,21 +1,28 @@
 <template>
-  <UPageSection
-    title="Virify Guides"
-    description="Complete step-by-step guides for buying, selling, and renting properties. Learn how to find the right property, negotiate deals, and navigate the entire process with confidence."
-  >
-    <template #top>
-      <UBreadcrumb
-        :items="[
-          { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
-        ]"
-        :ui="{
-          linkLeadingIcon: 'text-secondary',
-          root: 'container'
-        }"
-        class="m-4 text-(--foreground-100)"
-      />
-    </template>
-    <UBlogPosts>
+  <div>
+    <OrganismsBannerHero
+      class="container"
+      compact
+      description="Complete step-by-step guides for buying, selling, and renting properties."
+    >
+      <template #top>
+        <UBreadcrumb
+          :items="[
+            { label: 'Guides', to: '/guides', icon: 'i-lucide-home' },
+          ]"
+          :ui="{
+            linkLeadingIcon: 'text-secondary',
+          }"
+          class="text-white pt-2 pb-2"
+        />
+      </template>
+
+      <template #title>
+        Virify Guides
+      </template>
+    </OrganismsBannerHero>
+
+    <UBlogPosts class="pt-8 pb-8 | container">
       <UBlogPost
         v-for="(category, index) in categories"
         :key="index"
@@ -54,7 +61,7 @@
         }"
       />
     </UBlogPosts>
-  </UPageSection>
+  </div>
 </template>
 
 <script setup lang="ts">

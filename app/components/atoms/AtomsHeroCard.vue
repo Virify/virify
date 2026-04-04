@@ -31,8 +31,8 @@ const variantClass = props.variant === 'primary'
   justify-content: space-around;
   padding: var(--size-32);
   gap: var(--size-8);
-  background: url('/img/logo-background.svg') no-repeat bottom right, var(--blue-400);
-  background-size: auto 180%, cover;
+  background: var(--blue-200);
+  background-size: auto 300%, cover;
   color: var(--monochrome-900);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 

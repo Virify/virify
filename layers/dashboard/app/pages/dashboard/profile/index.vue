@@ -108,24 +108,38 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Avatar" name="avatar" orientation="horizontal" description="URL to your profile picture" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
-              <UInput
-                v-model="state.avatar"
-                type="url"
-                placeholder="avatar"
-                variant="subtle"
-                :loading="pending"
-                color="secondary"
-                class="w-full md:w-80"
-                :ui="{
-                  base: 'pl-16 placeholder:text-(--foreground-200)/50!',
-                  leadingIcon: 'text-(--foreground-200)/50',
-                }"
-              >
-                <template #leading>
-                  <p class="body-sm">https://</p>
-                </template>
-              </UInput>
+            <UFormField label="Avatar" name="avatar" orientation="horizontal" description="Upload your profile picture (JPEG, PNG or WebP, max 2MB)" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+              <UFileUpload v-slot="{ open, removeFile }" v-model="avatarFile" accept="image/jpeg,image/jpg,image/png,image/webp">
+                <div class="flex flex-wrap items-center gap-3">
+                  <UAvatar
+                    size="lg"
+                    :src="avatarPreview || state.avatar || undefined"
+                    icon="i-lucide-image"
+                    :as="{ img: 'img' }"
+                  />
+                  <UButton
+                    :label="avatarModerating ? 'Moderating...' : state.avatar ? 'Change image' : 'Upload image'"
+                    color="neutral"
+                    variant="outline"
+                    :loading="avatarUploading || avatarModerating"
+                    :disabled="avatarUploading || avatarModerating"
+                    @click="open()"
+                  />
+                </div>
+                <div v-if="avatarFile || state.avatar" class="flex items-center justify-between w-full mt-1.5">
+                  <p class="text-xs text-muted">{{ avatarFile?.name ?? 'Current avatar' }}</p>
+                  <UButton
+                    icon="i-lucide-trash"
+                    color="secondary"
+                    variant="solid"
+                    size="xs"
+                    class="text-white!"
+                    :loading="avatarRemoving"
+                    :disabled="avatarRemoving"
+                    @click="removeAvatar(removeFile)"
+                  />
+                </div>
+              </UFileUpload>
             </UFormField>
 
             <USeparator class="my-4" />
@@ -200,4 +214,5 @@ const { accountNavigationItems } = useDashboardNavigation();
 const { state, pending, onSubmit, profileSchema } = await useProfileForm();
 const intents = profileIntents;
 
+const { avatarFile, avatarPreview, avatarUploading, avatarModerating, avatarRemoving, removeAvatar } = useAvatarUpload(state);
 </script>

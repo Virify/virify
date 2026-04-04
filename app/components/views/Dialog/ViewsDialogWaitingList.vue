@@ -19,5 +19,9 @@
   .homepage-section-signup-form__text-input {
     border: 1px solid var(--input-text-border);
   }
+
+  .homepage-section-signup-form__consent {
+    color: var(--foreground-100);
+  }
 }
 </style>

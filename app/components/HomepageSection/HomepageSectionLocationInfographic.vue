@@ -403,6 +403,7 @@ useIntersectionObserver($root, ([entry]) => {
   position: relative;
   width: min(100%, 36rem);
   min-height: 28rem;
+  color: var(--foreground-100);
 
   &::before {
     content: '';
@@ -410,7 +411,7 @@ useIntersectionObserver($root, ([entry]) => {
     inset: 0;
     z-index: 2;
     opacity: 0;
-    background: var(--background-200);
+    background: var(--blue-200);
     pointer-events: none;
     transition: opacity var(--animation-subtle);
   }

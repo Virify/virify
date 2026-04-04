@@ -25,7 +25,104 @@ function showModalFromElement() {
 /**
  *  Fetch filters
  */
+<<<<<<< HEAD
 const { searchState } = useSearchState()
+=======
+const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
+const { checkText, isChecking } = useModeration()
+const toast = useToast()
+
+const initialQuery = computed(() => {
+  const { query } = asObject(searchState.value)
+
+  return query
+})
+
+async function traditionalSearchSubmit(formData: TraditionalSearchData) {
+  const { location } = asObject(searchState.value)
+
+  if (!location) {
+    return
+  }
+
+  try {
+    await animateFormToDock()
+    setSearchPending(true)
+
+    // Build query analysis from form data for filter badges
+    const queryAnalysis = buildQueryAnalysisFromFormData(formData)
+
+    // Set search parameters and navigate instead of fetching here
+    // The search page will handle the fetch
+    searchState.value = {
+      ...asObject(searchState.value),
+      searchType: 'traditional',
+      traditionalSearchForm: formData,
+      queryAnalysis,
+      results: [], // Clear old results
+      hasSearched: false
+    }
+
+    // Navigate to search results page
+    await navigateTo('/search')
+
+  } catch (error) {
+    console.error('Traditional search error:', error)
+    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
+    setSearchPending(false)
+  }
+}
+
+async function aiSearchSubmit(query: string) {
+  setListingType(props.listingType)
+
+  const { location, radius, listingType } = asObject(searchState.value)
+
+  if (!location) {
+    return
+  }
+
+  // Check content moderation before proceeding
+  const { safe, reason } = await checkText(query)
+  if (!safe) {
+    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
+    return
+  }
+
+  try {
+    await animateFormToDock()
+    setSearchPending(true)
+
+    // Set search parameters and navigate instead of fetching here
+    // The search page will handle the fetch
+    searchState.value = {
+      ...asObject(searchState.value),
+      searchType: 'ai',
+      query,
+      listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
+      radius: radius ?? 5,
+      results: [], // Clear old results
+      hasSearched: false
+    }
+
+    // Navigate to search results page
+    await navigateTo('/search')
+
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    })
+  } catch (error) {
+    console.error('AI search error:', error)
+    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
+    setSearchPending(false)
+  }
+};
+
+function searchReset() {
+  setQuery('')
+}
+>>>>>>> main
 
 /**
  *  Disable filters button if no location is added - to avoid hydration

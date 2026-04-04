@@ -1,32 +1,30 @@
 <template>
   <div class="price-paid-page">
-    <!-- Hero like the homepage -->
-    <OrganismsHero title="{gradient}Price Paid{/gradient} Data"
-      subtitle="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address." />
+    <!-- Hero with search form inside -->
+    <OrganismsBannerHero class="container" compact description="Real sold prices from HM Land Registry. Search by postcode to see sale histories and trends for any address.">
+      <template #title>Price Paid Data</template>
 
-    <!-- Form + results (unchanged) -->
-    <div class="price-paid | container">
-      <AtomsHeroCard class="price-paid__hero">
-        <p class="| body-md">Enter a UK postcode and search for property sales history</p>
+      <div class="price-paid__search-form">
         <div class="price-paid__search">
           <div class="price-paid__input">
-            <AtomsInput v-model="searchQuery" type="text" placeholder="e.g., 'CF10 1AA' or 'cf101aa'" required
-              class="| body-sm" :disabled="loading" @keyup.enter="search" />
+            <AtomsInput v-model="searchQuery" type="text" placeholder="e.g., 'CF10 1AA' or 'cf101aa'" required class="| body-sm" :disabled="loading" @keyup.enter="search" />
           </div>
           <div class="price-paid__button">
-            <button class="| button button-secondary button-md" @click="search" :disabled="loading">
+            <UButton variant="solid" size="lg" icon="i-lucide-search" :disabled="loading" @click="search" class="button-secondary | font-bold text-white rounded-3xl body-md">
               <span v-if="loading">Searching...</span>
               <span v-else>Search</span>
-            </button>
+            </UButton>
           </div>
         </div>
-      </AtomsHeroCard>
+      </div>
+    </OrganismsBannerHero>
 
+    <!-- Results -->
+    <div class="price-paid | container">
       <div v-if="results.length > 0" class="price-paid__results">
         <ul class="price-paid__list">
           <li v-for="(result, index) in results" :key="index" class="price-paid__item">
-            <MoleculesTimeline :title="result.full_address" :type="result.property_type_display"
-              :duration="result.duration_display" :items="formatTimelineItems(result.sales)" />
+            <MoleculesTimeline :title="result.full_address" :type="result.property_type_display" :duration="result.duration_display" :items="formatTimelineItems(result.sales)" />
           </li>
         </ul>
       </div>
@@ -56,54 +54,71 @@
       <div v-else-if="searched && results.length === 0" class="price-paid__no-results">
         <div class="no-results-message">
           <h3 class="| title-sm">No results found</h3>
-          <p class="| body-md">We couldn't find any price paid data for this postcode. Try a different postcode or check
-            the spelling.</p>
+          <p class="| body-md">We couldn't find any price paid data for this postcode. Try a different postcode or check the spelling.</p>
         </div>
       </div>
     </div>
 
-    <!-- Feature tiles teaser (hidden once results load) -->
-    <section class="price-paid-teaser">
-      <div class="container">
-        <header class="price-paid-teaser__header">
-          <h2 class="title-xl">What you can do with Price Paid data</h2>
-          <p class="body-md max-width-prose">
-            Explore recent sold prices, track local market momentum, and understand how a home’s value has changed over
-            time. This is a preview of the tools we’re building.
-          </p>
-        </header>
+    <UPageSection
+      title="What you can do with Price Paid data"
+      description="Explore recent sold prices, track local market momentum, and understand how a home's value has changed over time. This is a preview of the tools we're building."
+      class="p-index__border-radius | container"
+      :ui="{
+        container: 'pt-4!',
+        headline: 'text-secondary',
+        body: 'flex grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 text-white',
+        footer: 'flex justify-center',
+      }"
+    >
+      <template #body>
+        <UPageCard
+          icon="i-lucide-history"
+          title="See sold history by address"
+          description="Look up a property and see its full sale timeline with prices and transfer dates."
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{ root: 'bg-[#2b3945]! ring-0', container: 'shadow-xl', title: 'title-md', leadingIcon: 'h-6 w-6 text-secondary', description: 'body-sm', body: 'flex flex-col justify-evenly' }"
+        />
+        <UPageCard
+          icon="i-lucide-trending-up"
+          title="Track local trends"
+          description="Understand price momentum in your area over the last 12–36 months."
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{ root: 'bg-[#2b3945]! ring-0', container: 'shadow-xl', title: 'title-md', leadingIcon: 'h-6 w-6 text-secondary', description: 'body-sm', body: 'flex flex-col justify-evenly' }"
+        />
+        <UPageCard
+          icon="i-lucide-map"
+          title="Map the neighbourhood"
+          description="Spot streets and pockets that outperform the postcode average."
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{ root: 'bg-[#2b3945]! ring-0', container: 'shadow-xl', title: 'title-md', leadingIcon: 'h-6 w-6 text-secondary', description: 'body-sm', body: 'flex flex-col justify-evenly' }"
+        />
+        <UPageCard
+          icon="i-lucide-building-2"
+          title="Compare property types"
+          description="See how detached, semi, terrace, and flats differ in both price and velocity."
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{ root: 'bg-[#2b3945]! ring-0', container: 'shadow-xl', title: 'title-md', leadingIcon: 'h-6 w-6 text-secondary', description: 'body-sm', body: 'flex flex-col justify-evenly' }"
+        />
+        <UPageCard
+          icon="i-lucide-search"
+          title="Verify asking prices"
+          description="Sense‑check current listings against actual sold prices nearby."
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{ root: 'bg-[#2b3945]! ring-0', container: 'shadow-xl', title: 'title-md', leadingIcon: 'h-6 w-6 text-secondary', description: 'body-sm', body: 'flex flex-col justify-evenly' }"
+        />
+        <UPageCard
+          icon="i-lucide-calendar"
+          title="Timing the move"
+          description="See when sales cluster and how that affects negotiation power."
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right"
+          :ui="{ root: 'bg-[#2b3945]! ring-0', container: 'shadow-xl', title: 'title-md', leadingIcon: 'h-6 w-6 text-secondary', description: 'body-sm', body: 'flex flex-col justify-evenly' }"
+        />
+      </template>
 
-        <div class="price-paid-teaser__grid">
-          <MoleculesFeatureTile iconName="listings/savings" title="See sold history by address"
-            subtitle="Every transaction, one place"
-            description="Look up a property and see its full sale timeline with prices and transfer dates."
-            variant="blue" />
-
-          <MoleculesFeatureTile iconName="explore/trending" title="Track local trends"
-            subtitle="Postcode-level insights"
-            description="Understand price momentum in your area over the last 12–36 months." variant="blue" />
-
-          <MoleculesFeatureTile iconName="explore/map" title="Map the neighbourhood"
-            subtitle="Streets that set the tone"
-            description="Spot streets and pockets that outperform the postcode average." variant="blue" />
-
-          <MoleculesFeatureTile iconName="listings/property-type" title="Compare property types"
-            subtitle="Flats vs houses"
-            description="See how detached, semi, terrace, and flats differ in both price and velocity."
-            variant="blue" />
-
-          <MoleculesFeatureTile iconName="search" title="Verify asking prices" subtitle="Reality check"
-            description="Sense‑check current listings against actual sold prices nearby." variant="blue" />
-
-          <MoleculesFeatureTile iconName="content/info" title="Timing the move" subtitle="Seasonality & cycles"
-            description="See when sales cluster and how that affects negotiation power." variant="blue" />
-        </div>
-
-        <div class="price-paid-teaser__cta">
-          <NuxtLink to="/" class="button button-lg button-monochrome">Join the waiting list</NuxtLink>
-        </div>
-      </div>
-    </section>
+      <template #footer>
+        <UButton to="/" variant="solid" class="button button-secondary | font-bold" size="xl" icon="i-lucide-mail">Join the waiting list</UButton>
+      </template>
+    </UPageSection>
   </div>
 </template>
 <script lang="ts" setup>
@@ -150,9 +165,8 @@ async function search() {
   }
 }
 
-
 function formatTimelineItems(sales: any[]) {
-  return sales.map(sale => ({
+  return sales.map((sale) => ({
     id: sale.transaction_id,
     title: `Price Sold: £${sale.price.toLocaleString()}`,
     date: sale.transfer_date,
@@ -161,33 +175,30 @@ function formatTimelineItems(sales: any[]) {
 
 // SEO - Nuxt SEO auto-generates WebPage schema from this
 useSeoMeta({
-  title: 'UK Price Paid Data - Free Property Sale History Search | Virify',
-  description: 'Search real property sale prices from HM Land Registry. View complete sale histories, market trends, and actual sold prices by postcode. Free UK property price data.',
-  keywords: 'UK price paid data, property sale prices, HM Land Registry, house sale history, property sold prices, UK postcode search, land registry data',
-  ogTitle: 'UK Price Paid Data - Free Property Sale History Search | Virify',
-  ogDescription: 'Search real property sale prices from HM Land Registry. View complete sale histories and market trends by postcode.',
-  ogType: 'website',
-  ogUrl: 'https://virify.co.uk/price-paid',
-  twitterCard: 'summary',
+  title: "UK Price Paid Data - Free Property Sale History Search | Virify",
+  description: "Search real property sale prices from HM Land Registry. View complete sale histories, market trends, and actual sold prices by postcode. Free UK property price data.",
+  keywords: "UK price paid data, property sale prices, HM Land Registry, house sale history, property sold prices, UK postcode search, land registry data",
+  ogTitle: "UK Price Paid Data - Free Property Sale History Search | Virify",
+  ogDescription: "Search real property sale prices from HM Land Registry. View complete sale histories and market trends by postcode.",
+  ogType: "website",
+  ogUrl: "https://virify.co.uk/price-paid",
+  twitterCard: "summary",
 });
 
 useHead({
-  link: [
-    { rel: 'canonical', href: 'https://virify.co.uk/price-paid' }
-  ],
+  link: [{ rel: "canonical", href: "https://virify.co.uk/price-paid" }],
 });
 
 // Custom breadcrumbs
 useSchemaOrg([
   {
-    '@type': 'BreadcrumbList',
+    "@type": "BreadcrumbList",
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://virify.co.uk' },
-      { '@type': 'ListItem', position: 2, name: 'Price Paid Data', item: 'https://virify.co.uk/price-paid' }
-    ]
-  }
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://virify.co.uk" },
+      { "@type": "ListItem", position: 2, name: "Price Paid Data", item: "https://virify.co.uk/price-paid" },
+    ],
+  },
 ]);
-
 </script>
 <style lang="scss" scoped>
 .price-paid-page {
@@ -195,21 +206,20 @@ useSchemaOrg([
 }
 
 .price-paid {
-  padding: var(--size-64) 0;
+  padding: var(--size-32) 0 var(--size-64);
 
-  &__hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-    margin: auto;
-    max-width: 500px;
+  &__search-form {
+    width: min(100%, 540px);
+    margin: 0 auto;
+    margin-top: var(--size-16);
+    position: relative;
+    z-index: 1;
   }
 
   &__search {
     display: flex;
     gap: var(--size-12);
-    align-items: baseline;
+    align-items: center;
     margin-top: var(--size-8);
     width: 100%;
   }
@@ -229,17 +239,23 @@ useSchemaOrg([
 
   &__list {
     margin-top: var(--size-32);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--size-48);
     list-style: none;
     padding: 0;
+
+    @media (min-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   &__item {
     width: 100%;
-    max-width: 800px;
+    padding: var(--size-32);
+    background: var(--background-100);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   }
 
   &__loading {
@@ -253,10 +269,7 @@ useSchemaOrg([
     }
 
     .loading-skeleton {
-      background: linear-gradient(90deg,
-          var(--background-300) 25%,
-          var(--background-100) 50%,
-          var(--background-300) 75%);
+      background: linear-gradient(90deg, var(--background-300) 25%, var(--background-100) 50%, var(--background-300) 75%);
       background-size: 200% 100%;
       animation: loading-shimmer 1.5s infinite;
       border-radius: var(--border-radius-md);
