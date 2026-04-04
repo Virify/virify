@@ -107,10 +107,14 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
       return
     }
 
-    // 3. Safe — persist to database immediately
+    // 3. Safe — delete the old CF image if one existed, then persist
+    const oldCfId = state.avatar ? getCloudflareId(state.avatar as string) : null
     const url = getImageUrl(uploaded.id)
     await saveAvatarToDb(url)
     await refreshSession()
+    if (oldCfId) {
+      await deleteImage(oldCfId)
+    }
     state.avatar = url
     avatarPreview.value = undefined
     toast.add({ title: 'Avatar updated', color: 'success' })
