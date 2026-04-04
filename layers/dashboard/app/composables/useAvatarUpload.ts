@@ -25,6 +25,7 @@ function getCloudflareId(url: string): string | null {
 export function useAvatarUpload(state: { avatar?: string | null }) {
   const { uploadImage, getImageUrl, deleteImage, isUploading: avatarUploading } = useCloudflare()
   const { checkImages } = useModeration()
+  const { fetch: refreshSession } = useUserSession()
   const toast = useToast()
 
   const avatarFile = ref<File | undefined>(undefined)
@@ -59,6 +60,7 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
 
       // Clear in database
       await saveAvatarToDb('')
+      await refreshSession()
 
       toast.add({ title: 'Avatar removed', color: 'success' })
     } catch {
@@ -108,6 +110,7 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
     // 3. Safe — persist to database immediately
     const url = getImageUrl(uploaded.id)
     await saveAvatarToDb(url)
+    await refreshSession()
     state.avatar = url
     avatarPreview.value = undefined
     toast.add({ title: 'Avatar updated', color: 'success' })

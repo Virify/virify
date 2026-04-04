@@ -8,6 +8,12 @@ export default defineEventHandler(async (event) => {
 
   try {
     const updatedUser = await updateUserProfileData(user.id, body);
+    await setUserSession(event, {
+      user: {
+        ...user,
+        avatar: updatedUser.avatar || undefined,
+      },
+    });
     return updatedUser;
   } catch (error) {
     console.error("Error updating user profile:", error);
