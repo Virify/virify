@@ -88,13 +88,16 @@ function __getFullAddress(property: Result['property']): string | undefined {
 /**
  *  Get labels for sale type (e.g. 'chain free', 'leasehold')
  */
-function __getLabels(result: Result, isSale: boolean) {
+function __getLabels(result: Result, isSale: boolean): string[] {
   if (isSale) {
-    const { tenureType } = asObject(result?.saleListing)
+    const { tenureType, furnishedStatus, chain } = asObject(result?.saleListing)
 
     // @TODO - probably want to standardise how we format enum strings
-    //         as we also have the getTenureType function
-    return __formatString(tenureType)
+    return [
+      tenureType,
+      furnishedStatus,
+      chain && 'Chain free'
+    ].map(__formatString).filter(isString)
   }
 
   const { rentalLength, furnishedStatus } = asObject(result?.rentalListing)
@@ -204,7 +207,7 @@ function __getOverview(property: Result['property']): string {
 /**
  *  Get rental duration (e.g. price per week or per month)
  */
-function __getRentalFrequency(rentalListing: Result['rentalListing']) {
+function __getRentalFrequency(rentalListing: Result['rentalListing']): string | undefined {
   const { rentFrequency } = asObject(rentalListing)
 
   return __formatString(rentalListing?.rentFrequency) || rentFrequency
@@ -288,8 +291,8 @@ export function formatSearchResults(result?: Result) {
    *          mean this does not error)
    */
   return {
-    listingId: id,
-    userId,
+    listingId: id as number,
+    userId: userId as number,
     saleOrRent: listingType as 'buy' | 'rent',
     price: numberToCurrency(price as number, true),
     overviewAddress: __getFullAddress(property as Result['property']),
@@ -304,7 +307,7 @@ export function formatSearchResults(result?: Result) {
     labels: __getLabels(result as Result, isSale),
     priceLabel: __getPriceLabel(isSale && saleListing),
     rentFrequency: __getRentalFrequency(!isSale && rentalListing),
-    sellerName: username,
-    sellerImage: avatar
+    sellerName: username as string | undefined,
+    sellerImage: avatar as string | undefined
   }
 }

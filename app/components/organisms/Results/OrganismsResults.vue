@@ -113,6 +113,8 @@ const paginatedResults = computed(() => {
   //
   //         Leaving here for now as this works more than well enough
   //         for the time being
+  //
+  //         We probably also want to update `mapToCardProps` to
   //         `formatSearchResults` at some point - should be a simple
   //         swap
   return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value).map(mapToCardProps)

@@ -40,7 +40,7 @@ export function mapToCardProps(result: ListingCardData) {
   return {
     saleOrRent,
     propertyImage: media?.[0]?.image ?? undefined,
-    carouselImages: media?.map(row => row?.image).filter(Boolean),
+    carouselImages: media?.map(row => row?.image).filter(Boolean) as string[],
     propertyImageAlt: overview,
     price: numberToCurrency(Math.floor(price)),
     rentFrequency: rentalListing ? convertEnumToString(rentalListing.rentFrequency) : undefined,
