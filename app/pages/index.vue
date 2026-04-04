@@ -251,11 +251,8 @@ function showSignupForm() {
   }
 
   &__bg-change {
-
-    @include mq.tablet {
-      background-color: var(--blue-200);
-      padding: var(--size-120) 0;
-    }
+    background-color: var(--blue-200);
+    padding: var(--size-120) 0;
   }
 }
 </style>
