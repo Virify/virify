@@ -55,7 +55,7 @@
       </div>
 
       <div v-if="!disabledInteractions" class="property-card-root__footer" aria-role="presentation">
-        <PropertyCardSeller :name="sellerName" />
+        <PropertyCardSeller :name="sellerName" :profile-image="sellerImage" />
 
         <div role="presentation" class="property-card-root__footer-text">
           <span role="presentation" class="property-card-root__footer-name | body-xs">

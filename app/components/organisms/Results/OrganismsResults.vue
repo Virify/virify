@@ -4,8 +4,7 @@
       <div class="o-results__title o-results__title--skeleton | skeleton"></div>
 
       <div class="o-results__grid">
-        <MoleculesCardPremiumSkeleton class="o-results__card--large" />
-        <MoleculesCardSkeleton v-for="key of 6" :key />
+        <PropertyCardSkeleton v-for="key of 8" :key />
       </div>
     </template>
 
@@ -16,10 +15,7 @@
       </div>
 
       <div class="o-results__grid">
-        <component v-for="{ variant, fullWidth, component, result } of paginatedResults" :is="component" :variant
-          :result :class="{
-            'o-results__card--large': !!fullWidth
-          }" />
+        <PropertyCardRoot v-for="result of paginatedResults" :key="result.id" v-bind="mapToCardProps(result)" />
       </div>
 
       <MoleculesPaginator v-if="requiresPagnination" :current-page="currentPage" :items-per-page="RESULTS_PER_PAGE"
@@ -31,12 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import {
-  MoleculesCardBasic,
-  MoleculesCardFeatured,
-  MoleculesCardPremium
-} from '#components'
-
 interface Props {
   isLoading?: boolean
   results: ListingCardData[]
@@ -122,73 +112,10 @@ const paginatedResults = computed(() => {
 })
 
 /**
- *  Get the variant of the card
- */
-function getCardVariant(result: ListingCardData) {
-  const { listingTier } = asObject(result)
-
-  if (listingTier === 'PREMIUM') {
-    return {
-      variant: 'premium',
-      component: MoleculesCardPremium,
-      fullWidth: true
-    }
-  }
-
-  if (listingTier === 'FEATURED') {
-    return {
-      variant: 'featured',
-      component: MoleculesCardFeatured
-    }
-  }
-
-  return {
-    variant: 'basic',
-    component: MoleculesCardBasic
-  }
-}
-
-/**
- * Flatten the premium listing sections into a simple array 
- * while maintaining the distribution logic from the utility
- */
-function distributeListings(listings: ListingCardData[]): ListingCardData[] {
-  // Use the existing utility function
-  const sections = distributePremiumListings(listings as ListingWithFullProperty[])
-  const result: ListingCardData[] = []
-
-  // Flatten the sections into a simple array
-  for (const section of sections) {
-    if (section.item) {
-      result.push(section.item as ListingCardData)
-    }
-    if (section.items) {
-      // Add all items from the section
-      for (const item of section.items) {
-        result.push(item as ListingCardData)
-      }
-    }
-  }
-
-  return result
-}
-
-/**
- *  Determine component type, variant for each card
+ *  Determine card props for each result
  */
 const resultsComponents = computed(() => {
-  const { results } = asObject(props)
-
-  const sortedResults = asArray(results) /* @TODO - sort here */
-  const distributedResults = distributeListings(sortedResults)
-
-  return distributedResults
-    .filter((result): result is ListingCardData => !!result) // Type guard to remove undefined
-    .map((result) => {
-      const { variant, fullWidth, component } = getCardVariant(result)
-
-      return { variant, fullWidth, component, result }
-    })
+  return asArray(props.results)
 })
 
 // Track impressions when results are displayed
