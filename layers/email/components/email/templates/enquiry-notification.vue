@@ -3,6 +3,7 @@ import { Html, Head, Preview, Body, Container, Section, Text, Heading, Hr, Link,
 
 defineProps<{
   senderName: string;
+  senderAvatar?: string;
   message: string;
   conversationUrl: string;
   listingAddress?: string;
@@ -32,9 +33,15 @@ defineProps<{
         <!-- Main Content -->
         <Section style="background-color: #ffffff; padding: 40px 32px; border-radius: 0 0 12px 12px;">
 
-          <Text style="color: #1a1a1a; font-size: 18px; line-height: 1.6; margin: 0 0 24px 0;">
-            {{ isReply ? `${senderName} has replied to your enquiry.` : `You have a new enquiry from ${senderName}.` }}
-          </Text>
+          <div style="display: flex; align-items: center; gap: 12px; margin: 0 0 24px 0;">
+            <Img v-if="senderAvatar" :src="senderAvatar" :alt="senderName" width="48" height="48" style="border-radius: 50%; object-fit: cover; flex-shrink: 0;" />
+            <div v-else style="width: 48px; height: 48px; border-radius: 50%; background-color: #FC7239; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <Text style="color: #ffffff; font-size: 20px; font-weight: 700; margin: 0; line-height: 1;">{{ senderName?.charAt(0)?.toUpperCase() }}</Text>
+            </div>
+            <Text style="color: #1a1a1a; font-size: 18px; line-height: 1.6; margin: 0;">
+              {{ isReply ? `${senderName} has replied to your enquiry.` : `You have a new enquiry from ${senderName}.` }}
+            </Text>
+          </div>
 
           <!-- Message -->
           <Section style="background-color: #f9fafb; border-left: 4px solid #FC7239; border-radius: 4px; padding: 20px 24px; margin: 0 0 32px 0;">

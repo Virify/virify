@@ -7,6 +7,8 @@ export interface SendEnquiryNotificationOptions {
   to: string;
   /** Display name of the person who sent the message/enquiry */
   senderName: string;
+  /** Avatar URL of the sender */
+  senderAvatar?: string;
   /** The message text */
   message: string;
   /** Full URL to the conversation page */
@@ -26,10 +28,11 @@ export interface SendEnquiryNotificationOptions {
  * Only call this when the recipient is not connected to the WebSocket.
  */
 export async function sendEnquiryNotificationEmail(options: SendEnquiryNotificationOptions) {
-  const { to, senderName, message, conversationUrl, isReply = false, listing } = options;
+  const { to, senderName, senderAvatar, message, conversationUrl, isReply = false, listing } = options;
 
   const html = await render(enquiryNotification, {
     senderName,
+    senderAvatar,
     message,
     conversationUrl,
     isReply,

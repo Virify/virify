@@ -1,20 +1,12 @@
 <template>
   <section class="o-listing-sidebar-agent | body-sm">
     <div class="o-listing-sidebar-agent__logo">
-      <NuxtImg
-        v-if="agent?.avatar"
-        :src="agent.avatar"
-        :alt="`${agent.username}'s avatar`"
-        :width="20"
-        :height="20"
-        class="o-listing-sidebar-agent__logo-image"
-      />
-      <AtomsIcon
-        v-else
-        icon="profile"
-        class="o-listing-sidebar-agent__logo-icon"
-        aria-hidden="true"
-        :size="40"
+      <UAvatar
+        :src="agent?.avatar || undefined"
+        :name="agent?.username || undefined"
+        :alt="agent?.username || 'Agent'"
+        :ui="{ root: agent?.avatar ? 'bg-transparent' : 'bg-(--background-300)', fallback: 'text-(--monochrome-900)' }"
+        size="xl"
       />
     </div>
 

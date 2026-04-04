@@ -105,6 +105,7 @@ export default defineEventHandler(async (event) => {
         sendEnquiryNotificationEmail({
           to: recipientPrefs.email,
           senderName: conversation.sender?.username || 'Someone',
+          senderAvatar: conversation.sender?.avatar ?? undefined,
           message,
           conversationUrl: `${baseUrl}/dashboard/enquiries/${conversation.id}`,
           isReply: false,

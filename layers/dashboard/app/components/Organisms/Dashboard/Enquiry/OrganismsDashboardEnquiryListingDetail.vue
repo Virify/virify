@@ -24,7 +24,7 @@
               @click.stop="$emit('click', enquiry)">
               <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                  <UAvatar :name="enquiry.sender?.username || 'User'" :alt="enquiry.sender?.username || 'User'"
+                  <UAvatar :src="enquiry.sender?.avatar || undefined" :name="enquiry.sender?.username || 'User'" :alt="enquiry.sender?.username || 'User'"
                     size="xs" class="bg-(--background-100) text-(--foreground-100)" />
                   <span class="text-sm font-bold text-(--foreground-100)">
                     {{ enquiry.sender?.username || "User" }}
@@ -48,7 +48,7 @@
               @click.stop="$emit('click', enquiry)">
               <div class="flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                  <UAvatar :name="enquiry.sender?.username || 'User'" :alt="enquiry.sender?.username || 'User'"
+                  <UAvatar :src="enquiry.sender?.avatar || undefined" :name="enquiry.sender?.username || 'User'" :alt="enquiry.sender?.username || 'User'"
                     size="xs" class="bg-(--background-100) text-(--foreground-100)" />
                   <span class="text-sm font-bold text-(--foreground-100)">
                     {{ enquiry.sender?.username || "User" }}
