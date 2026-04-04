@@ -7,10 +7,17 @@ type Schema = z.output<typeof notificationPreferencesSchema>;
 
 export const useNotificationPreferences = createSharedComposable(() => {
   const toast = useToast();
+  const { loggedIn } = useUserSession();
 
   const { data, pending } = useAsyncData("notificationPreferences", () =>
     useRequestFetch()<Schema>("/api/user/notifications"),
+    { immediate: false }
   );
+
+  watch(loggedIn, (isLoggedIn) => {
+    if (isLoggedIn) refreshNuxtData("notificationPreferences");
+    else data.value = undefined;
+  }, { immediate: true });
 
   const state = reactive<Schema>({
     receiveEmailNotifications: true,
