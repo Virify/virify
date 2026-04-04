@@ -13,6 +13,7 @@
           ]"
           :ui="{
             linkLeadingIcon: 'text-secondary',
+            link: 'truncate max-w-[24ch]',
           }"
           class="text-white pt-2 pb-2"
         />

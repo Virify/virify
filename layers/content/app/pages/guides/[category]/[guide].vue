@@ -14,7 +14,7 @@
           ]"
           :ui="{
             linkLeadingIcon: 'text-secondary',
-            link: 'text-white',
+            link: 'text-white truncate max-w-[20ch]',
           }"
           class="text-white pt-2 pb-2"
         />
