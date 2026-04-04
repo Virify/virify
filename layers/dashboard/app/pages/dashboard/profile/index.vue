@@ -118,11 +118,11 @@
                     :as="{ img: 'img' }"
                   />
                   <UButton
-                    :label="state.avatar ? 'Change image' : 'Upload image'"
+                    :label="avatarModerating ? 'Moderating...' : state.avatar ? 'Change image' : 'Upload image'"
                     color="neutral"
                     variant="outline"
-                    :loading="avatarUploading"
-                    :disabled="avatarUploading"
+                    :loading="avatarUploading || avatarModerating"
+                    :disabled="avatarUploading || avatarModerating"
                     @click="open()"
                   />
                 </div>
@@ -214,5 +214,5 @@ const { accountNavigationItems } = useDashboardNavigation();
 const { state, pending, onSubmit, profileSchema } = await useProfileForm();
 const intents = profileIntents;
 
-const { avatarFile, avatarPreview, avatarUploading, avatarRemoving, removeAvatar } = useAvatarUpload(state);
+const { avatarFile, avatarPreview, avatarUploading, avatarModerating, avatarRemoving, removeAvatar } = useAvatarUpload(state);
 </script>
