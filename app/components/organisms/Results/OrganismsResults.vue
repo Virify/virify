@@ -4,7 +4,7 @@
       <div class="o-results__title o-results__title--skeleton | skeleton"></div>
 
       <div class="o-results__grid">
-        <PropertyCardSkeleton v-for="key of 8" :key />
+        <PropertyCardSkeleton v-for="key of 10" :key />
       </div>
     </template>
 
@@ -93,16 +93,6 @@ const lastPaginatedIndex = computed(() => {
   return Math.min(firstPaginatedIndex.value + RESULTS_PER_PAGE - 1, resultsLength.value)
 })
 
-// Get title for visible paginated indexes
-const visibleResultsTitle = computed(() => {
-  // If no pagination, show normal title
-  if (!requiresPagnination.value) {
-    return `Showing ${resultsLength.value} results`
-  }
-
-  return `Showing results ${firstPaginatedIndex.value} to ${lastPaginatedIndex.value} of ${resultsLength.value}`
-})
-
 const paginatedResults = computed(() => {
   // If no results, return empty array
   if (!resultsLength.value) return []
@@ -151,25 +141,26 @@ watch(() => props.results, (newResults) => {
 
   &__grid {
     display: grid;
-    grid-gap: var(--size-12);
-    align-items: stretch;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-12);
+    row-gap: var(--size-24);
 
-    @container (800px > width >=640px) {
-      grid-template-columns: repeat(2, 1fr);
-      grid-gap: var(--size-16);
-
-      .o-results__card--large {
-        grid-column: span 2;
-      }
+    @container (min-width: 560px) {
+      gap: var(--size-16);
     }
 
-    @container (width >=950px) {
-      grid-template-columns: repeat(2, 1fr);
-      grid-gap: var(--size-16);
+    @container (min-width: 1024px) {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--size-20);
+    }
 
-      .o-results__card--large {
-        grid-column: span 2;
-      }
+    @container (min-width: 1280px) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--size-24);
+    }
+
+    @container (min-width: 1600px) {
+      grid-template-columns: repeat(5, 1fr);
     }
   }
 
