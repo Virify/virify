@@ -73,7 +73,7 @@
               label="Desktop Notifications"
               name="receiveDesktopNotifications"
               orientation="horizontal"
-              description="Receive notifications on your desktop"
+              :description="browserPermission === 'denied' ? 'Blocked by your browser — enable in site settings' : browserPermission === 'granted' ? 'Receive notifications on your desktop' : 'Receive notifications on your desktop'"
               :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }"
             >
               <USwitch
@@ -104,5 +104,5 @@ definePageMeta({
 
 const { accountNavigationItems } = useDashboardNavigation();
 
-const { state, saving, onSubmit, notificationPreferencesSchema } = useNotificationPreferences();
+const { state, saving, onSubmit, notificationPreferencesSchema, browserPermission } = useNotificationPreferences();
 </script>

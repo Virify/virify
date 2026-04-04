@@ -155,9 +155,16 @@ export default defineNuxtPlugin(() => {
 
         // Trigger browser desktop notification if the user has enabled it
         if (canDesktop.value && Notification.permission === 'granted') {
+          const body = [
+            notification.message,
+            notification.listingAddress ? notification.listingAddress : null,
+          ].filter(Boolean).join('\n');
+
           new Notification(notification.title, {
-            body: notification.message ?? undefined,
-            icon: '/favicon.ico',
+            body,
+            icon: notification.senderAvatar || '/favicon.ico',
+            image: notification.listingImage || undefined,
+            tag: `notification-${notification.id}`, // deduplicates if fired twice
           });
         }
       },

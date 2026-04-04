@@ -34,6 +34,42 @@ export const useNotificationPreferences = createSharedComposable(() => {
   const canPush = computed(() => state.receivePushNotifications);
   const canDesktop = computed(() => state.receiveDesktopNotifications);
 
+  // Browser Notification API permission status (client-only)
+  const browserPermission = ref<NotificationPermission | null>(null);
+
+  if (import.meta.client) {
+    browserPermission.value = Notification.permission;
+
+    // When user enables desktop notifications, request browser permission
+    watch(
+      () => state.receiveDesktopNotifications,
+      async (enabled) => {
+        if (!enabled) return;
+        if (Notification.permission === 'granted') return;
+        if (Notification.permission === 'denied') {
+          // Browser has blocked it — can't re-request, revert the toggle
+          state.receiveDesktopNotifications = false;
+          toast.add({
+            title: 'Permission blocked',
+            description: 'Desktop notifications are blocked in your browser settings. Please enable them manually.',
+            color: 'warning',
+          });
+          return;
+        }
+        const result = await Notification.requestPermission();
+        browserPermission.value = result;
+        if (result !== 'granted') {
+          state.receiveDesktopNotifications = false;
+          toast.add({
+            title: 'Permission not granted',
+            description: 'Desktop notifications were not enabled.',
+            color: 'warning',
+          });
+        }
+      },
+    );
+  }
+
   const saving = ref(false);
 
   async function onSubmit(event: FormSubmitEvent<Schema>) {
@@ -60,5 +96,6 @@ export const useNotificationPreferences = createSharedComposable(() => {
     canEmail,
     canPush,
     canDesktop,
+    browserPermission,
   };
 });
