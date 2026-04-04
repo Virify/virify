@@ -111,6 +111,21 @@ export const useEnquiries = createSharedComposable(() => {
         contactedListings.value = new Set()
       }
     }, { immediate: true })
+
+    // Reset all state when the logged-in user changes (login/logout/switch)
+    watch(() => user.value?.id, (newId, oldId) => {
+      if (newId === oldId) return;
+      enquiries.value = [];
+      total.value = 0;
+      loading.value = false;
+      error.value = null;
+      activeEnquiry.value = null;
+      contactedListings.value = new Set();
+      contactedListingsLoading.value = false;
+      hydratingConversations.clear();
+      hydrationQueue.length = 0;
+      processingHydrationQueue = false;
+    });
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
