@@ -1,0 +1,13 @@
+model UserNotificationPreferences {
+  id                          Int             @id @default(autoincrement())
+  userPreferencesId           Int
+  receiveEmailNotifications   Boolean         @default(true) // User preference for receiving email notifications
+  receivePushNotifications    Boolean         @default(false) // User preference for receiving push notifications
+  receiveDesktopNotifications Boolean         @default(false) // User preference for receiving desktop notifications
+  receiveAppNotifications     Boolean         @default(true) // User preference for receiving in-app notifications
+  createdAt                   DateTime        @default(now())
+  updatedAt                   DateTime        @updatedAt
+  userPreferences             UserPreferences @relation(fields: [userPreferencesId], references: [userId], onDelete: Cascade)
+
+  @@index([userPreferencesId])
+}

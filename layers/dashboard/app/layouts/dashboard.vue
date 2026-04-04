@@ -8,7 +8,6 @@
 </template>
 <script lang="ts" setup>
   const { fetchUserItemsAggregates, fetchNotifications, fetchNotificationCounts } = useNotifications()
-  const { groups } = useDashboardSearch()
   
   // Initialize lookups for favourites and notes (needed for hasNote/isFavourite checks)
   useFavouriteLookups()

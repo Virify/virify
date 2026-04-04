@@ -1,4 +1,6 @@
 import * as z from "zod";
+import { useMapSearch } from "~~/layers/map/shared/utils/useMapSearch";
+import { createAmenitiesForProperty } from "~~/layers/database/server/utils/amenities";
 
 const publishSchema = z.object({
   draftId: z.number().int().positive(),
@@ -282,6 +284,20 @@ export default defineEventHandler(async (event) => {
       listingId: result.id,
       message: "Listing published successfully",
     };
+
+    // Fire-and-forget: fetch real amenities from MapTiler and persist them
+    // Done after the response so it doesn't block the publish flow
+    const address = draft.property?.address;
+    if (address?.lat && address?.lon && draft.propertyId) {
+      const { findNearbyAmenities } = useMapSearch();
+      findNearbyAmenities(address.lat, address.lon)
+        .then((amenitiesData) => {
+          if (amenitiesData.length > 0) {
+            return createAmenitiesForProperty(draft.propertyId!, amenitiesData);
+          }
+        })
+        .catch((err) => console.error("[Publish] Failed to fetch/save amenities:", err));
+    }
   } catch (error) {
     console.error("Error publishing listing:", error);
     return errorResponse(error, event);

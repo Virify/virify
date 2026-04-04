@@ -1,14 +1,15 @@
 model UserPreferences {
-  id             Int                    @id @default(autoincrement())
-  userId         Int                    @unique
-  user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  favourites     UserFavouriteListing[]
-  savedSearches  SavedSearch[]
-  hiddenListings HiddenListing[]
-  notes          UserNote[]
-  savedLocation  UserLocation[]
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+  id                      Int                           @id @default(autoincrement())
+  userId                  Int                           @unique
+  user                    User                          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favourites              UserFavouriteListing[]
+  savedSearches           SavedSearch[]
+  hiddenListings          HiddenListing[]
+  notes                   UserNote[]
+  savedLocation           UserLocation[]
+  notificationPreferences UserNotificationPreferences[]
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
 
   @@index([userId])
 }

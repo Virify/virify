@@ -32,7 +32,9 @@ watch(lastNotification, (notification) => {
     toast.add({
       title: notification.title,
       description: notification.description,
-      icon: 'i-heroicons-chat-bubble-left-right',
+      ...(notification.senderAvatar
+        ? { avatar: { src: notification.senderAvatar, alt: notification.senderUsername || 'User', name: notification.senderUsername || 'User' } }
+        : { icon: 'i-heroicons-chat-bubble-left-right' }),
       color: 'secondary',
       onClick: async () => {
         if (notification.conversationId) {

@@ -1,7 +1,6 @@
 <template>
   <div class="homepage-section-coming-soon">
-    <HomepageSectionIntro title="A smarter way to buy, sell and rent is coming soon" description="Whether you're looking for your next home, ready to market privately, or an estate agent looking for a more
-      cost-effective and easy-to-use platform, join our waiting list for exclusive early access and progress updates.">
+    <HomepageSectionIntro :title="title" :description="description">
 
       <!-- <div class="homepage-section-coming-soon__computer">
         <video width="700" autoplay muted loop disablepictureinpicture playsinline>
@@ -20,6 +19,10 @@
 
   </div>
 </template>
+<script lang="ts" setup>
+const title = 'A smarter way to buy, sell and rent property, coming soon.';
+const description = 'Whether you\'re searching for your next home, selling privately, or an estate agent seeking a simpler, more cost-effective platform, join our waiting list for exclusive early access and updates. We\'re free to use at launch — supporting users while times are tough — and will remain so for the near future.';
+</script>
 
 <style lang="scss">
 @use 'sass:math';

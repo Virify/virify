@@ -58,11 +58,11 @@
     </template>
 
     <template #premium-button="{ tier }">
-      <UButton @click="$emit('create-listing', 'PREMIUM')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" />
+      <UButton @click="$emit('create-listing', 'PREMIUM')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" disabled />
     </template>
     
     <template #professional-button="{ tier }">
-      <UButton @click="$emit('create-listing', 'FEATURED')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" />
+      <UButton @click="$emit('create-listing', 'FEATURED')" :label="tier.button.label" block class="body-sm cursor-pointer text-white!" color="secondary" variant="solid" disabled />
     </template>
   </UPricingTable>
 </template>

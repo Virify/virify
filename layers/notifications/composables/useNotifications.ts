@@ -47,6 +47,38 @@ export const useNotifications = createSharedComposable(() => {
   const { user } = useUserSession();
   const requestFetch = useRequestFetch();
 
+  // Reset all state when the logged-in user changes (login/logout/switch)
+  watch(() => user.value?.id, (newId, oldId) => {
+    if (newId === oldId) return;
+    notifications.value = [];
+    notificationsLoading.value = false;
+    notificationsFetched.value = false;
+    notificationCounts.value = null;
+    notificationPage.value = 1;
+    notificationHasMore.value = true;
+    aggregates.value = {
+      favourites: 0,
+      notes: 0,
+      enquiries: 0,
+      locations: 0,
+      listings: 0,
+      unreadMessages: 0,
+      messages: 0,
+      unreadConversations: 0,
+      sentEnquiries: 0,
+      sentUnreadEnquiries: 0,
+      receivedEnquiries: 0,
+      receivedUnreadEnquiries: 0,
+      draftListings: 0,
+      archivedListings: 0,
+    };
+    aggregatesLoading.value = false;
+    aggregatesFetched.value = false;
+    aggregatesError.value = null;
+    lastNotification.value = null;
+    toastedNotificationIds.clear();
+  });
+
   /**
    * Fetch notifications from the new notifications API
    * Much more efficient than fetching full conversations

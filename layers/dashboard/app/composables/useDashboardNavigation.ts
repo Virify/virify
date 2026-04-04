@@ -17,15 +17,15 @@ export function useDashboardNavigation() {
         text: "Dashboard Home",
       },
     },
-    {
-      label: "Pricing & Tiers",
-      icon: "i-lucide-badge-pound-sterling",
-      tooltip: {
-        text: "See our pricing and plans",
-      },
-      type: "link",
-      to: "/dashboard/tiers",
-    },
+    // {
+    //   label: "Pricing & Tiers",
+    //   icon: "i-lucide-badge-pound-sterling",
+    //   tooltip: {
+    //     text: "See our pricing and plans",
+    //   },
+    //   type: "link",
+    //   to: "/dashboard/tiers",
+    // },
     {
       label: "Listings",
       icon: "i-lucide-house-heart",
@@ -207,7 +207,7 @@ export function useDashboardNavigation() {
         {
           label: "Notifications",
           type: "link",
-          to: "#",
+          to: "/dashboard/notifications",
           icon: "i-lucide-bell",
           tooltip: {
             text: "Notification preferences",
@@ -257,24 +257,24 @@ export function useDashboardNavigation() {
         text: "Your profile",
       },
     },
-    {
-      label: "Settings",
-      type: "link",
-      to: "#",
-      icon: "i-lucide-settings",
-      tooltip: {
-        text: "Account settings",
-      },
-    },
-    {
-      label: "Billing",
-      type: "link",
-      to: "#",
-      icon: "i-lucide-credit-card",
-      tooltip: {
-        text: "Billing & payments",
-      },
-    },
+    // {
+    //   label: "Settings",
+    //   type: "link",
+    //   to: "#",
+    //   icon: "i-lucide-settings",
+    //   tooltip: {
+    //     text: "Account settings",
+    //   },
+    // },
+    // {
+    //   label: "Billing",
+    //   type: "link",
+    //   to: "#",
+    //   icon: "i-lucide-credit-card",
+    //   tooltip: {
+    //     text: "Billing & payments",
+    //   },
+    // },
     {
       label: "Security",
       type: "link",
@@ -287,21 +287,21 @@ export function useDashboardNavigation() {
     {
       label: "Notifications",
       type: "link",
-      to: "#",
+      to: "/dashboard/notifications",
       icon: "i-lucide-bell",
       tooltip: {
         text: "Notification preferences",
       },
     },
-    {
-      label: "Analytics",
-      type: "link",
-      to: "#",
-      icon: "i-lucide-chart-bar",
-      tooltip: {
-        text: "View analytics",
-      },
-    },
+    // {
+    //   label: "Analytics",
+    //   type: "link",
+    //   to: "#",
+    //   icon: "i-lucide-chart-bar",
+    //   tooltip: {
+    //     text: "View analytics",
+    //   },
+    // },
   ]);
 
   return {

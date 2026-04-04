@@ -7,7 +7,7 @@
   }">
     <template #title>
       <div class="flex items-center gap-3">
-        <UAvatar :alt="otherUser?.username!" :name="otherUser?.username!" size="sm" class="bg-(--background-300)" />
+        <UAvatar :src="otherUser?.avatar || undefined" :alt="otherUser?.username!" :name="otherUser?.username!" size="lg" class="bg-(--background-300)" />
         <div class="flex flex-col gap-1 flex-wrap">
           <h2 class="text-sm font-bold leading-none">{{ otherUser?.username || "Unknown User" }}</h2>
           <p class="text-xs text-(--foreground-200)/80 truncate mt-1 font-normal">
@@ -36,8 +36,8 @@
                 {{ message.content }}
               </p>
               <div class="flex mt-1 items-center gap-1">
-                <UAvatar :alt="message.sender.username!" class="text-(--foreground-100) bg-(--background-200)"
-                  size="xs" />
+                <UAvatar :src="message.sender.avatar || undefined" :alt="message.sender.username!" class="text-(--foreground-100)" :ui="{ root: message.sender.avatar ? 'bg-transparent' : 'bg-(--background-200)' }"
+                  size="lg" />
                 <p class="body-xs italic py-1">{{ getConvoMessagePoV(message, user?.id!) }}</p>
               </div>
             </template>

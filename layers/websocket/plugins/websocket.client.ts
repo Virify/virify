@@ -35,6 +35,7 @@ export default defineNuxtPlugin(() => {
     const { handleAggregateUpdate, showToast, addNotification, fetchUserItemsAggregates, aggregatesLoading, fetchNotificationCounts } = useNotifications();
     const { handleNewConversation, handleNewMessage, handleMessageRead, activeEnquiryId, enquiries } = useEnquiries();
     const { syncConversationIfOpen, isModalOpen, modalConversation } = useGlobalEnquiryModal();
+    const { canDesktop } = useNotificationPreferences();
     const wsComposable = useWebSocketServer();
 
     const globalWebSocketEvents: WebSocketEvents = {
@@ -151,6 +152,21 @@ export default defineNuxtPlugin(() => {
           senderUsername: notification.senderUsername ?? undefined,
           senderAvatar: notification.senderAvatar ?? undefined,
         });
+
+        // Trigger browser desktop notification if the user has enabled it
+        // Suppress if the page is currently focused (in-app toast already shown)
+        if (canDesktop.value && Notification.permission === 'granted' && document.visibilityState === 'hidden') {
+          const body = [
+            notification.message,
+            notification.listingAddress ? notification.listingAddress : null,
+          ].filter(Boolean).join('\n');
+
+          new Notification(notification.title, {
+            body,
+            icon: notification.senderAvatar || '/favicon.ico',
+            tag: `notification-${notification.id}`,
+          });
+        }
       },
       
       /**

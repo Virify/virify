@@ -7,7 +7,7 @@
   }" @click="$emit('click')">
     <template #header>
       <div class="text-(--foreground-200)">
-        <UAvatar :name="enquiry.sender?.username || 'User'" :alt="enquiry.sender.username!" size="sm"
+        <UAvatar :src="enquiry.sender?.avatar || undefined" :name="enquiry.sender?.username || 'User'" :alt="enquiry.sender.username!" size="sm"
           class="mr-2 text-(--foreground-100) bg-(--background-200)" />
         <p class="inline font-bold">{{ enquiry.sender?.username || 'User' }}</p>
       </div>

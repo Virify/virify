@@ -50,7 +50,8 @@
                 <!-- Header -->
                 <div class="flex justify-between items-center p-3">
                   <div class="flex items-center gap-2">
-                    <UAvatar :name="getConversationOtherUser(enquiry, user?.id)?.username || 'User'"
+                    <UAvatar :src="(getConversationOtherUser(enquiry, user?.id) as any)?.avatar || undefined"
+                      :name="getConversationOtherUser(enquiry, user?.id)?.username || 'User'"
                       :alt="getConversationOtherUser(enquiry, user?.id)?.username || 'User'" size="xs"
                       class="bg-(--background-100) text-(--foreground-100)" />
                     <span class="text-sm font-bold text-(--foreground-100)">
