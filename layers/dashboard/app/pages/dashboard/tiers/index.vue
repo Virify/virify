@@ -31,7 +31,12 @@
 import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
 
 definePageMeta({
-  middleware: ["authenticated"],
+  // TODO: Re-enable when tiers page is ready
+  middleware: [
+    function () {
+      return navigateTo("/dashboard", { redirectCode: 302 });
+    },
+  ],
   head: {
     title: "Pricing & Tiers",
     icon: "i-lucide-badge-pound-sterling",

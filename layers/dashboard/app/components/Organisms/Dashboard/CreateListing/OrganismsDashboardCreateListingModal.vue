@@ -42,8 +42,6 @@ const isMobile = computed(() => {
 const {
   steps,
   currentStepValue,
-  draftListingId,
-  editingListingId,
   selectedTier,
   startNewListing,
   loadDraftListing,
@@ -57,8 +55,14 @@ const mode = ref<'create' | 'draft' | 'edit'>('create');
 const tierLabel = computed(() => {
   const tier = selectedTier.value
   if (!tier) return ''
-  return tier.charAt(0) + tier.slice(1).toLowerCase()
+  return tierLabels[tier] || ''
 })
+
+const tierLabels = {
+  BASIC: 'Personal',
+  PREMIUM: 'Premium',
+  FEATURED: 'Professional',
+}
 
 // Tier badge color: neutral for Basic, primary for Featured, secondary for Premium
 const tierColor = computed(() => {
