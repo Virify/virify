@@ -26,7 +26,7 @@ defineProps<{
             Virify
           </Heading>
           <Text style="color: #ffffff; font-size: 18px; margin: 0; opacity: 0.95;">
-            {{ isReply ? 'New Reply 💬' : 'New Enquiry 📬' }}
+            {{ isReply ? 'New Reply' : 'New Enquiry' }}
           </Text>
         </Section>
 
