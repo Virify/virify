@@ -87,6 +87,8 @@ defineProps<{
     position: absolute;
     top: var(--size-16);
     left: var(--size-24);
+    right: var(--size-24);
+    overflow: hidden;
     z-index: 1;
   }
 
