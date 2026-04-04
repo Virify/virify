@@ -10,7 +10,7 @@
     </button>
 
     <div :id="menuId" class="header-mobile-nav__menu" :hidden="!isExpanded">
-      <div class="header-mobile-nav__menu-search | container">
+      <div v-if="!isWaitingListMode" class="header-mobile-nav__menu-search | container">
         <HeaderActionsSearch />
       </div>
 
@@ -76,6 +76,10 @@ watch(isExpanded, (newState) => {
   newState ? activate() : deactivate()
 })
 */
+
+// @TODO - waiting list - remove once live
+const { isWaitingListMode } = useWaitingListMode();
+// @TODO end
 
 </script>
 

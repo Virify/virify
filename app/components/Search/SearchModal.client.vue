@@ -166,6 +166,10 @@ async function animateFormToDock() {
 /**
  *  Universal search
  */
+// @TODO - waiting list - remove once live
+const { isWaitingListMode } = useWaitingListMode();
+// @TODO end
+
 function showUniversalSearch({ key, metaKey }: KeyboardEvent) {
   if (!metaKey || key !== 'k') return
 
@@ -173,6 +177,10 @@ function showUniversalSearch({ key, metaKey }: KeyboardEvent) {
 }
 
 onMounted(() => {
+  // @TODO - waiting list - remove once live
+  if (isWaitingListMode) return
+  // @TODO end
+
   window.addEventListener('keydown', showUniversalSearch)
 })
 

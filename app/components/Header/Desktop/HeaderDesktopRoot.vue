@@ -5,7 +5,7 @@
         <HeaderDesktopLink v-if="type === 'link'" :href :label />
         <HeaderDesktopDropdown v-else-if="type === 'dropdown'" :label :href :children />
       </li>
-      <li class="header-desktop-nav__menu-spacer">
+      <li v-if="!isWaitingListMode" class="header-desktop-nav__menu-spacer">
         <HeaderActionsSearch show-shortcut />
       </li>
     </ul>
@@ -31,6 +31,10 @@ interface Props {
 }
 
 defineProps<Props>()
+
+// @TODO - waiting list - remove once live
+const { isWaitingListMode } = useWaitingListMode();
+// @TODO end
 
 </script>
 
