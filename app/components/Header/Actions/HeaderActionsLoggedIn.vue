@@ -4,7 +4,12 @@
       Account
 
       <span role="img" class="header-actions-logged-in__profile-image">
-        <AtomsIcon icon="profile" />
+        <UAvatar
+          :src="user?.avatar || undefined"
+          icon="i-lucide-user"
+          size="lg"
+          :as="{ img: 'img' }"
+        />
       </span>
     </PopoverTrigger>
 
@@ -82,7 +87,7 @@ const notificationsTotal = computed(() => {
 /**
  *  Log user out
  */
-const { clear } = useUserSession()
+const { clear, user } = useUserSession()
 
 async function logOut() {
   await clear()

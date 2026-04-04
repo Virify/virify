@@ -126,7 +126,7 @@ const formatDisplayDate = (date: string | Date): string => {
   }
 
   &__item {
-    background: var(--background-200);
+    background: var(--background-100);
     border: 1px solid var(--monochrome-600);
     border-radius: var(--border-radius-lg);
     padding: var(--size-16);
@@ -137,19 +137,20 @@ const formatDisplayDate = (date: string | Date): string => {
     &::before {
       content: "";
       position: absolute;
-      left: calc(-1 * var(--size-48) + var(--size-6));
+      left: calc(-1 * var(--size-48) + var(--size-14));
       top: var(--size-16);
       width: var(--size-16);
       height: var(--size-16);
       background-color: var(--primary-400);
       border-radius: 50%;
       z-index: 2;
+      transform: translateX(-50%);
     }
 
     // Highlight first item
     &:first-child::before {
       border: 3px solid var(--blue-500);
-      left: calc(-1 * var(--size-48) + var(--size-6) - 3px);
+      box-sizing: content-box;
       top: calc(var(--size-16) - 3px);
     }
 
@@ -157,12 +158,13 @@ const formatDisplayDate = (date: string | Date): string => {
     &::after {
       content: "";
       position: absolute;
-      left: calc(-1 * var(--size-48) + var(--size-14) - 1px);
+      left: calc(-1 * var(--size-48) + var(--size-14));
       top: calc(var(--size-16) + var(--size-16));
       width: 2px;
       height: calc(100% + var(--size-16));
       background-color: var(--primary-400);
       z-index: 1;
+      transform: translateX(-50%);
     }
 
     &:last-child::after {
@@ -171,7 +173,7 @@ const formatDisplayDate = (date: string | Date): string => {
 
     // No history item styling
     &--no-history {
-      background: var(--background-200);
+      background: var(--background-100);
       border: 1px dashed var(--monochrome-600);
       text-align: center;
     }

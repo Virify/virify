@@ -60,6 +60,10 @@ export default defineAppConfig({
       },
     },
     navigationMenu: {
+      slots: {
+        viewport: 'bg-(--background-100)! ring-0! border-0!',
+        arrow: 'bg-(--background-100)! border-white/20!',
+      },
       compoundVariants: [
         // Active state for sidebar navigation (expanded)
         {
@@ -100,8 +104,8 @@ export default defineAppConfig({
           variant: "pill",
           collapsed: true,
           class: {
-            link: "hover:text-white hover:before:bg-white/5",
-            linkLeadingIcon: "group-hover:text-white",
+            link: "hover:text-foreground hover:before:bg-white/5",
+            linkLeadingIcon: "group-hover:text-foreground",
             item: "mb-2",
           },
         },

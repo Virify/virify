@@ -6,13 +6,14 @@
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard
           icon="i-lucide-eye"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -30,14 +31,14 @@
 
         <UPageCard
           icon="i-lucide-check-circle"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-100% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -55,14 +56,14 @@
 
         <UPageCard
           icon="i-lucide-trending-up"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -80,14 +81,14 @@
 
         <UPageCard
           icon="i-lucide-message-circle"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -111,14 +112,15 @@
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard
           icon="i-lucide-send"
-          spotlight
-          spotlight-color="secondary"
           :to="buildEnquiriesUrl({ direction: 'sent', sort: 'newest' })"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -136,14 +138,14 @@
 
         <UPageCard
           icon="i-lucide-reply"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -161,14 +163,14 @@
 
         <UPageCard
           icon="i-lucide-heart"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>
@@ -186,14 +188,14 @@
 
         <UPageCard
           icon="i-lucide-sticky-note"
-          variant="subtle"
-          spotlight
-          spotlight-color="secondary"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
-            leadingIcon: 'text-secondary',
-            title: 'body-sm font-bold',
-            description: 'body-xs text-muted-foreground',
-            container: 'border border-secondary rounded-lg',
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
           }"
         >
           <template #title>

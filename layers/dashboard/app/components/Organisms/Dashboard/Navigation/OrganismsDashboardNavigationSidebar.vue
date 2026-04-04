@@ -12,26 +12,27 @@
       class="border-0 ring-0"
       :ui="{
         header: 'p-4 border-none',
-        root: 'bg-primary text-sm',
+        root: 'bg-background text-sm',
         body: 'border-none',
-        content: 'bg-primary',
+        content: 'bg-background',
         footer: 'border-none w-full',
         overlay: 'backdrop-blur-sm',
-        toggle: '!text-white hover:!bg-white/10',
+        toggle: '!text-foreground hover:!bg-white/10',
+        handle: 'border border-(--background-300)',
       }"
     >
     <!-- sidebar header -->
     <template #header="{ collapsed }">
       <div class="flex items-center justify-between w-full p-2">
         <nuxt-link to="/" :class="[collapsed ? 'flex justify-center w-full' : '']" aria-label="Virify Home">
-          <AtomsIcon v-if="!collapsed" icon="logo/horizontal-colour" width="140" height="42" class="max-w-140 text-white" />
+          <AtomsIcon v-if="!collapsed" icon="logo/horizontal-colour" width="140" height="42" class="max-w-140 text-foreground" />
           <AtomsIcon v-else icon="logo/v-logo" width="42" height="42" class="shrink-0" />
         </nuxt-link>
         <UDashboardSidebarCollapse
           v-if="!collapsed"
           class="hover:bg-white/5 rounded-md transition-colors"
           :ui="{
-            leadingIcon: 'text-white',
+            leadingIcon: 'text-foreground',
           }"
         />
       </div>
@@ -41,19 +42,21 @@
       <TooltipProvider :delay-duration="400">
         <!-- notifications button at top -->
         <div 
-          class="flex items-center gap-2 border-b border-white/20 pb-2 cursor-pointer p-1"
+          :class="['flex items-center border-b border-white/20 pb-2 cursor-pointer p-1', collapsed ? 'justify-center' : 'gap-2']"
           @click="notificationSlideoverOpen = true"
         >
           <OrganismsDashboardNotificationButton v-model:open="notificationSlideoverOpen" color="secondary" />
           <div v-if="!collapsed" class="flex items-center gap-2 px-0 py-0">
-            <p class="body-xs! text-white">Notifications</p>
+            <p class="body-xs! text-foreground">Notifications</p>
             <UBadge
               v-if="notificationCounts?.total"
               :label="notificationCounts.total"
               size="md"
-              class="text-white border"
+              class="text-foreground bg-background"
               color="primary"
+              variant="outline"
               :ui="{
+                base: 'border',
                 label: 'font-normal',
               }"
             />
@@ -67,13 +70,12 @@
           :ui="{
             label: 'text-normal',
             link: 'body-xs no-underline',
-            item: 'text-white',
-            content: 'no-underline bg-primary text-white ring-0 border-0',
-            viewport: 'shadow-none ring-0 border-0',
+            item: 'text-foreground',
+            content: 'no-underline text-foreground ring-0! border-0!',
             linkLeadingIcon: 'text-secondary',
             linkTrailingBadgeSize: 'md',
             childLinkIcon: 'text-secondary',
-            linkTrailingBadge: 'text-white bg-background',
+            linkTrailingBadge: 'text-foreground bg-(--background-100) border',
           }"
           :collapsed="collapsed"
         >
@@ -81,9 +83,9 @@
           <template #list-leading>
             <UDashboardSidebarCollapse
               v-if="collapsed"
-              class="hover:bg-white/5 rounded-md transition-colors"
+              class="hover:bg-background/90 rounded-md transition-colors"
               :ui="{
-                leadingIcon: 'text-white',
+                leadingIcon: 'text-foreground',
               }"
             />
           </template>
@@ -115,10 +117,10 @@
               size="xs"
               @click="logout"
               tooltip="Logout"
-              class="body-sm text-white hover:bg-white/5 rounded-md transition-colors"
+              class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
               :ui="{
                 leadingIcon: 'text-secondary',
-                label: 'text-white font-bold',
+                label: 'text-foreground font-bold',
               }"
               :label="collapsed ? undefined : 'Logout'"
               :square="collapsed"
@@ -128,7 +130,7 @@
         <UColorModeButton
           class="hover:bg-white/5 rounded-md transition-colors"
           :ui="{
-            leadingIcon: 'text-white',
+            leadingIcon: 'text-foreground',
           }"
         />
       </div>

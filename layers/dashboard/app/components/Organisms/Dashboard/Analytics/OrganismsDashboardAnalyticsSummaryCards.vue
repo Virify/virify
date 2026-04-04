@@ -12,10 +12,8 @@
     <!-- Data state -->
     <template v-else>
       <!-- Total Views -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-eye"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -24,7 +22,6 @@
             <UBadge
               v-if="summary.totalViews > 0"
               :color="summary.viewsChange >= 0 ? 'success' : 'error'"
-              variant="subtle"
               size="md"
               :leading-icon="summary.viewsChange >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'"
             >
@@ -38,11 +35,8 @@
       </UPageCard>
 
       <!-- Impressions -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-trending-up"
-        variant="subtle"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -51,7 +45,6 @@
             <UBadge
               v-if="summary.totalImpressions > 0"
               :color="summary.impressionsChange >= 0 ? 'success' : 'error'"
-              variant="subtle"
               size="md"
               :leading-icon="summary.impressionsChange >= 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'"
             >
@@ -65,11 +58,8 @@
       </UPageCard>
 
       <!-- CTR -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-mouse-pointer-click"
-        variant="subtle"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -81,11 +71,8 @@
       </UPageCard>
 
       <!-- Enquiries -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-message-square"
-        variant="subtle"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -97,10 +84,8 @@
       </UPageCard>
 
       <!-- Favourited -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-heart"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -112,11 +97,8 @@
       </UPageCard>
 
       <!-- Reply Rate -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-reply"
-        variant="subtle"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -128,11 +110,8 @@
       </UPageCard>
 
       <!-- Avg Views -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-bar-chart-2"
-        variant="subtle"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>
@@ -144,11 +123,8 @@
       </UPageCard>
 
       <!-- Saved -->
-      <UPageCard
+      <UPageCard class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
         icon="i-lucide-bookmark"
-        variant="subtle"
-        spotlight
-        spotlight-color="secondary"
         :ui="ANALYTICS_CARD_UI"
       >
         <template #title>

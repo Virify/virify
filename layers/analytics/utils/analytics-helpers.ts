@@ -128,8 +128,10 @@ export const getEmptyAnalyticsSummary = () => ({
  * UPageCard UI config for analytics cards
  */
 export const ANALYTICS_CARD_UI = {
-  leadingIcon: 'text-secondary',
-  title: 'body-sm font-bold',
-  description: 'body-xs text-muted-foreground',
-  container: 'border border-secondary rounded-lg',
+  root: 'bg-[#2b3945]! ring-0',
+  container: 'shadow-xl',
+  title: 'body-sm font-bold text-white',
+  leadingIcon: 'h-6 w-6 text-secondary',
+  description: 'body-xs text-white',
+  body: 'flex flex-col justify-evenly',
 };

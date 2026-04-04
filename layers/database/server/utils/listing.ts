@@ -49,6 +49,7 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
           username: true,
           email: true,
           createdAt: true,
+          avatar: true,
         },
       },
     },
@@ -83,6 +84,7 @@ export async function getListingByIdForEdit(id: number, userId: number): Promise
           username: true,
           email: true,
           createdAt: true,
+          avatar: true,
         },
       },
     },
@@ -143,6 +145,7 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
           username: true,
           email: true,
           createdAt: true,
+          avatar: true,
         },
       },
     },
@@ -312,6 +315,7 @@ const fullListingInclude = {
       username: true,
       email: true,
       createdAt: true,
+      avatar: true,
     },
   },
 };
@@ -336,6 +340,30 @@ export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, pa
   return await prisma.listing.findMany({
     where,
     include: fullListingInclude,
+    skip,
+    take: limit,
+  });
+}
+
+/**
+ * Fetches card-only listing data (lean select, no room details).
+ */
+export async function fetchListingsForCard(where: Prisma.ListingWhereInput): Promise<ListingCardType[]> {
+  return await prisma.listing.findMany({
+    where,
+    select: listingCardFields,
+  });
+}
+
+/**
+ * Fetches paginated card-only listing data.
+ */
+export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20): Promise<ListingCardType[]> {
+  const skip = (page - 1) * limit;
+
+  return await prisma.listing.findMany({
+    where,
+    select: listingCardFields,
     skip,
     take: limit,
   });

@@ -1,42 +1,20 @@
 <template>
-  <div class="homepage-section-search">
-    <h1 class="homepage-section-search__search-title | title-2xl lineheight-xs">
-      Find Your Perfect Home with
-      <span class="gradient-text"> Virify AI </span>
-    </h1>
+  <OrganismsBannerHero class="homepage-section-search">
+    <template #title>
+      Find Your Perfect Home with Virify AI
+    </template>
 
-    <OrganismsDockBanner listingType="all" class="homepage-section-search__search-dock" />
-  </div>
+    <OrganismsDockBanner listingType="all" class="homepage-section-search__dock" />
+  </OrganismsBannerHero>
 </template>
 
 <style lang="scss">
 @use '#styles/_utils/media' as mq;
 
 .homepage-section-search {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-  position: relative;
   z-index: 2;
-  background: var(--blue-200);
-  border-radius: var(--border-radius-2xl);
-  padding: var(--size-48) var(--size-32) var(--size-32);
 
-  @include mq.tablet {
-    border-radius: var(--border-radius-3xl);
-    padding: var(--size-56) var(--size-72) var(--size-72);
-    min-height: 24em;
-  }
-
-  @include mq.desktop {
-    border-radius: var(--border-radius-4xl);
-    padding: var(--size-56) var(--size-56) var(--size-96);
-    min-height: 30em;
-  }
-
-  &__search-dock {
+  &__dock {
     width: min(100%, 740px);
     margin: 0 auto var(--size-48);
   }
@@ -47,7 +25,7 @@
     margin: 0 auto var(--size-24);
 
     @include mq.tablet {
-      margin-bottom: var(--size-48);
+      margin-top: var(--size-24);
     }
   }
 

@@ -76,6 +76,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         username: true,
         email: true,
         createdAt: true,
+        avatar: true,
       },
     },
   },
@@ -89,6 +90,7 @@ export type ListingCardData = Omit<ListingWithFullProperty, 'property' | 'user'>
   };
   user: NonNullable<ListingWithFullProperty['user']> & {
     username: string;
+    avatar?: string | null;
   };
 };
 
@@ -274,13 +276,21 @@ export const listingCardFields = {
           land: true,
         },
       },
+      energyAndUtilities: {
+        select: {
+          renewables: true,
+        },
+      },
     },
   },
+  createdAt: true,
+  updatedAt: true,
   user: {
     select: {
       id: true,
       username: true,
       email: true,
+      avatar: true,
     },
   },
 };
