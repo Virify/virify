@@ -82,6 +82,7 @@ interface FacilitiesIcon {
 interface Props {
   saleOrRent?: 'buy' | 'rent' | string
   propertyImage?: string
+  carouselImages?: string[]
   propertyImageAlt?: string
   disabledInteractions?: boolean
   imageProvider?: 'cloudflare' | 'local'
