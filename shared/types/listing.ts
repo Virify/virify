@@ -76,6 +76,7 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         username: true,
         email: true,
         createdAt: true,
+        avatar: true,
       },
     },
   },

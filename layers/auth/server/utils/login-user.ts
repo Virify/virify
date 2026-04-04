@@ -23,6 +23,7 @@ export async function loginUser(event: H3Event, user: UserWithVerificationAndMem
       membershipEndDate: user.membership?.endDate,
       role: user.verification?.role,
       activated: user.verification?.activated,
+      avatar: user.avatar || undefined,
     },
     loggedIn: true,
     loggedInAt: new Date(),

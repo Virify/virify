@@ -178,7 +178,7 @@ function showExpandedForm() {
  *  Fetch filters
  */
 const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
-const { checkContent, isChecking } = useModeration()
+const { checkText, isChecking } = useModeration()
 const toast = useToast()
 
 const initialQuery = computed(() => {
@@ -232,7 +232,7 @@ async function aiSearchSubmit(query: string) {
   }
 
   // Check content moderation before proceeding
-  const { safe, reason } = await checkContent(query)
+  const { safe, reason } = await checkText(query)
   if (!safe) {
     toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
     return
