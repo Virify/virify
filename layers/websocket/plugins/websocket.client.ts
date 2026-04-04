@@ -154,7 +154,8 @@ export default defineNuxtPlugin(() => {
         });
 
         // Trigger browser desktop notification if the user has enabled it
-        if (canDesktop.value && Notification.permission === 'granted') {
+        // Suppress if the page is currently focused (in-app toast already shown)
+        if (canDesktop.value && Notification.permission === 'granted' && document.visibilityState === 'hidden') {
           const body = [
             notification.message,
             notification.listingAddress ? notification.listingAddress : null,
@@ -163,8 +164,7 @@ export default defineNuxtPlugin(() => {
           new Notification(notification.title, {
             body,
             icon: notification.senderAvatar || '/favicon.ico',
-            image: notification.listingImage || undefined,
-            tag: `notification-${notification.id}`, // deduplicates if fired twice
+            tag: `notification-${notification.id}`,
           });
         }
       },
