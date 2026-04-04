@@ -99,17 +99,22 @@ const paginatedResults = computed(() => {
 
   // Else return sliced results
   //
-  // @TODO - we probably want to have `.map(mapToCardProps)` earlier in
-  //         the lifecycle of data processing. Having this here means we
-  //         are re-formatting every time someone paginates, meaning a
-  //         user might end up formatting the same thing multiple times
-  //         if navigating back/forth. If we format earlier - maybe even
-  //         using the fetch(..., { transform: () => ... })) function -
-  //         we can optimise this even further and make data processing
-  //         even more simple
+  // @TODO - we probably want to have `.map(mapToCardProps)`
+  //         earlier in the lifecycle of data processing. Having this 
+  //         here means we are re-formatting every time someone
+  //         paginates, meaning a user might end up formatting the same
+  //         thing multiple times if navigating back/forth. If we format
+  //         earlier - maybe even using the:
+  //
+  //         > fetch(..., { transform: () => ... }))
+  // 
+  //         function - we can optimise this even further and make data
+  //         processing even more simple
   //
   //         Leaving here for now as this works more than well enough
   //         for the time being
+  //         `formatSearchResults` at some point - should be a simple
+  //         swap
   return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value).map(mapToCardProps)
 })
 
