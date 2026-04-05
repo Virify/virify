@@ -561,6 +561,41 @@ export async function getTrendingSearches(limit: number = 10): Promise<TrackSear
 }
 
 /**
+ * Get recent search queries that returned results, deduplicated by query text
+ * Note: Caching is handled at the API endpoint level using Nitro's defineCachedEventHandler
+ * @param limit Maximum number of unique query strings to return
+ * @returns Unique query strings from recent successful searches
+ */
+export async function getRecentSearchQueries(limit: number = 6): Promise<string[]> {
+  const searches = await prisma.trackSearch.findMany({
+    where: {
+      resultCount: { gt: 0 },
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    select: {
+      query: true,
+    },
+    take: limit * 4, // Fetch extra to allow deduplication
+  });
+
+  const seen = new Set<string>();
+  const unique: string[] = [];
+
+  for (const { query } of searches) {
+    const normalised = query.trim().toLowerCase();
+    if (!seen.has(normalised)) {
+      seen.add(normalised);
+      unique.push(query.trim());
+    }
+    if (unique.length >= limit) break;
+  }
+
+  return unique;
+}
+
+/**
  * Get trending locations based on search count
  * Note: Caching is handled at the API endpoint level using Nitro's defineCachedEventHandler
  * @param limit Maximum number of trending locations to return

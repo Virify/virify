@@ -35,15 +35,7 @@ const { searchState, setQuery } = useSearchState()
 
 const location = computed(() => searchState.value?.location)
 
-// @TODO: Consider making these dynamic based on popular searches or user preferences
-const examplePrompts = [
-  "4 bedroom house with a garden for sale",
-  "Studio flat with a balcony to rent",
-  "2+ bedroom property to buy",
-  "3 bedroom detached cottage for sale",
-  "A large parcel of land",
-  "3 bedroom house with a garage"
-];
+const { suggestedSearches: examplePrompts } = useAiSuggestedSearches();
 
 function searchWithPrompt(prompt: string) {
   const loc = location.value
