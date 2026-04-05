@@ -274,19 +274,19 @@ useHead({
   }
 
   &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: fixed;
-    bottom: 120px;
-    left: 50%;
-    transform: translateX(-50%);
+    inset: 0;
     z-index: 8;
-    background: var(--background-200);
-    border-radius: var(--border-radius-2xl);
-    padding: var(--size-24);
-    box-shadow: var(--shadow-300);
-    max-width: 400px;
+    background: radial-gradient(var(--background-200), transparent);
+    gap: var(--size-16);
 
-    @media (min-width: 768px) {
-      bottom: 140px;
+    .m-ai-search-loading__content {
+      max-width: 24ch;
+      line-height: var(--lineheight-sm);
+      font-size: var(--font-lg);
     }
   }
 }
