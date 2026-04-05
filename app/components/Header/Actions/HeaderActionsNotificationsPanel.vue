@@ -31,13 +31,15 @@
 
     <!-- Notification list -->
     <div v-else class="nav-notifications__list">
-      <button
+      <div
         v-for="notification in displayNotifications"
         :key="notification.id"
-        type="button"
+        role="button"
+        tabindex="0"
         class="nav-notifications__item"
         :class="{ 'nav-notifications__item--unread': !notification.isRead }"
         @click="handleSelect(notification)"
+        @keydown.enter.space.prevent="handleSelect(notification)"
       >
         <span class="nav-notifications__unread-dot" aria-hidden="true" />
 
@@ -65,7 +67,7 @@
         >
           <AtomsIcon icon="cross" :size="16" />
         </button>
-      </button>
+      </div>
 
       <!-- Infinite scroll sentinel -->
       <div ref="sentinel" class="nav-notifications__sentinel" />
