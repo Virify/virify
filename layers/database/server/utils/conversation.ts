@@ -508,6 +508,7 @@ const conversationListingMinimalSelect = {
       address: {
         select: {
           fullAddress: true,
+          street: true,
           city: true,
           postcode: true,
         },
