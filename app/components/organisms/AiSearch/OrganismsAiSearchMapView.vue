@@ -13,14 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import { loadingMessages } from '~/utils/search-form/loading-messages';
-
-
-const loadingMessage = computed(() => {
-  const randomIndex = Math.floor(Math.random() * loadingMessages.length);
-  return loadingMessages[randomIndex] ?? 'Searching for properties...';
-});
-
 interface Props {
   results: ListingWithFullProperty[];
   location?: GeocodingFeatureWithBoundary | null;
@@ -37,36 +29,46 @@ const mapInstance = ref<any>(null);
 
 // Convert ListingWithFullProperty to ListingCardType format that Map component expects
 const convertedMarkers = computed((): ListingCardType[] => {
-  return convertListingsToMarkers(props.results);
+  const { results } = asObject(props)
+
+  return convertListingsToMarkers(results);
 });
 
 // Calculate map center from location or bbox
 const mapCenter = computed(() => {
-  if (props.location) {
-    return calculateMapCenter(props.location, props.radius);
-  }
-  return undefined; // Let Map component use defaults
-});
+  const { location, radius = 0 } = asObject(props)
+
+  if (!location) return undefined // Let Map component use defaults
+
+  return calculateMapCenter(location, radius)
+})
 
 // Calculate zoom from radius or bbox
 const mapZoom = computed(() => {
-  if (props.location) {
-    return calculateMapZoom(props.location, props.radius);
-  }
-  return undefined; // Let Map component use defaults
+  const { location, radius = 0 } = asObject(props)
+
+  if (!location) return undefined // Let Map component use defaults
+
+  return calculateMapZoom(location, radius);
 });
 
 // Apply radius visualization to the map
 function applyRadiusVisualization() {
-  if (mapInstance.value && props.location) {
-    const center = calculateMapCenter(props.location, props.radius);
-    updateSearchRadiusVisualization(mapInstance.value, center, props.radius, props.location.bbox, props.location.boundaryPolygon);
-  }
+  const { location, radius = 0 } = asObject(props)
+
+  if (!mapInstance.value || !location) return
+
+  const { bbox, boundaryPolygon } = asObject(location)
+  const center = calculateMapCenter(location, radius)
+
+  updateSearchRadiusVisualization(mapInstance.value, center, radius, bbox, boundaryPolygon);
 }
+
 
 // Handle map ready event - apply visualization when map is fully initialized
 function onMapReady(map: any) {
   mapInstance.value = map;
+
   applyRadiusVisualization();
 }
 
