@@ -2,7 +2,7 @@ import type { ListingWithFullProperty as Result } from '../types/listing'
 
 interface LastChange {
   dateChanged: string
-  dateChangedType: 'Added' | 'Updated'
+  dateChangedType: 'Added' | 'Updated' | 'Reduced'
 }
 
 /**
@@ -60,25 +60,20 @@ function __getCoords(property: Result['property']): [number, number] | undefined
 }
 
 /**
- *  Get seller username
+ *  Get all images for the result card
  */
-function __getUsername(result: Result): string | undefined {
-  const { username } = asObject(result?.user)
-
-  return username as string | undefined
-}
-
-/**
- *  Get first image from property media attribute
- */
-function __getFirstImage(property: Result['property']): string | undefined {
+function __getImages(property: Result['property']): string[] {
   const { media } = asObject(property)
 
-  // @ts-ignore
-  const [firstImage] = asArray(media)
+  interface PropertyImage {
+    image: string
+  }
 
-  // @ts-ignore
-  return firstImage?.image
+  return asArray(media).map((row: PropertyImage) => {
+    const { image } = asObject(row)
+
+    return image
+  })
 }
 
 /**
@@ -93,19 +88,21 @@ function __getFullAddress(property: Result['property']): string | undefined {
 /**
  *  Get labels for sale type (e.g. 'chain free', 'leasehold')
  */
-function __getLabels(result: Result, isSale: boolean) {
+function __getLabels(result: Result, isSale: boolean): string[] {
   if (isSale) {
-    const { tenureType } = asObject(result?.saleListing)
+    const { tenureType, furnishedStatus, chain } = asObject(result?.saleListing)
 
-    // @ts-ignore
-    // @TODO - check what the actual type expected is, here
-    return [tenureType].map(__formatString).filter(isString)
+    // @TODO - probably want to standardise how we format enum strings
+    return [
+      tenureType,
+      furnishedStatus,
+      chain && 'Chain free'
+    ].map(__formatString).filter(isString)
   }
 
   const { rentalLength, furnishedStatus } = asObject(result?.rentalListing)
 
-  // @ts-ignore
-  // @TODO - check what the actual type expected is, here
+  // @TODO - probably want to standardise how we format enum strings
   return [rentalLength, furnishedStatus].map(__formatString).filter(isString)
 }
 
@@ -114,35 +111,51 @@ function __getLabels(result: Result, isSale: boolean) {
  */
 function __getIcons(property: Result['property']): { icon: string, label: string }[] {
   const {
-    bedroomFeatures,
-    bathroomFeatures,
-    reception,
+    numberBedrooms,
+    numberBathrooms,
+    numberReceptions,
+    energyAndUtilities,
     parking,
     outdoorSpace,
   } = asObject(property)
 
-  // Quickly check if features exist
-  const hasFeatures = (attr: unknown): boolean => {
-    const { features } = asObject(attr)
+  const __hasRenewables = (energyAndUtilities: unknown): boolean => {
+    const { renewables } = asObject(energyAndUtilities)
 
-    return !!(features as unknown[])?.length
+    return isPopulatedArray(renewables)
+  }
+
+  const __hasParking = (parking: unknown): boolean => {
+    const { features } = asObject(parking)
+
+    return isPopulatedArray(features)
+  }
+
+  const __hasOutdoorSpace = (outdoorSpace: unknown): boolean => {
+    const { garden, yard, land } = asObject(outdoorSpace)
+
+    const hasGarden = isPopulatedArray(garden)
+    const hasYard = isPopulatedArray(yard)
+    const hasLand = isPopulatedArray(land)
+
+    return hasGarden || hasYard || hasLand
   }
 
   // Get numbered rooms
   const numberedRooms = [
     {
       icon: 'property/bedrooms',
-      count: (bedroomFeatures as unknown[])?.length,
+      count: numberBedrooms,
       label: 'Bedrooms'
     },
     {
       icon: 'property/bathrooms',
-      count: (bathroomFeatures as unknown[])?.length,
+      count: numberBathrooms,
       label: 'Bathrooms'
     },
     {
       icon: 'property/receptions',
-      count: (reception as unknown[])?.length,
+      count: numberReceptions,
       label: 'Receptions'
     },
   ].filter(({ count }) => !!count)
@@ -152,12 +165,17 @@ function __getIcons(property: Result['property']): { icon: string, label: string
     {
       icon: 'property/parking',
       label: 'Parking',
-      active: hasFeatures(parking),
+      active: __hasParking(parking),
     },
     {
       icon: 'property/front-garden',
       label: 'Garden',
-      active: hasFeatures(outdoorSpace),
+      active: __hasOutdoorSpace(outdoorSpace),
+    },
+    {
+      icon: 'property/utility',
+      label: 'Renewables',
+      active: __hasRenewables(energyAndUtilities),
     }
   ].filter(({ active }) => !!active)
 
@@ -189,7 +207,7 @@ function __getOverview(property: Result['property']): string {
 /**
  *  Get rental duration (e.g. price per week or per month)
  */
-function __getRentalFrequency(rentalListing: Result['rentalListing']) {
+function __getRentalFrequency(rentalListing: Result['rentalListing']): string | undefined {
   const { rentFrequency } = asObject(rentalListing)
 
   return __formatString(rentalListing?.rentFrequency) || rentFrequency
@@ -253,16 +271,19 @@ function __getLastChanged(property: Result['property']): LastChange {
 export function formatSearchResults(result?: Result) {
   const {
     id,
-    userId,
     price,
     property,
     listingType,
     saleListing,
-    rentalListing
+    rentalListing,
+    user,
   } = asObject(result)
 
   const isSale = listingType === 'buy'
   const { dateChanged, dateChangedType } = __getLastChanged(property)
+
+  const { id: userId, username, avatar } = asObject(user)
+  const images = __getImages(property as Result['property'])
 
   /**
    *  @TODO - Should fix type hinting below, as casting everything can
@@ -270,26 +291,23 @@ export function formatSearchResults(result?: Result) {
    *          mean this does not error)
    */
   return {
-    listingId: id,
-    userId,
+    listingId: id as number,
+    userId: userId as number,
     saleOrRent: listingType as 'buy' | 'rent',
     price: numberToCurrency(price as number, true),
     overviewAddress: __getFullAddress(property as Result['property']),
-    propertyImage: __getFirstImage(property as Result['property']),
+    propertyImage: images[0],
+    carouselImages: images,
     coords: __getCoords(property as Result['property']),
-    sellerName: __getUsername(result as Result),
     overview: __getOverview(property as Result['property']),
     icons: __getIcons(property as Result['property']),
     viewUrl: __getListingURL(result as Result),
     dateChanged: dateChanged,
     dateChangedType: dateChangedType,
-
-    // @TODO - partial
     labels: __getLabels(result as Result, isSale),
     priceLabel: __getPriceLabel(isSale && saleListing),
     rentFrequency: __getRentalFrequency(!isSale && rentalListing),
-
-    // @TODO - full
-    sellerImage: null,
+    sellerName: username as string | undefined,
+    sellerImage: avatar as string | undefined
   }
 }

@@ -1,3 +1,10 @@
+/**
+ *  @TODO - we also have a function at:
+ *
+ *          > shared/utils/format-search-results.ts
+ *
+ *          which should potentially replace this function in the future
+ */
 export function mapToCardProps(result: ListingCardData) {
   const { id, price, rentalListing, saleListing, updatedAt, createdAt, property, user } = result;
   const { numberBedrooms, numberBathrooms, numberReceptions, type, classification, address, media, outdoorSpace, energyAndUtilities } = property;
@@ -33,6 +40,7 @@ export function mapToCardProps(result: ListingCardData) {
   return {
     saleOrRent,
     propertyImage: media?.[0]?.image ?? undefined,
+    carouselImages: media?.map(row => row?.image).filter(Boolean) as string[],
     propertyImageAlt: overview,
     price: numberToCurrency(Math.floor(price)),
     rentFrequency: rentalListing ? convertEnumToString(rentalListing.rentFrequency) : undefined,
