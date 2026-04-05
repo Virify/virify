@@ -1,8 +1,16 @@
 <template>
   <section class="property-card-root">
     <div class="property-card-root__images | v-skeleton">
-      <PropertyCardImage v-if="propertyImage" :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt"
-        variant="card" class="property-card-root__image" width="491" height="368" loading="lazy" />
+      <template v-if="imageCarouselArray">
+        <PropertyCardCarousel :slides="imageCarouselArray" v-slot="{ slide }">
+          <PropertyCardImage :provider="imageProvider" :src="slide" :alt="propertyImageAlt" variant="card"
+            class="property-card-root__image" width="491" height="368" loading="lazy" />
+        </PropertyCardCarousel>
+      </template>
+
+      <PropertyCardImage v-else-if="propertyImage" :provider="imageProvider" :src="propertyImage"
+        :alt="propertyImageAlt" variant="card" class="property-card-root__image" width="491" height="368"
+        loading="lazy" />
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
@@ -158,6 +166,24 @@ const timeAgo = computed(() => {
   const { dateChanged, dateChangedType } = props
 
   return [dateChangedType, getTimeAgo(dateChanged)].filter(Boolean).join(' ')
+})
+
+/**
+ *  Get populated images for image carousel
+ */
+const imageCarouselArray = computed(() => {
+  const { carouselImages } = asObject(props)
+
+  // If carousel images is not a populated array, return nothing
+  if (!isPopulatedArray(carouselImages)) {
+    return null
+  }
+
+  // Get only array entries that are strings
+  const imageStrings = carouselImages?.filter(isString) as string[]
+
+  // Return array only if it has entries
+  return imageStrings.length ? imageStrings : null
 })
 
 </script>

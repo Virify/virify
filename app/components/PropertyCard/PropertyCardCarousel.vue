@@ -103,14 +103,19 @@ const unwatch = watch(emblaApi, (api) => {
   color: white;
   border: 0;
   border-radius: 50%;
-  width: var(--size-36);
-  height: var(--size-36);
+  width: var(--size-32);
+  height: var(--size-32);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background-color var(--animation-fast) var(--ease-in-out);
   z-index: 2;
   cursor: pointer;
+
+  @include mq.tablet {
+    width: var(--size-36);
+    height: var(--size-36);
+  }
 
   &:hover:not(:disabled) {
     background: rgba(0, 0, 0, 0.7);
@@ -123,16 +128,24 @@ const unwatch = watch(emblaApi, (api) => {
 }
 
 .embla-prev {
-  left: var(--size-12);
+  left: var(--size-6);
+
+  @include mq.tablet {
+    left: var(--size-12);
+  }
 }
 
 .embla-next {
-  right: var(--size-12);
+  right: var(--size-6);
+
+  @include mq.tablet {
+    right: var(--size-12);
+  }
 }
 
 .embla-current-slide {
   position: absolute;
-  bottom: var(--size-12);
+  bottom: var(--size-6);
   left: 50%;
   transform: translateX(-50%);
   padding: var(--size-4) var(--size-10);
@@ -141,6 +154,10 @@ const unwatch = watch(emblaApi, (api) => {
   border-radius: var(--border-radius-md);
   font-weight: var(--font-semibold);
   margin: 0;
+
+  @include mq.tablet {
+    bottom: var(--size-12);
+  }
 }
 
 @media (hover: hover) {
@@ -151,6 +168,12 @@ const unwatch = watch(emblaApi, (api) => {
 
   .embla-wrapper:hover .embla-desktop-hover {
     opacity: 1;
+  }
+}
+
+@media (hover:none) {
+  .embla-nav {
+    display: none;
   }
 }
 </style>
