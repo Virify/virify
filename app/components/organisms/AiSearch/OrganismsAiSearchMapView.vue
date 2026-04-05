@@ -1,14 +1,12 @@
 <template>
-  <div class="ai-search-map-view">
-    <Map ref="mapRef" :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" @map-ready="onMapReady" />
-
-    <!-- Loading overlay for map view - only show when actively searching -->
-    <div v-if="isSearching" class="ai-search-map-view__overlay | body-lg">
-      {{ loadingMessage }}
-    </div>
+  <div class="ai-search-map-view" :class="{
+    'ai-search-map-view--inactive | v-skeleton': isSearching || !results.length
+  }">
+    <Map :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" @map-ready="onMapReady" />
 
     <!-- No results overlay - show when search completed with no results -->
-    <div v-else-if="hasSearched && !results.length" class="ai-search-map-view__overlay ai-search-map-view__overlay--no-results | body-lg">
+    <div v-if="hasSearched && !results.length"
+      class="ai-search-map-view__overlay ai-search-map-view__overlay--no-results | body-lg">
       No properties found in this area
     </div>
   </div>
@@ -35,7 +33,6 @@ const props = defineProps<Props>();
 
 const { updateSearchRadiusVisualization } = useMap();
 
-const mapRef = ref();
 const mapInstance = ref<any>(null);
 
 // Convert ListingWithFullProperty to ListingCardType format that Map component expects
@@ -91,6 +88,13 @@ watch([() => props.location, () => props.radius], () => {
   position: relative;
   overflow: hidden;
 
+  &--inactive {
+
+    .map-container {
+      opacity: 0;
+    }
+  }
+
   &__overlay {
     position: absolute;
     top: 0;
@@ -102,7 +106,7 @@ watch([() => props.location, () => props.radius], () => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: fn.faded-color(70%, var(--monochrome-100));
+    background: fn.faded-color(70%, var(--background-200));
     color: var(--monochrome-900);
     font-weight: var(--font-semibold);
 
