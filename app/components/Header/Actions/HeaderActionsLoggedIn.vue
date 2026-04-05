@@ -78,8 +78,8 @@ const accountLinks = [
     url: '/dashboard'
   },
   {
-    title: 'Security',
-    url: '/dashboard/security'
+    title: 'Settings',
+    url: '/dashboard/profile'
   }
 ]
 
