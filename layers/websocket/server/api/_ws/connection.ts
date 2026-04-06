@@ -7,11 +7,17 @@ const { addPeer, removePeer, handleIncomingMessages } = useWebSocketServer();
 // every high-frequency typing / message_read frame. Entries expire after 60 seconds.
 const participantCache = new Map<string, { otherParticipantId: number; expiresAt: number }>();
 const PARTICIPANT_CACHE_TTL_MS = 60_000;
+const PARTICIPANT_CACHE_CLEANUP_INTERVAL_MS = 10_000;
+let lastParticipantCacheCleanupAt = 0;
 
 function setCachedParticipant(key: string, value: { otherParticipantId: number; expiresAt: number }) {
   const now = Date.now();
-  for (const [k, v] of participantCache) {
-    if (v.expiresAt <= now) participantCache.delete(k);
+  // Clean up memory periodically instead of on every cache write.
+  if (now - lastParticipantCacheCleanupAt >= PARTICIPANT_CACHE_CLEANUP_INTERVAL_MS) {
+    lastParticipantCacheCleanupAt = now;
+    for (const [k, v] of participantCache) {
+      if (v.expiresAt <= now) participantCache.delete(k);
+    }
   }
   participantCache.set(key, value);
 }

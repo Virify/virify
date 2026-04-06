@@ -76,12 +76,22 @@ export function useTurnstile() {
         reject(new Error('Bot verification timed out. Please refresh the page and try again.'));
       }, 10_000);
 
-      tokenResolver.value = (token: string) => {
+      const resolver = (token: string) => {
         clearTimeout(timeout);
         resolve(token);
       };
 
-      (window as any).turnstile.execute(widgetId.value);
+      tokenResolver.value = resolver;
+
+      try {
+        (window as any).turnstile.execute(widgetId.value);
+      } catch (error) {
+        clearTimeout(timeout);
+        if (tokenResolver.value === resolver) {
+          tokenResolver.value = null;
+        }
+        reject(error instanceof Error ? error : new Error('Bot verification could not be started. Please try again.'));
+      }
     });
   };
 
