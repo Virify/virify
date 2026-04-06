@@ -122,7 +122,8 @@
                     color="neutral"
                     variant="outline"
                     :loading="avatarUploading || avatarModerating"
-                    :disabled="avatarUploading || avatarModerating"
+                    :disabled="avatarUploading || avatarModerating || !isProfileValid"
+                    :title="!isProfileValid ? 'Please complete the required profile fields before uploading an avatar' : undefined"
                     @click="open()"
                   />
                 </div>
@@ -213,6 +214,8 @@ const { accountNavigationItems } = useDashboardNavigation();
 
 const { state, pending, onSubmit, profileSchema } = await useProfileForm();
 const intents = profileIntents;
+
+const isProfileValid = computed(() => profileSchema.safeParse(state).success);
 
 const { avatarFile, avatarPreview, avatarUploading, avatarModerating, avatarRemoving, removeAvatar } = useAvatarUpload(state);
 </script>
