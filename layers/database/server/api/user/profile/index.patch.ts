@@ -1,4 +1,4 @@
-import { invalidateListingCaches } from "~~/layers/database/server/utils/listing-cache";
+import { invalidateListingCaches } from "~~/layers/database/server/utils/cache";
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);

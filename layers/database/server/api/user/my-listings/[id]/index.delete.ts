@@ -24,12 +24,13 @@ export default defineEventHandler(async (event) => {
     // Clear the listing cache when archived
     const storage = useStorage('cache:listing')
     await storage.removeItem(`listing:${id}`)
+    await invalidateAggregatesCache(userId as number)
     
     // Send websocket update for listings count change
     try {
       const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer()
-      const aggregateMessage = createAggregateUpdateMessage("listings", "update", userId)
-      sendMessage(aggregateMessage)
+      sendMessage(createAggregateUpdateMessage("listings", "remove", userId as number))
+      sendMessage(createAggregateUpdateMessage("archivedListings", "add", userId as number))
     } catch (error) {
       console.warn(`[DELETE /api/user/my-listings/${id}] WebSocket update failed (non-critical):`, error)
     }

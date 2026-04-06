@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { SaleAvailabilityStatus, RentalAvailabilityStatus } from '~~/layers/database/server/database/prisma/generated/client'
-import { invalidateListingCache } from '~~/layers/database/server/utils/listing-cache'
+import { invalidateListingCache } from '~~/layers/database/server/utils/cache'
 
 const availabilitySchema = z.object({
   availabilityStatus: z.enum({ ...SaleAvailabilityStatus, ...RentalAvailabilityStatus }),

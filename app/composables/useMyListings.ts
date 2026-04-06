@@ -154,6 +154,25 @@ export const useMyListings = createSharedComposable(() => {
     }
   }
 
+  /**
+   * Restores an archived listing back to My Listings (unpublished, not archived).
+   */
+  async function restoreListing(listingId: number): Promise<void> {
+    await $fetch('/api/listing/restore', {
+      method: "POST",
+      body: { listingId },
+    });
+
+    // Remove from local archived listings view
+    const idx = listings.value.findIndex((l) => l.id === listingId);
+    if (idx !== -1) {
+      listings.value.splice(idx, 1);
+      total.value -= 1;
+    }
+
+    toast.add({ title: "Listing restored", description: "Your listing is back in My Listings (unpublished)", color: "success" });
+  }
+
   async function getRecentListings(limit = 5) {
     if (!loggedIn.value) return []
     
@@ -195,6 +214,7 @@ export const useMyListings = createSharedComposable(() => {
     togglePublished,
     setAvailabilityStatus,
     archiveListing,
+    restoreListing,
     getRecentListings,
     getAllListingsForAnalytics,
   };
