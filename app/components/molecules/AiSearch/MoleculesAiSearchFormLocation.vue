@@ -109,7 +109,11 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
 function handleRadiusSelected() {
   const { radius } = asObject(searchState.value)
 
+  // Update radius for location
   setLocationRadius(Number(radius) || 0)
+
+  // Emit event to parent
+  emit('location-selected')
 }
 
 /**

@@ -10,7 +10,8 @@
         </AtomsButton>
 
         <template v-if="popover">
-          <component class="o-dock__popover-content" :is="popover.component" />
+          <component class="o-dock__popover-content" :is="popover.component" @search-started="hidePopover"
+            @location-selected="updateLocation" />
 
           <OrganismsDockViewsFooter class="o-dock__popover-content" :popover-id="popoverId"
             :currently-open="popover?.type" @open-popover="showPopover" @close-popover="hidePopover" />
@@ -89,12 +90,19 @@ defineExpose({
 /**
  *  Close popover when results are updated
  */
-const { searchState } = useSearchState()
+const { searchState, updateState } = useSearchState()
 const results = computed(() => asObject(searchState.value).results)
 
 watch(results, () => {
   hidePopover()
 })
+
+/**
+ *  Re-search when location is updated
+ */
+function updateLocation() {
+  updateState({})
+}
 
 /**
  *  Monitor close events
