@@ -43,7 +43,7 @@
        *        OrganismsTraditionalSearchContract - we should probably
        *        create a global utility class so this can be 'shared'
        */
-      background: linear-gradient(to bottom, var(--blue-400), var(--blue-300));
+      background: linear-gradient(to bottom, var(--blue-300), light-dark(var(--blue-100), var(--background-100)));
       color: var(--monochrome-900);
     }
   }
