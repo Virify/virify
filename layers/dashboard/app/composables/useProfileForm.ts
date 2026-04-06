@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { UserIntent } from "~~/layers/database/server/database/prisma/generated/enums";
 import { profileSchema } from "~~/shared/utils/profile-schema";
-import type { FormSubmitEvent } from "#ui/types";
+import type { FormError, FormSubmitEvent } from "#ui/types";
 
 // Helper for intents
 export const profileIntents = [
@@ -11,9 +11,10 @@ export const profileIntents = [
   { value: UserIntent.LANDLORD, label: "Landlord" },
 ];
 
-export async function useProfileForm() {
+export async function useProfileForm(formRef: Ref<{ setErrors: (errors: FormError[]) => void } | null>) {
   const toast = useToast();
-  
+  const { checkText, isChecking: isModerating } = useModeration();
+
   // Use useRequestFetch to forward headers if SSR
   const { data: fullUser, pending } = await useAsyncData("fullUser", () => useRequestFetch()<UserWithAddress>(`/api/user/profile`));
 
@@ -78,6 +79,29 @@ export async function useProfileForm() {
   }, { immediate: true });
 
   async function onSubmit(event: FormSubmitEvent<Schema>) {
+    // Clear any previous moderation errors
+    formRef.value?.setErrors([])
+
+    // Check text fields for inappropriate content before posting
+    const fieldsToCheck = [
+      { name: 'firstName', value: event.data.firstName },
+      { name: 'lastName', value: event.data.lastName },
+      { name: 'username', value: event.data.username },
+    ].filter((f): f is { name: string; value: string } => !!f.value?.trim());
+
+    const results = await Promise.all(
+      fieldsToCheck.map(async (f) => ({ name: f.name, ...(await checkText(f.value)) }))
+    );
+
+    const failed = results.filter((r) => !r.safe);
+    if (failed.length > 0) {
+      formRef.value?.setErrors(failed.map((r) => ({
+        name: r.name,
+        message: 'This field contains inappropriate language. Please revise.',
+      })));
+      return;
+    }
+
     try {
       const response = await $fetch<Schema>("/api/user/profile", {
         method: "PATCH",
@@ -85,10 +109,10 @@ export async function useProfileForm() {
       });
 
       if (response) {
-        toast.add({ title: "Success", description: "Profile updated successfully", color: "success" });
+        toast.add({ title: "Success", description: "Profile updated successfully", color: "success", icon: 'i-lucide-user-check' });
       }
     } catch (error: any) {
-      toast.add({ title: "Error", description: error?.message || "An error occurred while updating profile", color: "error" });
+      toast.add({ title: "Error", description: error?.message || "An error occurred while updating profile", color: "error", icon: 'i-lucide-user-x' });
     }
   }
 
@@ -96,6 +120,7 @@ export async function useProfileForm() {
       state,
       pending,
       onSubmit,
-      profileSchema
+      profileSchema,
+      isModerating,
   };
 }

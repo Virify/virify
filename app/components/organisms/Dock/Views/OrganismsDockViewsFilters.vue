@@ -10,7 +10,7 @@
 
         <template v-slot:ai>
           <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="aiSearchSubmit"
-            :loading="isChecking" @reset-search="searchReset" />
+            @reset-search="searchReset" />
         </template>
       </OrganismsFilterSwitcher>
     </template>
@@ -29,7 +29,6 @@ const emits = defineEmits(['search-started'])
  *  Fetch filters
  */
 const { searchState, isLoading, setSearchType, setResults, setSearchPending, setQueryAnalysis } = useSearchState()
-const { checkText, isChecking } = useModeration()
 const toast = useToast()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
@@ -65,7 +64,7 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
     }
   } catch (error) {
     console.error('Traditional search error:', error)
-    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
+    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error', icon: 'i-lucide-search-x' })
   } finally {
     setSearchPending(false)
   }
@@ -75,13 +74,6 @@ async function aiSearchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)
 
   if (!location) {
-    return
-  }
-
-  // Check content moderation before proceeding
-  const { safe, reason } = await checkText(query)
-  if (!safe) {
-    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
     return
   }
 
@@ -113,7 +105,7 @@ async function aiSearchSubmit(query: string) {
     }
   } catch (error) {
     console.error('AI search error:', error)
-    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error' })
+    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error', icon: 'i-lucide-search-x' })
   } finally {
     setSearchPending(false)
   }

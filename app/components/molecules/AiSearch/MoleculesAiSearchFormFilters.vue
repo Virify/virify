@@ -4,16 +4,11 @@
       <legend class="| visually-hidden">The property</legend>
 
       <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-        :disabled="!isValid" :loading="props.loading" @submit="searchSubmit" />
+        :disabled="!isValid" :loading="props.loading || isChecking" @submit="searchSubmit" />
+
+      <p v-if="moderationError" class="m-ai-search-form-filters__error" role="alert">{{ moderationError }}</p>
     </div>
 
-    <!--
-      @TODO
-      Suggestions should dynamically update to whatever has been search
-      to show relevant prompts. For example, if someone searches for a
-      house with a garden. Until then, after a search has been done, the
-      suggestions are fairly irrelevant and can be hidden
-    -->
     <ul v-if="!hideSuggestions" class="m-ai-search-form-filters__example-prompts">
       <li v-for="(prompt, index) of examplePrompts" :key="index">
         <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
@@ -45,7 +40,16 @@ const props = defineProps<Props>();
  */
 const emits = defineEmits(['submit-search', 'reset-search']);
 
-function searchSubmit() {
+const { checkText, isChecking } = useModeration();
+const moderationError = ref<string | null>(null)
+
+async function searchSubmit() {
+  moderationError.value = null
+  const { safe, reason } = await checkText(searchQuery.value)
+  if (!safe) {
+    moderationError.value = reason || 'Please try a different search.'
+    return
+  }
   emits('submit-search', searchQuery.value);
 };
 
@@ -62,8 +66,11 @@ const { searchQuery } = useAi();
 
 watch(() => props.initialQuery, (newQuery) => {
   if (!newQuery) return
-
   searchQuery.value = newQuery;
+});
+
+watch(searchQuery, () => {
+  moderationError.value = null
 });
 
 /**
@@ -76,14 +83,7 @@ const isValid = computed(() => !props.disabled && unref(searchQuery).length)
  */
 const textareaId = useId();
 
-const examplePrompts = [
-  "4 bedroom house with a garden for sale",
-  "Studio flat with a balcony to rent",
-  "2+ bedroom property to buy",
-  "3 bedroom detached cottage with a downstairs bathroom for sale",
-  "A large parcel of land",
-  "3 bedroom house with a garden and a garage"
-];
+const { suggestedSearches: examplePrompts } = useAiSuggestedSearches();
 
 const addPrompt = (prompt: string) => {
   searchQuery.value = prompt;
@@ -95,6 +95,12 @@ const addPrompt = (prompt: string) => {
 
 <style lang="scss">
 .m-ai-search-form-filters {
+
+  &__error {
+    margin-top: var(--size-8);
+    color: var(--color-error-500);
+    font-size: var(--text-sm);
+  }
 
   &__example-prompts {
     list-style: none;

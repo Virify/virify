@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
     // Try to get from cache first
     const startTime = Date.now();
-    const cached = await useStorage().getItem(cacheKey);
+    const cached = await useStorage("cache").getItem(cacheKey);
     if (cached) {
       const cacheTime = Date.now() - startTime;
       console.log(`[CACHE] PPD CACHE HIT - Retrieved in ${cacheTime}ms`);
@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
     };
 
     // Cache the result for 30 days (PPD data is updated monthly)
-    await useStorage().setItem(cacheKey, result, {
+    await useStorage("cache").setItem(cacheKey, result, {
       ttl: 60 * 60 * 24 * 30 // 30 days in seconds
     });
 

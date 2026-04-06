@@ -186,7 +186,7 @@ export const useNotes = () => {
       },
       onError: (error) => {
         console.error("Error updating note:", error);
-        toast.add({ title: 'Error', description: errorMessage, color: 'error' });
+        toast.add({ title: 'Error', description: errorMessage, color: 'error', icon: 'i-lucide-circle-x' });
       },
     });
   };
@@ -228,7 +228,7 @@ export const useNotes = () => {
       },
       onError: (error) => {
         console.error("Error deleting note:", error);
-        toast.add({ title: 'Error', description: "Failed to delete note", color: 'error' });
+        toast.add({ title: 'Error', description: "Failed to delete note", color: 'error', icon: 'i-lucide-circle-x' });
       },
     });
   };

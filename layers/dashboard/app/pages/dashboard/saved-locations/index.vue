@@ -88,12 +88,14 @@ async function handleDelete(id: number) {
       title: "Success",
       description: "Location deleted successfully",
       color: "success",
+      icon: 'i-lucide-map-pin-off',
     });
   } catch (error) {
     toast.add({
       title: "Error",
       description: "Failed to delete location",
       color: "error",
+      icon: 'i-lucide-circle-x',
     });
   }
 }

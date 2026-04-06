@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { BedSizeType, BedroomFeature, BathroomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
-import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
+import { invalidateListingCache } from "~~/layers/database/server/utils/cache";
 
 // Validate payload to match Prisma Bedroom and Bathroom models and StepFive type (now includes both)
 const bedroomBathroomSchema = z.object({

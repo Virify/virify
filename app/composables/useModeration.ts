@@ -1,3 +1,7 @@
+import { Filter } from 'bad-words'
+
+const profanityFilter = new Filter()
+
 /**
  * Composable for content moderation using OpenAI's Moderation API
  */
@@ -20,7 +24,6 @@ export function useModeration() {
       return { safe: true }
     } catch (error) {
       // Fail open - if moderation fails, allow the content
-      console.error('[Moderation] Check failed:', error)
       return { safe: true }
     } finally {
       isChecking.value = false
@@ -28,10 +31,28 @@ export function useModeration() {
   }
 
   /**
-   * Check if text content is appropriate (e.g. search queries, descriptions)
+   * Fast synchronous profanity check using the bad-words library.
+   * Runs before any API call to catch obvious cases without a round-trip.
+   */
+  function checkProfanity(text: string): { safe: boolean; reason?: string } {
+    if (!text || text.trim().length === 0) return { safe: true }
+
+    if (profanityFilter.isProfane(text)) {
+      return { safe: false, reason: 'Your search contains inappropriate content. Please try a different search.' }
+    }
+
+    return { safe: true }
+  }
+
+  /**
+   * Check if text content is appropriate (e.g. search queries, descriptions).
+   * Runs a local profanity check first, then falls through to OpenAI moderation.
    */
   async function checkText(text: string): Promise<{ safe: boolean; reason?: string }> {
     if (!text || text.trim().length === 0) return { safe: true }
+
+    const profanityResult = checkProfanity(text)
+    if (!profanityResult.safe) return profanityResult
 
     const result = await moderate({ text })
     return result.safe ? result : {
@@ -86,6 +107,7 @@ export function useModeration() {
   }
 
   return {
+    checkProfanity,
     checkText,
     checkImages,
     checkContent,

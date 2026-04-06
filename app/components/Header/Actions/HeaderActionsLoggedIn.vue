@@ -1,5 +1,5 @@
 <template>
-  <PopoverRoot>
+  <PopoverRoot v-model:open="popoverOpen">
     <PopoverTrigger class="header-actions-logged-in__toggle | body-md">
       Account
 
@@ -14,40 +14,54 @@
     </PopoverTrigger>
 
     <PopoverPortal>
-      <PopoverContent align="end" :align-offset="-16" :side-offset="8"
-        class="header-actions-logged-in__popover | gradient-box">
-        <nuxt-link v-for="{ title, url } of accountLinks" :key="title" :to="url"
-          class="header-actions-logged-in__button">
-          {{ title }}
-        </nuxt-link>
+      <PopoverContent
+        align="end"
+        :align-offset="-16"
+        :side-offset="8"
+        class="header-actions-logged-in__popover | gradient-box"
+        :class="{ 'header-actions-logged-in__popover--wide': activePanel === 'notifications' }"
+      >
+        <!-- Main nav panel -->
+        <template v-if="activePanel === 'main'">
+          <nuxt-link v-for="{ title, url } of accountLinks" :key="title" :to="url"
+            class="header-actions-logged-in__button">
+            {{ title }}
+          </nuxt-link>
 
-        <nuxt-link to="dashboard?notifications=true" class="header-actions-logged-in__button">
-          Notifications
+          <button type="button" class="header-actions-logged-in__button" @click="openNotifications">
+            Notifications
 
-          <span class="header-actions-logged-in__notifications | body-2xs" :class="{
-            'header-actions-logged-in__notifications--active': notificationsTotal
-          }">
-            {{ notificationsTotal }}
-          </span>
-        </nuxt-link>
+            <span class="header-actions-logged-in__notifications | body-2xs" :class="{
+              'header-actions-logged-in__notifications--active': notificationsTotal
+            }">
+              {{ notificationsTotal }}
+            </span>
+          </button>
 
-        <label class="header-actions-logged-in__button">
-          Dark mode
+          <label class="header-actions-logged-in__button">
+            Dark mode
 
-          <HeaderDarkModeToggle />
-        </label>
+            <HeaderDarkModeToggle />
+          </label>
 
-        <button type="button" class="header-actions-logged-in__button header-actions-logged-in__button--logout"
-          @click.prevent="logOut">
-          Log out
-          <AtomsIcon icon="account/logout" />
-        </button>
+          <button type="button" class="header-actions-logged-in__button header-actions-logged-in__button--logout"
+            @click.prevent="logOut">
+            Log out
+            <AtomsIcon icon="account/logout" />
+          </button>
+        </template>
+
+        <!-- Notifications panel -->
+        <HeaderActionsNotificationsPanel
+          v-else-if="activePanel === 'notifications'"
+          @back="activePanel = 'main'"
+        />
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   PopoverContent,
   PopoverPortal,
@@ -64,15 +78,25 @@ const accountLinks = [
     url: '/dashboard'
   },
   {
-    title: 'Security',
-    url: '/dashboard/security'
+    title: 'Settings',
+    url: '/dashboard/profile'
   }
 ]
 
 /**
+ *  Panel switching
+ */
+const popoverOpen = ref(false)
+const activePanel = ref<'main' | 'notifications'>('main')
+
+watch(popoverOpen, (open) => {
+  if (!open) activePanel.value = 'main'
+})
+
+/**
  *  Show notifications
  */
-const { notificationCounts, fetchNotificationCounts } = useNotifications()
+const { notificationCounts, fetchNotificationCounts, fetchNotifications } = useNotifications()
 
 onMounted(() => {
   fetchNotificationCounts();
@@ -83,6 +107,11 @@ const notificationsTotal = computed(() => {
 
   return total
 })
+
+async function openNotifications() {
+  activePanel.value = 'notifications'
+  await fetchNotifications({ force: true, page: 1 })
+}
 
 /**
  *  Log user out
@@ -153,6 +182,11 @@ async function logOut() {
     padding: var(--size-20) var(--size-16) var(--size-16);
     background: var(--background-100);
     width: min(calc(100vw - var(--size-32)), 24ch);
+    transition: width var(--animation-fast);
+
+    &--wide {
+      width: min(calc(100vw - var(--size-32)), 320px);
+    }
   }
 
   &__button {

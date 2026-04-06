@@ -21,7 +21,8 @@ async function getMortgageRates(buyerType: MortgageBuyerType, ltvBracket: Mortga
 
   // Try to get from cache first
   const startTime = Date.now();
-  const cached = await useStorage().getItem<any[]>(CACHE_KEY);
+  const cacheStorage = useStorage("cache");
+  const cached = await cacheStorage.getItem<any[]>(CACHE_KEY);
   
   let allRates: any[];
   
@@ -40,7 +41,7 @@ async function getMortgageRates(buyerType: MortgageBuyerType, ltvBracket: Mortga
     });
 
     // Cache for 4 weeks (rates only update monthly)
-    await useStorage().setItem(CACHE_KEY, allRates, {
+    await cacheStorage.setItem(CACHE_KEY, allRates, {
       ttl: FOUR_WEEKS_IN_SECONDS,
     });
 

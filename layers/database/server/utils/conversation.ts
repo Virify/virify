@@ -1,4 +1,5 @@
 import type { MessageWithUser } from "~~/shared/types/conversation";
+import { prisma } from "./prisma-client";
 
 
 /**
@@ -494,9 +495,10 @@ const conversationBaseSelect = {
  */
 const conversationListingMinimalSelect = {
   id: true,
+  userId: true,
   price: true,
-  rentalListing: { select: { id: true } },
-  saleListing: { select: { id: true } },
+  rentalListing: { select: { id: true, availabilityStatus: true } },
+  saleListing: { select: { id: true, availabilityStatus: true } },
   property: {
     select: {
       media: {
@@ -508,6 +510,7 @@ const conversationListingMinimalSelect = {
       address: {
         select: {
           fullAddress: true,
+          street: true,
           city: true,
           postcode: true,
         },
@@ -531,9 +534,10 @@ const conversationListingMinimalSelect = {
  */
 const conversationListingCardSelect = {
   id: true,
+  userId: true,
   price: true,
-  rentalListing: { select: { id: true } },
-  saleListing: { select: { id: true } },
+  rentalListing: { select: { id: true, availabilityStatus: true } },
+  saleListing: { select: { id: true, availabilityStatus: true } },
   property: {
     select: {
       media: {

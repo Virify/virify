@@ -19,6 +19,9 @@ export default defineEventHandler(async (event) => {
 
     const listings = await updateFavouriteListing(user.id, listingId);
 
+    // Invalidate lookups cache so the next GET reflects the new favourite
+    useStorage('cache').removeItem(`favs:lookups:${user.id}`).catch(() => {});
+
     // Broadcast aggregate update via WebSocket
     const aggregateMessage = createAggregateUpdateMessage("favourites", "add", user.id);
     sendMessage(aggregateMessage);

@@ -1,6 +1,6 @@
 import * as z from "zod";
 import { BuildingFeature, ParkingFeature, SecurityFeature, AccessibilityFeature, StorageFeature, UtilityFeature } from "~~/layers/database/server/database/prisma/generated/enums";
-import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
+import { invalidateListingCache } from "~~/layers/database/server/utils/cache";
 
 // Validate payload for Step Eight - Property Features
 const stepEightSchema = z.object({

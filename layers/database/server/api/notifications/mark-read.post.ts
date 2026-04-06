@@ -30,18 +30,17 @@ export default defineEventHandler(async (event) => {
 
   if (body.all) {
     await markAllNotificationsAsRead(user.id);
-    return { success: true, message: 'All notifications marked as read' };
-  }
-
-  if (body.conversationId) {
+  } else if (body.conversationId) {
     await markConversationNotificationsAsRead(body.conversationId, user.id);
-    return { success: true, message: 'Conversation notifications marked as read' };
-  }
-
-  if (body.notificationId) {
+  } else if (body.notificationId) {
     await markNotificationAsRead(body.notificationId, user.id);
-    return { success: true, message: 'Notification marked as read' };
+  } else {
+    throw createError({ statusCode: 400, statusMessage: 'Invalid request' });
   }
 
-  throw createError({ statusCode: 400, statusMessage: 'Invalid request' });
+  // Bust the notification counts cache so the badge reflects the change immediately
+  const storage = useStorage('cache');
+  await storage.removeItem(`notif-counts:user:${user.id}`);
+
+  return { success: true, message: 'Notification(s) marked as read' };
 });

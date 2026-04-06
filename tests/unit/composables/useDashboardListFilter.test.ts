@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Remove debounce delay so tests don't wait 300ms per search interaction
+vi.mock('@vueuse/core', async (importOriginal) => {
+  const actual: any = await importOriginal();
+  return {
+    ...actual,
+    refDebounced: (source: any) => source,
+  };
+});
+
 // Mock cookies
 const mockCookies = new Map<string, any>();
 

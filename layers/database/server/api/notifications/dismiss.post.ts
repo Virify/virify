@@ -20,5 +20,9 @@ export default defineEventHandler(async (event) => {
 
   await dismissNotification(body.notificationId, user.id);
 
+  // Bust the notification counts cache so the badge reflects the change immediately
+  const storage = useStorage('cache');
+  await storage.removeItem(`notif-counts:user:${user.id}`);
+
   return { success: true, message: "Notification dismissed" };
 });

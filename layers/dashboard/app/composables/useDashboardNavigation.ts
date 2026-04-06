@@ -55,6 +55,16 @@ export function useDashboardNavigation() {
           badge: aggregates.value.draftListings ? String(aggregates.value.draftListings) : undefined,
         },
         {
+          label: "Archived Listings",
+          type: "link",
+          to: "/dashboard/archived-listings",
+          icon: "i-lucide-archive",
+          tooltip: {
+            text: "View archived listings",
+          },
+          badge: aggregates.value.archivedListings ? String(aggregates.value.archivedListings) : undefined,
+        },
+        {
           label: "Create Listing",
           type: "link",
           to: "/dashboard/create-listing",

@@ -1,4 +1,4 @@
-import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client"
+import type { Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client"
 
 /**
  * Count listings owned by the provided user matching filters
@@ -193,7 +193,7 @@ function applyTierSorting(listings: any[], sort: string) {
   )
 }
 
-import { invalidateListingCache } from "./listing-cache";
+import { invalidateListingCache } from "./cache";
 
 export async function toggleListingPublished(userId: number, listingId: number, published: boolean) {
   const listing = await prisma.listing.findFirst({ 
@@ -225,6 +225,41 @@ export async function toggleListingPublished(userId: number, listingId: number, 
   const isDraft = !result.published && !result.publishedAt
   
   return { result, wasDraft, isDraft }
+}
+
+export async function updateListingAvailabilityStatus(
+  userId: number,
+  listingId: number,
+  availabilityStatus: SaleAvailabilityStatus | RentalAvailabilityStatus
+) {
+  const listing = await prisma.listing.findFirst({
+    where: { id: listingId, userId },
+    select: {
+      id: true,
+      saleListing: { select: { id: true } },
+      rentalListing: { select: { id: true } },
+    },
+  })
+
+  if (!listing) {
+    throw createError({ statusCode: 404, statusMessage: 'Listing not found' })
+  }
+
+  if (listing.saleListing) {
+    await prisma.saleListing.update({
+      where: { listingId },
+      data: { availabilityStatus: availabilityStatus as SaleAvailabilityStatus },
+    })
+  } else if (listing.rentalListing) {
+    await prisma.rentalListing.update({
+      where: { listingId },
+      data: { availabilityStatus: availabilityStatus as RentalAvailabilityStatus },
+    })
+  } else {
+    throw createError({ statusCode: 422, statusMessage: 'Listing has no sale or rental type' })
+  }
+
+  await invalidateListingCache(listingId)
 }
 
 export async function archiveListing(userId: number, listingId: number) {

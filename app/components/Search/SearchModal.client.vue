@@ -1,5 +1,5 @@
 <template>
-  <div popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
+  <div ref="root" popover :id="popoverId" class="search-modal" @toggle="toggleFocusTrap">
     <div class="search-modal__window" ref="modal-content">
       <div class="search-modal__content">
         <div class="search-modal__pseudo-background | elevate-300" ref="backdrop">
@@ -191,45 +191,31 @@ onBeforeUnmount(() => {
 /**
  *  Hide menu on scroll
  */
+const $root = useTemplateRef('root')
 const MAX_SCROLL = 300;
 
 function updateBackdropOpacity() {
-  const rootEl = getRootElement()
+  if (!isElement($root.value)) return
 
-  if (!isElement(rootEl)) return
+  const scrollTop = $root.value.scrollTop || 0
+  const scrollRel = Math.min(MAX_SCROLL, scrollTop) / MAX_SCROLL
+  const scrollEase = Math.min(1.6 - (Math.pow(1 - scrollRel, 3)), 1) || 0
 
-  const scrollTop = rootEl.scrollTop || 0
-  const scrollOpacity = Math.min(MAX_SCROLL, scrollTop) / MAX_SCROLL
-  const scrollEase = Math.min(1.6 - (Math.pow(1 - scrollOpacity, 3)), 1)
-
-  rootEl.style.setProperty('--backdrop-opacity', String(scrollEase || 0))
-}
-
-/**
- *  @TODO
- *  Originally used const rootEl = useTemplateRef here, but it was not
- *  always available onMounted and had to use await nextTick() to make
- *  sure the element was available. So defaulting to getElementById
- *  instead and can revisit later to go back to the Vue way of doing it
- */
-function getRootElement() {
-  return document.getElementById(popoverId)
+  $root.value.style.setProperty('--backdrop-opacity', String(scrollEase))
 }
 
 onMounted(async () => {
-  const rootEl = getRootElement()
+  await nextTick()
 
-  updateBackdropOpacity()
-
-  rootEl?.addEventListener('scroll', updateBackdropOpacity, {
+  $root.value?.addEventListener('scroll', updateBackdropOpacity, {
     passive: true
   })
+
+  updateBackdropOpacity()
 })
 
 onBeforeUnmount(() => {
-  const rootEl = getRootElement()
-
-  rootEl?.removeEventListener('scroll', updateBackdropOpacity)
+  $root.value?.removeEventListener('scroll', updateBackdropOpacity)
 })
 
 </script>

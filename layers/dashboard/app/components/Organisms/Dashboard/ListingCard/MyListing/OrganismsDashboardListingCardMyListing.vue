@@ -89,8 +89,8 @@
           >{{ completedStepsCount }}/9 Steps</UBadge>
         </div>
         
-        <!-- Publish toggle (only for completed non-archived listings) -->
-        <div v-if="canTogglePublish">
+        <!-- Publish toggle + availability status (only for completed non-archived listings) -->
+        <div v-if="canTogglePublish" class="flex items-center gap-3">
           <USwitch
             v-model="isPublished"
             :disabled="isUpdating"
@@ -104,64 +104,92 @@
               thumb: 'w-5 h-5 border border-accented bg-white!',
             }"
           />
+          <USelect
+            v-if="availabilityItems.length > 0"
+            v-model="currentAvailabilityStatus"
+            :items="availabilityItems"
+            :disabled="isUpdatingStatus"
+            size="xs"
+            color="secondary"
+            class="w-40"
+            @update:model-value="handleAvailabilityChange"
+          />
         </div>
 
         <!-- Action buttons -->
         <div class="flex flex-wrap gap-2 mt-auto pt-2">
-          <UButton 
-            variant="subtle" 
-            size="xs" 
-            color="secondary" 
-            class="font-semibold flex-1 justify-center" 
-            icon="i-lucide-pencil" 
-            :label="listing.isDraft ? 'Continue' : 'Edit'" 
-            @click="handleEdit"
-          />
-          <UButton 
-            variant="subtle" 
-            size="xs" 
-            color="secondary" 
-            class="font-semibold flex-1 justify-center" 
-            :to="viewUrl" 
-            target="_blank" 
-            icon="i-lucide-eye" 
-            label="View" 
-            :disabled="!canView" 
-          />
-          <UButton 
-            v-if="listing.isDraft"
-            variant="solid" 
-            size="xs" 
-            color="secondary" 
-            class="font-semibold flex-1 justify-center text-white!" 
-            icon="i-lucide-rocket"
-            label="Publish"
-            :disabled="!isAllStepsCompleted || isPublishing"
-            :loading="isPublishing"
-            @click="handlePublish"
-          />
-          <UButton 
-            v-if="!listing.isDraft" 
-            variant="subtle" 
-            size="xs" 
-            color="error" 
-            class="font-semibold flex-1 justify-center cursor-pointer" 
-            :disabled="isDeleting" 
-            @click="openArchiveDialog" 
-            icon="i-lucide-trash-2" 
-            label="Delete" 
-          />
-          <UButton 
-            v-else 
-            variant="subtle" 
-            size="xs" 
-            color="error" 
-            class="font-semibold flex-1 justify-center cursor-pointer" 
-            :disabled="isDeleting" 
-            @click="openDiscardDialog" 
-            icon="i-lucide-trash-2" 
-            label="Discard" 
-          />
+          <!-- Archived: single restore action -->
+          <template v-if="listing.archived">
+            <UButton
+              variant="solid"
+              size="xs"
+              color="secondary"
+              class="font-semibold flex-1 justify-center text-white!"
+              icon="i-lucide-undo-2"
+              label="Restore"
+              :disabled="isRestoring"
+              :loading="isRestoring"
+              @click="openRestoreDialog"
+            />
+          </template>
+
+          <!-- Non-archived -->
+          <template v-else>
+            <UButton 
+              variant="subtle" 
+              size="xs" 
+              color="secondary" 
+              class="font-semibold flex-1 justify-center" 
+              icon="i-lucide-pencil" 
+              :label="listing.isDraft ? 'Continue' : 'Edit'" 
+              @click="handleEdit"
+            />
+            <UButton 
+              variant="subtle" 
+              size="xs" 
+              color="secondary" 
+              class="font-semibold flex-1 justify-center" 
+              :to="viewUrl" 
+              target="_blank" 
+              icon="i-lucide-eye" 
+              label="View" 
+              :disabled="!canView" 
+            />
+            <UButton 
+              v-if="listing.isDraft"
+              variant="solid" 
+              size="xs" 
+              color="secondary" 
+              class="font-semibold flex-1 justify-center text-white!" 
+              icon="i-lucide-rocket"
+              label="Publish"
+              :disabled="!isAllStepsCompleted || isPublishing"
+              :loading="isPublishing"
+              @click="handlePublish"
+            />
+            <UButton 
+              v-if="!listing.isDraft" 
+              variant="subtle" 
+              size="xs" 
+              color="error" 
+              class="font-semibold flex-1 justify-center cursor-pointer" 
+              :disabled="isDeleting" 
+              @click="openArchiveDialog" 
+              icon="i-lucide-trash-2" 
+              label="Delete" 
+            />
+            <UButton 
+              v-else 
+              variant="subtle" 
+              size="xs" 
+              color="error" 
+              class="font-semibold flex-1 justify-center cursor-pointer" 
+              :disabled="isDeleting" 
+              @click="openDiscardDialog" 
+              icon="i-lucide-trash-2" 
+              label="Discard" 
+            />
+          </template>
         </div>
       </div>
     </template>
@@ -197,6 +225,17 @@
       :loading="isDeleting"
       @confirm="handleDiscardConfirm"
     />
+
+    <!-- Restore Listing Confirmation Dialog -->
+    <OrganismsDashboardConfirmDialog
+      ref="restoreDialog"
+      title="Restore Listing"
+      message="This will restore the listing to My Listings as unpublished. You can then edit and re-publish it when ready."
+      confirm-label="Restore"
+      type="info"
+      :loading="isRestoring"
+      @confirm="handleRestoreConfirm"
+    />
   </UPageCard>
 </template>
 
@@ -216,17 +255,32 @@ const emit = defineEmits<{
   'edit': [payload: { id: number; isDraft: boolean }]
 }>()
 
-const { archiveListing, setPublished } = useMyListings();
+const { archiveListing, restoreListing, setPublished, setAvailabilityStatus } = useMyListings();
 const toast = useToast();
 
 // Dialog refs
 const archiveDialog = ref<InstanceType<typeof OrganismsDashboardConfirmDialog> | null>(null);
 const discardDialog = ref<InstanceType<typeof OrganismsDashboardConfirmDialog> | null>(null);
+const restoreDialog = ref<InstanceType<typeof OrganismsDashboardConfirmDialog> | null>(null);
 
 const isDeleting = ref(false);
 const isUpdating = ref(false);
 const isPublishing = ref(false);
+const isUpdatingStatus = ref(false);
+const isRestoring = ref(false);
 const isPublished = ref(props.listing.published);
+
+const currentAvailabilityStatus = ref<string>(
+  props.listing.saleListing?.availabilityStatus ??
+  props.listing.rentalListing?.availabilityStatus ??
+  'AVAILABLE'
+);
+
+const availabilityItems = computed(() => {
+  if (props.listing.saleListing) return saleAvailabilityItems;
+  if (props.listing.rentalListing) return rentalAvailabilityItems;
+  return [];
+});
 
 // Draft completion tracking
 const completedStepsCount = computed(() => {
@@ -269,7 +323,7 @@ const viewUrl = computed(() => {
   return `/listing/${props.listing.id}`;
 });
 
-// Can only toggle publish for non-draft, non-archived listings
+// Can only toggle publish / change status for non-draft, non-archived listings
 const canTogglePublish = computed(() => !props.listing.isDraft && !props.listing.archived);
 
 const formattedAddress = computed(() => {
@@ -335,10 +389,8 @@ async function handlePublish() {
       title: 'Success!',
       description: 'Your listing has been published',
       color: 'success',
+      icon: 'i-lucide-check-circle',
     });
-    // Refresh aggregates to update sidebar counts
-    const { fetchUserItemsAggregates } = useNotifications();
-    await fetchUserItemsAggregates(true);
     // Refresh the listings
     const { refetchCurrentPage } = useDraftListings();
     await refetchCurrentPage();
@@ -347,9 +399,30 @@ async function handlePublish() {
       title: 'Publish Failed',
       description: error?.data?.statusMessage || 'Failed to publish listing',
       color: 'error',
+      icon: 'i-lucide-circle-x',
     });
   } finally {
     isPublishing.value = false;
+  }
+}
+
+async function handleAvailabilityChange(value: string | number | boolean | null) {
+  if (!value || typeof value !== 'string') return;
+  isUpdatingStatus.value = true;
+  const previous = currentAvailabilityStatus.value;
+  try {
+    await setAvailabilityStatus(props.listing.id, value as AvailabilityOptions);
+    toast.add({
+      title: 'Status updated',
+      description: availabilityItems.value.find((i) => i.value === value)?.label ?? value,
+      color: 'success',
+      icon: 'i-lucide-check-circle',
+    });
+  } catch {
+    currentAvailabilityStatus.value = previous;
+    toast.add({ title: 'Error', description: 'Failed to update listing status', color: 'error', icon: 'i-lucide-circle-x' });
+  } finally {
+    isUpdatingStatus.value = false;
   }
 }
 
@@ -357,18 +430,8 @@ async function handleTogglePublish(value: boolean) {
   isUpdating.value = true;
   try {
     await setPublished(props.listing.id, value);
-    toast.add({
-      title: "Success",
-      description: value ? "Listing published" : "Listing unpublished",
-      color: "success",
-    });
   } catch (error) {
     isPublished.value = !value;
-    toast.add({
-      title: "Error",
-      description: "Failed to update listing",
-      color: "error",
-    });
   } finally {
     isUpdating.value = false;
   }
@@ -390,10 +453,7 @@ async function handleArchiveConfirm() {
   try {
     await archiveListing(props.listing.id);
     archiveDialog.value?.close();
-    // Refresh aggregates to update sidebar counts
-    const { fetchUserItemsAggregates } = useNotifications();
-    await fetchUserItemsAggregates(true);
-    // Toast is shown by useMyListings.archiveListing
+    // Badge counts updated via WebSocket aggregate messages from server
   } catch (error) {
     // Error toast is shown by useMyListings.archiveListing
   } finally {
@@ -416,6 +476,25 @@ async function handleDiscardConfirm() {
     // Error already handled in composable
   } finally {
     isDeleting.value = false;
+  }
+}
+
+// Open restore confirmation dialog
+function openRestoreDialog() {
+  restoreDialog.value?.open();
+}
+
+// Handle restore confirmation
+async function handleRestoreConfirm() {
+  isRestoring.value = true;
+  try {
+    await restoreListing(props.listing.id);
+    restoreDialog.value?.close();
+    // Badge counts updated via WebSocket aggregate messages from server
+  } catch {
+    toast.add({ title: "Error", description: "Failed to restore listing", color: "error", icon: 'i-lucide-circle-x' });
+  } finally {
+    isRestoring.value = false;
   }
 }
 </script>

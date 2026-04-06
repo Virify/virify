@@ -47,7 +47,7 @@ export function getUserLocation(userId: number, location: string): Promise<UserL
  * @param locationData - The data for the location
  * @returns A promise that resolves to the created or updated location
  */
-export function updateUserSavedLocation(
+export async function updateUserSavedLocation(
   id: number | undefined,
   userId: number,
   locationData: {
@@ -66,10 +66,16 @@ export function updateUserSavedLocation(
   };
   
   if (id) {
-    return prisma.userLocation.upsert({
+    // Prisma upsert `where` only accepts unique fields — relation filters are not valid there.
+    // Verify ownership separately, then update.
+    const owned = await prisma.userLocation.findFirst({
+      where: { id, userPreferences: { userId } },
+      select: { id: true },
+    });
+    if (!owned) throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
+    return prisma.userLocation.update({
       where: { id },
-      create: { userPreferences: { connectOrCreate: { where: { userId: userId }, create: { userId: userId } } }, ...data },
-      update: { ...data },
+      data,
     });
   } else {
     return prisma.userLocation.create({

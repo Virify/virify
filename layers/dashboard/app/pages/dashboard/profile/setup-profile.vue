@@ -157,11 +157,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     if (response) {
       await fetch()
-      toast.add({ title: "Success", description: "Profile updated successfully", color: "success" });
+      toast.add({ title: "Success", description: "Profile updated successfully", color: "success", icon: 'i-lucide-user-check' });
       navigateTo('/dashboard');
     }
   } catch (error: any) {
-    toast.add({ title: "Error", description: error?.statusText || "An error occurred while updating profile", color: "error" });
+    toast.add({ title: "Error", description: error?.statusText || "An error occurred while updating profile", color: "error", icon: 'i-lucide-circle-x' });
   }
 }
 </script>
