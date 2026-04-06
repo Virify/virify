@@ -1,11 +1,10 @@
 <template>
   <div class="ai-search-map-view" :class="{
-    'ai-search-map-view--inactive | v-skeleton': isSearching || !results.length
+    'ai-search-map-view--loading | v-skeleton': isSearching
   }">
     <Map :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" @map-ready="onMapReady" />
 
-    <!-- No results overlay - show when search completed with no results -->
-    <div v-if="hasSearched && !results.length"
+    <div v-if="!isSearching && !results.length"
       class="ai-search-map-view__overlay ai-search-map-view__overlay--no-results | body-lg">
       No properties found in this area
     </div>
@@ -18,7 +17,6 @@ interface Props {
   location?: GeocodingFeatureWithBoundary | null;
   radius?: number;
   isSearching?: boolean;
-  hasSearched?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -90,7 +88,7 @@ watch([() => props.location, () => props.radius], () => {
   position: relative;
   overflow: hidden;
 
-  &--inactive {
+  &--loading {
 
     .map-container {
       opacity: 0;
