@@ -104,12 +104,13 @@ export const useMyListings = createSharedComposable(() => {
 
       toast.add({
         title: 'Success',
-        description: published ? "Listing published" : "Listing unpublished", 
+        description: published ? "Listing published" : "Listing unpublished",
         color: 'success',
+        icon: 'i-lucide-check-circle',
       })
     } catch (error) {
       console.error("Failed to update publish state", error)
-      toast.add({ title: 'Error', description: "Failed to update publish state", color: 'error' })
+      toast.add({ title: 'Error', description: "Failed to update publish state", color: 'error', icon: 'i-lucide-circle-x' })
       throw error
     }
   }
@@ -146,10 +147,10 @@ export const useMyListings = createSharedComposable(() => {
         total.value -= 1
       }
 
-      toast.add({ title: 'Success', description: "Listing archived successfully", color: "success" })
+      toast.add({ title: 'Success', description: "Listing archived successfully", color: "success", icon: 'i-lucide-archive' })
     } catch (error) {
       console.error("Failed to archive listing", error)
-      toast.add({ title: "Failed to archive listing", description: "Failed to archive listing", color: "error" })
+      toast.add({ title: "Failed to archive listing", description: "Failed to archive listing", color: "error", icon: 'i-lucide-circle-x' })
       throw error
     }
   }
@@ -170,7 +171,7 @@ export const useMyListings = createSharedComposable(() => {
       total.value -= 1;
     }
 
-    toast.add({ title: "Listing restored", description: "Your listing is back in My Listings (unpublished)", color: "success" });
+    toast.add({ title: "Listing restored", description: "Your listing is back in My Listings (unpublished)", color: "success", icon: 'i-lucide-rotate-ccw' });
   }
 
   async function getRecentListings(limit = 5) {

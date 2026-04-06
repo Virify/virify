@@ -87,7 +87,8 @@ function showGenericError() {
   toast.add({
     title: 'Submission error',
     description: 'There was an error with your form - please check all fields and try again',
-    color: 'error'
+    color: 'error',
+    icon: 'i-lucide-circle-x',
   })
 }
 
@@ -109,7 +110,8 @@ function showErrors(errors?: ErrorBoxProp) {
       toast.add({
         title: 'Terms and conditions',
         description: 'Please confirm you agree to our terms and conditions before proceeding',
-        color: 'error'
+        color: 'error',
+        icon: 'i-lucide-circle-x',
       })
     }
 
@@ -117,7 +119,8 @@ function showErrors(errors?: ErrorBoxProp) {
       toast.add({
         title: 'Email address',
         description: message,
-        color: 'error'
+        color: 'error',
+        icon: 'i-lucide-circle-x',
       })
     }
 

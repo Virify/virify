@@ -2,6 +2,7 @@ import type { GeocodingFeatureWithBoundary } from '~~/shared/types/map';
 
 export default function useAi() {
   const { trackSearch } = useAnalyticsTracking();
+  const { checkText } = useModeration();
   // Global state for query analysis and search query
   const queryAnalysis = useState<QueryAnalysis | null>(
     "ai-query-analysis",
@@ -20,7 +21,12 @@ export default function useAi() {
    */
   async function aiSearch(listingType: ListingType, location: GeocodingFeatureWithBoundary, radius: number, query: string, page?: number, limit?: number) {
     searchQuery.value = query; // Update state for analysis function
-    
+
+    const { safe, reason } = await checkText(query)
+    if (!safe) {
+      throw new Error(reason ?? 'Your search contains inappropriate content. Please try a different search.')
+    }
+
     // Get center coordinates - use center property if available (for regions with Polygon geometry)
     // otherwise fall back to Point geometry coordinates
     const [lon, lat] = location.center 

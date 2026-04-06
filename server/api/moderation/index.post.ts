@@ -63,7 +63,6 @@ export default defineEventHandler(async (event) => {
         .map(([category]) => category) : [],
     }
   } catch (error) {
-    console.error('[Moderation API] Error:', error)
     // Fail open - don't block content if moderation fails
     return {
       flagged: false,

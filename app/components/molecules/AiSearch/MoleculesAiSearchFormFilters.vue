@@ -4,7 +4,9 @@
       <legend class="| visually-hidden">The property</legend>
 
       <MoleculesPromptbox :id="textareaId" placeholder="Describe your ideal property here..." v-model="searchQuery"
-        :disabled="!isValid" :loading="props.loading" @submit="searchSubmit" />
+        :disabled="!isValid" :loading="props.loading || isChecking" @submit="searchSubmit" />
+
+      <p v-if="moderationError" class="m-ai-search-form-filters__error" role="alert">{{ moderationError }}</p>
     </div>
 
     <ul v-if="!hideSuggestions" class="m-ai-search-form-filters__example-prompts">
@@ -38,7 +40,16 @@ const props = defineProps<Props>();
  */
 const emits = defineEmits(['submit-search', 'reset-search']);
 
-function searchSubmit() {
+const { checkText, isChecking } = useModeration();
+const moderationError = ref<string | null>(null)
+
+async function searchSubmit() {
+  moderationError.value = null
+  const { safe, reason } = await checkText(searchQuery.value)
+  if (!safe) {
+    moderationError.value = reason || 'Please try a different search.'
+    return
+  }
   emits('submit-search', searchQuery.value);
 };
 
@@ -55,8 +66,11 @@ const { searchQuery } = useAi();
 
 watch(() => props.initialQuery, (newQuery) => {
   if (!newQuery) return
-
   searchQuery.value = newQuery;
+});
+
+watch(searchQuery, () => {
+  moderationError.value = null
 });
 
 /**
@@ -81,6 +95,12 @@ const addPrompt = (prompt: string) => {
 
 <style lang="scss">
 .m-ai-search-form-filters {
+
+  &__error {
+    margin-top: var(--size-8);
+    color: var(--color-error-500);
+    font-size: var(--text-sm);
+  }
 
   &__example-prompts {
     list-style: none;

@@ -8,6 +8,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
   const { draftListingId, editingListingId, media, maxImages, listingTier } = options
   
   const { uploadImage, deleteImage, isUploading } = useCloudflare()
+  const { checkImages, isChecking: isModerating } = useModeration()
   const toast = useToast()
   
   // Upload state
@@ -37,6 +38,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
           title: 'File too large',
           description: `${file.name} exceeds 10MB limit.`,
           color: 'error',
+          icon: 'i-lucide-file-x',
         })
         return false
       }
@@ -59,6 +61,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
         title: 'Maximum images reached',
         description: `You can only upload ${maxImages.value} images for your ${listingTier.value} tier.`,
         color: 'warning',
+        icon: 'i-lucide-triangle-alert',
       })
       return
     }
@@ -84,8 +87,31 @@ export function useStep9Media(options: UseStep9MediaOptions) {
       uploadProgress.value = (uploaded / validFiles.length) * 100
     }
 
+    if (uploadedImages.length === 0) {
+      uploadingCount.value = 0
+      return
+    }
+
+    // Moderate all uploaded images before persisting
+    const uploadedIds = uploadedImages.map(img => img.cloudflareId)
+    const { safe } = await checkImages(uploadedIds)
+
+    if (!safe) {
+      // checkImages already deleted all flagged images from Cloudflare.
+      // Clean up any that were not flagged (safe ones in a batch that included a bad one).
+      // Since we pass all IDs together, checkImages deletes ALL of them.
+      toast.add({
+        title: 'Images rejected',
+        description: 'One or more of your images contained inappropriate content. All uploaded images have been removed. Please ensure your images are appropriate before uploading.',
+        color: 'error',
+        icon: 'i-lucide-image-off',
+      })
+      uploadingCount.value = 0
+      return
+    }
+
     // Save to database
-    if (uploadedImages.length > 0 && draftListingId.value) {
+    if (draftListingId.value) {
       try {
         await useRequestFetch()(`/api/draft-listings/${draftListingId.value}/media`, {
           method: 'POST',
@@ -98,6 +124,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
           title: 'Success',
           description: `${uploadedImages.length} image${uploadedImages.length > 1 ? 's' : ''} uploaded`,
           color: 'success',
+          icon: 'i-lucide-image',
         })
       } catch (error) {
         console.error('Failed to save images to database:', error)
@@ -105,6 +132,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
           title: 'Error',
           description: 'Failed to save images. Please try again.',
           color: 'error',
+          icon: 'i-lucide-circle-x',
         })
         
         // Cleanup Cloudflare on DB failure
@@ -132,6 +160,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
         title: 'Cannot set as main image',
         description: 'Only general property images can be set as the main image. Remove the room assignment first.',
         color: 'warning',
+        icon: 'i-lucide-triangle-alert',
       })
       return false
     }
@@ -182,6 +211,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
         title: 'Error',
         description: 'Failed to delete image. Please try again.',
         color: 'error',
+        icon: 'i-lucide-circle-x',
       })
     } finally {
       deletingIds.value.delete(cloudflareId)
@@ -221,6 +251,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
         title: 'Success',
         description: `${cloudflareIds.length} image${cloudflareIds.length > 1 ? 's' : ''} deleted`,
         color: 'success',
+        icon: 'i-lucide-image',
       })
     } catch (error) {
       console.error('Failed to delete images:', error)
@@ -228,6 +259,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
         title: 'Error',
         description: 'Failed to delete images. Please try again.',
         color: 'error',
+        icon: 'i-lucide-circle-x',
       })
     } finally {
       deletingIds.value.clear()
@@ -242,6 +274,7 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     deletingIds,
     isRemovingAll,
     isUploading,
+    isModerating,
     
     // Computed
     atMaxImages,

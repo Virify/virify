@@ -188,10 +188,11 @@ async function handleEnquiryAvailabilityChange(value: string | number | boolean 
       title: 'Status updated',
       description: enquiryAvailabilityItems.value.find((i) => i.value === value)?.label ?? value,
       color: 'success',
+      icon: 'i-lucide-check-circle',
     });
   } catch {
     enquiryAvailabilityStatus.value = previous;
-    toast.add({ title: 'Error', description: 'Failed to update listing status', color: 'error' });
+    toast.add({ title: 'Error', description: 'Failed to update listing status', color: 'error', icon: 'i-lucide-circle-x' });
   } finally {
     isUpdatingEnquiryStatus.value = false;
   }

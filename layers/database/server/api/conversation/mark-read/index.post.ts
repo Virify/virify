@@ -32,6 +32,9 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Bust the aggregates cache so the next fetch returns the updated unread counts
+    await invalidateAggregatesCache(userId as number);
+
     // Send WebSocket notification to the message sender about read receipt
     const messageReadNotification = createMessageReadMessage(
       conversationId,
@@ -41,14 +44,9 @@ export default defineEventHandler(async (event) => {
 
     sendMessage(messageReadNotification);
 
-    // Send aggregate update to the reader (unreadMessages count decreased)
-    const aggregateUpdate = createAggregateUpdateMessage(
-      "unreadMessages",
-      "remove",
-      userId
-    );
-
-    sendMessage(aggregateUpdate);
+    // Send aggregate update to the reader (unreadMessages + unreadConversations count decreased)
+    sendMessage(createAggregateUpdateMessage("unreadMessages", "remove", userId));
+    sendMessage(createAggregateUpdateMessage("unreadConversations", "remove", userId));
 
     return updatedMessage;
   } catch (error: any) {

@@ -389,10 +389,8 @@ async function handlePublish() {
       title: 'Success!',
       description: 'Your listing has been published',
       color: 'success',
+      icon: 'i-lucide-check-circle',
     });
-    // Refresh aggregates to update sidebar counts
-    const { fetchUserItemsAggregates } = useNotifications();
-    await fetchUserItemsAggregates(true);
     // Refresh the listings
     const { refetchCurrentPage } = useDraftListings();
     await refetchCurrentPage();
@@ -401,6 +399,7 @@ async function handlePublish() {
       title: 'Publish Failed',
       description: error?.data?.statusMessage || 'Failed to publish listing',
       color: 'error',
+      icon: 'i-lucide-circle-x',
     });
   } finally {
     isPublishing.value = false;
@@ -417,10 +416,11 @@ async function handleAvailabilityChange(value: string | number | boolean | null)
       title: 'Status updated',
       description: availabilityItems.value.find((i) => i.value === value)?.label ?? value,
       color: 'success',
+      icon: 'i-lucide-check-circle',
     });
   } catch {
     currentAvailabilityStatus.value = previous;
-    toast.add({ title: 'Error', description: 'Failed to update listing status', color: 'error' });
+    toast.add({ title: 'Error', description: 'Failed to update listing status', color: 'error', icon: 'i-lucide-circle-x' });
   } finally {
     isUpdatingStatus.value = false;
   }
@@ -430,18 +430,8 @@ async function handleTogglePublish(value: boolean) {
   isUpdating.value = true;
   try {
     await setPublished(props.listing.id, value);
-    toast.add({
-      title: "Success",
-      description: value ? "Listing published" : "Listing unpublished",
-      color: "success",
-    });
   } catch (error) {
     isPublished.value = !value;
-    toast.add({
-      title: "Error",
-      description: "Failed to update listing",
-      color: "error",
-    });
   } finally {
     isUpdating.value = false;
   }
@@ -463,10 +453,7 @@ async function handleArchiveConfirm() {
   try {
     await archiveListing(props.listing.id);
     archiveDialog.value?.close();
-    // Refresh aggregates to update sidebar counts
-    const { fetchUserItemsAggregates } = useNotifications();
-    await fetchUserItemsAggregates(true);
-    // Toast is shown by useMyListings.archiveListing
+    // Badge counts updated via WebSocket aggregate messages from server
   } catch (error) {
     // Error toast is shown by useMyListings.archiveListing
   } finally {
@@ -503,11 +490,9 @@ async function handleRestoreConfirm() {
   try {
     await restoreListing(props.listing.id);
     restoreDialog.value?.close();
-    // Refresh aggregates so sidebar badges update
-    const { fetchUserItemsAggregates } = useNotifications();
-    await fetchUserItemsAggregates(true);
+    // Badge counts updated via WebSocket aggregate messages from server
   } catch {
-    toast.add({ title: "Error", description: "Failed to restore listing", color: "error" });
+    toast.add({ title: "Error", description: "Failed to restore listing", color: "error", icon: 'i-lucide-circle-x' });
   } finally {
     isRestoring.value = false;
   }

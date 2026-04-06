@@ -21,8 +21,8 @@
 
     <template #body>
       <AtomsDashboardFormContainer>
-        <UForm :schema="profileSchema" :state="state" @submit="onSubmit">
-          <OrganismsDashboardAccountHeroCard title="Setup your profile" description="Create your profile information to fully act" label="Save Changes" />
+        <UForm ref="formRef" :schema="profileSchema" :state="state" @submit="onSubmit">
+          <OrganismsDashboardAccountHeroCard title="Setup your profile" description="Create your profile information to fully act" label="Save Changes" :loading="isModerating" />
 
           <AtomsDashboardForm>
             <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
@@ -203,6 +203,7 @@
 </template>
 
 <script setup lang="ts">
+import type { FormError } from '#ui/types'
 import { profileIntents } from "~~/layers/dashboard/app/composables/useProfileForm";
 
 definePageMeta({
@@ -212,7 +213,8 @@ definePageMeta({
 
 const { accountNavigationItems } = useDashboardNavigation();
 
-const { state, pending, onSubmit, profileSchema } = await useProfileForm();
+const formRef = useTemplateRef<{ setErrors: (errors: FormError[]) => void }>('formRef')
+const { state, pending, onSubmit, profileSchema, isModerating } = await useProfileForm(formRef);
 const intents = profileIntents;
 
 const isProfileValid = computed(() => profileSchema.safeParse(state).success);
