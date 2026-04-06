@@ -30,6 +30,9 @@ export default defineEventHandler(async (event) => {
 
     const result = await updateUserNote(user.id, listingId, note);
 
+    // Invalidate lookups cache so the next GET reflects the new/updated note
+    useStorage('cache').removeItem(`notes:lookups:${user.id}`).catch(() => {});
+
     // Only broadcast aggregate update for new notes, not updates
     if (isNewNote) {
       const aggregateMessage = createAggregateUpdateMessage("notes", "add", user.id);
