@@ -26,8 +26,8 @@ async function flushRedis() {
 
   if (!url && !host) {
     console.error("No Redis connection configured.");
-    console.error("  Inside Railway: REDIS_URL is injected automatically.");
-    console.error("  Outside Railway: set REDIS_PUBLIC_URL in your .env");
+    console.error("Inside Railway: REDIS_URL is injected automatically.");
+    console.error("Outside Railway: set REDIS_PUBLIC_URL in your .env");
     process.exit(1);
   }
 
