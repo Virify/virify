@@ -54,6 +54,10 @@ export const useWebSocketServer = () => {
       userPeers.delete(peer);
       if (userPeers.size === 0) {
         peers.delete(userId);
+        // User has fully disconnected — clear their presence state so that
+        // notification suppression (isUserViewingConversation) doesn't fire
+        // against a stale entry for an offline user
+        globalActiveConversationByUser.delete(userId);
       }
     }
   };

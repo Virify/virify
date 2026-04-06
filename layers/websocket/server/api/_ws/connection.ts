@@ -59,18 +59,25 @@ export default defineWebSocketHandler({
       if (msgType === "typing" || msgType === "message_read") {
         const convId = Number(parsed?.conversationId);
         if (!convId) return;
-        const participant = await prisma.conversation.findFirst({
+        const conversation = await prisma.conversation.findFirst({
           where: { id: convId, OR: [{ senderId: user.id }, { receiverId: user.id }] },
-          select: { id: true },
+          select: { senderId: true, receiverId: true },
         });
-        if (!participant) return;
+        // Drop if sender is not a participant
+        if (!conversation) return;
+        // Overwrite the client-supplied `to` field with the real other participant
+        // — the client must never decide who receives their typing/read frames
+        const otherParticipantId = conversation.senderId === user.id
+          ? conversation.receiverId
+          : conversation.senderId;
+        parsed.to = [otherParticipantId];
       }
+
+      // Forward the sanitized payload — parsed.to has been overwritten for typing/read msgs
+      handleIncomingMessages(JSON.stringify(parsed), user.id!);
     } catch {
       // Invalid JSON — drop silently
       return;
     }
-
-    // Process the message through the unified handler
-    handleIncomingMessages(String(message), user.id!);
   },
 });
