@@ -22,7 +22,7 @@ async function flushRedis() {
   const username = process.env.REDISUSER;
 
   if (!url && !host) {
-    console.error("❌ No Redis connection configured. Set REDIS_URL or REDISHOST.");
+    console.error("No Redis connection configured. Set REDIS_URL or REDISHOST.");
     process.exit(1);
   }
 
@@ -32,10 +32,10 @@ async function flushRedis() {
 
   try {
     await redis.flushall();
-    console.log("✅ Redis flushed successfully (FLUSHALL)");
+    console.log("Redis flushed successfully (FLUSHALL)");
     process.exit(0);
   } catch (error: any) {
-    console.error("❌ Failed to flush Redis:", error.message);
+    console.error("Failed to flush Redis:", error.message);
     process.exit(1);
   } finally {
     redis.disconnect();
