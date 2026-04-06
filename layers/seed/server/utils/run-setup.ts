@@ -21,13 +21,13 @@ async function runSetup() {
     await execa('pnpm', ['db:reset'], { stdio: 'inherit' })
     console.log('Database reset complete\n')
 
-    // Step 2: Flush Redis cache (skipped if REDIS_PUBLIC_URL not set, e.g. local dev)
+    // Step 2: Flush Redis cache (skipped if no Redis configured, e.g. local dev without Redis)
     console.log('Step 2: Flushing Redis cache...')
-    if (process.env.REDIS_PUBLIC_URL) {
+    if (process.env.REDIS_PUBLIC_URL || process.env.REDIS_URL || process.env.REDISHOST) {
       await execa('pnpm', ['redis:flush'], { stdio: 'inherit' })
       console.log('Redis flushed\n')
     } else {
-      console.log('Skipped (REDIS_PUBLIC_URL not set)\n')
+      console.log('Skipped (no Redis connection configured)\n')
     }
 
     // Step 3: Seed database
