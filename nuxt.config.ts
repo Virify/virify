@@ -157,6 +157,23 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    // Named storage mounts — key is the base prefix used in useStorage("<mount>:...").
+    // Falls back to memory driver if no Redis credentials are available (staging2/3/4, local dev).
+    storage: {
+      cache: process.env.REDIS_URL || process.env.REDISHOST
+        ? {
+            driver: "redis",
+            url: process.env.REDIS_URL,
+            host: process.env.REDISHOST,
+            password: process.env.REDISPASSWORD,
+            port: process.env.REDISPORT ? parseInt(process.env.REDISPORT) : undefined,
+            username: process.env.REDISUSER,
+          }
+        : { driver: "memory" },
+    },
+    devStorage: {
+      cache: { driver: "memory" },
+    },
     experimental: {
       asyncContext: true,
       tasks: true,

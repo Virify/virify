@@ -2,10 +2,11 @@ import type { MinMaxPriceResponse } from "~~/shared/types/price";
 
 /**
  * Retrieves the minimum and maximum price of sale and rental listings from the database.
- * 
+ * Cached for 1 hour — aggregates across all listings are expensive and slow-changing.
+ *
  * @returns { MinMaxPriceResponse }
  */
-export default defineEventHandler(async (event): Promise<MinMaxPriceResponse | undefined> => {
+export default defineCachedEventHandler(async (event): Promise<MinMaxPriceResponse | undefined> => {
   const { errorResponse } = useResponse();
   try {
     const saleMinMax = await getMinMaxPrice('sales');
@@ -21,4 +22,7 @@ export default defineEventHandler(async (event): Promise<MinMaxPriceResponse | u
     console.error("Error fetching min and max prices:", error);
     errorResponse(error, event);
   }
+}, {
+  maxAge: 60 * 60, // 1 hour
+  name: 'price-min-max',
 });

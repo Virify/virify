@@ -22,9 +22,11 @@ export default defineEventHandler(async (event) => {
       listing = await getFullListingById(Number(id));
 
       if (listing) {
-        // Cache for 1 year
+        // Cache for 24 hours. TTL is in seconds (unstorage convention).
+        // The cache is explicitly invalidated on any listing write (publish,
+        // archive, step updates, availability change) via invalidateListingCache().
         await storage.setItem(cacheKey, listing, {
-          ttl: 1000 * 60 * 60 * 24 * 365,
+          ttl: 60 * 60 * 24,
         });
       }
     }

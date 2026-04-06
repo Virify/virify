@@ -3,7 +3,8 @@ import type { UserAnalyticsSummary } from "~~/shared/types/analytics";
 
 /**
  * Handler for GET /api/analytics/listing/all/
- * Returns analytics summary for all user's listings
+ * Returns analytics summary for all user's listings.
+ * Cached per-user for 30 seconds (shares key with /api/analytics/all).
  */
 export default defineEventHandler(async (event): Promise<UserAnalyticsSummary> => {
   const { user } = await requireUserSession(event);
@@ -12,8 +13,15 @@ export default defineEventHandler(async (event): Promise<UserAnalyticsSummary> =
       statusCode: 401,
       message: "User not authenticated"
     });
+
+    // Reuse the same cache key as /api/analytics/all — identical data
+    const cacheKey = `analytics:all:${user.id}`;
+    const storage = useStorage('cache');
+    const cached = await storage.getItem<UserAnalyticsSummary>(cacheKey);
+    if (cached) return cached;
+
     const analytics = await getUserListingAnalytics(user.id);
-  
+    storage.setItem(cacheKey, analytics, { ttl: 30 }).catch(() => {});
     return analytics as UserAnalyticsSummary;
   } catch (error) {
     console.error("Error fetching user analytics:", error);

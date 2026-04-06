@@ -5,6 +5,7 @@
  * Returns minimal data for fast loading - no time-series, just current totals
  * 
  * Uses pre-aggregated DailyUserStats for performance
+ * Cached per-user for 30 seconds to shield simultaneous dashboard mounts.
  */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -12,6 +13,11 @@ export default defineEventHandler(async (event) => {
   if (!user?.id) {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
+
+  const cacheKey = `analytics:quick:${user.id}`;
+  const storage = useStorage('cache');
+  const cached = await storage.getItem(cacheKey);
+  if (cached) return cached;
 
   try {
     // Get user's listing IDs for filtered queries
@@ -78,7 +84,7 @@ export default defineEventHandler(async (event) => {
 
     const stats = recentDailyStats._sum;
 
-    return {
+    const result = {
       // Counts
       activeListings,
       totalEnquiriesReceived,
@@ -92,6 +98,9 @@ export default defineEventHandler(async (event) => {
         ctr: stats.impressions ? Math.round(((stats.clicks ?? 0) / stats.impressions) * 100) : 0,
       },
     };
+
+    storage.setItem(cacheKey, result, { ttl: 30 }).catch(() => {});
+    return result;
   } catch (error) {
     console.error("Quick analytics error:", error);
     throw createError({ statusCode: 500, message: "Failed to fetch quick analytics" });
