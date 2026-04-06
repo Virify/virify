@@ -55,7 +55,7 @@ function createSearchState() {
    * Update listing type filter
    */
   function setListingType(value: string, callback?: () => void) {
-    if(value !== 'all' && value !== 'sale' && value !== 'rent') return
+    if (value !== 'all' && value !== 'sale' && value !== 'rent') return
     // Check value is valid
     if (!isString(value)) return
 
@@ -176,6 +176,92 @@ function createSearchState() {
     searchState.value = { ...defaultState };
   };
 
+  /**
+   *  Fetch results
+   */
+  interface RecentSearch {
+    type: 'ai' | 'traditional'
+    body: unknown
+  }
+
+  let mostRecentSearch: RecentSearch | null = null
+  const toast = useToast()
+
+  async function fetchResults(searchData = mostRecentSearch) {
+    const { location, radius } = asObject(searchState.value)
+
+    if (!location || !searchData) {
+      return
+    }
+
+    const { type, body } = asObject(searchData)
+
+    const isAI = type === 'ai'
+    const validatedType = isAI ? 'ai' : 'traditional'
+
+    try {
+      setSearchPending(true)
+      setSearchType(validatedType)
+
+      /**
+       *  Perform AI search
+       */
+      if (isAI) {
+        const response = await $fetch('/api/search/rag', {
+          method: 'POST',
+          body: body as BodyInit
+        })
+
+        const { results = [] } = asObject(response)
+
+        setResults(results as unknown[])
+      }
+
+      /**
+       *  Perform traditional search
+       */
+      else {
+        const { formData, location, radius } = asObject(body)
+
+        const formDataObject = asObject(formData) as unknown as TraditionalSearchData
+
+        const response = await $fetch('/api/search/traditional', {
+          method: 'POST',
+          body: {
+            ...formDataObject,
+            location,
+            radius
+          }
+        })
+
+        if (!response) throw new Error('')
+
+        const queryAnalysis = buildQueryAnalysisFromFormData(formDataObject)
+        setQueryAnalysis(queryAnalysis)
+        setResults(response as unknown[])
+      }
+
+      await navigateTo('/search')
+
+      window.scrollTo({
+        top: 0,
+        behavior: "instant"
+      })
+    }
+    catch (error) {
+      console.error('Search error:', error)
+
+      toast.add({
+        title: 'Error',
+        description: 'Search failed. Please try again.',
+        color: 'error'
+      })
+    } finally {
+      setSearchPending(false)
+      mostRecentSearch = searchData
+    }
+  }
+
   return {
     searchState,
     setSortOrder,
@@ -190,6 +276,7 @@ function createSearchState() {
     setResults,
     updateState,
     clearState,
+    fetchResults,
     isLoading: readonly(isLoading),
   };
 }
