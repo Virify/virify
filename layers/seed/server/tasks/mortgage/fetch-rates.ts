@@ -129,7 +129,7 @@ Important rate relationships:
       });
 
       // Bust the cache so next request gets fresh rates
-      await useStorage().removeItem("mortgage:rates");
+      await useStorage("cache").removeItem("mortgage:rates");
       console.log(`[Mortgage Task] Cache busted for mortgage:rates`);
 
       console.log(`[Mortgage Task] Successfully stored ${createdRates.count} mortgage rates`);

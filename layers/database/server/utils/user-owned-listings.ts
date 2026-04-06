@@ -193,7 +193,7 @@ function applyTierSorting(listings: any[], sort: string) {
   )
 }
 
-import { invalidateListingCache } from "./listing-cache";
+import { invalidateListingCache } from "./cache";
 
 export async function toggleListingPublished(userId: number, listingId: number, published: boolean) {
   const listing = await prisma.listing.findFirst({ 

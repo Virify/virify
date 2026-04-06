@@ -426,7 +426,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
         title: 'Error',
         description: error?.data?.message || error?.message || 'Failed to save progress',
         color: 'error',
-        duration: 3000
+        duration: 3000,
+        icon: 'i-lucide-circle-x',
       })
       return false
     } finally {
@@ -492,7 +493,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
         title: 'Error',
         description: error?.data?.message || error?.message || 'Failed to save room',
         color: 'error',
-        duration: 3000
+        duration: 3000,
+        icon: 'i-lucide-circle-x',
       })
       return false
     } finally {

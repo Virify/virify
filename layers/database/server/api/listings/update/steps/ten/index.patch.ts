@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
+import { invalidateListingCache } from "~~/layers/database/server/utils/cache";
 
 /**
  * Schema for media assignment to rooms

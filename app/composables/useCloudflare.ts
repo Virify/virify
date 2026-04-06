@@ -96,13 +96,13 @@ export const useCloudflare = () => {
       } else {
         const errorMessage = data.errors?.[0]?.message || 'Upload failed';
         uploadError.value = errorMessage;
-        toast.add({ title: 'Error', description: `Failed to upload image: ${errorMessage}`, color: 'error' });
+        toast.add({ title: 'Error', description: `Failed to upload image: ${errorMessage}`, color: 'error', icon: 'i-lucide-image-off' });
         return null;
       }
     } catch (error: any) {
       const errorMessage = error?.data?.message || error?.message || 'Upload failed';
       uploadError.value = errorMessage;
-      toast.add({ title:'Error', description: `Error uploading image: ${errorMessage}`, color: 'error' });
+      toast.add({ title: 'Error', description: `Error uploading image: ${errorMessage}`, color: 'error', icon: 'i-lucide-image-off' });
       console.error('Upload error:', error);
       return null;
     } finally {
@@ -134,7 +134,7 @@ export const useCloudflare = () => {
       return response.success;
     } catch (error: any) {
       console.error('Error deleting image:', error);
-      toast.add({ title: 'Error', description: 'Failed to delete image', color: 'secondary' });
+      toast.add({ title: 'Error', description: 'Failed to delete image', color: 'secondary', icon: 'i-lucide-image-off' });
       return false;
     }
   };

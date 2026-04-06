@@ -8,7 +8,7 @@
 import * as z from "zod";
 
 const impressionsSchema = z.object({
-  listingIds: z.array(z.number()),
+  listingIds: z.array(z.number()).max(100),
   sessionId: z.string().nullable().optional(), // Optional for anonymous tracking
   timestamp: z.number(),
   source: z.string().optional(),

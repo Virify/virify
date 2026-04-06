@@ -67,12 +67,19 @@ export async function getAllPrices(type: ListingType = "sales"): Promise<number[
 }
 
 /**
- * A version of getAllPrices that converts the listing type input format.
- * This is now a regular function without caching.
- * 
+ * Cached version of getAllPrices. Converts the listing type input format.
+ * Caches the full price array for 1 hour — shared across /api/price and /api/price/graph.
+ *
  * @param listingType - "buy" or "rent"
  * @returns {Promise<number[]>} The prices for the specified listing type
  */
-export const getAllPricesCached = async (listingType: string): Promise<number[]> => {
-  return await getAllPrices(listingType === "buy" ? "sales" : "rentals");
-};
+export const getAllPricesCached = defineCachedFunction(
+  async (listingType: string): Promise<number[]> => {
+    return getAllPrices(listingType === "buy" ? "sales" : "rentals");
+  },
+  {
+    maxAge: 60 * 60, // 1 hour
+    name: "all-prices",
+    getKey: (listingType: string) => listingType,
+  }
+);

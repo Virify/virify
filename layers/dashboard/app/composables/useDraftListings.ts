@@ -119,14 +119,16 @@ export const useDraftListings = createSharedComposable(() => {
       toast.add({ 
         title: 'Success', 
         description: "Draft discarded successfully", 
-        color: "success" 
+        color: "success",
+        icon: 'i-lucide-trash-2',
       });
     } catch (error) {
       console.error("Failed to delete draft", error);
       toast.add({ 
         title: "Error", 
         description: "Failed to discard draft", 
-        color: "error" 
+        color: "error",
+        icon: 'i-lucide-circle-x',
       });
       throw error;
     }

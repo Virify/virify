@@ -3,6 +3,12 @@
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
+
+  if (!isAdmin(user)) {
+    throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
+  }
+
   try {
     const ppdData = await ppdPrisma.pricePaid.findMany({
       take: 10,

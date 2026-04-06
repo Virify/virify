@@ -11,6 +11,7 @@ const openai = new OpenAI({
  * Returns whether the content is flagged and which categories
  */
 export default defineEventHandler(async (event) => {
+  await requireUserSession(event);
   const body = await readBody(event)
   const { text, images } = body
 
@@ -62,7 +63,6 @@ export default defineEventHandler(async (event) => {
         .map(([category]) => category) : [],
     }
   } catch (error) {
-    console.error('[Moderation API] Error:', error)
     // Fail open - don't block content if moderation fails
     return {
       flagged: false,

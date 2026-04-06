@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
+import { invalidateListingCache } from "~~/layers/database/server/utils/cache";
 
 const addressSchema = z.object({
   listingId: z.number().int().positive(),

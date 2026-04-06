@@ -61,6 +61,7 @@ export const useNotificationPreferences = createSharedComposable(() => {
             title: 'Permission blocked',
             description: 'Desktop notifications are blocked in your browser settings. Please enable them manually.',
             color: 'warning',
+            icon: 'i-lucide-bell-off',
           });
           return;
         }
@@ -72,6 +73,7 @@ export const useNotificationPreferences = createSharedComposable(() => {
             title: 'Permission not granted',
             description: 'Desktop notifications were not enabled.',
             color: 'warning',
+            icon: 'i-lucide-bell-off',
           });
         }
       },
@@ -87,9 +89,9 @@ export const useNotificationPreferences = createSharedComposable(() => {
         method: "PATCH",
         body: event.data,
       });
-      toast.add({ title: "Success", description: "Notification preferences updated", color: "success" });
+      toast.add({ title: "Success", description: "Notification preferences updated", color: "success", icon: 'i-lucide-bell' });
     } catch (error: any) {
-      toast.add({ title: "Error", description: error?.message || "Failed to update notification preferences", color: "error" });
+      toast.add({ title: "Error", description: error?.message || "Failed to update notification preferences", color: "error", icon: 'i-lucide-circle-x' });
     } finally {
       saving.value = false;
     }

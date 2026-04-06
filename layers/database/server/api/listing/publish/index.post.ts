@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { useMapSearch } from "~~/layers/map/shared/utils/useMapSearch";
 import { createAmenitiesForProperty } from "~~/layers/database/server/utils/amenities";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
 const publishSchema = z.object({
   draftId: z.number().int().positive(),
@@ -279,11 +280,17 @@ export default defineEventHandler(async (event) => {
       return listing;
     });
 
-    return {
-      success: true,
-      listingId: result.id,
-      message: "Listing published successfully",
-    };
+    // Bust aggregates cache so sidebar counts update immediately
+    await invalidateAggregatesCache(user.id as number);
+
+    // Send WebSocket aggregate updates: draft removed, listing added
+    try {
+      const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
+      sendMessage(createAggregateUpdateMessage("draftListings", "remove", user.id as number));
+      sendMessage(createAggregateUpdateMessage("listings", "add", user.id as number));
+    } catch {
+      // Non-critical
+    }
 
     // Fire-and-forget: fetch real amenities from MapTiler and persist them
     // Done after the response so it doesn't block the publish flow
@@ -298,6 +305,12 @@ export default defineEventHandler(async (event) => {
         })
         .catch((err) => console.error("[Publish] Failed to fetch/save amenities:", err));
     }
+
+    return {
+      success: true,
+      listingId: result.id,
+      message: "Listing published successfully",
+    };
   } catch (error) {
     console.error("Error publishing listing:", error);
     return errorResponse(error, event);

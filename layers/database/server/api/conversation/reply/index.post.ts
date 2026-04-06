@@ -6,8 +6,7 @@ import { sendEnquiryNotificationEmail } from "~~/layers/email/server/email/send-
 
 const replySchema = z.object({
   conversationId: z.coerce.number(),
-  message: z.string(),
-  suppressNotification: z.boolean().optional(),
+  message: z.string().min(1).max(5000),
 });
 
 export default defineEventHandler(async (event) => {
@@ -15,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const { sendMessage, createNewMessageMessage, createAggregateUpdateMessage, createNotificationNewMessage, isUserViewingConversation, isUserOnline } = useWebSocketServer();
 
   try {
-    const { conversationId, message, suppressNotification } = await readValidatedBody(event, replySchema.parse);
+    const { conversationId, message } = await readValidatedBody(event, replySchema.parse);
     const config = useRuntimeConfig();
     const senderId = user.id;
 
@@ -38,9 +37,6 @@ export default defineEventHandler(async (event) => {
 
     const newMessage = await replyToConversation(conversationId, message, senderId);
 
-    // Refetch conversation to include the new message for websocket
-    const updatedConversation = await getConversation(conversationId);
-
     const receiverId = getOtherParticipantId(senderId, newMessage);
 
     // Create notification for the receiver with minimal listing data
@@ -59,7 +55,7 @@ export default defineEventHandler(async (event) => {
 
     let createdNotification: Awaited<ReturnType<typeof createMessageNotification>> | null = null;
     const recipientViewing = isUserViewingConversation(receiverId, conversationId);
-    if (!suppressNotification && !recipientViewing) {
+    if (!recipientViewing) {
       createdNotification = await createMessageNotification(
         receiverId,
         message,
@@ -71,7 +67,7 @@ export default defineEventHandler(async (event) => {
       );
     }
 
-    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, updatedConversation);
+    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, conversation);
     sendMessage(messageToSend);
 
     // Emit notification_new if we created one

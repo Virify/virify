@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { useWebSocketServer } from '~~/layers/websocket/composables/useWebSocketServer'
 
 const togglePublishedSchema = z.object({
   published: z.boolean()

@@ -343,13 +343,6 @@ useSeoMeta({
 
 useHead({
   link: [{ rel: "canonical", href: seoData.value.canonicalUrl }],
-  script: [
-    {
-      src: "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit",
-      async: true,
-      defer: true,
-    },
-  ],
 });
 
 onUnmounted(() => {

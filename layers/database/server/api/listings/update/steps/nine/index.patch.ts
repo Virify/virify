@@ -7,7 +7,7 @@ import {
   RenewableEnergy, 
   ConnectedUtilities 
 } from "~~/layers/database/server/database/prisma/generated/enums";
-import { invalidateListingCache } from "~~/layers/database/server/utils/listing-cache";
+import { invalidateListingCache } from "~~/layers/database/server/utils/cache";
 
 // Validate payload for Step Nine - Energy & Costs
 const stepNineSchema = z.object({

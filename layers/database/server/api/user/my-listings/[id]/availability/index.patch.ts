@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { SaleAvailabilityStatus, RentalAvailabilityStatus } from '~~/layers/database/server/database/prisma/generated/client'
+import { invalidateListingCache } from '~~/layers/database/server/utils/cache'
 
 const availabilitySchema = z.object({
   availabilityStatus: z.enum({ ...SaleAvailabilityStatus, ...RentalAvailabilityStatus }),
@@ -24,6 +25,8 @@ export default defineEventHandler(async (event) => {
     const { availabilityStatus } = availabilitySchema.parse(body)
 
     await updateListingAvailabilityStatus(userId as number, Number(id), availabilityStatus)
+    // Bust the public listing page cache so availability shows immediately
+    await invalidateListingCache(Number(id))
 
     return { success: true }
   } catch (error) {

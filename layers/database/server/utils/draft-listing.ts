@@ -1,5 +1,6 @@
 import { prisma } from "./prisma-client";
 import type { DraftListing, ListingTier } from "../database/prisma/generated/client";
+import { propertyInclude } from "./property";
 /**
  * Get a draft listing by its ID.
  * @param id DraftListing ID

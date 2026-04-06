@@ -48,34 +48,32 @@ export default defineEventHandler(async (event) => {
 
       const propertyId = existingListing.property.id;
 
-      // Update room assignments and sortOrder for existing media
-      for (let i = 0; i < media.length; i++) {
-        const mediaItem = media[i];
-        await prisma.media.updateMany({
-          where: {
-            propertyId,
-            image: mediaItem.cloudflareId,
-          },
-          data: {
-            sortOrder: i,
-            metadata: JSON.stringify({
-              alt: mediaItem.description || 'Property image',
-              description: mediaItem.description || null,
-              cloudflareImageId: mediaItem.cloudflareId,
-              filename: mediaItem.filename || null,
-            }),
-            bedroomId: mediaItem.bedroomId || null,
-            bathroomId: mediaItem.bathroomId || null,
-            kitchenId: mediaItem.kitchenId || null,
-            receptionId: mediaItem.receptionId || null,
-            otherRoomId: mediaItem.otherRoomId || null,
-            gardenId: mediaItem.gardenId || null,
-            yardId: mediaItem.yardId || null,
-            landId: mediaItem.landId || null,
-            outdoorSpaceId: mediaItem.outdoorSpaceId || null,
-          },
-        });
-      }
+      // Batch all media updates in a single transaction — avoids N+1 round-trips (one per image)
+      await prisma.$transaction(
+        media.map((mediaItem, i) =>
+          prisma.media.updateMany({
+            where: { propertyId, image: mediaItem.cloudflareId },
+            data: {
+              sortOrder: i,
+              metadata: JSON.stringify({
+                alt: mediaItem.description || 'Property image',
+                description: mediaItem.description || null,
+                cloudflareImageId: mediaItem.cloudflareId,
+                filename: mediaItem.filename || null,
+              }),
+              bedroomId: mediaItem.bedroomId || null,
+              bathroomId: mediaItem.bathroomId || null,
+              kitchenId: mediaItem.kitchenId || null,
+              receptionId: mediaItem.receptionId || null,
+              otherRoomId: mediaItem.otherRoomId || null,
+              gardenId: mediaItem.gardenId || null,
+              yardId: mediaItem.yardId || null,
+              landId: mediaItem.landId || null,
+              outdoorSpaceId: mediaItem.outdoorSpaceId || null,
+            },
+          })
+        )
+      );
 
       return await prisma.listing.findUnique({
         where: { id: listingId, userId: user.id },
@@ -127,36 +125,32 @@ export default defineEventHandler(async (event) => {
 
     const propertyId = existingDraft.property.id;
 
-    // Update room assignments and sortOrder for existing media
-    // Images are already in DB (auto-saved on upload), just update their room assignments and order
-    // The array index determines sortOrder (0 = first/main image)
-    for (let i = 0; i < media.length; i++) {
-      const mediaItem = media[i];
-      await prisma.media.updateMany({
-        where: {
-          propertyId,
-          image: mediaItem.cloudflareId,
-        },
-        data: {
-          sortOrder: i, // Array position becomes sortOrder
-          metadata: JSON.stringify({
-            alt: mediaItem.description || 'Property image',
-            description: mediaItem.description || null,
-            cloudflareImageId: mediaItem.cloudflareId,
-            filename: mediaItem.filename || null,
-          }),
-          bedroomId: mediaItem.bedroomId || null,
-          bathroomId: mediaItem.bathroomId || null,
-          kitchenId: mediaItem.kitchenId || null,
-          receptionId: mediaItem.receptionId || null,
-          otherRoomId: mediaItem.otherRoomId || null,
-          gardenId: mediaItem.gardenId || null,
-          yardId: mediaItem.yardId || null,
-          landId: mediaItem.landId || null,
-          outdoorSpaceId: mediaItem.outdoorSpaceId || null,
-        },
-      });
-    }
+    // Batch all media updates in a single transaction — avoids N+1 round-trips (one per image)
+    await prisma.$transaction(
+      media.map((mediaItem, i) =>
+        prisma.media.updateMany({
+          where: { propertyId, image: mediaItem.cloudflareId },
+          data: {
+            sortOrder: i,
+            metadata: JSON.stringify({
+              alt: mediaItem.description || 'Property image',
+              description: mediaItem.description || null,
+              cloudflareImageId: mediaItem.cloudflareId,
+              filename: mediaItem.filename || null,
+            }),
+            bedroomId: mediaItem.bedroomId || null,
+            bathroomId: mediaItem.bathroomId || null,
+            kitchenId: mediaItem.kitchenId || null,
+            receptionId: mediaItem.receptionId || null,
+            otherRoomId: mediaItem.otherRoomId || null,
+            gardenId: mediaItem.gardenId || null,
+            yardId: mediaItem.yardId || null,
+            landId: mediaItem.landId || null,
+            outdoorSpaceId: mediaItem.outdoorSpaceId || null,
+          },
+        })
+      )
+    );
 
     // Get current completedSteps to check if step 9 already exists
     const completedSteps = existingDraft.completedSteps || [];
