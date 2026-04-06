@@ -1,5 +1,5 @@
 <template>
-  <UChip inset color="error" :show="aggregates.unreadMessages > 0" class="relative">
+  <UChip inset color="error" :show="(notificationCounts?.total ?? 0) > 0" class="relative">
     <USlideover 
       description="Your notifications"
       :ui="{
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-const { aggregates, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading } = useNotifications();
+const { aggregates, notificationCounts, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading } = useNotifications();
 const { openConversation } = useGlobalEnquiryModal();
 const { enquiries } = useEnquiries();
 

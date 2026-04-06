@@ -9,9 +9,6 @@
   <OrganismsFooter />
 
   <ViewsDialog />
-  <ClientOnly>
-    <ViewsHelpButton v-if="!isWaitingListMode" />
-  </ClientOnly>
 </template>
 
 <script setup lang="ts">

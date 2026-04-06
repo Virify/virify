@@ -7,13 +7,6 @@
         :disabled="!isValid" :loading="props.loading" @submit="searchSubmit" />
     </div>
 
-    <!--
-      @TODO
-      Suggestions should dynamically update to whatever has been search
-      to show relevant prompts. For example, if someone searches for a
-      house with a garden. Until then, after a search has been done, the
-      suggestions are fairly irrelevant and can be hidden
-    -->
     <ul v-if="!hideSuggestions" class="m-ai-search-form-filters__example-prompts">
       <li v-for="(prompt, index) of examplePrompts" :key="index">
         <AtomsButtonPill variant="ghost" :content="prompt" icon="ai/prompt" icon-start
@@ -76,14 +69,7 @@ const isValid = computed(() => !props.disabled && unref(searchQuery).length)
  */
 const textareaId = useId();
 
-const examplePrompts = [
-  "4 bedroom house with a garden for sale",
-  "Studio flat with a balcony to rent",
-  "2+ bedroom property to buy",
-  "3 bedroom detached cottage with a downstairs bathroom for sale",
-  "A large parcel of land",
-  "3 bedroom house with a garden and a garage"
-];
+const { suggestedSearches: examplePrompts } = useAiSuggestedSearches();
 
 const addPrompt = (prompt: string) => {
   searchQuery.value = prompt;
