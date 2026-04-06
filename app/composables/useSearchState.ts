@@ -266,7 +266,8 @@ function createSearchState() {
       toast.add({
         title: 'Error',
         description: 'Search failed. Please try again.',
-        color: 'error'
+        color: 'error',
+        icon: 'i-lucide-search-x'
       })
     } finally {
       setSearchPending(false)
