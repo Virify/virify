@@ -26,13 +26,18 @@ async function runSetup() {
     await execa('pnpm', [seedCommand], { stdio: 'inherit' })
     console.log('✅ Database seed complete\n')
 
-    // Step 3: Update admin password
-    console.log('3️⃣  Updating admin password...')
+    // Step 3: Flush Redis cache
+    console.log('3️⃣  Flushing Redis cache...')
+    await execa('pnpm', ['redis:flush'], { stdio: 'inherit' })
+    console.log('✅ Redis flushed\n')
+
+    // Step 4: Update admin password
+    console.log('4️⃣  Updating admin password...')
     await execa('pnpm', ['db:update-admin-password'], { stdio: 'inherit' })
     console.log('✅ Admin password updated\n')
 
-    // Step 4: Fetch mortgage rates
-    console.log('4️⃣  Fetching mortgage rates...')
+    // Step 5: Fetch mortgage rates
+    console.log('5️⃣  Fetching mortgage rates...')
     await execa('pnpm', ['db:fetch-rates'], { stdio: 'inherit' })
     console.log('✅ Mortgage rates fetched\n')
 
