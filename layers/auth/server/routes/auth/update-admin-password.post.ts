@@ -1,12 +1,12 @@
 /**
  * API endpoint to update admin password hash
- * Protected by TASK_SECRET query parameter
+ * Protected by TASK_SECRET in request body
  * Cloudflare Access (staging) validates service token headers at edge as additional layer
- * GET /auth/update-admin-password?taskSecret=<secret>
+ * POST /auth/update-admin-password
  */
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const { taskSecret } = getQuery(event);
+  const { taskSecret } = await readBody(event);
 
   // Verify task secret for authentication
   if (!taskSecret || taskSecret !== config.TASK_SECRET) {

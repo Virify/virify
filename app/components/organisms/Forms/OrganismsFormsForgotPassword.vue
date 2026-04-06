@@ -5,6 +5,7 @@
       <AtomsInput :id v-model="email" type="email" name="email" required />
     </MoleculesFormField>
 
+    <div ref="turnstileEl"></div>
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Submit </AtomsButton>
   </MoleculesForm>
 </template>
@@ -19,6 +20,7 @@ const emits = defineEmits(['form-success']);
  *  Composables
  */
 const { isPending, setPendingWhile } = usePending();
+const { turnstileEl, turnstileToken, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 
 /**
  *  Form data
@@ -29,6 +31,9 @@ const email = ref('')
  *  Handle errors
  */
 const formErrors = ref();
+
+onMounted(() => initializeTurnstile());
+onUnmounted(() => cleanupTurnstile());
 
 /**
  *  Validate form and submit
@@ -50,16 +55,19 @@ async function resetPassword({ target }: SubmitEvent) {
     }
 
     // Post data
+    await executeTurnstile();
     await $fetch('/auth/password-reset', {
       method: 'POST',
       body: {
         email: email.value,
+        turnstileToken: turnstileToken.value,
       },
     })
       .then(({ passwordToken }) => {
         emits('form-success', passwordToken);
       })
       .catch((error) => {
+        resetTurnstile();
         formErrors.value = {
           title: 'Password reset failed',
           message: error.data.message,

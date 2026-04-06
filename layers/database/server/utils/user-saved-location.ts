@@ -67,7 +67,7 @@ export function updateUserSavedLocation(
   
   if (id) {
     return prisma.userLocation.upsert({
-      where: { id },
+      where: { id, userPreferences: { userId } },
       create: { userPreferences: { connectOrCreate: { where: { userId: userId }, create: { userId: userId } } }, ...data },
       update: { ...data },
     });

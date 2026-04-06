@@ -11,6 +11,7 @@ const openai = new OpenAI({
  * Returns whether the content is flagged and which categories
  */
 export default defineEventHandler(async (event) => {
+  await requireUserSession(event);
   const body = await readBody(event)
   const { text, images } = body
 

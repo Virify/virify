@@ -43,7 +43,32 @@ export default defineWebSocketHandler({
     }
     const { user } = await requireUserSession(peer);
 
-    // Handle heartbeat ping messages with pong response
+    // Guard against malicious client-crafted frames before passing to the handler.
+    // Real-time message delivery (new_message) is HTTP-only — clients should never
+    // send this type over WS. Typing/read-receipt indicators are legitimate but must
+    // be scoped to conversations the sender actually participates in.
+    try {
+      const parsed = JSON.parse(String(message));
+      const msgType = parsed?.type;
+
+      if (msgType === "new_message") {
+        // Silently drop — messages are created via the HTTP API only
+        return;
+      }
+
+      if (msgType === "typing" || msgType === "message_read") {
+        const convId = Number(parsed?.conversationId);
+        if (!convId) return;
+        const participant = await prisma.conversation.findFirst({
+          where: { id: convId, OR: [{ senderId: user.id }, { receiverId: user.id }] },
+          select: { id: true },
+        });
+        if (!participant) return;
+      }
+    } catch {
+      // Invalid JSON — drop silently
+      return;
+    }
 
     // Process the message through the unified handler
     handleIncomingMessages(String(message), user.id!);

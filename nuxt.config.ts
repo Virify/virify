@@ -114,16 +114,30 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
-      xFrameOptions: false,
+      xFrameOptions: 'SAMEORIGIN',
     },
     nonce: false,
     sri: false,
-    requestSizeLimiter: false,
+    requestSizeLimiter: {
+      maxRequestSizeInBytes: 2_000_000,
+      maxUploadFileRequestInBytes: 10_000_000,
+      throwError: true,
+    },
   },
   routeRules: {
     '/waiting-list': {
       redirect: '/',
-    }
+    },
+    // Tight rate limits on high-value auth endpoints to prevent brute-force
+    '/auth/login': {
+      security: { rateLimiter: { tokensPerInterval: 5, interval: 60000, throwError: false } },
+    },
+    '/auth/verify-otp': {
+      security: { rateLimiter: { tokensPerInterval: 5, interval: 300000, throwError: false } },
+    },
+    '/auth/password-reset': {
+      security: { rateLimiter: { tokensPerInterval: 3, interval: 300000, throwError: false } },
+    },
   },
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },

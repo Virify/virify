@@ -23,6 +23,19 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    // Verify the image belongs to the requesting user before deleting
+    const ownedMedia = await prisma.media.findFirst({
+      where: { image: imageId, property: { userId: user.id } },
+      select: { id: true },
+    });
+
+    if (!ownedMedia) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Forbidden',
+      });
+    }
+
     const config = useRuntimeConfig();
 
     // Delete from Cloudflare Images API

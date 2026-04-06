@@ -6,6 +6,7 @@
 
     <MoleculesFormPassword label="Password" v-model="password" type="password" name="password" required minlength="8" />
 
+    <div ref="turnstileEl"></div>
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Log in </AtomsButton>
   </MoleculesForm>
 </template>
@@ -21,6 +22,7 @@ const emits = defineEmits(['form-success']);
  */
 const { pattern, validityText } = getValidPassword();
 const { isPending, setPendingWhile } = usePending();
+const { turnstileEl, turnstileToken, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 
 /**
  *  Form data
@@ -32,6 +34,9 @@ const password = ref('')
  *  Handle errors
  */
 const formErrors = ref();
+
+onMounted(() => initializeTurnstile());
+onUnmounted(() => cleanupTurnstile());
 
 /**
  *  Validate form and submit
@@ -53,17 +58,20 @@ async function loginUser({ target }: SubmitEvent) {
     }
 
     // Post data
+    await executeTurnstile();
     await $fetch('/auth/login', {
       method: 'POST',
       body: {
         email: email.value,
         password: password.value,
+        turnstileToken: turnstileToken.value,
       },
     })
       .then(() => {
         emits('form-success');
       })
       .catch((error) => {
+        resetTurnstile();
         formErrors.value = {
           title: 'Login failed',
           message: error.data.message,

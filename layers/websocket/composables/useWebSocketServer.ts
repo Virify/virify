@@ -16,14 +16,20 @@ export interface WebSocketEvents {
 const globalPeers = new Map<number, Set<{ send: (data: string) => void; close: () => void }>>();
 
 /**
+ * Global singleton presence map - shared across all composable instances
+ * Tracks which conversation each user is actively viewing
+ */
+const globalActiveConversationByUser = new Map<number, number | null>();
+
+/**
  * Unified WebSocket composable for handling all message types
  * Provides both server-side message routing and client-side event handling
  */
 export const useWebSocketServer = () => {
   // Use the global singleton peers Map
   const peers = globalPeers;
-  // Track which conversation a user is actively viewing (if any)
-  const activeConversationByUser = new Map<number, number | null>();
+  // Use the global singleton presence map
+  const activeConversationByUser = globalActiveConversationByUser;
 
   /**
    * Adds a new WebSocket peer for a user
