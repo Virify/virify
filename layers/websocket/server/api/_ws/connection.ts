@@ -3,6 +3,19 @@ import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocket
 // Initialize the WebSocket server composable
 const { addPeer, removePeer, handleIncomingMessages } = useWebSocketServer();
 
+// Cache conversation participant lookups per (userId, conversationId) to avoid a DB hit on
+// every high-frequency typing / message_read frame. Entries expire after 60 seconds.
+const participantCache = new Map<string, { otherParticipantId: number; expiresAt: number }>();
+const PARTICIPANT_CACHE_TTL_MS = 60_000;
+
+function setCachedParticipant(key: string, value: { otherParticipantId: number; expiresAt: number }) {
+  const now = Date.now();
+  for (const [k, v] of participantCache) {
+    if (v.expiresAt <= now) participantCache.delete(k);
+  }
+  participantCache.set(key, value);
+}
+
 export default defineWebSocketHandler({
   /**
    * Upgrade the connection to a secure one
@@ -59,18 +72,28 @@ export default defineWebSocketHandler({
       if (msgType === "typing" || msgType === "message_read") {
         const convId = Number(parsed?.conversationId);
         if (!convId) return;
-        const conversation = await prisma.conversation.findFirst({
-          where: { id: convId, OR: [{ senderId: user.id }, { receiverId: user.id }] },
-          select: { senderId: true, receiverId: true },
-        });
-        // Drop if sender is not a participant
-        if (!conversation) return;
+
+        const cacheKey = `${user.id}:${convId}`;
+        const now = Date.now();
+        let cached = participantCache.get(cacheKey);
+
+        if (!cached || cached.expiresAt <= now) {
+          const conversation = await prisma.conversation.findFirst({
+            where: { id: convId, OR: [{ senderId: user.id }, { receiverId: user.id }] },
+            select: { senderId: true, receiverId: true },
+          });
+          // Drop if sender is not a participant
+          if (!conversation) return;
+          const otherParticipantId = conversation.senderId === user.id
+            ? conversation.receiverId
+            : conversation.senderId;
+          cached = { otherParticipantId, expiresAt: now + PARTICIPANT_CACHE_TTL_MS };
+          setCachedParticipant(cacheKey, cached);
+        }
+
         // Overwrite the client-supplied `to` field with the real other participant
         // — the client must never decide who receives their typing/read frames
-        const otherParticipantId = conversation.senderId === user.id
-          ? conversation.receiverId
-          : conversation.senderId;
-        parsed.to = [otherParticipantId];
+        parsed.to = [cached.otherParticipantId];
       }
 
       // Forward the sanitized payload — parsed.to has been overwritten for typing/read msgs

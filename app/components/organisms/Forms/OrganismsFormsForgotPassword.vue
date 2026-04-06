@@ -20,7 +20,7 @@ const emits = defineEmits(['form-success']);
  *  Composables
  */
 const { isPending, setPendingWhile } = usePending();
-const { turnstileEl, turnstileToken, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
+const { turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 
 /**
  *  Form data
@@ -55,12 +55,22 @@ async function resetPassword({ target }: SubmitEvent) {
     }
 
     // Post data
-    await executeTurnstile();
+    let turnstileToken: string;
+    try {
+      turnstileToken = await executeTurnstile();
+    } catch {
+      formErrors.value = {
+        title: 'Bot verification failed',
+        message: 'Unable to complete bot verification. Please refresh and try again.',
+      };
+      return;
+    }
+
     await $fetch('/auth/password-reset', {
       method: 'POST',
       body: {
         email: email.value,
-        turnstileToken: turnstileToken.value,
+        turnstileToken,
       },
     })
       .then(({ passwordToken }) => {

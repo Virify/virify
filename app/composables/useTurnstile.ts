@@ -4,6 +4,20 @@
  */
 export function useTurnstile() {
   const config = useRuntimeConfig();
+
+  // Ensure the Turnstile script is loaded — pages that don't already add it via
+  // useHead will get it injected here. Nuxt deduplicates by key so it only loads once.
+  useHead({
+    script: [
+      {
+        key: 'cf-turnstile',
+        src: 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
+        async: true,
+        defer: true,
+      },
+    ],
+  });
+
   const turnstileToken = ref<string | null>(null);
   const turnstileEl = ref<HTMLElement | null>(null);
   const widgetId = ref<string | null>(null);
@@ -46,14 +60,28 @@ export function useTurnstile() {
   };
 
   /**
-   * Execute Turnstile challenge and return a promise that resolves with the token
+   * Execute Turnstile challenge and return a promise that resolves with the token.
+   * Rejects immediately if the widget was never initialized (e.g. script blocked),
+   * or after 10 seconds if the callback never fires.
    */
   const executeTurnstile = (): Promise<string> => {
-    return new Promise((resolve) => {
-      tokenResolver.value = resolve;
-      if ((window as any).turnstile && widgetId.value) {
-        (window as any).turnstile.execute(widgetId.value);
+    return new Promise((resolve, reject) => {
+      if (!widgetId.value) {
+        reject(new Error('Bot verification is not available. Please refresh the page and try again.'));
+        return;
       }
+
+      const timeout = setTimeout(() => {
+        tokenResolver.value = null;
+        reject(new Error('Bot verification timed out. Please refresh the page and try again.'));
+      }, 10_000);
+
+      tokenResolver.value = (token: string) => {
+        clearTimeout(timeout);
+        resolve(token);
+      };
+
+      (window as any).turnstile.execute(widgetId.value);
     });
   };
 
