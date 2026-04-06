@@ -32,21 +32,25 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Create cache key from listing ID
-    const cacheKey = `ppd:listing:${listingId}`;
-    console.log(`[CACHE] Checking price paid cache for key: ${cacheKey}`);
+    // Cache bucket resets on the 2nd of each month — aligned with the Railway PPD DB import.
+    // Before the 2nd, uses the previous month's bucket so stale cache isn't served post-import.
+    const now = new Date();
+    const day = now.getUTCDate();
+    const bucketMonth = day < 2
+      ? new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
+      : new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const bucket = `${bucketMonth.getUTCFullYear()}-${String(bucketMonth.getUTCMonth() + 1).padStart(2, '0')}`;
+
+    // Create cache key from listing ID + monthly bucket
+    const cacheKey = `ppd:listing:${listingId}:${bucket}`;
 
     // Try to get from cache first
     const startTime = Date.now();
     const cached = await useStorage("cache").getItem(cacheKey);
     if (cached) {
-      const cacheTime = Date.now() - startTime;
-      console.log(`[CACHE] PPD CACHE HIT - Retrieved in ${cacheTime}ms`);
       return cached;
     }
 
-    console.log(`[CACHE] PPD CACHE MISS - Fetching from database`);
-    
     // Use utility function to get PPD data
     const ppdData = await getPricePaidByAddress(postcode, street, city, number, flat);
 
@@ -117,13 +121,10 @@ export default defineEventHandler(async (event) => {
       }
     };
 
-    // Cache the result for 30 days (PPD data is updated monthly)
+    // Cache the result (TTL: 35 days — longer than the monthly bucket cycle so old keys expire naturally)
     await useStorage("cache").setItem(cacheKey, result, {
-      ttl: 60 * 60 * 24 * 30 // 30 days in seconds
+      ttl: 60 * 60 * 24 * 35
     });
-
-    const totalTime = Date.now() - startTime;
-    console.log(`[CACHE] PPD CACHE MISS - Total time: ${totalTime}ms`);
 
     return result;
 

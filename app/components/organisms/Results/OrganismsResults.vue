@@ -168,7 +168,7 @@ watch(() => props.results, (newResults) => {
       gap: var(--size-16);
     }
 
-    @container (min-width: 1024px) {
+    @container (min-width: 920px) {
       grid-template-columns: repeat(3, 1fr);
       gap: var(--size-20);
     }
