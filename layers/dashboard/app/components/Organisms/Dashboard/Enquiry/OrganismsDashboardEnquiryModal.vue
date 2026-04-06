@@ -1,5 +1,5 @@
 <template>
-  <UModal v-model:open="isOpen" description="Enquiry Details" :fullscreen="isMobile" :ui="{
+  <UModal v-model:open="isOpen" :fullscreen="isMobile" :ui="{
     overlay: 'bg-black/50 backdrop-blur-sm',
     content: 'max-w-[1300px] w-full sm:w-[90vw]',
     description: 'pl-10 body-sm',
@@ -13,6 +13,17 @@
           <p class="text-xs text-(--foreground-200)/80 truncate mt-1 font-normal">
             {{ subTitle }}
           </p>
+          <USelect
+            v-if="isOwner && enquiryAvailabilityItems.length > 0"
+            v-model="enquiryAvailabilityStatus"
+            :items="enquiryAvailabilityItems"
+            :disabled="isUpdatingEnquiryStatus"
+            size="xs"
+            color="secondary"
+            class="mt-1 w-36"
+            :ui="{ value: 'text-sm font-normal' }"
+            @update:model-value="handleEnquiryAvailabilityChange"
+          />
         </div>
       </div>
     </template>
@@ -72,6 +83,8 @@ import type { User } from "#auth-utils";
  */
 const { sendReply, markMessageAsRead, activeEnquiry } = useEnquiries();
 const { markAsRead } = useNotifications();
+const { setAvailabilityStatus } = useMyListings();
+const toast = useToast();
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const activeBreakpoints = breakpoints.active();
 
@@ -96,11 +109,33 @@ const chatContainer = ref<HTMLElement | null>(null);
 const localMessages = ref<any[]>([]);
 const processedMessageIds = new Set<number>();
 const isMarkingAsRead = ref(false);
+const isUpdatingEnquiryStatus = ref(false);
+
+// Mirror availability status locally so the select is reactive
+const enquiryAvailabilityStatus = ref<string>(
+  props.conversation?.listing?.saleListing?.availabilityStatus ??
+  props.conversation?.listing?.rentalListing?.availabilityStatus ??
+  'AVAILABLE'
+);
 
 /**
  * Computed Properties
  */
 const isOpen = usePropModel(props, "open", emit);
+
+// True when the current user owns the listing in this conversation
+const isOwner = computed(() => {
+  if (!props.conversation?.listing?.userId || !props.user?.id) return false;
+  return props.conversation.listing.userId === props.user.id;
+});
+
+const enquiryAvailabilityItems = computed(() => {
+  const listing = props.conversation?.listing;
+  if (!listing) return [];
+  if (listing.saleListing) return saleAvailabilityItems;
+  if (listing.rentalListing) return rentalAvailabilityItems;
+  return [];
+});
 
 const isMobile = computed(() => {
   return !activeBreakpoints.value.includes("md") && !activeBreakpoints.value.includes("lg") && !activeBreakpoints.value.includes("xl") && !activeBreakpoints.value.includes("2xl");
@@ -140,6 +175,26 @@ function scrollToBottom() {
       chatContainer.value.scrollTop = chatContainer.value.scrollHeight;
     }
   });
+}
+
+async function handleEnquiryAvailabilityChange(value: string | number | boolean | null) {
+  const listingId = props.conversation?.listing?.id;
+  if (!listingId || !value || typeof value !== 'string') return;
+  isUpdatingEnquiryStatus.value = true;
+  const previous = enquiryAvailabilityStatus.value;
+  try {
+    await setAvailabilityStatus(listingId, value as AvailabilityOptions);
+    toast.add({
+      title: 'Status updated',
+      description: enquiryAvailabilityItems.value.find((i) => i.value === value)?.label ?? value,
+      color: 'success',
+    });
+  } catch {
+    enquiryAvailabilityStatus.value = previous;
+    toast.add({ title: 'Error', description: 'Failed to update listing status', color: 'error' });
+  } finally {
+    isUpdatingEnquiryStatus.value = false;
+  }
 }
 
 async function handleSendMessage() {

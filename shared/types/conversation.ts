@@ -32,9 +32,10 @@ export type ConversationWithMessages = Prisma.ConversationGetPayload<{
  */
 export type ConversationListingMinimal = {
   id: number;
+  userId: number;
   price: number | null;
-  rentalListing: { id: number } | null;
-  saleListing: { id: number } | null;
+  rentalListing: { id: number; availabilityStatus: string } | null;
+  saleListing: { id: number; availabilityStatus: string } | null;
   property: {
     media: { image: string | null }[];
     address: {
