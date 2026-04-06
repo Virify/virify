@@ -1,4 +1,5 @@
 import { createSharedComposable } from "@vueuse/core";
+import type { RentalAvailabilityStatus, SaleAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/enums";
 
 type StatusFilter = "all" | "active" | "inactive" | "draft" | "archived";
 type SortBy = "new" | "old" | "premium" | "featured" | "basic";
@@ -117,6 +118,21 @@ export const useMyListings = createSharedComposable(() => {
     return setPublished(listingId, !current)
   }
 
+  async function setAvailabilityStatus(listingId: number, availabilityStatus: AvailabilityOptions) {
+    await $fetch(`/api/user/my-listings/${listingId}/availability`, {
+      method: 'PATCH',
+      body: { availabilityStatus },
+    })
+
+    // Update local state optimistically
+    const listing = listings.value.find((l) => l.id === listingId)
+    if (listing?.saleListing) {
+      listing.saleListing.availabilityStatus = availabilityStatus as SaleAvailabilityStatus
+    } else if (listing?.rentalListing) {
+      listing.rentalListing.availabilityStatus = availabilityStatus as RentalAvailabilityStatus
+    }
+  }
+
   async function archiveListing(listingId: number) {
     try {
       await $fetch(`/api/user/my-listings/${listingId}`, { 
@@ -177,6 +193,7 @@ export const useMyListings = createSharedComposable(() => {
     refetchCurrentPage,
     setPublished,
     togglePublished,
+    setAvailabilityStatus,
     archiveListing,
     getRecentListings,
     getAllListingsForAnalytics,

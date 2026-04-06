@@ -494,9 +494,10 @@ const conversationBaseSelect = {
  */
 const conversationListingMinimalSelect = {
   id: true,
+  userId: true,
   price: true,
-  rentalListing: { select: { id: true } },
-  saleListing: { select: { id: true } },
+  rentalListing: { select: { id: true, availabilityStatus: true } },
+  saleListing: { select: { id: true, availabilityStatus: true } },
   property: {
     select: {
       media: {
@@ -532,9 +533,10 @@ const conversationListingMinimalSelect = {
  */
 const conversationListingCardSelect = {
   id: true,
+  userId: true,
   price: true,
-  rentalListing: { select: { id: true } },
-  saleListing: { select: { id: true } },
+  rentalListing: { select: { id: true, availabilityStatus: true } },
+  saleListing: { select: { id: true, availabilityStatus: true } },
   property: {
     select: {
       media: {
