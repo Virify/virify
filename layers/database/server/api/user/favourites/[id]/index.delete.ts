@@ -22,6 +22,9 @@ export default defineEventHandler(async (event) => {
 
     const result = await deleteFavouriteListing(user.id as number, listingId);
 
+    // Invalidate lookups cache so the next GET reflects the removal
+    useStorage('cache').removeItem(`favs:lookups:${user.id}`).catch(() => {});
+
     // Broadcast aggregate update via WebSocket
     const aggregateMessage = createAggregateUpdateMessage("favourites", "remove", user.id);
     sendMessage(aggregateMessage);

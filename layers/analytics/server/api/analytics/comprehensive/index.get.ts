@@ -15,9 +15,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: "Unauthorized" });
   }
 
+  const config = useRuntimeConfig();
+  const cfAccountHash = config.public.CF_ACCOUNT_HASH as string;
+
   const query = getQuery(event);
   const period = (query.period as string) || '30d';
   const listingIdFilter = query.listingId ? Number(query.listingId) : undefined;
+
+  const cacheKey = `analytics:comprehensive:${user.id}:${period}:${listingIdFilter ?? 'all'}`;
+  const storage = useStorage('cache');
+  const cached = await storage.getItem(cacheKey);
+  if (cached) return cached;
 
   // Calculate date range
   const now = new Date();
@@ -129,15 +137,51 @@ export default defineEventHandler(async (event) => {
         },
         _count: true,
       }),
-      // Device breakdown (parse userAgent)
-      prisma.listingView.findMany({
-        where: {
-          listingId: { in: listingIds },
-          createdAt: { gte: startDate },
-          userAgent: { not: null },
-        },
-        select: { userAgent: true },
-      }),
+      // Device breakdown — three parallel counts, each using an indexed column filter.
+      // Avoids fetching all userAgent strings into JS (could be tens of thousands of rows).
+      Promise.all([
+        prisma.listingView.count({
+          where: {
+            listingId: { in: listingIds },
+            createdAt: { gte: startDate },
+            userAgent: { not: null },
+            OR: [
+              { userAgent: { contains: 'iPad', mode: 'insensitive' } },
+              { userAgent: { contains: 'tablet', mode: 'insensitive' } },
+            ],
+          },
+        }),
+        prisma.listingView.count({
+          where: {
+            listingId: { in: listingIds },
+            createdAt: { gte: startDate },
+            userAgent: { not: null },
+            NOT: [
+              { userAgent: { contains: 'iPad', mode: 'insensitive' } },
+              { userAgent: { contains: 'tablet', mode: 'insensitive' } },
+            ],
+            OR: [
+              { userAgent: { contains: 'Mobile', mode: 'insensitive' } },
+              { userAgent: { contains: 'Android', mode: 'insensitive' } },
+              { userAgent: { contains: 'iPhone', mode: 'insensitive' } },
+            ],
+          },
+        }),
+        prisma.listingView.count({
+          where: {
+            listingId: { in: listingIds },
+            createdAt: { gte: startDate },
+            userAgent: { not: null },
+            NOT: [
+              { userAgent: { contains: 'iPad', mode: 'insensitive' } },
+              { userAgent: { contains: 'tablet', mode: 'insensitive' } },
+              { userAgent: { contains: 'Mobile', mode: 'insensitive' } },
+              { userAgent: { contains: 'Android', mode: 'insensitive' } },
+              { userAgent: { contains: 'iPhone', mode: 'insensitive' } },
+            ],
+          },
+        }),
+      ]),
       // Per-listing aggregated stats
       prisma.dailyListingStats.groupBy({
         by: ['listingId'],
@@ -215,21 +259,13 @@ export default defineEventHandler(async (event) => {
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     );
 
-    // Parse device breakdown
-    const deviceCounts = { desktop: 0, mobile: 0, tablet: 0 };
-    deviceStats.forEach(({ userAgent }) => {
-      if (!userAgent) return;
-      const ua = userAgent.toLowerCase();
-      if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
-        if (ua.includes('ipad') || ua.includes('tablet')) {
-          deviceCounts.tablet++;
-        } else {
-          deviceCounts.mobile++;
-        }
-      } else {
-        deviceCounts.desktop++;
-      }
-    });
+    // Build device breakdown from the three parallel count queries
+    const [tabletCount, mobileCount, desktopCount] = deviceStats;
+    const deviceCounts = {
+      tablet: tabletCount,
+      mobile: mobileCount,
+      desktop: desktopCount,
+    };
 
     const totalDevices = deviceCounts.desktop + deviceCounts.mobile + deviceCounts.tablet;
     const deviceBreakdown = totalDevices > 0 ? [
@@ -251,7 +287,7 @@ export default defineEventHandler(async (event) => {
           address: listing.property?.address 
             ? `${listing.property.address.street}, ${listing.property.address.city}`
             : 'Unknown',
-          image: getMainImageUrl(listing.property),
+          image: getMainImageUrl(listing.property, cfAccountHash),
           price: listing.price,
           bedrooms: listing.property?.numberBedrooms || 0,
           tier: listing.listingTier,
@@ -280,7 +316,7 @@ export default defineEventHandler(async (event) => {
       ? Math.round(((currentImpressions - prevSum.impressions) / prevSum.impressions) * 100)
       : 0;
 
-    return {
+    const result = {
       summary: {
         totalViews,
         totalImpressions,
@@ -302,6 +338,8 @@ export default defineEventHandler(async (event) => {
       deviceBreakdown,
       period,
     };
+    storage.setItem(cacheKey, result, { ttl: 60 }).catch(() => {});
+    return result;
   } catch (error) {
     console.error("Comprehensive analytics error:", error);
     throw createError({ statusCode: 500, message: "Failed to fetch analytics" });

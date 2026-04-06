@@ -24,6 +24,9 @@ export default defineEventHandler(async (event) => {
 
     const result = await deleteUserNote(user.id, listingId);
 
+    // Invalidate lookups cache so the next GET reflects the deletion
+    useStorage('cache').removeItem(`notes:lookups:${user.id}`).catch(() => {});
+
     // Broadcast aggregate update via WebSocket
     const aggregateMessage = createAggregateUpdateMessage("notes", "remove", user.id);
     sendMessage(aggregateMessage);

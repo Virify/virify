@@ -37,9 +37,6 @@ export default defineEventHandler(async (event) => {
 
     const newMessage = await replyToConversation(conversationId, message, senderId);
 
-    // Refetch conversation to include the new message for websocket
-    const updatedConversation = await getConversation(conversationId);
-
     const receiverId = getOtherParticipantId(senderId, newMessage);
 
     // Create notification for the receiver with minimal listing data
@@ -70,7 +67,7 @@ export default defineEventHandler(async (event) => {
       );
     }
 
-    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, updatedConversation);
+    const messageToSend = createNewMessageMessage(conversationId, newMessage, [senderId, receiverId], senderId, conversation);
     sendMessage(messageToSend);
 
     // Emit notification_new if we created one
