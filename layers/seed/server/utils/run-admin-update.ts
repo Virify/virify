@@ -31,16 +31,18 @@ async function updateAdminPasswordRemote() {
       process.exit(1);
     }
 
-    const url = `${baseUrl}/auth/update-admin-password?taskSecret=${encodeURIComponent(taskSecret)}`;
+    const url = `${baseUrl}/auth/update-admin-password`;
 
     const response = await fetch(url, {
-      method: "GET",
+      method: "POST",
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
         "User-Agent": "virify-admin-update-script",
         "CF-Access-Client-Id": cfServiceTokenId,
         "CF-Access-Client-Secret": cfServiceTokenSecret,
       },
+      body: JSON.stringify({ taskSecret }),
     });
 
     if (!response.ok) {

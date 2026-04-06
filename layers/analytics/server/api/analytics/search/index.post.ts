@@ -6,7 +6,6 @@ const trackSearchSchema = z.object({
   query: z.string().min(1, "Query is required"),
   radius: z.number().int().min(0),
   resultCount: z.number().int().min(0),
-  userId: z.number().int().optional(),
   location: z.object({
     id: z.string(),
     type: z.string(),
@@ -28,7 +27,9 @@ const trackSearchSchema = z.object({
 export default defineEventHandler(async (event) => {
   try {
     const data = await readValidatedBody(event, trackSearchSchema.parse);
-    await trackSearch(data);
+    // Derive userId from session only — never accept from request body
+    const { user } = await getUserSession(event);
+    await trackSearch({ ...data, userId: user?.id });
     return { success: true };
   } catch (error) {
     console.error("Error tracking search:", error);

@@ -20,12 +20,12 @@ const toast = useToast();
 const { hideDialog } = useDialog();
 
 function onUpdated(name: string) {
-  toast.add({ title: 'Success', description: 'Location updated', color: 'success' })
+  toast.add({ title: 'Success', description: 'Location updated', color: 'success', icon: 'i-lucide-map-pin' })
   hideDialog?.({ returnValue: { updated: true, name } })
 }
 
 function onDeleted() {
-  toast.add({ title: 'Success', description: 'Location deleted', color: 'success' })
+  toast.add({ title: 'Success', description: 'Location deleted', color: 'success', icon: 'i-lucide-map-pin-off' })
   hideDialog?.({ returnValue: { deleted: true } })
 }
 </script>

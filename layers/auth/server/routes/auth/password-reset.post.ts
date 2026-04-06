@@ -4,13 +4,18 @@ import validatePasswordToken from "../../utils/validate-password-token";
 
 const passwordSchema = z.object({
   email: z.string().email("Invalid email address"),
+  turnstileToken: z.string().min(1, 'Bot verification is required'),
 });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { email } = await readValidatedBody(event, passwordSchema.parse);
+    const { email, turnstileToken } = await readValidatedBody(event, passwordSchema.parse);
+
+    const clientIp = getRequestIP(event, { xForwardedFor: true }) || '';
+    const isValidToken = await verifyTurnstileToken(turnstileToken, clientIp);
+    if (!isValidToken) throw createError({ statusCode: 403, statusMessage: 'Bot verification failed. Please try again.' });
     const existingUser = await findUser(email);
 
     if(!existingUser) throw createError({ statusCode: 404, statusMessage: "User not found" });
@@ -38,7 +43,6 @@ export default defineEventHandler(async (event) => {
       userID: updatedUser.id,
       email: updatedUser.email,
       passwordToken,
-      otpCode,
     };
   } catch (error) {
     return errorResponse(error, event);

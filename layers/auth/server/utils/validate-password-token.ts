@@ -1,6 +1,6 @@
-export default function validatePasswordToken(user: User): Boolean {
+export default function validatePasswordToken(user: User): boolean {
   const now = new Date();
-  if (!user.passwordResetToken || user.passwordResetToken !== user.passwordResetToken) {
+  if (!user.passwordResetToken) {
     return false;
   }
   if (user.passwordResetTokenExpiry && user.passwordResetTokenExpiry < now) {

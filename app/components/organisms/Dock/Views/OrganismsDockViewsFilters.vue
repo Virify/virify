@@ -10,7 +10,7 @@
 
         <template v-slot:ai>
           <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="aiSearchSubmit"
-            :loading="isChecking" @reset-search="searchReset" />
+            @reset-search="searchReset" />
         </template>
       </OrganismsFilterSwitcher>
     </template>
@@ -29,7 +29,6 @@ const emits = defineEmits(['search-started'])
  *  Fetch filters
  */
 const { searchState, isLoading, fetchResults } = useSearchState()
-const { checkText, isChecking } = useModeration()
 const toast = useToast()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
@@ -48,13 +47,6 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
 
 async function aiSearchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)
-
-  const { safe, reason } = await checkText(query)
-
-  if (!safe) {
-    toast.add({ title: 'Error', description: reason || 'Please try a different search.', color: 'error' })
-    return
-  }
 
   emits('search-started')
 

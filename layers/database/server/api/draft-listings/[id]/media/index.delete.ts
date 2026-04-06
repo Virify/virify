@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { invalidateListingCache } from '~~/layers/database/server/utils/listing-cache';
+import { invalidateListingCache } from '~~/layers/database/server/utils/cache';
 
 /**
  * DELETE /api/draft-listings/[id]/media

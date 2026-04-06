@@ -87,6 +87,7 @@ export function useSecurityForm() {
           title: 'Success',
           description: 'Your security settings have been updated.',
           color: 'success',
+          icon: 'i-lucide-shield-check',
         })
         await fetch();
         clearForm();
@@ -108,6 +109,7 @@ export function useSecurityForm() {
           title: 'Error',
           description: error.statusText || error.message || "An error occurred",
           color: 'error',
+          icon: 'i-lucide-shield-x',
         })
       }
     }

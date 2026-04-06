@@ -140,7 +140,7 @@ export const useFavourites = () => {
         refetchCurrentPage();
       },
       onError: (error) => {
-        toast.add({ title: 'Error', description: "Failed to add to favourites", color: 'error' });
+        toast.add({ title: 'Error', description: "Failed to add to favourites", color: 'error', icon: 'i-lucide-heart-crack' });
         console.error("Error adding to favourites:", error);
       },
     });
@@ -178,7 +178,7 @@ export const useFavourites = () => {
         refreshFavourites();
       },
       onError: (error) => {
-        toast.add({ title: 'Error', description: "Failed to remove from favourites", color: 'error' });
+        toast.add({ title: 'Error', description: "Failed to remove from favourites", color: 'error', icon: 'i-lucide-heart-crack' });
         console.error("Error removing from favourites:", error);
       },
     });

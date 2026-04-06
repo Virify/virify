@@ -83,7 +83,7 @@ async function submitForm() {
       }
     })
 
-    toast.add({ title: 'Success', description: 'Support request submitted successfully!', color: 'success' })
+    toast.add({ title: 'Success', description: 'Support request submitted successfully!', color: 'success', icon: 'i-lucide-check-circle' })
     hideDialog()
 
   } catch (err) {

@@ -69,7 +69,8 @@ function onFormError(error: any) {
   toast.add({
     title: 'Validation Error',
     description: error?.errors?.[0]?.message || 'Please check the form fields',
-    color: 'error'
+    color: 'error',
+    icon: 'i-lucide-circle-x',
   })
 }
 

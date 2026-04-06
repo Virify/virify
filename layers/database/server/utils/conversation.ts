@@ -1,4 +1,5 @@
 import type { MessageWithUser } from "~~/shared/types/conversation";
+import { prisma } from "./prisma-client";
 
 
 /**

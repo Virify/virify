@@ -106,8 +106,8 @@ export default defineNuxtPlugin(() => {
         // Update enquiries state
         handleNewMessage(conversationId, msg, conv);
         
-        // Keep global enquiry modal in sync if it's open on this conversation
-        const updatedConv = conv || enquiries.value.find(c => c.id === conversationId);
+        // Keep global enquiry modal in sync if it's open on this conversation.
+        const updatedConv = enquiries.value.find(c => c.id === conversationId);
         if (updatedConv) {
           syncConversationIfOpen(updatedConv);
         }

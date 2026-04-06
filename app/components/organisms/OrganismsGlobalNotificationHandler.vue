@@ -34,7 +34,7 @@ watch(lastNotification, (notification) => {
       description: notification.description,
       ...(notification.senderAvatar
         ? { avatar: { src: notification.senderAvatar, alt: notification.senderUsername || 'User', name: notification.senderUsername || 'User' } }
-        : { icon: 'i-heroicons-chat-bubble-left-right' }),
+        : { icon: 'i-lucide-message-circle' }),
       color: 'secondary',
       onClick: async () => {
         if (notification.conversationId) {

@@ -10,7 +10,7 @@ import type { ConversationWithMinimalListing } from "~~/shared/types/conversatio
 const conversationSchema = z.object({
   listingId: z.coerce.number().optional(),
   receiverId: z.coerce.number(),
-  message: z.string(),
+  message: z.string().min(1).max(5000),
 });
 
 export default defineEventHandler(async (event) => {
@@ -35,6 +35,20 @@ export default defineEventHandler(async (event) => {
         statusCode: 400,
         statusMessage: "Cannot create a conversation with yourself",
       });
+    }
+
+    // If a listing is provided, verify it belongs to the receiver
+    if (listingId) {
+      const listing = await prisma.listing.findFirst({
+        where: { id: listingId },
+        select: { userId: true },
+      });
+      if (!listing || listing.userId !== receiverId) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: "Listing does not belong to the specified recipient",
+        });
+      }
     }
 
     // Create the conversation

@@ -9,19 +9,20 @@ export default defineEventHandler(async (event) => {
 
   const body = await readValidatedBody(event, notificationPreferencesSchema.parse);
 
-  // Ensure UserPreferences exists for this user
-  const userPreferences = await prisma.userPreferences.upsert({
-    where: { userId: user.id },
-    create: { userId: user.id },
-    update: {},
-    select: { userId: true },
-  });
-
-  // Find existing notification preferences row
-  const existing = await prisma.userNotificationPreferences.findFirst({
-    where: { userPreferencesId: userPreferences.userId },
-    select: { id: true },
-  });
+  // Run both in parallel — userPreferencesId === user.id (references UserPreferences.userId)
+  // findFirst is safe to run concurrently: if UserPreferences doesn't exist yet it returns null anyway
+  const [, existing] = await Promise.all([
+    prisma.userPreferences.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id },
+      update: {},
+      select: { userId: true },
+    }),
+    prisma.userNotificationPreferences.findFirst({
+      where: { userPreferencesId: user.id },
+      select: { id: true },
+    }),
+  ]);
 
   const selectFields = {
     receiveEmailNotifications: true,
@@ -36,7 +37,7 @@ export default defineEventHandler(async (event) => {
         select: selectFields,
       })
     : await prisma.userNotificationPreferences.create({
-        data: { userPreferencesId: userPreferences.userId, ...body },
+        data: { userPreferencesId: user.id, ...body },
         select: selectFields,
       });
 
