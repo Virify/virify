@@ -178,7 +178,7 @@ function showUniversalSearch({ key, metaKey }: KeyboardEvent) {
 
 onMounted(() => {
   // @TODO - waiting list - remove once live
-  if (isWaitingListMode) return
+  if (isWaitingListMode.value) return
   // @TODO end
 
   window.addEventListener('keydown', showUniversalSearch)

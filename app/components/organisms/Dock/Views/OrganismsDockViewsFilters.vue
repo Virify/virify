@@ -21,6 +21,11 @@
 const initialQuery = ref('')
 
 /**
+ *  Emits
+ */
+const emits = defineEmits(['search-started'])
+
+/**
  *  Fetch filters
  */
 const { searchState, isLoading, setSearchType, setResults, setSearchPending, setQueryAnalysis } = useSearchState()
@@ -41,6 +46,8 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
 
   try {
     setSearchPending(true)
+    emits('search-started')
+
     const response = await $fetch<ListingWithFullProperty[]>('/api/search/traditional', {
       method: 'POST',
       body
@@ -49,7 +56,7 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
     if (response) {
       // Build query analysis from form data for filter badges
       const queryAnalysis = buildQueryAnalysisFromFormData(formData)
-      
+
       setSearchType('traditional')
       setQueryAnalysis(queryAnalysis)
       setResults(response)
@@ -79,6 +86,8 @@ async function aiSearchSubmit(query: string) {
 
   try {
     setSearchPending(true)
+    emits('search-started')
+
     const response = await $fetch('/api/search/rag', {
       method: 'POST',
       body
@@ -88,7 +97,7 @@ async function aiSearchSubmit(query: string) {
       setSearchType('ai')
       setResults(response.results || [])
       await navigateTo('/search')
-      
+
       window.scrollTo({
         top: 0,
         behavior: "instant"

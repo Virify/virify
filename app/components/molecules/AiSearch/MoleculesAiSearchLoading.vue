@@ -1,6 +1,6 @@
 <template>
   <div class="m-ai-search-loading">
-    <img src="/img/ai-loading.svg" class="m-ai-search-loading__spinner" />
+    <img src="/img/v-loader.svg" class="m-ai-search-loading__spinner" />
     <p class="m-ai-search-loading__content | body-lg">
       {{ loadingMessage }}
     </p>
@@ -34,13 +34,14 @@ const loadingMessage = computed(() => {
     justify-content: center;
     color: var(--primary-400);
     width: auto;
-    height: 4ch;
+    height: 6ch;
   }
 
   &__content {
     color: var(--text-color);
     text-align: center;
     line-height: var(--lineheight-md);
+    font-weight: var(--font-semibold);
   }
 }
 </style>
