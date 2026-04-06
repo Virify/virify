@@ -38,13 +38,12 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   emits('search-started')
 
   await fetchResults({
+    location,
+    radius
+  }, {
     type: 'traditional',
-    body: {
-      formData,
-      location,
-      radius,
-    }
-  })
+    body: formData
+  },)
 }
 
 async function aiSearchSubmit(query: string) {
@@ -60,12 +59,13 @@ async function aiSearchSubmit(query: string) {
   emits('search-started')
 
   await fetchResults({
+    location,
+    radius,
+  }, {
     type: 'ai',
     body: {
       query,
       listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
-      location,
-      radius: radius ?? 5,
     }
   })
 }

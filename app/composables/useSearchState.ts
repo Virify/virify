@@ -184,17 +184,27 @@ function createSearchState() {
     body: unknown
   }
 
-  let mostRecentSearch: RecentSearch | null = null
+  interface RecentLocation {
+    location?: unknown
+    radius?: number
+  }
+
+  let mostRecentLocation: RecentLocation = {}
+  let mostRecentQuery: RecentSearch | null = null
+
   const toast = useToast()
 
-  async function fetchResults(searchData = mostRecentSearch) {
-    const { location, radius } = asObject(searchState.value)
+  async function fetchResults(
+    locationData = mostRecentLocation,
+    queryData = mostRecentQuery
+  ) {
+    const { location, radius } = asObject(locationData)
 
-    if (!location || !searchData) {
+    if (!location || !queryData) {
       return
     }
 
-    const { type, body } = asObject(searchData)
+    const { type, body } = asObject(queryData)
 
     const isAI = type === 'ai'
     const validatedType = isAI ? 'ai' : 'traditional'
@@ -209,7 +219,11 @@ function createSearchState() {
       if (isAI) {
         const response = await $fetch('/api/search/rag', {
           method: 'POST',
-          body: body as BodyInit
+          body: {
+            ...asObject(body),
+            location,
+            radius
+          } as unknown as BodyInit
         })
 
         const { results = [] } = asObject(response)
@@ -221,14 +235,12 @@ function createSearchState() {
        *  Perform traditional search
        */
       else {
-        const { formData, location, radius } = asObject(body)
-
-        const formDataObject = asObject(formData) as unknown as TraditionalSearchData
+        const formData = asObject(body) as unknown as TraditionalSearchData
 
         const response = await $fetch('/api/search/traditional', {
           method: 'POST',
           body: {
-            ...formDataObject,
+            ...formData,
             location,
             radius
           }
@@ -236,7 +248,7 @@ function createSearchState() {
 
         if (!response) throw new Error('')
 
-        const queryAnalysis = buildQueryAnalysisFromFormData(formDataObject)
+        const queryAnalysis = buildQueryAnalysisFromFormData(formData)
         setQueryAnalysis(queryAnalysis)
         setResults(response as unknown[])
       }
@@ -258,7 +270,8 @@ function createSearchState() {
       })
     } finally {
       setSearchPending(false)
-      mostRecentSearch = searchData
+      mostRecentQuery = queryData
+      mostRecentLocation = locationData
     }
   }
 

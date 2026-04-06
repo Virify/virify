@@ -90,7 +90,7 @@ defineExpose({
 /**
  *  Close popover when results are updated
  */
-const { searchState, updateState } = useSearchState()
+const { searchState, fetchResults } = useSearchState()
 const results = computed(() => asObject(searchState.value).results)
 
 watch(results, () => {
@@ -101,7 +101,9 @@ watch(results, () => {
  *  Re-search when location is updated
  */
 function updateLocation() {
-  updateState({})
+  const { location, radius } = asObject(searchState.value)
+
+  fetchResults({ location, radius })
 }
 
 /**
