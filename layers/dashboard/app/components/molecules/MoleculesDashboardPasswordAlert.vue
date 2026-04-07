@@ -29,19 +29,28 @@
 <script lang="ts" setup>
 const { user, loggedIn } = useUserSession();
 
+const hasUsername = computed(() => !!user.value?.username);
+const hasFirstName = computed(() => !!user.value?.firstName);
+const hasLastName = computed(() => !!user.value?.lastName);
+const hasNames = computed(() => hasFirstName.value && hasLastName.value);
+const verified = computed(() => isVerified(user.value));
+
 const status = computed(() => {
-  if (!isVerified(user.value) && !user.value?.username) {
+  if (!verified.value && !hasUsername.value) {
     return "Please complete your profile to fully activate your account.";
   }
-  if (!isVerified(user.value) && user.value?.username) {
+  if (!verified.value && hasUsername.value) {
     return "Please create a password to fully activate your account.";
   }
-  if (isVerified(user.value) && !user.value?.username) {
+  if (verified.value && !hasUsername.value) {
     return "Please create a username to fully activate your account.";
+  }
+  if (verified.value && hasUsername.value && !hasNames.value) {
+    return "Please add your first and last name to complete your profile.";
   }
 });
 
 const showAlert = computed(() => {
-  return (!isVerified(user.value) && !user.value?.username) || (!isVerified(user.value) && user.value?.username) || (isVerified(user.value) && !user.value?.username);
+  return !verified.value || !hasUsername.value || !hasNames.value;
 });
 </script>

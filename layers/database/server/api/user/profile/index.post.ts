@@ -43,9 +43,9 @@ export default defineEventHandler(async (event) => {
  * @returns 200
  */
 async function handleUsernameUpdate(event: H3Event<EventHandlerRequest>, userId: number): Promise<{ success: true }> {
-  const { username } = await readValidatedBody(event, profileCreateUsernameSchema.parse);
+  const { username, firstName, lastName } = await readValidatedBody(event, profileCreateUsernameSchema.parse);
 
-  const updatedUser = await updateUserUsernameById(userId, username);
+  const updatedUser = await updateUserUsernameById(userId, username, firstName, lastName);
   await loginUser(event, updatedUser);
 
   return { success: true };
@@ -58,7 +58,7 @@ async function handleUsernameUpdate(event: H3Event<EventHandlerRequest>, userId:
  * @returns 200
  */
 async function handleProfileCreation(event: H3Event<EventHandlerRequest>, userId: number): Promise<{ success: true }> {
-  const { username, newPassword } = await readValidatedBody(event, profileCreateSchema.parse);
+  const { username, firstName, lastName, newPassword } = await readValidatedBody(event, profileCreateSchema.parse);
 
   const userRecord = await getUserWithVerificationAndMembershipById(userId);
 
@@ -70,7 +70,7 @@ async function handleProfileCreation(event: H3Event<EventHandlerRequest>, userId
   validatePasswordNotSet(userRecord);
 
   const hashedNewPassword = await hashPassword(newPassword);
-  const updatedUser = await updateUserById(userId, username, hashedNewPassword, "ACTIVATED");
+  const updatedUser = await updateUserById(userId, username, hashedNewPassword, "ACTIVATED", firstName, lastName);
   
   await loginUser(event, updatedUser);
 

@@ -2,7 +2,7 @@
   <UFormField 
     label="Address" 
     name="address" 
-    required 
+    :required="variant === 'listing'" 
     :orientation="variant === 'listing' ? 'vertical' : 'horizontal'" 
     :description="variant === 'listing' ? 'Enter your postcode to find your property address' : 'This will not be publicly displayed'" 
     :error="addressError" 

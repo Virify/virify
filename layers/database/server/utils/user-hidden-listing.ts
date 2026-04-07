@@ -11,6 +11,7 @@ import { listingCardFields } from "~~/shared/types/listing";
 export async function getUserHiddenListingLookups(userId: number): Promise<number[]> {
   const results = await prisma.hiddenListing.findMany({
     where: {
+      hidden: true,
       userPreferences: {
         userId,
       },
@@ -35,25 +36,30 @@ export async function hideListingForUser(
   listingId: number,
   reason?: string
 ): Promise<void> {
-  const userPreferences = await prisma.userPreferences.findFirstOrThrow({
+  const { id: userPreferencesId } = await prisma.userPreferences.upsert({
     where: { userId },
+    create: { userId },
+    update: {},
     select: { id: true },
   });
 
   await prisma.hiddenListing.upsert({
     where: {
       userPreferencesId_listingId: {
-        userPreferencesId: userPreferences.id,
+        userPreferencesId,
         listingId,
       },
     },
     create: {
-      userPreferencesId: userPreferences.id,
+      userPreferencesId,
       listingId,
       reason: reason ?? null,
+      hidden: true,
     },
     update: {
+      hidden: true,
       reason: reason ?? null,
+      hiddenAt: new Date(),
     },
   });
 }
@@ -68,12 +74,16 @@ export async function unhideListingForUser(
   userId: number,
   listingId: number
 ): Promise<void> {
-  await prisma.hiddenListing.deleteMany({
+  await prisma.hiddenListing.updateMany({
     where: {
       listingId,
+      hidden: true,
       userPreferences: {
         userId,
       },
+    },
+    data: {
+      hidden: false,
     },
   });
 }
@@ -97,6 +107,7 @@ export async function getAllUserHiddenListings(
   const { skip, take, sort = "newest", filter = "all" } = options || {};
 
   const whereClause: any = {
+    hidden: true,
     userPreferences: {
       userId,
     },

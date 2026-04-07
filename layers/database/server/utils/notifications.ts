@@ -39,6 +39,7 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     }),
     prisma.hiddenListing.count({
       where: {
+        hidden: true,
         userPreferences: {
           userId: userId,
         },
