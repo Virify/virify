@@ -79,8 +79,40 @@
     <template #footer="{ collapsed }">
       <TooltipProvider :delay-duration="400">
         <div :class="collapsed ? 'flex flex-col items-center gap-3' : 'grid grid-cols-3 items-end w-full'">
-          <!-- col 1: User Dashboard + Logout -->
+          <!-- col 1: Export Data / Clear Cache / User Dashboard / Logout -->
           <div class="flex flex-col items-start gap-1">
+            <UTooltip text="Export Data">
+              <UButton
+                :icon="isExporting ? 'i-lucide-loader-circle' : 'i-lucide-download'"
+                variant="link"
+                size="xs"
+                :disabled="isExporting"
+                class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
+                :ui="{
+                  leadingIcon: 'text-secondary',
+                  label: 'text-foreground font-bold',
+                }"
+                :label="collapsed ? undefined : 'Export Data'"
+                :square="collapsed"
+                @click="exportAll"
+              />
+            </UTooltip>
+            <UTooltip :text="cacheBustStatus">
+              <UButton
+                :icon="bustState === 'loading' ? 'i-lucide-loader-circle' : 'i-lucide-trash-2'"
+                variant="link"
+                size="xs"
+                :disabled="bustState === 'loading'"
+                class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
+                :ui="{
+                  leadingIcon: bustState === 'success' ? 'text-green-500' : bustState === 'error' ? 'text-red-500' : 'text-secondary',
+                  label: 'text-foreground font-bold',
+                }"
+                :label="collapsed ? undefined : 'Clear Cache'"
+                :square="collapsed"
+                @click="bustCache"
+              />
+            </UTooltip>
             <UTooltip text="User Dashboard">
               <UButton
                 icon="i-lucide-layout-dashboard"
@@ -112,26 +144,8 @@
               />
             </UTooltip>
           </div>
-          <!-- col 2: Export Data -->
-          <div class="flex items-end">
-            <UTooltip text="Export Data">
-              <UButton
-                :icon="isExporting ? 'i-lucide-loader-circle' : 'i-lucide-download'"
-                variant="link"
-                size="xs"
-                :disabled="isExporting"
-                class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
-                :class="{ 'animate-spin': isExporting }"
-                :ui="{
-                  leadingIcon: 'text-secondary',
-                  label: 'text-foreground font-bold',
-                }"
-                :label="collapsed ? undefined : 'Export Data'"
-                :square="collapsed"
-                @click="exportAll"
-              />
-            </UTooltip>
-          </div>
+          <!-- col 2: empty -->
+          <div />
           <!-- col 3: Color mode -->
           <div class="flex items-end justify-end">
             <UColorModeButton
@@ -151,6 +165,28 @@ import { TooltipProvider } from "reka-ui";
 const { adminNavigationItems } = useAdminNavigation();
 const { isExporting, exportAll } = useAdminExport();
 const { clear } = useUserSession();
+const bustState = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+const cacheBustStatus = computed(() => ({
+  idle: 'Clear Cache',
+  loading: 'Clearing cache…',
+  success: 'Cache cleared!',
+  error: 'Clear failed – check console',
+}[bustState.value]));
+
+async function bustCache() {
+  if (bustState.value === 'loading') return;
+  bustState.value = 'loading';
+  try {
+    await useRequestFetch()('/api/admin/cache', { method: 'POST' });
+    bustState.value = 'success';
+  } catch (e) {
+    console.error('[Admin] Cache bust failed:', e);
+    bustState.value = 'error';
+  } finally {
+    setTimeout(() => { bustState.value = 'idle'; }, 3000);
+  }
+}
 
 const logout = async () => {
   await clear();
