@@ -16,9 +16,12 @@ export const useAiSuggestedSearches = createSharedComposable(() => {
     { default: (): string[] => [], immediate: true },
   );
 
-  const suggestedSearches = computed(() =>
-    recentSearches.value?.length ? recentSearches.value : DEFAULT_SUGGESTED_SEARCHES,
-  );
+  const suggestedSearches = computed(() => {
+    const recent = recentSearches.value ?? []
+    const needed = Math.max(0, 6 - recent.length)
+    const defaults = DEFAULT_SUGGESTED_SEARCHES.filter((d) => !recent.includes(d)).slice(0, needed)
+    return [...recent, ...defaults].slice(0, 6)
+  });
 
   return { suggestedSearches };
 });

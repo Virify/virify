@@ -70,7 +70,7 @@
 
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  modelValue: AddressParsed | null;
+  modelValue: AddressParsed | null | undefined;
   pending?: boolean;
   variant?: 'profile' | 'listing';
 }>(), {

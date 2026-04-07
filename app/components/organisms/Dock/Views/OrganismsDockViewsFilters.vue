@@ -29,6 +29,7 @@ const emits = defineEmits(['search-started'])
  *  Fetch filters
  */
 const { searchState, isLoading, setSearchType, setResults, setSearchPending, setQueryAnalysis } = useSearchState()
+const { trackSearch } = useAnalyticsTracking()
 const toast = useToast()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
@@ -96,6 +97,15 @@ async function aiSearchSubmit(query: string) {
     if (response) {
       setSearchType('ai')
       setResults(response.results || [])
+
+      trackSearch({
+        listingType: response.effectiveListingType ?? body.listingType,
+        query,
+        location: location as GeocodingFeature,
+        radius: body.radius,
+        resultCount: response.results?.length ?? 0,
+      })
+
       await navigateTo('/search')
 
       window.scrollTo({
