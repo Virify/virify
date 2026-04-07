@@ -65,7 +65,9 @@ onMounted(async () => {
       radius
     }, {
       type: 'traditional',
-      body: traditionalSearchForm
+      body: {
+        ...asObject(traditionalSearchForm)
+      }
     })
   }
 
