@@ -225,8 +225,12 @@ function createSearchState() {
           } as unknown as BodyInit
         })
 
-        const { results = [], effectiveListingType } = asObject(response)
+        const { queryAnalysis, results = [], effectiveListingType } = asObject(response)
         const { listingType, query } = asObject(body)
+
+        if (queryAnalysis) {
+          setQueryAnalysis(queryAnalysis)
+        }
 
         setResults(results as unknown[])
         trackSearch({
