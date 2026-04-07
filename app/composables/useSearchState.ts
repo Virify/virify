@@ -1,5 +1,3 @@
-const { trackSearch } = useAnalyticsTracking()
-
 export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
 export type ResultLayout = 'map' | 'grid' | 'split'
 
@@ -193,6 +191,7 @@ function createSearchState() {
   let mostRecentQuery: RecentSearch | null = null
 
   const toast = useToast()
+  const { trackSearch } = useAnalyticsTracking()
 
   async function fetchResults(
     locationData = mostRecentLocation,
