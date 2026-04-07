@@ -134,6 +134,10 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   vite: {
+    // Apparently needed to prevent Vite from hanging on file changes in some environments (e.g. WSL, Docker on Windows) and also will stop concurrent builds from stepping on each other's files
+    build: {
+        emptyOutDir: false
+      },
     server: {
       watch: {
         usePolling: true,
