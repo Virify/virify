@@ -1,7 +1,7 @@
-export async function useMainNavigation() {
-  const { data: mainMenu } = await useFetch('/api/navigation')
+export function useMainNavigation() {
+  const { data: menuData } = useFetch('/api/navigation', { default: () => [] })
 
   return {
-    mainMenu: asArray(mainMenu.value)
+    mainMenu: computed(() => asArray(menuData.value))
   }
 }

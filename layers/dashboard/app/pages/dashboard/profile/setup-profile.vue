@@ -38,6 +38,44 @@
               />
             </UFormField>
 
+            <USeparator class="my-4" />
+
+            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Your first name" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+              <UInput
+                v-model="state.firstName"
+                type="text"
+                icon="i-lucide-user-pen"
+                placeholder="First Name"
+                variant="subtle"
+                :loading="pending"
+                color="secondary"
+                class="w-full md:w-80"
+                :ui="{
+                  base: 'placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50',
+                }"
+              />
+            </UFormField>
+
+            <USeparator class="my-4" />
+
+            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Your last name" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+              <UInput
+                v-model="state.lastName"
+                type="text"
+                icon="i-lucide-user-pen"
+                placeholder="Last Name"
+                variant="subtle"
+                :loading="pending"
+                color="secondary"
+                class="w-full md:w-80"
+                :ui="{
+                  base: 'placeholder:text-(--foreground-200)/50!',
+                  leadingIcon: 'text-(--foreground-200)/50',
+                }"
+              />
+            </UFormField>
+
             <div v-if="!hasPassword">
               <USeparator class="my-4" />
               <div class="body-sm pb-5">
@@ -130,6 +168,8 @@ const showConfirmNewPassword = ref(false);
 const { data: fullUser, pending } = await useAsyncData("fullUser", () => useRequestFetch()<UserWithAddress>(`/api/user/profile/`));
 
 const state = reactive({
+  firstName: fullUser.value?.firstName || "",
+  lastName: fullUser.value?.lastName || "",
   username: fullUser.value?.username || "",
   newPassword: "",
   confirmNewPassword: "",

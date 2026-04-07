@@ -175,7 +175,7 @@ export const useNotes = () => {
         },
       ],
       operation: async () => {
-        await $fetch(`/api/user/notes/${listingId}/`, {
+        await requestFetch(`/api/user/notes/${listingId}/`, {
           method: "POST",
           body: { listingId, note },
         });
@@ -217,7 +217,7 @@ export const useNotes = () => {
         },
       ],
       operation: async () => {
-        await $fetch(`/api/user/notes/${listingId}/`, {
+        await requestFetch(`/api/user/notes/${listingId}/`, {
           method: "DELETE",
           body: { listingId },
         });
@@ -249,7 +249,6 @@ export const useNotes = () => {
    * @param listingId - ID of the listing
    */
   const showNoteDialog = (listingId: number) => {
-    console.log("showNoteDialog", listingId);
     if (!loggedIn.value) {
       showDialog({ component: ViewsDialogLogin });
       return;
