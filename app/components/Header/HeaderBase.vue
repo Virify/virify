@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-const { mainMenu } = await useMainNavigation()
+const { mainMenu } = useMainNavigation()
 
 /**
  *  Track logged in state
