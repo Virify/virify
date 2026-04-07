@@ -130,7 +130,7 @@ export const useFavourites = () => {
       ref: favouriteLookups,
       optimisticChange: (current) => [...current, listingId],
       operation: async () => {
-        await $fetch(`/api/user/favourites/${listingId}/`, {
+        await requestFetch(`/api/user/favourites/${listingId}/`, {
           method: "POST",
           body: { listingId },
         });
@@ -167,7 +167,7 @@ export const useFavourites = () => {
       pendingSet: pendingRemoval,
       id: listingId,
       operation: async () => {
-        await $fetch(`/api/user/favourites/${listingId}/`, {
+        await requestFetch(`/api/user/favourites/${listingId}/`, {
           method: "DELETE",
           body: { listingId },
         });

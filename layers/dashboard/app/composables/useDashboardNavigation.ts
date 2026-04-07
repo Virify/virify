@@ -122,6 +122,16 @@ export function useDashboardNavigation() {
           badge: aggregates.value.notes ? String(aggregates.value.notes) : undefined,
         },
         {
+          label: "Hidden",
+          type: "link",
+          to: "/dashboard/hidden-listings",
+          icon: "i-lucide-eye-off",
+          tooltip: {
+            text: "Your hidden listings" + (aggregates.value.hiddenListings ? ` (${aggregates.value.hiddenListings})` : ""),
+          },
+          badge: aggregates.value.hiddenListings ? String(aggregates.value.hiddenListings) : undefined,
+        },
+        {
           label: "Viewed",
           type: "link",
           to: "#",

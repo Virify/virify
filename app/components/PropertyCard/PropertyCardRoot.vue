@@ -1,5 +1,19 @@
 <template>
-  <section class="property-card-root">
+  <section class="property-card-root" :class="{ 'property-card-root--hidden': isListingHidden }">
+    <Transition name="fade">
+      <div v-if="isListingHidden" class="property-card-root__hidden-overlay">
+        <UIcon name="i-lucide-eye-off" class="property-card-root__hidden-icon" aria-hidden />
+        <span class="body-md">Hidden</span>
+        <button
+          type="button"
+          class="property-card-root__hidden-undo | button-none body-sm"
+          @click="unhideListing(listingId!)"
+        >
+          Undo
+        </button>
+      </div>
+    </Transition>
+
     <div class="property-card-root__images | v-skeleton">
       <template v-if="imageCarouselArray">
         <PropertyCardCarousel :slides="imageCarouselArray" v-slot="{ slide }">
@@ -114,6 +128,12 @@ const props = withDefaults(defineProps<Props>(), {
   imageProvider: 'cloudflare'
 })
 
+const { isHidden, unhideListing } = useHiddenListings()
+
+const isListingHidden = computed(() =>
+  !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
+)
+
 /**
  *  Conditionally show as links
  */
@@ -198,11 +218,52 @@ const imageCarouselArray = computed(() => {
 }
 
 .property-card-root {
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   container-name: card;
   container-type: inline-size;
+
+  &__hidden-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-6);
+    background-color: var(--background-200);
+    border-radius: var(--border-radius-2xl);
+    border: 1px solid var(--background-300);
+  }
+
+  &__hidden-icon {
+    width: var(--size-32);
+    height: var(--size-32);
+    color: var(--monochrome-500);
+  }
+
+  &__hidden-undo {
+    font-size: var(--font-xs);
+    font-weight: var(--font-semibold);
+    color: var(--primary-500);
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--primary-400);
+    }
+  }
+
+  &--hidden {
+    .property-card-root__images,
+    .property-card-root__content {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+  }
 
   &__images,
   &__image {

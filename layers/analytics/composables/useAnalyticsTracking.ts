@@ -148,15 +148,19 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     
     // Mark as sent
     newImpressions.forEach(id => sentImpressions.value.add(id));
-    
-    const payload: TrackingImpressionBatchPayload = {
-      ...getBasePayload(),
-      listingIds: newImpressions,
-      source: options?.source,
-      searchQuery: options?.searchQuery,
-    };
-    
-    sendBeaconEvent('/api/analytics/track/impressions', payload);
+
+    // Send in chunks of 100 to respect the API limit
+    const CHUNK_SIZE = 100;
+    for (let i = 0; i < newImpressions.length; i += CHUNK_SIZE) {
+      const chunk = newImpressions.slice(i, i + CHUNK_SIZE);
+      const payload: TrackingImpressionBatchPayload = {
+        ...getBasePayload(),
+        listingIds: chunk,
+        source: options?.source,
+        searchQuery: options?.searchQuery,
+      };
+      sendBeaconEvent('/api/analytics/track/impressions', payload);
+    }
   };
   
   /**

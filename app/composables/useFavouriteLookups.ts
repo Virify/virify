@@ -1,15 +1,19 @@
+import { createSharedComposable } from '@vueuse/core'
+
 /**
  * Shared Global State for User Favourites
  * Keeps valid list of all listing IDs the user has favourited.
- * Note: useAsyncData caches by key, so this is already shared across components
+ * createSharedComposable ensures a single instance (and single watcher) across the app.
  */
-export const useFavouriteLookups = () => {
+export const useFavouriteLookups = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const requestFetch = useRequestFetch();
 
   const { data: favouriteLookups, refresh: refreshFavourites, pending: favouriteLookupsPending } = useAsyncData<number[]>(
     "favouriteLookups",
-    () => requestFetch<number[]>("/api/user/favourites/all/lookups"),
+    () => loggedIn.value
+      ? requestFetch<number[]>("/api/user/favourites/all/lookups")
+      : Promise.resolve([]),
     {
       default: () => [],
       watch: [loggedIn],
@@ -22,4 +26,5 @@ export const useFavouriteLookups = () => {
     refreshFavourites,
     favouriteLookupsPending,
   };
-};
+});
+

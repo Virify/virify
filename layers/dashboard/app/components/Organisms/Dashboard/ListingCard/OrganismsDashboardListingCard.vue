@@ -116,10 +116,13 @@ interface Props {
 const props = defineProps<Props>();
 
 /**
- * Check if this card is pending removal
+ * Check if this card is pending removal.
+ * Only show the overlay when this card is being used as a favourite card (props.fav set).
+ * On the notes page (no fav prop), we never show this overlay — the pending state
+ * is for the favourites page context only.
  */
 const isPending = computed(() => {
-  return isPendingRemoval(props.listing?.id!);
+  return !!props.fav && isPendingRemoval(props.listing?.id!);
 });
 
 /**

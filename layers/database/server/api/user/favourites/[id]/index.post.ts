@@ -21,6 +21,8 @@ export default defineEventHandler(async (event) => {
 
     // Invalidate lookups cache so the next GET reflects the new favourite
     useStorage('cache').removeItem(`favs:lookups:${user.id}`).catch(() => {});
+    // Invalidate aggregates cache (safety net if WebSocket update is missed)
+    await invalidateAggregatesCache(user.id as number);
 
     // Broadcast aggregate update via WebSocket
     const aggregateMessage = createAggregateUpdateMessage("favourites", "add", user.id);
@@ -28,7 +30,7 @@ export default defineEventHandler(async (event) => {
 
     return listings;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return errorResponse(error, event);
   }
 });

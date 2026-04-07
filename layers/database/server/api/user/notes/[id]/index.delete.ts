@@ -26,6 +26,8 @@ export default defineEventHandler(async (event) => {
 
     // Invalidate lookups cache so the next GET reflects the deletion
     useStorage('cache').removeItem(`notes:lookups:${user.id}`).catch(() => {});
+    // Invalidate aggregates cache (safety net if WebSocket update is missed)
+    await invalidateAggregatesCache(user.id as number);
 
     // Broadcast aggregate update via WebSocket
     const aggregateMessage = createAggregateUpdateMessage("notes", "remove", user.id);

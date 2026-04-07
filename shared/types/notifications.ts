@@ -56,6 +56,7 @@ export interface NotificationCounts {
 export interface UserItemsAggregates {
   favourites: number;
   notes: number;
+  hiddenListings: number;
   enquiries: number;
   locations: number;
   listings: number; // Count of user's active (non-archived) listings
