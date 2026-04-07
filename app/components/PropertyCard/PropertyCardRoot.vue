@@ -68,7 +68,8 @@
 
       <div class="property-card-root__buttons" aria-role="presentation">
         <component :is="viewLinkComponent.is" :href="viewLinkComponent.href"
-          class="property-card-root__button property-card-root__button--view | body-sm">
+          class="property-card-root__button property-card-root__button--view | body-sm"
+          @click="!disabledInteractions && listingId && trackClick(listingId)">
           View
         </component>
 
@@ -129,6 +130,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { isHidden, unhideListing } = useHiddenListings()
+const { trackClick } = useAnalyticsTracking()
 
 const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)

@@ -38,11 +38,18 @@ export default defineEventHandler(async (event) => {
 
     const { whereClause, queryAnalysis } = await constructPrismaWhereClause(listingType, query, propertyIds);
 
+    // Derive the effective listing type from what the AI put in the where clause
+    const effectiveListingType: 'sale' | 'rent' | 'all' =
+      whereClause.saleListing ? 'sale'
+      : whereClause.rentalListing ? 'rent'
+      : 'all';
+
     // If propertyIds is an empty array, no properties were found, so we can return early.
     if (Array.isArray(propertyIds) && propertyIds.length === 0) {
       return {
         results: [],
         query,
+        effectiveListingType,
         generatedWhereClause: whereClause,
         queryAnalysis,
         locationContext,
@@ -70,6 +77,7 @@ export default defineEventHandler(async (event) => {
     return {
       results: resultsWithListingType,
       query,
+      effectiveListingType,
       generatedWhereClause: whereClause,
       queryAnalysis,
       locationContext,

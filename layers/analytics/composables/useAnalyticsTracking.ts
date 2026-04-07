@@ -88,12 +88,17 @@ export const useAnalyticsTracking = createSharedComposable(() => {
    */
   const sendBeaconEvent = <T extends object>(endpoint: string, payload: T): boolean => {
     if (!import.meta.client || typeof navigator.sendBeacon !== 'function') {
+      console.warn(`[analytics] sendBeacon not available for ${endpoint}`);
       return false;
     }
     
     try {
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-      return navigator.sendBeacon(endpoint, blob);
+      const accepted = navigator.sendBeacon(endpoint, blob);
+      if (!accepted) {
+        console.warn(`[analytics] sendBeacon rejected by browser for ${endpoint} (queue full?)`);
+      }
+      return accepted;
     } catch (error) {
       console.error(`Failed to send beacon to ${endpoint}:`, error);
       return false;
@@ -264,6 +269,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     };
     
     sendBeaconEvent('/api/analytics/search', payload);
+    console.log('[analytics] trackSearch beacon sent, payload:', JSON.stringify(payload));
   };
   
   /**

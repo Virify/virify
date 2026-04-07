@@ -36,15 +36,25 @@ export default defineEventHandler(async (event) => {
       select: { userId: true },
     });
     
-    // Record the click (skip if listing doesn't exist)
+    // Skip if listing doesn't exist
     if (!listing) {
       return { success: false };
     }
-    
-    // Use raw SQL or a different approach since ListingClick model needs migration
-    // For now, just update the daily stats
-    
-    // Update daily stats
+
+    // Write individual click event to ListingClick (used by overview count)
+    await prisma.listingClick.create({
+      data: {
+        listingId,
+        userId: user?.id ?? null,
+        sessionId: body.sessionId ?? null,
+        ip,
+        userAgent: body.userAgent ?? null,
+        source: body.source ?? null,
+        position: body.position ?? null,
+      },
+    });
+
+    // Also update pre-aggregated daily stats (used by engagement analytics)
     if (listing.userId) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -68,7 +78,6 @@ export default defineEventHandler(async (event) => {
           clicks: 1,
           favourites: 0,
           enquiries: 0,
-          avgDuration: 0,
         },
       });
     }

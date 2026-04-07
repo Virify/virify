@@ -44,6 +44,8 @@ const {
   setQueryAnalysis
 } = useSearchState()
 
+const { trackSearch } = useAnalyticsTracking()
+
 /**
  * Re-run search on page load if we have search metadata but no results
  * This handles page refreshes and back/forward navigation
@@ -103,6 +105,13 @@ onMounted(async () => {
         if (response.queryAnalysis) {
           setQueryAnalysis(response.queryAnalysis)
         }
+        trackSearch({
+          listingType: response.effectiveListingType ?? body.listingType,
+          query: body.query,
+          location: state.location as GeocodingFeature,
+          radius: body.radius,
+          resultCount: response.results?.length ?? 0,
+        })
       }
     }
   } catch (error) {

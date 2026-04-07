@@ -69,19 +69,7 @@ import {
   PopoverTrigger
 } from 'reka-ui'
 
-/**
- *  Account navigation
- */
-const accountLinks = [
-  {
-    title: 'Dashboard',
-    url: '/dashboard'
-  },
-  {
-    title: 'Settings',
-    url: '/dashboard/profile'
-  }
-]
+
 
 /**
  *  Panel switching
@@ -117,6 +105,20 @@ async function openNotifications() {
  *  Log user out
  */
 const { clear, user } = useUserSession()
+
+/**
+ *  Account navigation
+ */
+const accountLinks = computed(() => {
+  const links: { title: string; url: string }[] = [
+    { title: 'Dashboard', url: '/dashboard' },
+    { title: 'Settings', url: '/dashboard/profile' },
+  ]
+  if (isAdmin(user.value as Parameters<typeof isAdmin>[0])) {
+    links.splice(1, 0, { title: 'Admin Dashboard', url: '/admin' })
+  }
+  return links
+})
 
 async function logOut() {
   await clear()
