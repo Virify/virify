@@ -104,6 +104,7 @@ function updateLocation() {
   const { location, radius } = asObject(searchState.value)
 
   fetchResults({ location, radius })
+  hidePopover()
 }
 
 /**
