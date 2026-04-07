@@ -1,21 +1,13 @@
 import vue from "@vitejs/plugin-vue";
 
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity', './layers/dashboard', './layers/admin'],
+  extends: ["./layers/cloudflare", "./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity', './layers/dashboard', './layers/admin'],
   future: {
     compatibilityVersion: 4,
   },
   runtimeConfig: {
-    CF_SECRET_KEY: process.env.CF_SECRET_KEY,
-    CF_IMAGES_API_KEY: process.env.CF_IMAGES_API_KEY,
-    CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
-    CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH,
-    CF_SERVICE_TOKEN_ID: process.env.CF_SERVICE_TOKEN_ID,
-    CF_SERVICE_TOKEN_SECRET: process.env.CF_SERVICE_TOKEN_SECRET,
     public: {
       isWaitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
-      CF_SITE_KEY: process.env.CF_SITE_KEY,
-      CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
   modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],

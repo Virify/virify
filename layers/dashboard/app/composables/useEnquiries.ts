@@ -235,14 +235,30 @@ export const useEnquiries = createSharedComposable(() => {
   /**
    * Send a reply message
    */
-  async function sendReply(conversationId: number, content: string, options?: { suppressNotification?: boolean }) {
-    if (!content.trim() || !currentUserId.value) {
-      throw new Error('Message content is required');
+  async function sendReply(
+    conversationId: number,
+    content: string,
+    options?: { suppressNotification?: boolean; mediaId?: number }
+  ) {
+    const hasContent = content.trim().length > 0;
+    const hasMedia = !!options?.mediaId;
+
+    if (!hasContent && !hasMedia) {
+      throw new Error('A message or attachment is required');
+    }
+
+    if (!currentUserId.value) {
+      throw new Error('User is not authenticated');
     }
 
     const response = await $fetch<MessageWithUser>('/api/conversation/reply/', {
       method: 'POST',
-      body: { message: content, conversationId, suppressNotification: options?.suppressNotification === true },
+      body: {
+        message: hasContent ? content : undefined,
+        userMediaId: options?.mediaId,
+        conversationId,
+        suppressNotification: options?.suppressNotification === true,
+      },
     });
 
     return response;

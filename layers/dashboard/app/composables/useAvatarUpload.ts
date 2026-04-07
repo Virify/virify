@@ -23,7 +23,7 @@ function getCloudflareId(url: string): string | null {
  * 2. Clears `state.avatar` and PATCHes the database
  */
 export function useAvatarUpload(state: { avatar?: string | null }) {
-  const { uploadImage, getImageUrl, deleteImage, isUploading: avatarUploading } = useCloudflare()
+  const { uploadImage, getImageUrl, deleteImage, isUploading: avatarUploading } = useCloudflareImages()
   const { checkImages } = useModeration()
   const { fetch: refreshSession } = useUserSession()
   const toast = useToast()
@@ -110,14 +110,15 @@ export function useAvatarUpload(state: { avatar?: string | null }) {
       return
     }
 
-    // 3. Safe — delete the old CF image if one existed, then persist
+    // 3. Safe — delete the old CF image first (ownership check uses current DB value),
+    //    then persist the new URL
     const oldCfId = state.avatar ? getCloudflareId(state.avatar as string) : null
-    const url = getImageUrl(uploaded.id)
-    await saveAvatarToDb(url)
-    await refreshSession()
     if (oldCfId) {
       await deleteImage(oldCfId)
     }
+    const url = getImageUrl(uploaded.id)
+    await saveAvatarToDb(url)
+    await refreshSession()
     state.avatar = url
     avatarPreview.value = undefined
     toast.add({ title: 'Avatar updated', color: 'success', icon: 'i-lucide-check-circle' })
