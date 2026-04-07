@@ -1,4 +1,4 @@
-import { useStorage } from '@vueuse/core'
+const { trackSearch } = useAnalyticsTracking()
 
 export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
 export type ResultLayout = 'map' | 'grid' | 'split'
@@ -226,9 +226,17 @@ function createSearchState() {
           } as unknown as BodyInit
         })
 
-        const { results = [] } = asObject(response)
+        const { results = [], effectiveListingType } = asObject(response)
+        const { listingType, query } = asObject(body)
 
         setResults(results as unknown[])
+        trackSearch({
+          listingType: effectiveListingType ?? listingType,
+          query: query as string,
+          location: location as GeocodingFeature,
+          radius: radius as number,
+          resultCount: results?.length ?? 0,
+        })
       }
 
       /**
