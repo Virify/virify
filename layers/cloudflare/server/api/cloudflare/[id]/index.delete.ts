@@ -45,9 +45,8 @@ export default defineEventHandler(async (event) => {
 
     const config = useRuntimeConfig();
 
-    // Delete from Cloudflare Images API
     const cloudflareUrl = `https://api.cloudflare.com/client/v4/accounts/${config.CF_ACCOUNT_ID}/images/v1/${imageId}`;
-    
+
     const response = await fetch(cloudflareUrl, {
       method: 'DELETE',
       headers: {
@@ -58,15 +57,14 @@ export default defineEventHandler(async (event) => {
     const data = await response.json();
 
     if (!data.success) {
-      // Check if error is "Image not found" - this is OK, image already deleted
       const errorMessage = data.errors?.[0]?.message || '';
       const isNotFound = errorMessage.toLowerCase().includes('not found') || response.status === 404;
-      
+
       if (isNotFound) {
         console.log(`Image ${imageId} already deleted from Cloudflare`);
         return { success: true };
       }
-      
+
       console.error('Cloudflare delete error:', data.errors);
       throw createError({
         statusCode: 500,
@@ -74,11 +72,8 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return {
-      success: true,
-    };
+    return { success: true };
   } catch (error) {
-    console.error('Delete error:', error);
     return errorResponse(error, event);
   }
 });

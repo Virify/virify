@@ -7,7 +7,7 @@ const profanityFilter = new Filter()
  */
 export function useModeration() {
   const isChecking = ref(false)
-  const { getImageUrls, deleteImages } = useCloudflare()
+  const { getImageUrls, deleteImages } = useCloudflareImages()
 
   async function moderate(body: { text?: string; images?: string[] }): Promise<{ safe: boolean; reason?: string }> {
     isChecking.value = true

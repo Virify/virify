@@ -22,49 +22,33 @@ export interface UploadResponse {
 }
 
 /**
- * Composable for managing Cloudflare image uploads via direct upload
- * 
+ * Composable for managing Cloudflare Images uploads via direct upload.
+ *
  * Features:
  * - Get secure one-time upload URLs
  * - Upload images directly to Cloudflare (bypasses server)
  * - Delete images from Cloudflare
  * - Parallel upload support
  */
-export const useCloudflare = () => {
+export const useCloudflareImages = () => {
   const isUploading = ref(false);
   const uploadError = ref<string | null>(null);
   const toast = useToast();
   const { public: { CF_ACCOUNT_HASH } } = useRuntimeConfig();
 
-  /**
-   * Get the delivery URL for a Cloudflare image
-   * @param id - Cloudflare image ID
-   * @param variant - Image variant (defaults to 'public')
-   */
   const getImageUrl = (id: string, variant = 'public'): string => {
     return `https://imagedelivery.net/${CF_ACCOUNT_HASH}/${id}/${variant}`;
   };
 
-  /**
-   * Get delivery URLs for multiple Cloudflare images
-   * @param ids - Array of Cloudflare image IDs
-   * @param variant - Image variant (defaults to 'public')
-   */
   const getImageUrls = (ids: string[], variant = 'public'): string[] => {
     return ids.map(id => getImageUrl(id, variant));
   };
 
-  /**
-   * Upload an image to Cloudflare using direct upload
-   * @param file - File to upload
-   * @returns Upload response with Cloudflare image ID and variants
-   */
   const uploadImage = async (file: File): Promise<UploadedImage | null> => {
     isUploading.value = true;
     uploadError.value = null;
 
     try {
-      // Step 1: Get a secure one-time upload URL from our server
       const { uploadUrl } = await $fetch<{ uploadUrl: string }>('/api/cloudflare', {
         method: 'POST',
       });
@@ -73,11 +57,9 @@ export const useCloudflare = () => {
         throw new Error('No upload URL received from server');
       }
 
-      // Step 2: Upload directly to Cloudflare (bypasses our server for speed)
       const formData = new FormData();
       formData.append('file', file);
 
-      // Don't set Content-Type header - browser will set it with boundary automatically
       const cloudflareResponse = await fetch(uploadUrl, {
         method: 'POST',
         body: formData,
@@ -99,54 +81,32 @@ export const useCloudflare = () => {
         toast.add({ title: 'Error', description: `Failed to upload image: ${errorMessage}`, color: 'error', icon: 'i-lucide-image-off' });
         return null;
       }
-    } catch (error: any) {
-      const errorMessage = error?.data?.message || error?.message || 'Upload failed';
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to upload image';
       uploadError.value = errorMessage;
-      toast.add({ title: 'Error', description: `Error uploading image: ${errorMessage}`, color: 'error', icon: 'i-lucide-image-off' });
-      console.error('Upload error:', error);
+      toast.add({ title: 'Error', description: errorMessage, color: 'error', icon: 'i-lucide-image-off' });
       return null;
     } finally {
       isUploading.value = false;
     }
   };
 
-  /**
-   * Upload multiple images to Cloudflare in parallel
-   * @param files - Array of files to upload
-   * @returns Array of uploaded image results
-   */
   const uploadImages = async (files: File[]): Promise<(UploadedImage | null)[]> => {
-    const uploadPromises = files.map(file => uploadImage(file));
-    return Promise.all(uploadPromises);
+    return Promise.all(files.map(file => uploadImage(file)));
   };
 
-  /**
-   * Delete an image from Cloudflare
-   * @param cloudflareId - Cloudflare image ID to delete
-   * @returns Success status
-   */
   const deleteImage = async (cloudflareId: string): Promise<boolean> => {
     try {
-      const response = await $fetch<{ success: boolean }>(`/api/cloudflare/${cloudflareId}`, {
-        method: 'DELETE',
-      });
-
-      return response.success;
-    } catch (error: any) {
-      console.error('Error deleting image:', error);
-      toast.add({ title: 'Error', description: 'Failed to delete image', color: 'secondary', icon: 'i-lucide-image-off' });
+      await $fetch(`/api/cloudflare/${cloudflareId}`, { method: 'DELETE' });
+      return true;
+    } catch (error) {
+      console.error('Failed to delete image:', error);
       return false;
     }
   };
 
-  /**
-   * Delete multiple images from Cloudflare in parallel
-   * @param cloudflareIds - Array of Cloudflare image IDs to delete
-   * @returns Array of success statuses
-   */
-  const deleteImages = async (cloudflareIds: string[]): Promise<boolean[]> => {
-    const deletePromises = cloudflareIds.map(id => deleteImage(id));
-    return Promise.all(deletePromises);
+  const deleteImages = async (ids: string[]): Promise<void> => {
+    await Promise.all(ids.map(id => deleteImage(id)));
   };
 
   return {

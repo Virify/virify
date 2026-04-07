@@ -7,7 +7,7 @@
 export function useStep9Media(options: UseStep9MediaOptions) {
   const { draftListingId, editingListingId, media, maxImages, listingTier } = options
   
-  const { uploadImage, deleteImage, isUploading } = useCloudflare()
+  const { uploadImage, deleteImage, isUploading } = useCloudflareImages()
   const { checkImages, isChecking: isModerating } = useModeration()
   const toast = useToast()
   

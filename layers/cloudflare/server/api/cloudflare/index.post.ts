@@ -1,10 +1,10 @@
 /**
  * POST /api/cloudflare
  * Get a one-time direct upload URL from Cloudflare Images
- * 
+ *
  * This endpoint returns a secure, one-time upload URL that allows the client
  * to upload images directly to Cloudflare, bypassing our server.
- * 
+ *
  * Benefits:
  * - Faster uploads (no server bottleneck)
  * - Less server bandwidth usage
@@ -25,10 +25,8 @@ export default defineEventHandler(async (event) => {
 
     const config = useRuntimeConfig();
 
-    // Request a direct upload URL from Cloudflare
-    // Note: This endpoint doesn't accept a body - it just returns a URL
     const cloudflareUrl = `https://api.cloudflare.com/client/v4/accounts/${config.CF_ACCOUNT_ID}/images/v2/direct_upload`;
-    
+
     const response = await fetch(cloudflareUrl, {
       method: 'POST',
       headers: {
@@ -45,8 +43,6 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Return the upload URL to the client
-    // The client will upload directly to this URL
     return {
       success: true,
       uploadUrl: data.result.uploadURL,
