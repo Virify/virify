@@ -70,7 +70,7 @@
           <UIcon name="i-lucide-radar" class="text-secondary" />
         </h2>
         <div class="w-full">
-          <UTable :data="fakeRadiusData" :columns="radiusColumns" />
+          <UTable :data="radiusData" :columns="radiusColumns" />
         </div>
 
         <!-- Unmet Demand -->
@@ -106,12 +106,6 @@ const { data, status } = await useAsyncData("admin-search", () =>
 );
 
 const radiusData = computed(() => data.value?.radiusHistogram ?? []);
-
-const fakeRadiusData = [
-  { radiusMiles: 5, count: 3 },
-  { radiusMiles: 10, count: 1 },
-  { radiusMiles: 40, count: 6 },
-];
 
 const fmt = (n: number | undefined) => (n ?? 0).toLocaleString("en-GB");
 
