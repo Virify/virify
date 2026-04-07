@@ -29,7 +29,6 @@ const emits = defineEmits(['search-started'])
  *  Fetch filters
  */
 const { searchState, isLoading, fetchResults } = useSearchState()
-const toast = useToast()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   const { location, radius } = asObject(searchState.value)

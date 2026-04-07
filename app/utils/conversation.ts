@@ -170,7 +170,10 @@ export const getLastMessage = (conversation: ConversationWithMinimalListing): Me
  */
 export const getLastMessageContent = (conversation: ConversationWithMinimalListing): string => {
   const lastMessage = getLastMessage(conversation);
-  return lastMessage?.content || "No messages yet";
+  if (!lastMessage) return "No messages yet";
+  if (lastMessage.content) return lastMessage.content;
+  if (lastMessage.userMedia) return "📎 Attachment";
+  return "No messages yet";
 };
 
 /**

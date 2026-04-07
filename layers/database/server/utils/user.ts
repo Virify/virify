@@ -214,12 +214,14 @@ export async function findUserByPasswordToken(token: string): Promise<UserWithVe
  * @param data Data
  * @returns User
  */
-export async function updateUserById(id: number, username: string, hashedPassword: string, activate?: string): Promise<UserWithVerificationAndMembership> {
+export async function updateUserById(id: number, username: string, hashedPassword: string, activate?: string, firstName?: string, lastName?: string): Promise<UserWithVerificationAndMembership> {
   return prisma.user.update({
     where: { id },
     data: {
       username,
       password: hashedPassword,
+      ...(firstName !== undefined ? { firstName } : {}),
+      ...(lastName !== undefined ? { lastName } : {}),
       ...(activate ? {
         verification: {
           update: {
@@ -241,11 +243,13 @@ export async function updateUserById(id: number, username: string, hashedPasswor
  * @param username 
  * @returns UserWithVerificationAndMembership
  */
-export async function updateUserUsernameById(id: number, username: string): Promise<UserWithVerificationAndMembership> {
+export async function updateUserUsernameById(id: number, username: string, firstName?: string, lastName?: string): Promise<UserWithVerificationAndMembership> {
   return prisma.user.update({
     where: { id },
     data: {
       username,
+      ...(firstName !== undefined ? { firstName } : {}),
+      ...(lastName !== undefined ? { lastName } : {}),
     },
     include: {
       verification: true,
@@ -367,6 +371,9 @@ export async function createUserWithTokens(email: string, token: string, otpCode
           activationToken: token,
           activationTokenExpiry: new Date(Date.now() + 3600000),
         },
+      },
+      preferences: {
+        create: {},
       },
     },
     include: {
@@ -494,12 +501,14 @@ export async function updateUserProfileData(id: number, data: ProfileSchemaType)
     where: { id },
     data: {
       ...userData,
-      address: {
-        upsert: {
-          create: address,
-          update: address,
+      ...(address ? {
+        address: {
+          upsert: {
+            create: address,
+            update: address,
+          }
         }
-      },
+      } : {}),
     },
     include: {
       address: true,

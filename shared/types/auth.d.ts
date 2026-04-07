@@ -5,6 +5,8 @@ declare module "#auth-utils" {
     id: number;
     email?: string;
     username?: string;
+    firstName?: string;
+    lastName?: string;
     membership: MembershipType;
     membershipActive?: MembershipStatus;
     membershipEndDate?: Date | null;

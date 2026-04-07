@@ -32,20 +32,44 @@
         <UChatMessages should-auto-scroll>
           <UChatMessage v-for="message in localMessages"
             :variant="isMessageFromUser(message, user?.id!) ? 'soft' : 'subtle'" :key="message.id"
-            :side="isMessageFromUser(message, user?.id!) ? 'left' : 'right'" role="user" :parts="[
-              {
-                text: message.content,
-              },
-            ]" :id="String(message.id)" :ui="{
+            :side="isMessageFromUser(message, user?.id!) ? 'left' : 'right'" role="user" :parts="[{ text: message.content ?? '' }]" :id="String(message.id)" :ui="{
               container: 'pb-1',
               content: 'min-w-60' + (isMessageFromUser(message, user?.id!) ? ' bg-secondary/90 text-(--monochrome-900)/70' : ' bg-primary/100 text-(--monochrome-600)'),
             }">
             <template #content>
               <p class="body-xs italic pb-1">{{ formatMessageTimestamp(message.createdAt) }}</p>
-              <p
+              <p v-if="message.content"
                 :class="['body-sm break-all whitespace-pre-wrap', isMessageFromUser(message, user?.id!) ? 'text-(--monochrome-900)' : 'text-(--monochrome-900)']">
                 {{ message.content }}
               </p>
+              <!-- Attached media -->
+              <div v-if="message.userMedia" class="mt-1">
+                <a
+                  v-if="message.userMedia.mediaType === 'IMAGE'"
+                  :href="getFileUrl(message.userMedia.key)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    :src="getFileUrl(message.userMedia.key)"
+                    :alt="message.userMedia.originalName"
+                    class="max-h-48 max-w-full rounded-md object-contain"
+                  />
+                </a>
+                <a
+                  v-else
+                  :href="getFileUrl(message.userMedia.key)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-1 body-xs underline"
+                >
+                  <UIcon
+                    :name="message.userMedia.mediaType === 'PDF' ? 'i-lucide-file-text' : message.userMedia.mediaType === 'SPREADSHEET' ? 'i-lucide-table' : 'i-lucide-file'"
+                    class="size-4 shrink-0"
+                  />
+                  {{ message.userMedia.originalName }}
+                </a>
+              </div>
               <div class="flex mt-1 items-center gap-1">
                 <UAvatar :src="message.sender.avatar || undefined" :alt="message.sender.username!" class="text-(--foreground-100)" :ui="{ root: message.sender.avatar ? 'bg-transparent' : 'bg-(--background-200)' }"
                   size="lg" />
@@ -57,19 +81,85 @@
       </div>
     </template>
     <template #footer>
-      <UInput :ui="{
-        root: 'body-sm w-full',
-        base: 'bg-background/50! outline-0!',
-        trailingIcon: 'text-secondary',
-      }" placeholder="Type your message..." trailing variant="none" v-model="messageContent" autofocus
-        @keydown.enter.prevent="handleSendMessage">
-        <template #trailing>
-          <UButton icon="i-lucide-send" variant="ghost" size="sm" :disabled="messageContent.trim().length === 0"
-            @click="handleSendMessage" :ui="{
-              leadingIcon: 'text-secondary',
-            }" />
-        </template>
-      </UInput>
+      <!-- Pending media preview -->
+      <Transition name="fade">
+        <div v-if="pendingMedia" class="flex items-center gap-2 px-4 pb-2 border-t border-(--background-300) pt-2">
+          <div class="relative flex items-center gap-2 bg-(--background-200) rounded-md px-2 py-1 max-w-full">
+            <img
+              v-if="pendingMedia.mediaType === 'IMAGE'"
+              :src="getFileUrl(pendingMedia.key)"
+              class="h-10 w-10 rounded object-cover shrink-0"
+              :alt="pendingMedia.originalName"
+            />
+            <UIcon
+              v-else
+              :name="pendingMedia.mediaType === 'PDF' ? 'i-lucide-file-text' : pendingMedia.mediaType === 'SPREADSHEET' ? 'i-lucide-table' : 'i-lucide-file'"
+              class="size-5 shrink-0 text-secondary"
+            />
+            <span class="body-xs truncate max-w-40">{{ pendingMedia.originalName }}</span>
+            <UButton
+              icon="i-lucide-x"
+              variant="ghost"
+              size="xs"
+              color="error"
+              :loading="isDeletingMedia"
+              @click="removePendingMedia"
+            />
+          </div>
+        </div>
+      </Transition>
+      <!-- Upload progress -->
+      <div v-if="isUploading" class="flex items-center gap-2 px-4 pb-2">
+        <UIcon name="i-lucide-loader-circle" class="animate-spin size-4 text-secondary" />
+        <span class="body-xs text-(--foreground-200)">Uploading...</span>
+      </div>
+      <div class="flex items-center gap-1 px-2 w-full">
+        <!-- File attachment button -->
+        <input
+          ref="fileInputRef"
+          type="file"
+          class="hidden"
+          accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          @change="handleFileChange"
+        />
+        <UButton
+          icon="i-lucide-paperclip"
+          variant="ghost"
+          size="sm"
+          :disabled="!!pendingMedia || isUploading"
+          :ui="{ leadingIcon: 'text-(--foreground-200)' }"
+          @click="fileInputRef?.click()"
+        />
+        <!-- Emoji picker -->
+        <UPopover v-model:open="emojiPickerOpen" :ui="{ content: 'p-0 overflow-hidden' }">
+          <UButton
+            icon="i-lucide-smile"
+            variant="ghost"
+            size="sm"
+            :ui="{ leadingIcon: 'text-(--foreground-200)' }"
+          />
+          <template #content>
+            <ClientOnly>
+              <AtomsEmojiPicker @emoji-select="onEmojiSelect" />
+            </ClientOnly>
+          </template>
+        </UPopover>
+        <!-- Message input -->
+        <UInput :ui="{
+          root: 'body-sm flex-1',
+          base: 'bg-background/50! outline-0!',
+          trailingIcon: 'text-secondary',
+        }" placeholder="Type your message..." trailing variant="none" v-model="messageContent" autofocus
+          @keydown.enter.prevent="handleSendMessage">
+          <template #trailing>
+            <UButton icon="i-lucide-send" variant="ghost" size="sm"
+              :disabled="messageContent.trim().length === 0 && !pendingMedia"
+              @click="handleSendMessage" :ui="{
+                leadingIcon: 'text-secondary',
+              }" />
+          </template>
+        </UInput>
+      </div>
     </template>
   </UModal>
 </template>
@@ -84,6 +174,7 @@ import type { User } from "#auth-utils";
 const { sendReply, markMessageAsRead, activeEnquiry } = useEnquiries();
 const { markAsRead } = useNotifications();
 const { setAvailabilityStatus } = useMyListings();
+const { uploadFile, deleteFile, getFileUrl, isUploading } = useCloudflareR2();
 const toast = useToast();
 const breakpoints = useBreakpoints(breakpointsTailwind);
 const activeBreakpoints = breakpoints.active();
@@ -110,6 +201,10 @@ const localMessages = ref<any[]>([]);
 const processedMessageIds = new Set<number>();
 const isMarkingAsRead = ref(false);
 const isUpdatingEnquiryStatus = ref(false);
+const pendingMedia = ref<UserMediaRecord | null>(null);
+const isDeletingMedia = ref(false);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const emojiPickerOpen = ref(false);
 
 // Mirror availability status locally so the select is reactive
 const enquiryAvailabilityStatus = ref<string>(
@@ -199,14 +294,51 @@ async function handleEnquiryAvailabilityChange(value: string | number | boolean 
 }
 
 async function handleSendMessage() {
-  if (!messageContent.value.trim() || !props.conversation?.id) return;
+  const hasContent = messageContent.value.trim().length > 0;
+  const hasMedia = !!pendingMedia.value;
+
+  if (!hasContent && !hasMedia) return;
+  if (!props.conversation?.id) return;
+
+  const mediaId = pendingMedia.value?.id;
 
   try {
-    await sendReply(props.conversation.id, messageContent.value);
+    await sendReply(props.conversation.id, messageContent.value, { mediaId });
     messageContent.value = "";
+    pendingMedia.value = null;
+    if (fileInputRef.value) fileInputRef.value.value = '';
   } catch (e) {
     console.error("Failed to send message", e);
   }
+}
+
+async function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  const result = await uploadFile(file);
+  if (result) {
+    pendingMedia.value = result;
+  }
+  // Reset input so the same file can be re-selected if needed
+  input.value = '';
+}
+
+async function removePendingMedia() {
+  if (!pendingMedia.value) return;
+  isDeletingMedia.value = true;
+  try {
+    await deleteFile(pendingMedia.value.id);
+    pendingMedia.value = null;
+  } finally {
+    isDeletingMedia.value = false;
+  }
+}
+
+function onEmojiSelect(emoji: string) {
+  messageContent.value += emoji;
+  emojiPickerOpen.value = false;
 }
 
 async function markMessagesAsRead() {
@@ -264,7 +396,7 @@ watch(
   { deep: true }
 );
 
-// Initialize view when modal opens
+// Initialize view when modal opens; clean up orphaned pending media on close
 watch(
   () => props.open,
   (newVal) => {
@@ -273,6 +405,9 @@ watch(
       localMessages.value = [...props.conversation.messages];
       scrollToBottom();
       markMessagesAsRead();
+    } else if (!newVal && pendingMedia.value) {
+      deleteFile(pendingMedia.value.id).catch(() => {});
+      pendingMedia.value = null;
     }
   },
   { immediate: true }

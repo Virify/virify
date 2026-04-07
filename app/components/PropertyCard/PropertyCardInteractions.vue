@@ -2,6 +2,7 @@
   <div role="presentation" class="property-card-interactions">
     <AtomsFavouriteButton :disabled :listing-id :confirm-removal="false" class="property-card-interactions__button" />
     <AtomsNoteButton :disabled :listing-id class="property-card-interactions__button" />
+    <AtomsHideButton :disabled :listing-id class="property-card-interactions__button" />
   </div>
 </template>
 
@@ -41,7 +42,8 @@ defineProps<Props>()
     }
   }
 
-  .a-icon {
+  .a-icon,
+  .iconify {
     width: var(--size-24);
     height: var(--size-24);
   }

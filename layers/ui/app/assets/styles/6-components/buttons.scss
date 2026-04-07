@@ -122,8 +122,8 @@
     color: var(--error-foreground);
 
     &:hover {
-      background: var(--error-foreground);
-      color: var(--error-background-100);
+      background: var(--error-background-200);
+      color: var(--background);
     }
   }
 

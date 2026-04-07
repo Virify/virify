@@ -22,7 +22,7 @@ export const profileSchema = z.object({
     fullAddress: z.string().nullable(),
     lat: z.number().nullable(),
     lon: z.number().nullable(),
-  }),
+  }).optional(),
   avatar: z.url("Must be a valid URL").optional().or(z.literal("")),
   bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
   intents: z.array(z.nativeEnum(UserIntent)).optional(),

@@ -2,7 +2,7 @@
   <UFormField 
     label="Address" 
     name="address" 
-    required 
+    :required="variant === 'listing'" 
     :orientation="variant === 'listing' ? 'vertical' : 'horizontal'" 
     :description="variant === 'listing' ? 'Enter your postcode to find your property address' : 'This will not be publicly displayed'" 
     :error="addressError" 
@@ -70,7 +70,7 @@
 
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  modelValue: AddressParsed | null;
+  modelValue: AddressParsed | null | undefined;
   pending?: boolean;
   variant?: 'profile' | 'listing';
 }>(), {

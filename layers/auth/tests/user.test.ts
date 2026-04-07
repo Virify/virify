@@ -260,6 +260,9 @@ describe("user functions", () => {
         email: newUser.email,
         otpCode: newUser.otpCode,
         otpCodeExpiry: expect.any(Date),
+        preferences: {
+          create: {},
+        },
         verification: {
           create: {
             activated: "PENDING",

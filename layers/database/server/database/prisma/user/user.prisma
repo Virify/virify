@@ -30,6 +30,7 @@ model User {
   messagesReceived         Message[]             @relation("ReceiverMessages")
   conversationsAsSender    Conversation[]        @relation("ConversationsAsSender")
   conversationsAsReceiver  Conversation[]        @relation("ConversationsAsReceiver")
+  userMedia                UserMedia[]
   membership               Membership?
   DraftListing             DraftListing[]
   mortgageCalculations     MortgageCalculation[]

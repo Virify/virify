@@ -78,10 +78,11 @@ export async function createConversation(senderId: number, receiverId: number, m
  *
  * @param conversationId conversation ID
  * @param senderId message sender ID
- * @param messageContent string message content
+ * @param messageContent string message content (optional when userMediaId is provided)
+ * @param userMediaId optional UserMedia record ID to attach to the message
  * @returns The message created in the conversation
  */
-export async function replyToConversation(conversationId: number, messageContent: string, senderId: number): Promise<MessageWithUser> {
+export async function replyToConversation(conversationId: number, messageContent: string | null, senderId: number, userMediaId?: number): Promise<MessageWithUser> {
   return await prisma.$transaction(async (tx) => {
     // First get the conversation for validation and to determine the receiver
     const conversation = await tx.conversation.findUnique({
@@ -105,6 +106,7 @@ export async function replyToConversation(conversationId: number, messageContent
         receiverId,
         content: messageContent,
         conversationId,
+        ...(userMediaId ? { userMediaId } : {}),
       },
       select: {
         id: true,
@@ -115,6 +117,17 @@ export async function replyToConversation(conversationId: number, messageContent
         isRead: true,
         createdAt: true,
         updatedAt: true,
+        userMedia: {
+          select: {
+            id: true,
+            key: true,
+            mediaType: true,
+            mimeType: true,
+            originalName: true,
+            size: true,
+            createdAt: true,
+          },
+        },
         sender: {
           select: {
             id: true,
@@ -132,7 +145,7 @@ export async function replyToConversation(conversationId: number, messageContent
       },
     });
 
-    return newMessage;
+    return newMessage as unknown as MessageWithUser;
   });
 }
 
@@ -457,6 +470,17 @@ const conversationBaseSelect = {
       createdAt: true,
       updatedAt: true,
       conversationId: true,
+      userMedia: {
+        select: {
+          id: true,
+          key: true,
+          mediaType: true,
+          mimeType: true,
+          originalName: true,
+          size: true,
+          createdAt: true,
+        },
+      },
       sender: {
         select: {
           id: true,

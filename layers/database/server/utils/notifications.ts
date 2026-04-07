@@ -9,6 +9,7 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
   const [
       favourites, 
       notes, 
+      hiddenListings,
       enquiries, 
       locations, 
       listings,
@@ -31,6 +32,14 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     }),
     prisma.userNote.count({
       where: {
+        userPreferences: {
+          userId: userId,
+        },
+      },
+    }),
+    prisma.hiddenListing.count({
+      where: {
+        hidden: true,
         userPreferences: {
           userId: userId,
         },
@@ -137,6 +146,7 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
   return {
     favourites,
     notes,
+    hiddenListings,
     enquiries,
     locations,
     listings,

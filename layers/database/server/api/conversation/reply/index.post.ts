@@ -6,15 +6,20 @@ import { sendEnquiryNotificationEmail } from "~~/layers/email/server/email/send-
 
 const replySchema = z.object({
   conversationId: z.coerce.number(),
-  message: z.string().min(1).max(5000),
-});
+  message: z.string().max(5000).optional(),
+  userMediaId: z.number().int().positive().optional(),
+  suppressNotification: z.boolean().optional(),
+}).refine(
+  (data) => data.message?.trim() || data.userMediaId,
+  { message: 'A message or attachment is required' }
+);
 
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
   const { sendMessage, createNewMessageMessage, createAggregateUpdateMessage, createNotificationNewMessage, isUserViewingConversation, isUserOnline } = useWebSocketServer();
 
   try {
-    const { conversationId, message } = await readValidatedBody(event, replySchema.parse);
+    const { conversationId, message, userMediaId, suppressNotification } = await readValidatedBody(event, replySchema.parse);
     const config = useRuntimeConfig();
     const senderId = user.id;
 
@@ -35,9 +40,12 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const newMessage = await replyToConversation(conversationId, message, senderId);
+    const newMessage = await replyToConversation(conversationId, message?.trim() || null, senderId, userMediaId);
 
     const receiverId = getOtherParticipantId(senderId, newMessage);
+
+    // Use content text for notification, or a fallback for media-only messages
+    const notificationText = message?.trim() || '📎 Sent an attachment';
 
     // Create notification for the receiver with minimal listing data
     let listingData: { id: number; price: number | null; address: string | null; image: string | null; isRental: boolean } | undefined;
@@ -55,10 +63,10 @@ export default defineEventHandler(async (event) => {
 
     let createdNotification: Awaited<ReturnType<typeof createMessageNotification>> | null = null;
     const recipientViewing = isUserViewingConversation(receiverId, conversationId);
-    if (!recipientViewing) {
+    if (!recipientViewing && suppressNotification !== true) {
       createdNotification = await createMessageNotification(
         receiverId,
-        message,
+        notificationText,
         newMessage.sender?.username || null,
         newMessage.sender?.avatar || null,
         conversationId,
@@ -85,7 +93,7 @@ export default defineEventHandler(async (event) => {
           to: recipientPrefs.email,
           senderName: newMessage.sender?.username || 'Someone',
           senderAvatar: newMessage.sender?.avatar ?? undefined,
-          message,
+          message: notificationText,
           conversationUrl: `${baseUrl}/dashboard/enquiries/${conversationId}`,
           isReply: true,
           listing: listingData ? {

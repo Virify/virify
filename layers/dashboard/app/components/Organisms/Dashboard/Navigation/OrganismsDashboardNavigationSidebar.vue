@@ -108,32 +108,50 @@
     </template>
     <!-- sidebar footer -->
     <template #footer="{ collapsed }">
-      <div class="flex" :class="collapsed ? 'flex-col items-center gap-2' : 'justify-between w-full'">
-        <TooltipProvider :delay-duration="400">
-          <UTooltip text="Logout">
-            <UButton
-              icon="i-lucide-log-out"
-              variant="link"
-              size="xs"
-              @click="logout"
-              tooltip="Logout"
-              class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
-              :ui="{
-                leadingIcon: 'text-secondary',
-                label: 'text-foreground font-bold',
-              }"
-              :label="collapsed ? undefined : 'Logout'"
-              :square="collapsed"
+      <TooltipProvider :delay-duration="400">
+        <div :class="collapsed ? 'flex flex-col items-center gap-3' : 'grid grid-cols-2 items-end w-full'">
+          <!-- col 1: Admin Dashboard (if admin) + Logout -->
+          <div class="flex flex-col items-start gap-1">
+            <UTooltip v-if="isUserAdmin" text="Admin Dashboard">
+              <UButton
+                icon="i-lucide-shield"
+                variant="link"
+                size="xs"
+                to="/admin"
+                class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
+                :ui="{
+                  leadingIcon: 'text-secondary',
+                  label: 'text-foreground font-bold',
+                }"
+                :label="collapsed ? undefined : 'Admin Dashboard'"
+                :square="collapsed"
+              />
+            </UTooltip>
+            <UTooltip text="Logout">
+              <UButton
+                icon="i-lucide-log-out"
+                variant="link"
+                size="xs"
+                @click="logout"
+                class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
+                :ui="{
+                  leadingIcon: 'text-secondary',
+                  label: 'text-foreground font-bold',
+                }"
+                :label="collapsed ? undefined : 'Logout'"
+                :square="collapsed"
+              />
+            </UTooltip>
+          </div>
+          <!-- col 2: Dark mode toggle -->
+          <div class="flex items-end justify-end">
+            <UColorModeButton
+              class="hover:bg-white/5 rounded-md transition-colors"
+              :ui="{ leadingIcon: 'text-foreground' }"
             />
-          </UTooltip>
-        </TooltipProvider>
-        <UColorModeButton
-          class="hover:bg-white/5 rounded-md transition-colors"
-          :ui="{
-            leadingIcon: 'text-foreground',
-          }"
-        />
-      </div>
+          </div>
+        </div>
+      </TooltipProvider>
     </template>
   </UDashboardSidebar>
 </template>
@@ -141,7 +159,9 @@
   import { TooltipProvider } from 'reka-ui';
   const { dashboardNavigationitems } = useDashboardNavigation();
   const { notificationCounts, fetchNotificationCounts } = useNotifications();
-  const { clear } = useUserSession();
+  const { clear, user } = useUserSession();
+
+  const isUserAdmin = computed(() => user.value?.role === 'ADMIN');
 
   const notificationSlideoverOpen = ref(false);
 

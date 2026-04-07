@@ -1,21 +1,13 @@
 import vue from "@vitejs/plugin-vue";
 
 export default defineNuxtConfig({
-  extends: ["./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity', './layers/dashboard'],
+  extends: ["./layers/cloudflare", "./layers/ui", "./layers/email", "./layers/database", "./layers/auth", "./layers/map", "./layers/analytics", "./layers/websocket", "./layers/seed", "./layers/content", './layers/sanity', './layers/dashboard', './layers/admin'],
   future: {
     compatibilityVersion: 4,
   },
   runtimeConfig: {
-    CF_SECRET_KEY: process.env.CF_SECRET_KEY,
-    CF_IMAGES_API_KEY: process.env.CF_IMAGES_API_KEY,
-    CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID,
-    CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH,
-    CF_SERVICE_TOKEN_ID: process.env.CF_SERVICE_TOKEN_ID,
-    CF_SERVICE_TOKEN_SECRET: process.env.CF_SERVICE_TOKEN_SECRET,
     public: {
       isWaitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
-      CF_SITE_KEY: process.env.CF_SITE_KEY,
-      CF_ACCOUNT_HASH: process.env.CF_ACCOUNT_HASH, // Needed for image URLs on client
     },
   },
   modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
@@ -142,6 +134,10 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-09",
   devtools: { enabled: true },
   vite: {
+    // Apparently needed to prevent Vite from hanging on file changes in some environments (e.g. WSL, Docker on Windows) and also will stop concurrent builds from stepping on each other's files
+    build: {
+        emptyOutDir: false
+      },
     server: {
       watch: {
         usePolling: true,

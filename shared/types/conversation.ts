@@ -1,5 +1,6 @@
 import type { Prisma } from "~~/layers/database/server/database/prisma/generated/client";
 import type { ListingCardType, ListingConversationCardType, ListingMinimalType } from "./listing";
+import type { UserMediaRecord } from "./userMedia";
 
 /**
  * Filter and sort options for enquiries
@@ -63,11 +64,12 @@ export type ConversationBase = {
     id: number;
     senderId: number;
     receiverId: number;
-    content: string;
+    content: string | null;
     createdAt: Date;
     updatedAt: Date;
     isRead: boolean;
     conversationId: number;
+    userMedia?: UserMediaRecord | null;
     sender: {
       id: number;
       username: string | null;
@@ -103,10 +105,11 @@ export type MessageWithUser = {
   conversationId: number;
   senderId: number;
   receiverId: number;
-  content: string;
+  content: string | null;
   isRead: boolean;
   createdAt: Date;
   updatedAt: Date;
+  userMedia?: UserMediaRecord | null;
   sender: {
     id: number;
     avatar: string | null;

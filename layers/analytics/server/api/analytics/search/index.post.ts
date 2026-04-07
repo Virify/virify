@@ -8,15 +8,10 @@ const trackSearchSchema = z.object({
   resultCount: z.number().int().min(0),
   location: z.object({
     id: z.string(),
-    type: z.string(),
+    placeName: z.string(),
     text: z.string(),
-    place_name_en: z.string(),
-    place_name: z.string(),
-    geometry: z.object({
-      type: z.string(),
-      coordinates: z.tuple([z.number(), z.number()]),
-    }),
-    properties: z.record(z.any(), z.any()),
+    lat: z.number(),
+    lon: z.number(),
   }),
 });
 
@@ -25,14 +20,33 @@ const trackSearchSchema = z.object({
  * Tracks a search event with location, query, radius, and results
  */
 export default defineEventHandler(async (event) => {
+  const rawBody = await readBody(event);
+
   try {
-    const data = await readValidatedBody(event, trackSearchSchema.parse);
+    const data = trackSearchSchema.parse(rawBody);
+
     // Derive userId from session only — never accept from request body
     const { user } = await getUserSession(event);
-    await trackSearch({ ...data, userId: user?.id });
+
+    // Reconstruct the GeocodingFeature shape expected by the trackSearch utility
+    const { location, ...rest } = data;
+    await trackSearch({
+      ...rest,
+      userId: user?.id,
+      location: {
+        id: location.id,
+        place_name_en: location.placeName,
+        place_name: location.placeName,
+        text: location.text,
+        geometry: {
+          type: 'Point',
+          coordinates: [location.lon, location.lat] as [number, number],
+        },
+      } as Parameters<typeof trackSearch>[0]['location'],
+    });
     return { success: true };
   } catch (error) {
-    console.error("Error tracking search:", error);
+    console.error('[analytics/search] ERROR:', error);
     return { success: false, error: error instanceof Error ? error.message : String(error) };
   }
 });
