@@ -107,6 +107,11 @@ export default defineEventHandler(async (event) => {
       data: mediaToCreate,
     });
 
+    // Bust the listing detail cache when images are added to a live listing
+    if (listingId) {
+      invalidateListingCache(listingId).catch(() => {});
+    }
+
     // Return created media
     const createdMedia = await prisma.media.findMany({
       where: {

@@ -162,6 +162,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{
   'edit': [payload: { id: number; isDraft: boolean }]
   'restored': [id: number]
+  'published': []
 }>()
 
 const { archiveListing, restoreListing, setPublished, setAvailabilityStatus } = useMyListings();
@@ -300,13 +301,11 @@ async function handlePublish() {
       color: 'success',
       icon: 'i-lucide-check-circle',
     });
-    // Refresh the listings - remove published draft from local state
-    const { draftListings, total: draftTotal } = useDraftListings();
-    const idx = draftListings.value.findIndex((d) => d.id === props.listing.id || d.draftId === props.listing.id);
-    if (idx !== -1) {
-      draftListings.value.splice(idx, 1);
-      draftTotal.value -= 1;
-    }
+    // Bust the Nuxt payload cache for both pages so the next navigation re-fetches fresh data
+    clearNuxtData((key) => String(key).startsWith('my-listings:'));
+    clearNuxtData((key) => String(key).startsWith('draft-listings:'));
+    // Notify the parent page to refresh its useAsyncData (card renders from page's fetchedData, not shared ref)
+    emit('published');
     const { fetchUserItemsAggregates } = useNotifications();
     fetchUserItemsAggregates(true);
   } catch (error: any) {

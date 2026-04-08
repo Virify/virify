@@ -35,6 +35,8 @@
     "db:update-admin-password": "tsx layers/seed/server/utils/run-admin-update.ts",
     "redis:flush": "tsx layers/seed/server/utils/run-redis-flush.ts",
     "seed:address": "tsx layers/seed/server/utils/extract-and-geocode-addresses.ts",
+    "seed:upload-images": "tsx layers/seed/server/utils/upload-seed-images.ts",
+    "seed:remove-images": "tsx layers/seed/server/utils/remove-seed-images.ts",
     "test": "vitest run",
     "test:full": "vitest run",
     "start": "node .output/server/index.mjs"

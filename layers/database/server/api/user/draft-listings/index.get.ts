@@ -93,7 +93,7 @@ export default defineEventHandler(async (event) => {
     if (!search.trim()) {
       const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
       useStorage("cache")
-        .setItem(cacheKey, result, { ttl: 120 })
+        .setItem(cacheKey, result, { ttl: 30 * 60 })
         .catch(() => {});
     }
     return result;

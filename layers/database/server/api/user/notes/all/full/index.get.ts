@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
       filter: query.filter,
     });
 
-    storage.setItem(cacheKey, result, { ttl: 300 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 60 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Error fetching all notes:", error);

@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const result = await getUserNoteLookups(userId as number);
-    storage.setItem(cacheKey, result, { ttl: 5 * 60 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 60 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Error fetching note lookups:", error);

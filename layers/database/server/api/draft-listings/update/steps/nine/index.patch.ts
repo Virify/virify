@@ -97,9 +97,11 @@ export default defineEventHandler(async (event) => {
           },
         },
       }).then(async (listing) => {
-        // Invalidate listing cache so modal shows fresh data
-        const storage = useStorage('cache:listing');
-        await storage.removeItem(`listing:${listingId}`);
+        // Invalidate listing detail cache and my-listings page cache
+        await Promise.all([
+          invalidateListingCache(listingId),
+          invalidateMyListingsCache(user.id),
+        ]);
         return listing;
       });
     }

@@ -17,6 +17,6 @@ export default defineEventHandler(async (event) => {
   if (cached) return cached;
 
   const result = await getSentConversationListingIds(user.id);
-  storage.setItem(cacheKey, result, { ttl: 10 * 60 }).catch(() => {});
+  storage.setItem(cacheKey, result, { ttl: 60 * 60 }).catch(() => {});
   return result;
 });

@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const result = await getUserSavedLocations(user.id);
-    storage.setItem(cacheKey, result, { ttl: 600 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 60 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.log(error);

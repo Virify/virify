@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const viewings = await getUserViewings(user.id as number, role, status);
-    storage.setItem(cacheKey, viewings, { ttl: 60 }).catch(() => {});
+    storage.setItem(cacheKey, viewings, { ttl: 5 * 60 }).catch(() => {});
     return viewings;
   } catch (error) {
     console.error("Error fetching viewings:", error);

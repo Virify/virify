@@ -30,7 +30,7 @@
       <!-- Draft Listings Grid -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredDrafts.length > 0">
         <div v-for="draft in filteredDrafts" :key="draft.id" class="h-full">
-          <OrganismsDashboardListingCardMyListing :listing="draft" @edit="handleEditDraft" />
+          <OrganismsDashboardListingCardMyListing :listing="draft" @edit="handleEditDraft" @published="refresh" />
         </div>
       </OrganismsDashboardListingCardGrid>
 

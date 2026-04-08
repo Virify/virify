@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
         saleRent: saleRent as any,
       })
 
-      storage.setItem(cacheKey, result, { ttl: 120 }).catch(() => {})
+      storage.setItem(cacheKey, result, { ttl: 30 * 60 }).catch(() => {})
       return result
     }
 

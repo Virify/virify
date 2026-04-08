@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const favourites = await getRecentFavourites(userId as number, 10);
-    storage.setItem(cacheKey, favourites, { ttl: 5 * 60 }).catch(() => {});
+    storage.setItem(cacheKey, favourites, { ttl: 30 * 60 }).catch(() => {});
     return favourites;
   } catch (error) {
     console.error("Error fetching recent favourites:", error);
