@@ -50,48 +50,40 @@ definePageMeta({
   layout: "dashboard",
 });
 
-const { userNotes, fetchNotes, total, loading } = useNotes()
+const { user } = useUserSession()
 const { setGroups } = useDashboardSearch()
+const requestFetch = useRequestFetch()
 
 const page = ref(1)
-const limit = ref(20)
+const limit = 20
 const pageTop = ref<HTMLElement | null>(null)
 const filteredUserNotes = ref<NoteData[]>([])
 
-// Ensure SSR and client both start loading — prevents hydration mismatch
-// caused by module-level cache divergence between server and client
-loading.value = true
+const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-notes' })
 
-const {
-  saleRentFilter,
-  sortOrderValue,
-} = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-notes' })
+// Reset to page 1 when filters change
+watch([saleRentFilter, sortOrderValue], () => { page.value = 1 })
 
-// Initial fetch on mount (client-only) — avoids SSR/client state divergence
-onMounted(async () => {
-  const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
-  await fetchNotes(saleRentFilter.value, 1, validSortOrder, limit.value)
-})
+const { data, pending: loading } = useAsyncData(
+  () => `notes:${user.value?.id}:${saleRentFilter.value}:${sortOrderValue.value}:${page.value}`,
+  () => requestFetch<{ notes: NoteData[]; total: number }>(
+    `/api/user/notes/all/full?filter=${saleRentFilter.value}&sort=${sortOrderValue.value}&page=${page.value}&limit=${limit}`
+  ),
+  { server: true }
+)
 
-// Watch filter changes and re-fetch from API (reset to page 1)
-watch([saleRentFilter, sortOrderValue], async () => {
-  page.value = 1
-  const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
-  await fetchNotes(saleRentFilter.value, 1, validSortOrder, limit.value)
-})
+const userNotes = computed(() => data.value?.notes ?? [])
+const total = computed(() => data.value?.total ?? 0)
 
-// Handle page changes from pagination component
-async function onPageChange(newPage: number) {
+function onPageChange(newPage: number) {
   page.value = newPage
-  const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
-  await fetchNotes(saleRentFilter.value, newPage, validSortOrder, limit.value)
-
   const el = (pageTop.value as any)?.$el ?? pageTop.value
   const scrollContainer = el?.closest('.overflow-y-auto, .overflow-y-scroll, .overflow-auto')
   scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-watch(userNotes, () => {
-  setGroups(generateDashboardSearchGroups(userNotes.value, 'notes'))
+watch(userNotes, (notes) => {
+  filteredUserNotes.value = notes
+  setGroups(generateDashboardSearchGroups(notes, 'notes'))
 }, { immediate: true })
 </script>

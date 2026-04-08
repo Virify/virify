@@ -44,8 +44,6 @@
 </template>
 
 <script lang="ts" setup>
-import type { ViewingWithDetails } from "~~/shared/types/viewing";
-
 definePageMeta({
   middleware: ["authenticated"],
   head: {
@@ -57,28 +55,37 @@ definePageMeta({
 
 const { user } = useUserSession();
 const currentUserId = computed(() => user.value?.id ?? null);
+const requestFetch = useRequestFetch();
 
-const { viewings, loading, fetchViewings, respondToViewing, cancelViewing } = useViewings();
+const { respondToViewing, cancelViewing } = useViewings();
+
+const { data: viewingsData, pending: loading } = useAsyncData(
+  () => `viewings:${user.value?.id}`,
+  () => user.value?.id
+    ? requestFetch<ViewingWithDetails[]>('/api/viewing')
+    : Promise.resolve<ViewingWithDetails[]>([]),
+  { server: true, default: () => [] as ViewingWithDetails[] }
+);
 
 // Tabs
 const activeTab = ref("requested");
 
-const confirmedViewings = computed(() => viewings.value.filter((v) => v.status === "ACCEPTED"));
-const requestedViewings = computed(() => viewings.value.filter((v) => v.status === "PENDING"));
-const rescheduledViewings = computed(() => viewings.value.filter((v) => v.status === "RESCHEDULED"));
+const confirmedViewings = computed(() => viewingsData.value.filter((v) => v.status === "ACCEPTED"));
+const requestedViewings = computed(() => viewingsData.value.filter((v) => v.status === "PENDING"));
+const rescheduledViewings = computed(() => viewingsData.value.filter((v) => v.status === "RESCHEDULED"));
 
 const tabs = computed(() => [
   { label: `Confirmed (${confirmedViewings.value.length})`, value: "confirmed" },
   { label: `Requested (${requestedViewings.value.length})`, value: "requested" },
   { label: `Rescheduled (${rescheduledViewings.value.length})`, value: "rescheduled" },
-  { label: `All (${viewings.value.length})`, value: "all" },
+  { label: `All (${viewingsData.value.length})`, value: "all" },
 ]);
 
 const displayedViewings = computed(() => {
   if (activeTab.value === "confirmed") return confirmedViewings.value;
   if (activeTab.value === "requested") return requestedViewings.value;
   if (activeTab.value === "rescheduled") return rescheduledViewings.value;
-  return [...viewings.value];
+  return [...viewingsData.value];
 });
 
 // Reschedule modal
@@ -107,11 +114,6 @@ async function handleCancel(id: number) {
 }
 
 async function handleAcceptCounter(id: number) {
-  // The requester accepts the owner's counter-proposed time by sending accept
   await respondToViewing(id, { response: "accept" });
 }
-
-onMounted(() => {
-  fetchViewings();
-});
 </script>

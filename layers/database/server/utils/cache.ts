@@ -64,6 +64,16 @@ export async function invalidateHiddenListingsFullCache(userId: number): Promise
   await sweepPrefix(useStorage("cache"), `hidden:full:${userId}:`);
 }
 
+/** Bust all paginated draft-listings cache entries for a user. */
+export async function invalidateDraftListingsCache(userId: number): Promise<void> {
+  await sweepPrefix(useStorage("cache"), `draft-listings:${userId}:`);
+}
+
+/** Bust all viewings cache entries for a user. */
+export async function invalidateViewingsCache(userId: number): Promise<void> {
+  await sweepPrefix(useStorage("cache"), `viewings:${userId}:`);
+}
+
 // ─── Single-key cache busters ─────────────────────────────────────────────────
 
 /** Bust the saved locations list cache for a user. */

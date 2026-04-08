@@ -42,14 +42,7 @@ export default defineEventHandler(async (event) => {
     // The requester is always the non-owner; recipient is always the listing owner
     const recipientId = ownerId;
 
-    const viewing = await createViewing(
-      user.id as number,
-      ownerId,
-      listingId,
-      new Date(proposedAt),
-      notes,
-      conversationId,
-    );
+    const viewing = await createViewing(user.id as number, ownerId, listingId, new Date(proposedAt), notes, conversationId);
 
     // Persist notification for the listing owner
     const notification = await createNotification({
@@ -93,6 +86,9 @@ export default defineEventHandler(async (event) => {
         }).catch((err) => console.error("Failed to send viewing request email:", err));
       }
     }
+
+    // Bust viewings cache for both requester and owner
+    await Promise.all([invalidateViewingsCache(user.id as number), invalidateViewingsCache(ownerId)]);
 
     return viewing;
   } catch (error) {

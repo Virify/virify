@@ -6,16 +6,7 @@
 /**
  * Notification types - matches the database model
  */
-export type NotificationType = 
-  | 'NEW_MESSAGE'
-  | 'NEW_ENQUIRY'
-  | 'ENQUIRY_REPLY'
-  | 'LISTING_UPDATE'
-  | 'SYSTEM'
-  | 'VIEWING_REQUEST'
-  | 'VIEWING_ACCEPTED'
-  | 'VIEWING_REJECTED'
-  | 'VIEWING_RESCHEDULED';
+export type NotificationType = "NEW_MESSAGE" | "NEW_ENQUIRY" | "ENQUIRY_REPLY" | "LISTING_UPDATE" | "SYSTEM" | "VIEWING_REQUEST" | "VIEWING_ACCEPTED" | "VIEWING_REJECTED" | "VIEWING_RESCHEDULED";
 
 /**
  * User notification type - matches the database model
@@ -61,6 +52,7 @@ export interface UserItemsAggregates {
   favourites: number;
   notes: number;
   hiddenListings: number;
+  viewedListings: number;
   enquiries: number;
   locations: number;
   listings: number; // Count of user's active (non-archived) listings
@@ -95,4 +87,3 @@ export interface InAppNotificationPayload {
 // Reserved for future use when implementing push notifications, email notifications, etc.
 
 export type NotificationCategory = keyof UserItemsAggregates;
-

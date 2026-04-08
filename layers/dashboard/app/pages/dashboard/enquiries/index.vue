@@ -48,8 +48,6 @@
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
-import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
-
 definePageMeta({
   middleware: ["authenticated"],
   head: {
@@ -59,12 +57,10 @@ definePageMeta({
   layout: "dashboard",
 });
 
-const { enquiries, loading, fetchEnquiries, total, activeEnquiry, openEnquiry, closeEnquiry } = useEnquiries();
-// On SSR only: force skeleton so stale module-level data doesn't cause hydration mismatch.
-// On client SPA navigation this is skipped — the cache-hit path handles resetting loading.
-if (import.meta.server) loading.value = true;
+const { enquiries, activeEnquiry, openEnquiry, closeEnquiry } = useEnquiries();
 const { user } = useUserSession();
 const router = useRouter();
+const requestFetch = useRequestFetch();
 
 const modalOpen = ref(false);
 const filterRef = ref();
@@ -75,8 +71,40 @@ const sortedAndFilteredEnquiries = ref<ConversationWithMinimalListing[]>([]);
 
 const { activeView: view, activeTab: enquiryFilter, enquiriesFilter: directionFilter, sortOrderValue: sortOrder, viewOptions } = useDashboardListFilter(ref([]), { persistenceKey: "dashboard-enquiries" });
 
-// Filtered enquiries come directly from API
-const filteredEnquiries = computed(() => enquiries.value);
+// Reset to page 1 when filters change
+watch([enquiryFilter, directionFilter, sortOrder], () => { page.value = 1 });
+
+// Return data so it's serialized in SSR payload and available during hydration
+const { data: fetchedData, pending: loading } = useAsyncData(
+  () => `enquiries:${user.value?.id}:${enquiryFilter.value}:${directionFilter.value}:${sortOrder.value}:${page.value}`,
+  async () => {
+    if (!user.value?.id) return { conversations: [] as ConversationWithMinimalListing[], total: 0 };
+    const url = buildEnquiryUrl({
+      filter: enquiryFilter.value as any,
+      direction: directionFilter.value as any,
+      sort: sortOrder.value as any,
+      page: page.value,
+      limit: limit.value,
+    });
+    return await requestFetch<{ conversations: ConversationWithMinimalListing[]; total: number }>(url);
+  },
+  { server: true }
+);
+
+// SSR-safe derived data (serialized in Nuxt payload, available immediately on hydration)
+const pageEnquiries = computed(() => fetchedData.value?.conversations ?? []);
+const total = computed(() => fetchedData.value?.total ?? 0);
+
+// Sync to shared composable for WebSocket handlers and modal state
+watch(pageEnquiries, (items) => { enquiries.value = items }, { immediate: true });
+
+// Filtered enquiries derive from SSR-safe data
+const filteredEnquiries = computed(() => pageEnquiries.value);
+
+// Seed sortedAndFilteredEnquiries so SSR and client start with the same state
+watch(filteredEnquiries, (items) => {
+  sortedAndFilteredEnquiries.value = items;
+}, { immediate: true });
 
 const groupedByListing = computed(() => {
   if (sortOrder.value !== "listing") return [];
@@ -96,43 +124,9 @@ const groupedByListing = computed(() => {
   return Array.from(groups.values());
 });
 
-// Watch filter changes and re-fetch from API (reset to page 1)
-watch(
-  [enquiryFilter, directionFilter, sortOrder],
-  async () => {
-    page.value = 1;
-    await fetchEnquiries({
-      filter: enquiryFilter.value as any,
-      direction: directionFilter.value as any,
-      page: 1,
-      sort: sortOrder.value as any,
-      limit: limit.value,
-    });
-  }
-);
-
-// Initial fetch on component mount (not in watch immediate)
-onMounted(async () => {
-  await fetchEnquiries({
-    filter: enquiryFilter.value as any,
-    direction: directionFilter.value as any,
-    page: 1,
-    sort: sortOrder.value as any,
-    limit: limit.value,
-  })
-});
-
 // Handle page changes from pagination component
 async function onPageChange(newPage: number) {
   page.value = newPage;
-
-  await fetchEnquiries({
-    filter: enquiryFilter.value as any,
-    direction: directionFilter.value as any,
-    page: newPage,
-    sort: sortOrder.value as any,
-    limit: limit.value,
-  });
 
   const el = (pageTop.value as any)?.$el ?? pageTop.value;
   const scrollContainer = el?.closest(".overflow-y-auto, .overflow-y-scroll, .overflow-auto");

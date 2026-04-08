@@ -12,6 +12,9 @@ export default defineEventHandler(async (event) => {
 
     const cancelled = await cancelViewing(id, user.id as number);
 
+    // Bust viewings cache for this user
+    await invalidateViewingsCache(user.id as number);
+
     return cancelled;
   } catch (error) {
     console.error("Error cancelling viewing:", error);

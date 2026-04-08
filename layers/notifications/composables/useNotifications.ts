@@ -17,7 +17,8 @@ const aggregates = ref<UserItemsAggregates>({
   receivedEnquiries: 0,
   receivedUnreadEnquiries: 0,
   draftListings: 0,
-  archivedListings: 0
+  archivedListings: 0,
+  viewedListings: 0,
 });
 const aggregatesLoading = ref(false);
 const aggregatesFetched = ref(false);
@@ -40,7 +41,7 @@ const toastedNotificationIds = new Set<number>();
 /**
  * User notifications composable
  * Handles count badges, real-time updates, and notification management
- * 
+ *
  * Note: Active conversation state is now managed by useEnquiries
  */
 export const useNotifications = createSharedComposable(() => {
@@ -48,36 +49,40 @@ export const useNotifications = createSharedComposable(() => {
   const requestFetch = useRequestFetch();
 
   // Reset all state when the logged-in user changes (login/logout/switch)
-  watch(() => user.value?.id, (newId, oldId) => {
-    if (newId === oldId) return;
-    notifications.value = [];
-    notificationsLoading.value = false;
-    notificationsFetched.value = false;
-    notificationCounts.value = null;
-    notificationPage.value = 1;
-    notificationHasMore.value = true;
-    aggregates.value = {
-      favourites: 0,
-      notes: 0,
-      enquiries: 0,
-      locations: 0,
-      listings: 0,
-      unreadMessages: 0,
-      messages: 0,
-      unreadConversations: 0,
-      sentEnquiries: 0,
-      sentUnreadEnquiries: 0,
-      receivedEnquiries: 0,
-      receivedUnreadEnquiries: 0,
-      draftListings: 0,
-      archivedListings: 0,
-    };
-    aggregatesLoading.value = false;
-    aggregatesFetched.value = false;
-    aggregatesError.value = null;
-    lastNotification.value = null;
-    toastedNotificationIds.clear();
-  });
+  watch(
+    () => user.value?.id,
+    (newId, oldId) => {
+      if (newId === oldId) return;
+      notifications.value = [];
+      notificationsLoading.value = false;
+      notificationsFetched.value = false;
+      notificationCounts.value = null;
+      notificationPage.value = 1;
+      notificationHasMore.value = true;
+      aggregates.value = {
+        favourites: 0,
+        notes: 0,
+        enquiries: 0,
+        locations: 0,
+        listings: 0,
+        unreadMessages: 0,
+        messages: 0,
+        unreadConversations: 0,
+        sentEnquiries: 0,
+        sentUnreadEnquiries: 0,
+        receivedEnquiries: 0,
+        receivedUnreadEnquiries: 0,
+        draftListings: 0,
+        archivedListings: 0,
+        viewedListings: 0,
+      };
+      aggregatesLoading.value = false;
+      aggregatesFetched.value = false;
+      aggregatesError.value = null;
+      lastNotification.value = null;
+      toastedNotificationIds.clear();
+    },
+  );
 
   /**
    * Fetch notifications from the new notifications API
@@ -87,21 +92,19 @@ export const useNotifications = createSharedComposable(() => {
     // Prevent duplicate initial fetches during SSR + hydration
     if (!options?.force && !options?.append && notificationsFetched.value) return;
     if (notificationsLoading.value) return;
-    
+
     const page = options?.page ?? 1;
     const limit = options?.limit ?? 20;
     notificationsLoading.value = true;
     try {
-      const { notifications: data, total } = await requestFetch<{ notifications: UserNotification[], total: number }>(
-        `/api/notifications/?limit=${limit}&includeRead=${options?.includeRead || false}&page=${page}`
-      );
+      const { notifications: data, total } = await requestFetch<{ notifications: UserNotification[]; total: number }>(`/api/notifications/?limit=${limit}&includeRead=${options?.includeRead || false}&page=${page}`);
 
       notifications.value = options?.append ? mergeNotifications(notifications.value, data) : data;
 
       notificationPage.value = page;
       const loaded = page * limit;
       notificationHasMore.value = loaded < total;
-      
+
       if (!options?.append) notificationsFetched.value = true;
     } catch (e) {
       console.error("Failed to fetch notifications", e);
@@ -134,7 +137,7 @@ export const useNotifications = createSharedComposable(() => {
    */
   async function fetchNotificationCounts() {
     try {
-      const data = await requestFetch<NotificationCounts>('/api/notifications/counts');
+      const data = await requestFetch<NotificationCounts>("/api/notifications/counts");
       notificationCounts.value = data;
     } catch (e) {
       console.error("Failed to fetch notification counts", e);
@@ -147,7 +150,7 @@ export const useNotifications = createSharedComposable(() => {
   async function fetchUserItemsAggregates(force = false) {
     if (!force && aggregatesFetched.value) return;
     if (aggregatesLoading.value) return;
-    
+
     aggregatesLoading.value = true;
     aggregatesError.value = null;
 
@@ -179,11 +182,11 @@ export const useNotifications = createSharedComposable(() => {
    */
   function handleAggregateUpdate(data: AggregateUpdateMessage) {
     const currentCount = aggregates.value[data.aggregateType] || 0;
-    
+
     let newCount = currentCount;
-    if (data.operation === 'add') {
+    if (data.operation === "add") {
       newCount = currentCount + 1;
-    } else if (data.operation === 'remove') {
+    } else if (data.operation === "remove") {
       newCount = Math.max(0, currentCount - 1);
     }
 
@@ -198,7 +201,7 @@ export const useNotifications = createSharedComposable(() => {
    */
   function addNotification(notification: UserNotification) {
     // Prevent duplicates
-    if (!notifications.value.some(n => n.id === notification.id)) {
+    if (!notifications.value.some((n) => n.id === notification.id)) {
       notifications.value = [notification, ...notifications.value];
     }
   }
@@ -233,9 +236,9 @@ export const useNotifications = createSharedComposable(() => {
       const unreadNotificationCount = calculateUnreadNotificationCount(
         options.unreadMessageCount,
         options,
-        () => countUnreadNotifications(notifications.value, 'all'),
-        (id) => countUnreadNotifications(notifications.value, 'conversation', id),
-        (id) => countUnreadNotificationById(notifications.value, id)
+        () => countUnreadNotifications(notifications.value, "all"),
+        (id) => countUnreadNotifications(notifications.value, "conversation", id),
+        (id) => countUnreadNotificationById(notifications.value, id),
       );
 
       // Optimistically update aggregates using util
@@ -243,30 +246,30 @@ export const useNotifications = createSharedComposable(() => {
         aggregates.value = decrementAggregatesForReadMessages(aggregates.value, unreadNotificationCount, true);
       }
 
-      await requestFetch('/api/notifications/mark-read', {
-        method: 'POST',
+      await requestFetch("/api/notifications/mark-read", {
+        method: "POST",
         body: options,
       });
 
       // Optimistically update local notifications state using utility
-      let filterType: 'all' | 'conversation' | 'single' = 'all';
+      let filterType: "all" | "conversation" | "single" = "all";
       let id: number | undefined;
       if (options.conversationId) {
-        filterType = 'conversation';
+        filterType = "conversation";
         id = options.conversationId;
       } else if (options.notificationId) {
-        filterType = 'single';
+        filterType = "single";
         id = options.notificationId;
       }
       notifications.value = markNotificationsAsReadOptimistic(notifications.value, filterType, id);
 
       // Refresh aggregates and counts in the background to sync with server
-      fetchUserItemsAggregates(true).catch(e => console.error("Failed to refresh aggregates", e));
-      fetchNotificationCounts().catch(e => console.error("Failed to refresh notification counts", e));
+      fetchUserItemsAggregates(true).catch((e) => console.error("Failed to refresh aggregates", e));
+      fetchNotificationCounts().catch((e) => console.error("Failed to refresh notification counts", e));
     } catch (e) {
       console.error("Failed to mark notifications as read", e);
       // On error, refresh aggregates to get correct state
-      fetchUserItemsAggregates(true).catch(err => console.error("Failed to refresh aggregates after error", err));
+      fetchUserItemsAggregates(true).catch((err) => console.error("Failed to refresh aggregates after error", err));
     }
   }
 
@@ -277,26 +280,24 @@ export const useNotifications = createSharedComposable(() => {
    */
   async function dismissNotification(notificationId: number) {
     // Find the notification and calculate count decrement
-    const notification = notifications.value.find(n => n.id === notificationId);
+    const notification = notifications.value.find((n) => n.id === notificationId);
     const countDecrement = calculateDismissCountDecrement(notification);
 
     // Always optimistically mark as dismissed locally
-    notifications.value = notifications.value.map(n =>
-      n.id === notificationId ? { ...n, isDismissed: true } : n
-    );
+    notifications.value = notifications.value.map((n) => (n.id === notificationId ? { ...n, isDismissed: true } : n));
 
     // ONLY decrement notificationCounts, NOT aggregates (dismissing doesn't mark as read)
     notificationCounts.value = decrementNotificationCounts(notificationCounts.value, countDecrement);
 
     // Try to sync with backend, but don't revert on error (local state is source of truth for dismissal)
     try {
-      await requestFetch('/api/notifications/dismiss', {
-        method: 'POST',
+      await requestFetch("/api/notifications/dismiss", {
+        method: "POST",
         body: { notificationId },
       });
     } catch (e) {
       // Log error but keep local dismissal - backend may be out of sync or notification already dismissed
-      console.warn('Failed to sync notification dismissal with backend:', e);
+      console.warn("Failed to sync notification dismissal with backend:", e);
     }
   }
 
@@ -304,7 +305,7 @@ export const useNotifications = createSharedComposable(() => {
    * Get unread notification count
    */
   const unreadCount = computed(() => {
-    return countUnreadNotifications(notifications.value, 'all');
+    return countUnreadNotifications(notifications.value, "all");
   });
 
   /**
@@ -322,7 +323,7 @@ export const useNotifications = createSharedComposable(() => {
     fetchUserItemsAggregates,
     getAggregateCount,
     handleAggregateUpdate,
-    
+
     // Notifications
     notifications,
     notificationsLoading,
@@ -338,7 +339,7 @@ export const useNotifications = createSharedComposable(() => {
     dismissNotification,
     unreadCount,
     unreadNotifications,
-    
+
     // Toast notifications
     lastNotification,
     showToast,

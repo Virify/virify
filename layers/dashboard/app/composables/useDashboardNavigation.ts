@@ -139,11 +139,12 @@ export const useDashboardNavigation = createSharedComposable(() => {
         {
           label: "Viewed",
           type: "link",
-          to: "#",
+          to: "/dashboard/viewed",
           icon: "i-lucide-eye",
           tooltip: {
-            text: "Recently viewed properties",
+            text: "Recently viewed properties" + (aggregates.value.viewedListings ? ` (${aggregates.value.viewedListings})` : ""),
           },
+          badge: aggregates.value.viewedListings ? String(aggregates.value.viewedListings) : undefined,
         },
         {
           label: "Analytics",

@@ -12,12 +12,8 @@
         </template>
 
         <template #right>
-          <OrganismsDashboardFilterListings
-            :items="hiddenListings"
-            :date-key="'hiddenAt'"
-            persistence-key="dashboard-hidden-listings"
-            @update:filtered="filteredHiddenListings = $event"
-          />
+          <OrganismsDashboardFilterListings :items="hiddenListings" :date-key="'hiddenAt'"
+            persistence-key="dashboard-hidden-listings" @update:filtered="filteredHiddenListings = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
@@ -31,85 +27,67 @@
       </OrganismsDashboardListingCardGrid>
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredHiddenListings.length > 0">
         <div v-for="item in filteredHiddenListings" :key="item.listing?.id" class="h-full">
-          <OrganismsDashboardListingCardHidden
-            :listing="item.listing!"
-            :hidden-at="item.hiddenAt"
-            :reason="item.reason"
-            @unhide="removeHiddenListing"
-          />
+          <OrganismsDashboardListingCardHidden :listing="item.listing!" :hidden-at="item.hiddenAt" :reason="item.reason"
+            @unhide="removeHiddenListing" />
         </div>
       </OrganismsDashboardListingCardGrid>
       <OrganismsDashboardNoResults v-else :description="'No Hidden Listings found.'" />
 
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
-        <UPagination
-          v-model:page="page"
-          @update:page="onPageChange"
-          :total="total"
-          :items-per-page="limit"
-          variant="ghost"
-          active-color="secondary"
-          color="secondary"
-          size="md"
-          class="body-sm"
-        />
+        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"
+          variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
       </div>
     </template>
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
-  definePageMeta({
-    middleware: ["authenticated"],
-    head: {
-      title: "Hidden Listings",
-      icon: 'i-lucide-eye-off',
-    },
-    layout: "dashboard",
-  });
+definePageMeta({
+  middleware: ["authenticated"],
+  head: {
+    title: "Hidden Listings",
+    icon: 'i-lucide-eye-off',
+  },
+  layout: "dashboard",
+});
 
-  const { hiddenListings, fetchHiddenListings, total, loading } = useHiddenListings()
+const { user } = useUserSession()
+const requestFetch = useRequestFetch()
 
-  const page = ref(1)
-  const limit = ref(20)
-  const pageTop = ref<HTMLElement | null>(null)
-  const filteredHiddenListings = ref<UserHiddenListingCard[]>([])
+const page = ref(1)
+const limit = 20
+const pageTop = ref<HTMLElement | null>(null)
+const filteredHiddenListings = ref<UserHiddenListingCard[]>([])
 
-  // Ensure SSR and client both start loading — prevents hydration mismatch
-  loading.value = true
+const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-hidden-listings' })
 
-  const {
-    saleRentFilter,
-    sortOrderValue,
-  } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-hidden-listings' })
+// Reset to page 1 when filters change
+watch([saleRentFilter, sortOrderValue], () => { page.value = 1 })
 
-  // Initial fetch on mount (client-only) — avoids SSR/client state divergence
-  onMounted(async () => {
-    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
-    await fetchHiddenListings(saleRentFilter.value, 1, validSortOrder, limit.value)
-  })
+const { data, pending: loading, refresh } = useAsyncData(
+  () => `hidden:${user.value?.id}:${saleRentFilter.value}:${sortOrderValue.value}:${page.value}`,
+  () => requestFetch<{ hiddenListings: UserHiddenListingCard[]; total: number }>(
+    `/api/user/hidden-listings/all/full?filter=${saleRentFilter.value}&sort=${sortOrderValue.value}&page=${page.value}&limit=${limit}`
+  ),
+  { server: true }
+)
 
-  // Watch filter changes and re-fetch from API (reset to page 1)
-  watch([saleRentFilter, sortOrderValue], async () => {
-    page.value = 1
-    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
-    await fetchHiddenListings(saleRentFilter.value, 1, validSortOrder, limit.value)
-  })
+const hiddenListings = computed(() => data.value?.hiddenListings ?? [])
+const total = computed(() => data.value?.total ?? 0)
 
-  // Handle page changes from pagination component
-  async function onPageChange(newPage: number) {
-    page.value = newPage
-    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
-    await fetchHiddenListings(saleRentFilter.value, newPage, validSortOrder, limit.value)
+function onPageChange(newPage: number) {
+  page.value = newPage
+  const el = (pageTop.value as any)?.$el ?? pageTop.value
+  const scrollContainer = el?.closest('.overflow-y-auto, .overflow-y-scroll, .overflow-auto')
+  scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
-    const el = (pageTop.value as any)?.$el ?? pageTop.value
-    const scrollContainer = el?.closest('.overflow-y-auto, .overflow-y-scroll, .overflow-auto')
-    scrollContainer?.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+// Seed filteredHiddenListings so SSR and client start with the same state
+watch(hiddenListings, (listings) => {
+  filteredHiddenListings.value = listings
+}, { immediate: true })
 
-  // Remove a listing immediately when the user unhides it
-  function removeHiddenListing(listingId: number) {
-    hiddenListings.value = hiddenListings.value.filter(item => item.listing?.id !== listingId)
-    filteredHiddenListings.value = filteredHiddenListings.value.filter(item => item.listing?.id !== listingId)
-    total.value = Math.max(0, total.value - 1)
-  }
+// Refresh list when the user unhides a listing
+function removeHiddenListing(_listingId: number) {
+  refresh()
+}
 </script>

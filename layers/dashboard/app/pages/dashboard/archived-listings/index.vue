@@ -27,7 +27,8 @@
       <!-- Archived Listings Grid -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredListings.length > 0">
         <div v-for="listing in filteredListings" :key="listing.id" class="h-full">
-          <OrganismsDashboardListingCardMyListing :listing="listing" @edit="handleEditListing" />
+          <OrganismsDashboardListingCardMyListing :listing="listing" @edit="handleEditListing"
+            @restored="handleRestored" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
@@ -127,6 +128,14 @@ async function onPageChange(newPage: number) {
 
 async function handleEditListing(_payload: { id: number; isDraft: boolean }) {
   // Archived listings cannot be edited directly — use "Convert to Draft" on the card
+}
+
+function handleRestored(id: number) {
+  const idx = listings.value.findIndex((l) => l.id === id);
+  if (idx !== -1) {
+    listings.value.splice(idx, 1);
+    total.value -= 1;
+  }
 }
 
 function handleModalClose() {

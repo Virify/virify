@@ -32,12 +32,7 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: "counterProposedAt is required when rescheduling" });
     }
 
-    const updated = await updateViewingStatus(
-      id,
-      user.id as number,
-      statusMap[response],
-      counterProposedAt ? new Date(counterProposedAt) : undefined,
-    );
+    const updated = await updateViewingStatus(id, user.id as number, statusMap[response], counterProposedAt ? new Date(counterProposedAt) : undefined);
 
     // Notify the requester
     const notificationType = (response === "accept" ? "VIEWING_ACCEPTED" : response === "reject" ? "VIEWING_REJECTED" : "VIEWING_RESCHEDULED") as NotificationType;
@@ -78,9 +73,7 @@ export default defineEventHandler(async (event) => {
           senderAvatar: user.avatar ?? undefined,
           eventType,
           proposedAt: new Date(updated.proposedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
-          counterProposedAt: updated.counterProposedAt
-            ? new Date(updated.counterProposedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
-            : undefined,
+          counterProposedAt: updated.counterProposedAt ? new Date(updated.counterProposedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : undefined,
           notes: updated.notes ?? undefined,
           listing: (updated as any).listing
             ? {
@@ -93,6 +86,9 @@ export default defineEventHandler(async (event) => {
         }).catch((err) => console.error("Failed to send viewing response email:", err));
       }
     }
+
+    // Bust viewings cache for both parties
+    await Promise.all([invalidateViewingsCache(user.id as number), invalidateViewingsCache(updated.requesterId)]);
 
     return updated;
   } catch (error) {

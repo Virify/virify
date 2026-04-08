@@ -1,5 +1,4 @@
 import { createSharedComposable } from "@vueuse/core";
-import type { ViewingWithDetails, CreateViewingPayload, RespondViewingPayload, ViewingStatus } from "~~/shared/types/viewing";
 
 const viewings = ref<ViewingWithDetails[]>([]);
 const loading = ref(false);
@@ -7,39 +6,10 @@ const error = ref<string | null>(null);
 
 export const useViewings = createSharedComposable(() => {
   const requestFetch = useRequestFetch();
-  const { loggedIn, user } = useUserSession();
+  const { user } = useUserSession();
 
-  const pendingViewings = computed(() =>
-    viewings.value.filter((v) => v.status === "PENDING"),
-  );
+  const pendingViewings = computed(() => viewings.value.filter((v) => v.status === "PENDING"));
   const pendingCount = computed(() => pendingViewings.value.length);
-
-  // ─── Fetch ──────────────────────────────────────────────────────────────────
-
-  async function fetchViewings(role?: "requester" | "owner" | "all", status?: ViewingStatus) {
-    if (!loggedIn.value || !user.value?.id) {
-      viewings.value = [];
-      return;
-    }
-
-    loading.value = true;
-    error.value = null;
-
-    try {
-      const params = new URLSearchParams();
-      if (role) params.set("role", role);
-      if (status) params.set("status", status);
-      const qs = params.toString();
-      const data = await requestFetch<ViewingWithDetails[]>(`/api/viewing${qs ? `?${qs}` : ""}`);
-      viewings.value = data;
-    } catch (err) {
-      console.error("Error fetching viewings:", err);
-      error.value = "Failed to load viewings";
-      viewings.value = [];
-    } finally {
-      loading.value = false;
-    }
-  }
 
   // ─── Actions ─────────────────────────────────────────────────────────────────
 
@@ -97,25 +67,28 @@ export const useViewings = createSharedComposable(() => {
    */
   function hasActiveViewingAsRequester(listingId: number): boolean {
     if (!user.value?.id) return false;
-    return viewings.value.some(
-      (v) =>
-        v.listingId === listingId &&
-        v.requesterId === user.value!.id &&
-        (v.status === "PENDING" || v.status === "RESCHEDULED"),
-    );
+    return viewings.value.some((v) => v.listingId === listingId && v.requesterId === user.value!.id && (v.status === "PENDING" || v.status === "RESCHEDULED"));
+  }
+
+  async function fetchViewings(): Promise<void> {
+    if (!user.value?.id) return;
+    try {
+      const data = await requestFetch<{ viewings: ViewingWithDetails[] }>("/api/viewing");
+      viewings.value = data.viewings ?? [];
+    } catch (err) {
+      console.error("Error fetching viewings:", err);
+    }
   }
 
   return {
     viewings: readonly(viewings),
     pendingViewings,
     pendingCount,
-    loading: readonly(loading),
-    error: readonly(error),
-    fetchViewings,
     requestViewing,
     respondToViewing,
     cancelViewing,
     getConversationViewings,
     hasActiveViewingAsRequester,
+    fetchViewings,
   };
 });

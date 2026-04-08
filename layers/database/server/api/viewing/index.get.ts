@@ -12,8 +12,13 @@ export default defineEventHandler(async (event) => {
     const role = (query.role as "requester" | "owner" | "all") || "all";
     const status = query.status as ViewingStatus | undefined;
 
-    const viewings = await getUserViewings(user.id as number, role, status);
+    const cacheKey = `viewings:${user.id}:${role}:${status ?? "all"}`;
+    const storage = useStorage("cache");
+    const cached = await storage.getItem(cacheKey);
+    if (cached) return cached;
 
+    const viewings = await getUserViewings(user.id as number, role, status);
+    storage.setItem(cacheKey, viewings, { ttl: 60 }).catch(() => {});
     return viewings;
   } catch (error) {
     console.error("Error fetching viewings:", error);

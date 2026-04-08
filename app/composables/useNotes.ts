@@ -4,21 +4,6 @@ import { performMultiOptimisticUpdate, performPendingRemoval } from "~/utils/opt
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
 
-// Cache for paginated notes with TTL — busted by user mutations
-const NOTES_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-const NOTES_CACHE_MAX = 20; // cap entries to prevent unbounded growth
-const notesCache = new Map<string, { notes: NoteData[]; total: number; ts: number }>();
-
-function getNotesCacheHit(key: string) {
-  const entry = notesCache.get(key);
-  if (!entry) return null;
-  if (Date.now() - entry.ts > NOTES_CACHE_TTL_MS) {
-    notesCache.delete(key);
-    return null;
-  }
-  return entry;
-}
-
 /**
  * Notes Composable
  *
@@ -31,99 +16,10 @@ export const useNotes = () => {
   const toast = useToast();
   const requestFetch = useRequestFetch();
 
-  // Local filtering state (mirrors favourites pattern)
-  const searchTerm = ref("");
-  const categoryFilter = ref<"all" | "sale" | "rental">("all");
-
-  // Pagination state for dashboard
-  const total = ref(0);
-  const loading = ref(false);
-
   // Use Shared Global Lookups
   const { noteLookups, refreshUserNotes } = useNoteLookups();
   // Use Shared Recent Items
   const { recentUserNotes, refreshRecentNotes, recentNotesStatus } = useDashboardRecentItems();
-
-  /**
-   * Full notes data (for dashboard pages with pagination)
-   */
-  const userNotes = ref<NoteData[]>([]);
-
-  // Track current pagination state for refetching after add/remove
-  const currentFilter = ref<"all" | "sale" | "rent">("all");
-  const currentPage = ref(1);
-  const currentSort = ref<"newest" | "oldest">("newest");
-  const currentLimit = ref(20);
-
-  /**
-   * Fetch notes with pagination, sort, and filter (for dashboard)
-   */
-  async function fetchNotes(filter: "all" | "sale" | "rent" = "all", page: number = 1, sort: "newest" | "oldest" = "newest", limit: number = 20) {
-    // Store current pagination state
-    currentFilter.value = filter;
-    currentPage.value = page;
-    currentSort.value = sort;
-    currentLimit.value = limit;
-
-    // Clear pending removal state so 'Removed' overlays reset on navigation
-    pendingRemoval.value = new Set();
-
-    const url = `/api/user/notes/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`;
-    const cacheKey = `${user.value?.id}:${url}`;
-    const cached = getNotesCacheHit(cacheKey);
-    if (cached) {
-      userNotes.value = cached.notes;
-      total.value = cached.total;
-      loading.value = false;
-      return;
-    }
-
-    loading.value = true;
-    try {
-      const data = await requestFetch<{ notes: NoteData[]; total: number }>(url);
-      userNotes.value = data.notes || [];
-      total.value = data.total || 0;
-      if (notesCache.size >= NOTES_CACHE_MAX) notesCache.delete(notesCache.keys().next().value!);
-      notesCache.set(cacheKey, { notes: userNotes.value, total: total.value, ts: Date.now() });
-    } catch (error) {
-      console.error("Error fetching notes:", error);
-      userNotes.value = [];
-      total.value = 0;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  /**
-   * Refetch current page (used after add/remove when dashboard is active)
-   */
-  async function refetchCurrentPage() {
-    if (userNotes.value.length > 0 || total.value > 0) {
-      notesCache.clear();
-      pendingRemoval.value = new Set();
-      await fetchNotes(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
-    }
-  }
-
-  const saleNotes = computed(() => {
-    return userNotes.value.filter((item) => item.listing?.saleListing);
-  });
-
-  const rentalNotes = computed(() => {
-    return userNotes.value.filter((item) => item.listing?.rentalListing);
-  });
-
-  /**
-   * Filtered notes based on search term and category
-   * Uses shared search utility to match against listing fields + note content
-   */
-  const filteredUserNotes = computed(() => {
-    const category = categoryFilter.value;
-    let list = userNotes.value || [];
-    if (category === "sale") list = list.filter((n) => n?.listing?.saleListing);
-    else if (category === "rental") list = list.filter((n) => n?.listing?.rentalListing);
-    return filterListingItems(list, searchTerm.value, true); // include notes content
-  });
 
   /**
    * Check if a property has a note (uses lightweight lookups)
@@ -154,14 +50,11 @@ export const useNotes = () => {
    * @returns NoteData object or undefined
    */
   const getNoteData = (listingId: number): { note?: string; createdAt?: any } => {
-    // First check lightweight lookups (available across all pages)
     const lookup = noteLookups.value.find((note) => note.listingId === listingId);
-    // Fall back to full userNotes for createdAt (only available on notes dashboard)
-    const fullNote = userNotes.value.find((note) => note.listingId === listingId);
 
     return {
-      note: lookup?.note ?? fullNote?.note,
-      createdAt: fullNote?.createdAt,
+      note: lookup?.note,
+      createdAt: undefined,
     };
   };
 
@@ -190,10 +83,6 @@ export const useNotes = () => {
           ref: noteLookups,
           optimisticChange: (current) => (isUpdating ? current.map((n: NoteLookup) => (n.listingId === listingId ? { ...n, note } : n)) : [...current, { listingId, note }]),
         },
-        {
-          ref: userNotes,
-          optimisticChange: (current) => current.map((n: NoteData) => (n.listingId === listingId ? { ...n, note } : n)),
-        },
       ],
       operation: async () => {
         await requestFetch(`/api/user/notes/${listingId}/`, {
@@ -203,7 +92,6 @@ export const useNotes = () => {
       },
       onSuccess: () => {
         refreshUserNotes();
-        refetchCurrentPage();
       },
       onError: (error) => {
         console.error("Error updating note:", error);
@@ -214,11 +102,6 @@ export const useNotes = () => {
 
   /**
    * Delete a note for a specific listing
-   *
-   * Uses optimistic updates: the note is removed from the UI immediately while
-   * the API call happens in the background. If the API call fails, the note is restored.
-   *
-   * @param listingId - ID of the Listing
    */
   const deleteNote = async (listingId: number) => {
     if (!loggedIn.value) {
@@ -236,9 +119,7 @@ export const useNotes = () => {
         });
       },
       onSuccess: async () => {
-        notesCache.clear(); // always bust client cache regardless of calling instance state
         await refreshUserNotes();
-        await refetchCurrentPage();
       },
       onError: (error) => {
         console.error("Error deleting note:", error);
@@ -251,21 +132,12 @@ export const useNotes = () => {
     return pendingRemoval.value.has(listingId);
   }
 
-  /**
-   * Watch for changes in the loggedIn state
-   * When the user logs out, clear cached notes state
-   */
   watch(loggedIn, (isLoggedIn) => {
     if (!isLoggedIn) {
-      userNotes.value = [];
+      pendingRemoval.value = new Set();
     }
   });
 
-  /**
-   * Show note dialog for a specific property
-   *
-   * @param listingId - ID of the listing
-   */
   const showNoteDialog = (listingId: number) => {
     if (!loggedIn.value) {
       showDialog({ component: ViewsDialogLogin });
@@ -285,19 +157,9 @@ export const useNotes = () => {
     hasNote,
     isNotePendingRemoval,
     showNoteDialog,
-    userNotes,
-    filteredUserNotes,
     recentUserNotes,
     refreshRecentNotes,
-    saleNotes,
-    rentalNotes,
     refreshUserNotes,
-    fetchNotes,
-    total,
-    loading,
-    // search filter state
-    searchTerm,
-    categoryFilter,
-    isLoading: computed(() => loading.value || recentNotesStatus.value === "pending"),
+    isLoading: computed(() => recentNotesStatus.value === "pending"),
   };
 };

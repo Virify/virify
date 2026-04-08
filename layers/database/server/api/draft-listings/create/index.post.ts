@@ -1,9 +1,9 @@
-import * as z from 'zod';
-import { ListingTier } from '../../../database/prisma/generated/enums';
+import * as z from "zod";
+import { ListingTier } from "../../../database/prisma/generated/enums";
 
 const CreateSchema = z.object({
-    tier: z.enum(ListingTier),
-  });
+  tier: z.enum(ListingTier),
+});
 
 export default defineEventHandler(async (event) => {
   const { tier } = await readValidatedBody(event, CreateSchema.parse);
@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
     }
 
     const createdListing = await createDraftListing(user.id, tier);
+    const { invalidateDraftListingsCache } = await import("~~/layers/database/server/utils/cache");
+    await invalidateDraftListingsCache(user.id as number);
     return createdListing;
   } catch (error) {
     console.log(error);

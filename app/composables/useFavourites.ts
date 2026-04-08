@@ -4,124 +4,16 @@ import { performOptimisticUpdate, performPendingRemoval } from "~/utils/optimist
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
 
-// Cache for paginated favourites with TTL — busted by user mutations
-const FAVS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
-const FAVS_CACHE_MAX = 20; // cap entries to prevent unbounded growth
-const favouritesCache = new Map<string, { favourites: UserFavouriteListingCard[]; total: number; ts: number }>();
-
-function getFavsCacheHit(key: string) {
-  const entry = favouritesCache.get(key);
-  if (!entry) return null;
-  if (Date.now() - entry.ts > FAVS_CACHE_TTL_MS) {
-    favouritesCache.delete(key);
-    return null;
-  }
-  return entry;
-}
-
-/**
- * Favourites Composable
- *
- * Manages user's favourite listings with optimistic updates for seamless UX.
- * Uses lightweight lookups for efficient isFavourite checks across the app.
- *
- * @returns Favourites state and actions
- */
 export const useFavourites = () => {
   const { loggedIn, user } = useUserSession();
   const { showDialog } = useDialog();
   const toast = useToast();
   const requestFetch = useRequestFetch();
 
-  // Lightweight shared search / category state (favourites + notes share util)
-  const searchTerm = ref("");
-  const categoryFilter = ref<"all" | "sale" | "rental">("all");
-
-  // Pagination state for dashboard
-  const total = ref(0);
-  const loading = ref(false);
-
   // Use Shared Global Lookups
   const { favouriteLookups, refreshFavourites } = useFavouriteLookups();
   // Use Shared Recent Items
   const { recentFavourites, refreshRecentFavourites, recentFavouritesStatus } = useDashboardRecentItems();
-
-  /**
-   * Full favourites data (for dashboard pages with pagination)
-   */
-  const favourites = ref<UserFavouriteListingCard[]>([]);
-
-  // Track current pagination state for refetching after add/remove
-  const currentFilter = ref<"all" | "sale" | "rent">("all");
-  const currentPage = ref(1);
-  const currentSort = ref<"newest" | "oldest">("newest");
-  const currentLimit = ref(20);
-
-  /**
-   * Fetch favourites with pagination, sort, and filter (for dashboard)
-   */
-  async function fetchFavourites(filter: "all" | "sale" | "rent" = "all", page: number = 1, sort: "newest" | "oldest" = "newest", limit: number = 20) {
-    // Store current pagination state
-    currentFilter.value = filter;
-    currentPage.value = page;
-    currentSort.value = sort;
-    currentLimit.value = limit;
-
-    // Clear pending removal state so 'Removed' overlays reset on navigation
-    pendingRemoval.value = new Set();
-
-    const url = `/api/user/favourites/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`;
-    const cacheKey = `${user.value?.id}:${url}`;
-    const cached = getFavsCacheHit(cacheKey);
-    if (cached) {
-      favourites.value = cached.favourites;
-      total.value = cached.total;
-      loading.value = false;
-      return;
-    }
-
-    loading.value = true;
-    try {
-      const data = await requestFetch<{ favourites: UserFavouriteListingCard[]; total: number }>(url);
-      favourites.value = data.favourites || [];
-      total.value = data.total || 0;
-      if (favouritesCache.size >= FAVS_CACHE_MAX) favouritesCache.delete(favouritesCache.keys().next().value!);
-      favouritesCache.set(cacheKey, { favourites: favourites.value, total: total.value, ts: Date.now() });
-    } catch (error) {
-      console.error("Error fetching favourites:", error);
-      favourites.value = [];
-      total.value = 0;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  /**
-   * Refetch current page (used after add/remove when dashboard is active)
-   */
-  async function refetchCurrentPage() {
-    if (favourites.value.length > 0 || total.value > 0) {
-      favouritesCache.clear();
-      pendingRemoval.value = new Set();
-      await fetchFavourites(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
-    }
-  }
-
-  const saleFavourites = computed(() => {
-    return favourites.value.filter((item) => item.listing.saleListing);
-  });
-
-  const rentalFavourites = computed(() => {
-    return favourites.value.filter((item) => item.listing.rentalListing);
-  });
-
-  // Filter favourites (category first then text) via shared util
-  const filteredFavourites = computed(() => {
-    let list = favourites.value || [];
-    if (categoryFilter.value === "sale") list = list.filter((f) => f.listing.saleListing);
-    else if (categoryFilter.value === "rental") list = list.filter((f) => f.listing.rentalListing);
-    return filterListingItems(list, searchTerm.value);
-  });
 
   /**
    * Is a listing a favourite (uses lightweight lookups)
@@ -162,7 +54,6 @@ export const useFavourites = () => {
       },
       onSuccess: () => {
         refreshFavourites();
-        refetchCurrentPage();
       },
       onError: (error) => {
         toast.add({ title: "Error", description: "Failed to add to favourites", color: "error", icon: "i-lucide-heart-crack" });
@@ -200,9 +91,7 @@ export const useFavourites = () => {
       onSuccess: () => {
         // Optimistically remove from global lookups immediately
         favouriteLookups.value = favouriteLookups.value.filter((id) => id !== listingId);
-        favouritesCache.clear(); // always bust client cache regardless of calling instance state
         refreshFavourites();
-        refetchCurrentPage();
       },
       onError: (error) => {
         toast.add({ title: "Error", description: "Failed to remove from favourites", color: "error", icon: "i-lucide-heart-crack" });
@@ -219,13 +108,8 @@ export const useFavourites = () => {
   }
 
   /**
-   * Remove a listing from an array of favourite Listings
+   * Toggle favourite - add if not favourite, remove if favourite
    */
-  function removeListingFromArray(dToRemove: number) {
-    return favourites.value?.filter((d) => d.listing.id !== dToRemove);
-  }
-
-  // Add a toggleFavourite method to useFavourites composable
   const toggleFavourite = async (listingId: number) => {
     if (!loggedIn.value) {
       showDialog({ component: ViewsDialogLogin });
@@ -243,20 +127,10 @@ export const useFavourites = () => {
     isFavourite,
     isPendingRemoval,
     removeFromFavourite,
-    removeListingFromArray,
     toggleFavourite,
-    favourites,
     recentFavourites,
     refreshRecentFavourites,
-    saleFavourites,
-    rentalFavourites,
-    filteredFavourites,
     refreshFavourites,
-    fetchFavourites,
-    total,
-    loading,
-    searchTerm,
-    categoryFilter,
-    isLoading: computed(() => loading.value || recentFavouritesStatus.value === "pending"),
+    isLoading: computed(() => recentFavouritesStatus.value === "pending"),
   };
 };

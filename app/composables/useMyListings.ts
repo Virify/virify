@@ -10,55 +10,11 @@ export const useMyListings = createSharedComposable(() => {
   const { loggedIn } = useUserSession();
   const toast = useToast();
 
-  // Pagination state for dashboard
+  // Shared refs populated by the my-listings page's useAsyncData handler
   const total = ref(0);
-  const loading = ref(false);
-
-  // Use for dashboard pages with pagination
   const listings = ref<OwnedListingWithAnalytics[]>([]);
 
-  // Track current pagination state for refetching after add/remove
-  const currentFilter = ref<"all" | "active" | "inactive" | "draft" | "archived">("all");
-  const currentSaleRentFilter = ref<SaleRentFilter>("all");
-  const currentPage = ref(1);
-  const currentSort = ref<SortBy>("new");
-  const currentLimit = ref(20);
-
   const requestFetch = useRequestFetch();
-
-  /**
-   * Fetch listings with pagination, sort, and filter (for dashboard)
-   */
-  async function fetchMyListings(filter: StatusFilter = "all", page: number = 1, sort: SortBy = "new", limit: number = 20, saleRent: SaleRentFilter = "all") {
-    // Store current pagination state
-    currentFilter.value = filter;
-    currentSaleRentFilter.value = saleRent;
-    currentPage.value = page;
-    currentSort.value = sort;
-    currentLimit.value = limit;
-
-    loading.value = true;
-    try {
-      const data = await requestFetch<{ listings: OwnedListingWithAnalytics[]; total: number }>(`/api/user/my-listings/?status=${filter}&sort=${sort}&page=${page}&take=${limit}&saleRent=${saleRent}`);
-      listings.value = data.listings || [];
-      total.value = data.total || 0;
-    } catch (error) {
-      console.error("Error fetching my listings:", error);
-      listings.value = [];
-      total.value = 0;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  /**
-   * Refetch current page (used after add/remove when dashboard is active)
-   */
-  async function refetchCurrentPage() {
-    if (listings.value.length > 0 || total.value > 0) {
-      await fetchMyListings(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value, currentSaleRentFilter.value);
-    }
-  }
 
   async function setPublished(listingId: number, published: boolean) {
     try {
@@ -80,19 +36,7 @@ export const useMyListings = createSharedComposable(() => {
         isDraft: published ? false : existingListing.isDraft,
       };
 
-      // Check if listing should remain visible based on current filter
-      const shouldKeepListing =
-        currentFilter.value === "all" ||
-        (currentFilter.value === "active" && updatedListing.published) ||
-        (currentFilter.value === "inactive" && !updatedListing.published && !updatedListing.isDraft) ||
-        (currentFilter.value === "draft" && updatedListing.isDraft);
-
-      if (shouldKeepListing) {
-        listings.value[listingIndex] = updatedListing;
-      } else {
-        listings.value.splice(listingIndex, 1);
-        total.value -= 1;
-      }
+      listings.value[listingIndex] = updatedListing;
 
       toast.add({
         title: "Success",
@@ -195,10 +139,7 @@ export const useMyListings = createSharedComposable(() => {
 
   return {
     listings,
-    loading,
     total,
-    fetchMyListings,
-    refetchCurrentPage,
     setPublished,
     togglePublished,
     setAvailabilityStatus,

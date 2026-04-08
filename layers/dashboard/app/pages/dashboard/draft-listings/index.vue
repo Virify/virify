@@ -10,7 +10,7 @@
         </template>
 
         <template #right>
-          <OrganismsDashboardFilterListings :items="draftListings" persistence-key="dashboard-draft-listings"
+          <OrganismsDashboardFilterListings :items="pageDrafts" persistence-key="dashboard-draft-listings"
             :hide-sale-rent-filter="true" />
           <OrganismsDashboardNotificationButton />
         </template>
@@ -20,7 +20,7 @@
 
     <template #body>
       <!-- Tier Selection Table -->
-      <MoleculesDashboardPriceTier v-if="!draftListings.length && !loading" @select-tier="handleCreateListing" />
+      <MoleculesDashboardPriceTier v-if="!pageDrafts.length && !loading" @select-tier="handleCreateListing" />
 
       <!-- Loading State -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-if="loading">
@@ -38,8 +38,8 @@
       <OrganismsDashboardNoResults v-else :description="'No draft listings found. Start creating a new listing!'" />
 
       <!-- Pagination -->
-      <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
-        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"
+      <div v-if="pageTotal > 0" class="flex justify-center p-4 mt-auto">
+        <UPagination v-model:page="page" @update:page="onPageChange" :total="pageTotal" :items-per-page="limit"
           variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
       </div>
 
@@ -50,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
 definePageMeta({
   middleware: ["authenticated"],
   head: {
@@ -59,72 +60,77 @@ definePageMeta({
   layout: "dashboard",
 });
 
-// Draft listings state
-const { draftListings, loading, total, fetchDraftListings, refetchCurrentPage } = useDraftListings();
-const pageTop = ref<HTMLElement | null>(null);
-const page = ref(1);
-const limit = ref(20);
+const { user } = useUserSession()
+const { draftListings, total: sharedTotal } = useDraftListings()
+const requestFetch = useRequestFetch()
 
-// Use existing filter composable (only need sort and search for drafts)
+const pageTop = ref<HTMLElement | null>(null)
+const page = ref(1)
+const limit = 20
+
+const listingModal = ref<{ openForNewListing: (tier: any) => void; openForDraft: (id: number) => Promise<void>; openForListing: (id: number) => Promise<void> } | null>(null)
+
 const { sortOrderValue, searchQuery } = useDashboardListFilter(ref([]), {
   persistenceKey: "dashboard-draft-listings",
   hideListingSort: true,
-});
+})
 
-// Map sort order to API enum
-const mapSortOrder = computed(() => {
-  if (sortOrderValue.value === "newest") return "new";
-  if (sortOrderValue.value === "oldest") return "old";
-  return "new";
-});
+const mapSortOrder = computed(() => sortOrderValue.value === "newest" ? "new" : "old")
 
-// Modal ref
-import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
-const listingModal = ref<{ openForNewListing: (tier: any) => void; openForDraft: (id: number) => Promise<void>; openForListing: (id: number) => Promise<void> } | null>(null);
+// Reset to page 1 when sort changes
+watch([mapSortOrder], () => { page.value = 1 })
 
-// Handle create listing from tier table
-function handleCreateListing(tier: ListingTier) {
-  listingModal.value?.openForNewListing(tier);
-}
+// Return data so it's serialized in SSR payload and available during hydration
+const { data: fetchedData, pending: loading, refresh } = useAsyncData(
+  () => `draft-listings:${user.value?.id}:${mapSortOrder.value}:${page.value}`,
+  () => requestFetch<{ drafts: DraftListingWithFullPayload[]; total: number }>(
+    `/api/user/draft-listings/?sort=${mapSortOrder.value}&page=${page.value}&take=${limit}`
+  ),
+  { server: true }
+)
 
-// Watch filter changes and re-fetch from API
-watch(
-  [mapSortOrder],
-  async () => {
-    page.value = 1;
-    await fetchDraftListings(1, mapSortOrder.value as any, limit.value);
-  },
-  { immediate: true }
-);
+// SSR-safe derived data (serialized in Nuxt payload, available immediately on hydration)
+const pageDrafts = computed(() => (fetchedData.value?.drafts ?? []).map((draft): DraftListingForCard => ({
+  ...draft,
+  analytics: { viewsCount: 0, favouritesCount: 0, enquiriesCount: 0 },
+  published: false,
+  archived: false,
+  isDraft: true,
+  draftId: draft.id,
+  publishedAt: null,
+})))
+const pageTotal = computed(() => fetchedData.value?.total ?? 0)
 
-// Client-side search filtering
+// Sync to shared composable for external consumers
+watch(pageDrafts, (items) => { draftListings.value = items }, { immediate: true })
+watch(pageTotal, (t) => { sharedTotal.value = t }, { immediate: true })
+
+// Client-side search filter derived from SSR-safe data
 const filteredDrafts = computed(() => {
-  if (!searchQuery.value) return draftListings.value;
-
-  const term = searchQuery.value.toLowerCase();
-  return draftListings.value.filter((draft) =>
+  if (!searchQuery.value) return pageDrafts.value
+  const term = searchQuery.value.toLowerCase()
+  return pageDrafts.value.filter((draft) =>
     draft.property?.address?.fullAddress?.toLowerCase().includes(term) ||
     draft.price?.toString().includes(term)
-  );
-});
+  )
+})
 
-// Handle page changes
+function handleCreateListing(tier: ListingTier) {
+  listingModal.value?.openForNewListing(tier)
+}
+
 async function onPageChange(newPage: number) {
-  page.value = newPage;
-  await fetchDraftListings(newPage, mapSortOrder.value as any, limit.value);
-
-  const el = (pageTop.value as any)?.$el ?? pageTop.value;
-  const scrollContainer = el?.closest(".overflow-y-auto, .overflow-y-scroll, .overflow-auto");
-  scrollContainer?.scrollTo({ top: 0, behavior: "smooth" });
+  page.value = newPage
+  const el = (pageTop.value as any)?.$el ?? pageTop.value
+  const scrollContainer = el?.closest(".overflow-y-auto, .overflow-y-scroll, .overflow-auto")
+  scrollContainer?.scrollTo({ top: 0, behavior: "smooth" })
 }
 
-// Handle edit draft - open modal
 async function handleEditDraft(payload: { id: number; isDraft: boolean }) {
-  await listingModal.value?.openForDraft(payload.id);
+  await listingModal.value?.openForDraft(payload.id)
 }
 
-// Handle modal close - refetch to get any updates
 function handleModalClose() {
-  refetchCurrentPage();
+  refresh()
 }
 </script>
