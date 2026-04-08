@@ -61,17 +61,27 @@
   const pageTop = ref<HTMLElement | null>(null)
   const filteredUserNotes = ref<NoteData[]>([])
 
+  // Ensure SSR and client both start loading — prevents hydration mismatch
+  // caused by module-level cache divergence between server and client
+  loading.value = true
+
   const { 
     saleRentFilter,
     sortOrderValue,
   } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-notes' })
+
+  // Initial fetch on mount (client-only) — avoids SSR/client state divergence
+  onMounted(async () => {
+    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
+    await fetchNotes(saleRentFilter.value, 1, validSortOrder, limit.value)
+  })
 
   // Watch filter changes and re-fetch from API (reset to page 1)
   watch([saleRentFilter, sortOrderValue], async () => {
     page.value = 1
     const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
     await fetchNotes(saleRentFilter.value, 1, validSortOrder, limit.value)
-  }, { immediate: true })
+  })
 
   // Handle page changes from pagination component
   async function onPageChange(newPage: number) {

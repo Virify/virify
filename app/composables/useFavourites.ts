@@ -70,6 +70,7 @@ export const useFavourites = () => {
     if (cached) {
       favourites.value = cached.favourites;
       total.value = cached.total;
+      loading.value = false;
       return;
     }
 

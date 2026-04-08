@@ -74,17 +74,26 @@
   const pageTop = ref<HTMLElement | null>(null)
   const filteredHiddenListings = ref<UserHiddenListingCard[]>([])
 
+  // Ensure SSR and client both start loading — prevents hydration mismatch
+  loading.value = true
+
   const {
     saleRentFilter,
     sortOrderValue,
   } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-hidden-listings' })
+
+  // Initial fetch on mount (client-only) — avoids SSR/client state divergence
+  onMounted(async () => {
+    const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
+    await fetchHiddenListings(saleRentFilter.value, 1, validSortOrder, limit.value)
+  })
 
   // Watch filter changes and re-fetch from API (reset to page 1)
   watch([saleRentFilter, sortOrderValue], async () => {
     page.value = 1
     const validSortOrder = sortOrderValue.value === 'newest' || sortOrderValue.value === 'oldest' ? sortOrderValue.value : undefined
     await fetchHiddenListings(saleRentFilter.value, 1, validSortOrder, limit.value)
-  }, { immediate: true })
+  })
 
   // Handle page changes from pagination component
   async function onPageChange(newPage: number) {

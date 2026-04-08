@@ -68,6 +68,7 @@ export const useNotes = () => {
     if (cached) {
       userNotes.value = cached.notes;
       total.value = cached.total;
+      loading.value = false;
       return;
     }
 

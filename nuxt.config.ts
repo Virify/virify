@@ -107,8 +107,6 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: "2025-07-09",
-  // hate to do it, but I think its a red herring TS error for routeRules.
-  // @ts-ignore
   routeRules: {
     "/waiting-list": {
       redirect: "/",

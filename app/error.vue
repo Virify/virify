@@ -77,7 +77,6 @@ function clearErrors() {
     <SearchModal />
     <OrganismsFooter />
     <ViewsDialog />
-    <ViewsHelpButton />
   </div>
 </template>
 

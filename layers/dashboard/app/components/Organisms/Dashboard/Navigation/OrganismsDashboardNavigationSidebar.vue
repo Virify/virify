@@ -31,9 +31,6 @@
         <UDashboardSidebarCollapse
           v-if="!collapsed"
           class="hover:bg-white/5 rounded-md transition-colors"
-          :ui="{
-            leadingIcon: 'text-foreground',
-          }"
         />
       </div>
     </template>
@@ -84,9 +81,6 @@
             <UDashboardSidebarCollapse
               v-if="collapsed"
               class="hover:bg-background/90 rounded-md transition-colors"
-              :ui="{
-                leadingIcon: 'text-foreground',
-              }"
             />
           </template>
           <!-- popover badges -->
