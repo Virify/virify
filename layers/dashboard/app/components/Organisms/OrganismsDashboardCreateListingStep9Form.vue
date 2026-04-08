@@ -28,7 +28,7 @@
       <MoleculesDashboardCreateListingStep9ImageUpload
         :current-count="state.property.media.length"
         :max-images="maxImages"
-        :is-uploading="isUploading"
+        :is-uploading="isUploading || isProcessing"
         :at-max-images="atMaxImages"
         :upload-label="uploadLabel"
         :upload-progress="uploadProgress"
@@ -44,7 +44,7 @@
         :room-options="roomOptions"
         :deleting-ids="deletingIds"
         :is-removing-all="isRemovingAll"
-        :disabled="isUploading"
+        :disabled="isUploading || isProcessing"
         @remove-all="removeAllImages"
         @delete-image="removeImageById"
         @assign-room="assignToRoomById"
@@ -109,6 +109,7 @@ const {
   deletingIds,
   isRemovingAll,
   isUploading,
+  isProcessing,
   atMaxImages,
   uploadLabel,
   handleFilesSelected,

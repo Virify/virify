@@ -3,146 +3,173 @@
  * Handles Cloudflare uploads with database persistence
  */
 
-
 export function useStep9Media(options: UseStep9MediaOptions) {
-  const { draftListingId, editingListingId, media, maxImages, listingTier } = options
-  
-  const { uploadImage, deleteImage, isUploading } = useCloudflareImages()
-  const { checkImages, isChecking: isModerating } = useModeration()
-  const toast = useToast()
-  
+  const { draftListingId, editingListingId, media, maxImages, listingTier } = options;
+
+  const { uploadImage, deleteImage, isUploading } = useCloudflareImages();
+  const { checkImages, isChecking: isModerating } = useModeration();
+  const toast = useToast();
+
   // Upload state
-  const uploadProgress = ref(0)
-  const uploadingCount = ref(0)
-  
+  const uploadProgress = ref(0);
+  const uploadingCount = ref(0);
+  const isProcessing = ref(false); // true for entire upload→moderate→save flow
+
   // Delete state
-  const deletingIds = ref<Set<string>>(new Set())
-  const isRemovingAll = ref(false)
-  
+  const deletingIds = ref<Set<string>>(new Set());
+  const isRemovingAll = ref(false);
+
   // Computed
-  const atMaxImages = computed(() => media.length >= maxImages.value)
-  
+  const atMaxImages = computed(() => media.length >= maxImages.value);
+
   const uploadLabel = computed(() => {
-    if (atMaxImages.value) return 'Maximum images reached'
-    if (isUploading.value) return 'Uploading...'
-    return 'Drop images here or click to upload'
-  })
+    if (atMaxImages.value) return "Maximum images reached";
+    if (isUploading.value) return "Uploading...";
+    if (isModerating.value) return "Checking images...";
+    if (isProcessing.value) return "Saving...";
+    return "Drop images here or click to upload";
+  });
 
   /**
    * Validate and filter files for upload
    */
   function validateFiles(files: File[]): File[] {
-    return files.filter(file => {
+    return files.filter((file) => {
       if (file.size > MAX_FILE_SIZE) {
         toast.add({
-          title: 'File too large',
+          title: "File too large",
           description: `${file.name} exceeds 10MB limit.`,
-          color: 'error',
-          icon: 'i-lucide-file-x',
-        })
-        return false
+          color: "error",
+          icon: "i-lucide-file-x",
+        });
+        return false;
       }
-      return true
-    })
+      return true;
+    });
   }
 
   /**
    * Upload files to Cloudflare and save to database
    */
   async function handleFilesSelected(files: File[]) {
-    if (!files || files.length === 0) return
+    if (!files || files.length === 0) return;
 
     // Check remaining slots
-    const remainingSlots = maxImages.value - media.length
-    const filesToUpload = files.slice(0, remainingSlots)
+    const remainingSlots = maxImages.value - media.length;
+    const filesToUpload = files.slice(0, remainingSlots);
 
     if (filesToUpload.length === 0) {
       toast.add({
-        title: 'Maximum images reached',
+        title: "Maximum images reached",
         description: `You can only upload ${maxImages.value} images for your ${listingTier.value} tier.`,
-        color: 'warning',
-        icon: 'i-lucide-triangle-alert',
-      })
-      return
+        color: "warning",
+        icon: "i-lucide-triangle-alert",
+      });
+      return;
     }
 
-    const validFiles = validateFiles(filesToUpload)
+    const validFiles = validateFiles(filesToUpload);
     if (validFiles.length === 0) {
-      return
+      return;
     }
 
     // Upload to Cloudflare
-    uploadingCount.value = validFiles.length
-    uploadProgress.value = 0
+    isProcessing.value = true;
+    uploadingCount.value = validFiles.length;
+    uploadProgress.value = 0;
 
-    const uploadedImages: MediaAssignment[] = []
-    let uploaded = 0
-    
+    const uploadedImages: MediaAssignment[] = [];
+    let uploaded = 0;
+
     for (const file of validFiles) {
-      const result = await uploadImage(file)
+      const result = await uploadImage(file);
       if (result) {
-        uploadedImages.push(createEmptyMediaAssignment(result.id, file.name))
+        uploadedImages.push(createEmptyMediaAssignment(result.id, file.name));
       }
-      uploaded++
-      uploadProgress.value = (uploaded / validFiles.length) * 100
+      uploaded++;
+      uploadProgress.value = (uploaded / validFiles.length) * 100;
     }
 
     if (uploadedImages.length === 0) {
-      uploadingCount.value = 0
-      return
+      uploadingCount.value = 0;
+      isProcessing.value = false;
+      return;
     }
 
     // Moderate all uploaded images before persisting
-    const uploadedIds = uploadedImages.map(img => img.cloudflareId)
-    const { safe } = await checkImages(uploadedIds)
+    const uploadedIds = uploadedImages.map((img) => img.cloudflareId);
+    const { safe } = await checkImages(uploadedIds);
 
     if (!safe) {
       // checkImages already deleted all flagged images from Cloudflare.
       // Clean up any that were not flagged (safe ones in a batch that included a bad one).
       // Since we pass all IDs together, checkImages deletes ALL of them.
       toast.add({
-        title: 'Images rejected',
-        description: 'One or more of your images contained inappropriate content. All uploaded images have been removed. Please ensure your images are appropriate before uploading.',
-        color: 'error',
-        icon: 'i-lucide-image-off',
-      })
-      uploadingCount.value = 0
-      return
+        title: "Images rejected",
+        description: "One or more of your images contained inappropriate content. All uploaded images have been removed. Please ensure your images are appropriate before uploading.",
+        color: "error",
+        icon: "i-lucide-image-off",
+      });
+      uploadingCount.value = 0;
+      isProcessing.value = false;
+      return;
     }
 
     // Save to database
-    if (draftListingId.value) {
-      try {
-        await useRequestFetch()(`/api/draft-listings/${draftListingId.value}/media`, {
-          method: 'POST',
-          body: { media: uploadedImages },
-        })
-        
-        media.push(...uploadedImages)
-        
-        toast.add({
-          title: 'Success',
-          description: `${uploadedImages.length} image${uploadedImages.length > 1 ? 's' : ''} uploaded`,
-          color: 'success',
-          icon: 'i-lucide-image',
-        })
-      } catch (error) {
-        console.error('Failed to save images to database:', error)
-        toast.add({
-          title: 'Error',
-          description: 'Failed to save images. Please try again.',
-          color: 'error',
-          icon: 'i-lucide-circle-x',
-        })
-        
-        // Cleanup Cloudflare on DB failure
-        for (const img of uploadedImages) {
-          await deleteImage(img.cloudflareId)
-        }
+    const targetDraftId = draftListingId.value;
+    const targetListingId = editingListingId?.value;
+
+    if (!targetDraftId && !targetListingId) {
+      console.error("[useStep9Media] Cannot save images: neither draftListingId nor editingListingId is set");
+      toast.add({
+        title: "Error",
+        description: "Could not save images: listing not found. Please try again.",
+        color: "error",
+        icon: "i-lucide-circle-x",
+      });
+      // Cleanup orphaned Cloudflare images
+      for (const img of uploadedImages) {
+        await deleteImage(img.cloudflareId);
+      }
+      uploadingCount.value = 0;
+      isProcessing.value = false;
+      return;
+    }
+
+    try {
+      await useRequestFetch()("/api/draft-listings/0/media", {
+        method: "POST",
+        body: {
+          media: uploadedImages,
+          ...(targetDraftId ? { draftId: targetDraftId } : { listingId: targetListingId }),
+        },
+      });
+
+      media.push(...uploadedImages);
+
+      toast.add({
+        title: "Success",
+        description: `${uploadedImages.length} image${uploadedImages.length > 1 ? "s" : ""} uploaded`,
+        color: "success",
+        icon: "i-lucide-image",
+      });
+    } catch (error) {
+      console.error("[useStep9Media] Failed to save images to database:", error);
+      toast.add({
+        title: "Error",
+        description: "Failed to save images. Please try again.",
+        color: "error",
+        icon: "i-lucide-circle-x",
+      });
+
+      // Cleanup Cloudflare on DB failure
+      for (const img of uploadedImages) {
+        await deleteImage(img.cloudflareId);
       }
     }
 
-    uploadingCount.value = 0
+    uploadingCount.value = 0;
+    isProcessing.value = false;
   }
 
   /**
@@ -150,71 +177,71 @@ export function useStep9Media(options: UseStep9MediaOptions) {
    * Only general images (not assigned to rooms) can be the main image
    */
   function setAsMainImage(cloudflareId: string): boolean {
-    const index = media.findIndex(img => img.cloudflareId === cloudflareId)
-    if (index === -1) return false // Not found
-    if (index === 0) return true // Already first
-    
-    const image = media[index]
+    const index = media.findIndex((img) => img.cloudflareId === cloudflareId);
+    if (index === -1) return false; // Not found
+    if (index === 0) return true; // Already first
+
+    const image = media[index];
     if (!image?.isGeneral) {
       toast.add({
-        title: 'Cannot set as main image',
-        description: 'Only general property images can be set as the main image. Remove the room assignment first.',
-        color: 'warning',
-        icon: 'i-lucide-triangle-alert',
-      })
-      return false
+        title: "Cannot set as main image",
+        description: "Only general property images can be set as the main image. Remove the room assignment first.",
+        color: "warning",
+        icon: "i-lucide-triangle-alert",
+      });
+      return false;
     }
-    
-    media.splice(index, 1)
-    media.unshift(image)
-    return true
+
+    media.splice(index, 1);
+    media.unshift(image);
+    return true;
   }
-  
+
   /**
    * Check if an image can be set as main (must be general)
    */
   function canBeMainImage(cloudflareId: string): boolean {
-    const image = media.find(img => img.cloudflareId === cloudflareId)
-    return image?.isGeneral === true
+    const image = media.find((img) => img.cloudflareId === cloudflareId);
+    return image?.isGeneral === true;
   }
 
   /**
    * Remove a single image by cloudflareId
    */
   async function removeImageById(cloudflareId: string) {
-    const index = media.findIndex(img => img.cloudflareId === cloudflareId)
-    if (index === -1) return
+    const index = media.findIndex((img) => img.cloudflareId === cloudflareId);
+    if (index === -1) return;
 
-    if (deletingIds.value.has(cloudflareId)) return
-    deletingIds.value.add(cloudflareId)
+    if (deletingIds.value.has(cloudflareId)) return;
+    deletingIds.value.add(cloudflareId);
 
     try {
       // Use single endpoint with draftId or listingId in body
       const body: { cloudflareIds: string[]; draftId?: number; listingId?: number } = {
         cloudflareIds: [cloudflareId],
-      }
-      
+      };
+
       if (draftListingId.value) {
-        body.draftId = draftListingId.value
+        body.draftId = draftListingId.value;
       } else if (editingListingId?.value) {
-        body.listingId = editingListingId.value
+        body.listingId = editingListingId.value;
       }
 
-      await useRequestFetch()('/api/draft-listings/0/media', {
-        method: 'DELETE',
+      await useRequestFetch()("/api/draft-listings/0/media", {
+        method: "DELETE",
         body,
-      })
-      media.splice(index, 1)
+      });
+      media.splice(index, 1);
     } catch (error) {
-      console.error('Failed to delete image:', error)
+      console.error("Failed to delete image:", error);
       toast.add({
-        title: 'Error',
-        description: 'Failed to delete image. Please try again.',
-        color: 'error',
-        icon: 'i-lucide-circle-x',
-      })
+        title: "Error",
+        description: "Failed to delete image. Please try again.",
+        color: "error",
+        icon: "i-lucide-circle-x",
+      });
     } finally {
-      deletingIds.value.delete(cloudflareId)
+      deletingIds.value.delete(cloudflareId);
     }
   }
 
@@ -222,48 +249,48 @@ export function useStep9Media(options: UseStep9MediaOptions) {
    * Remove all images
    */
   async function removeAllImages() {
-    if (isRemovingAll.value || media.length === 0) return
-    
-    isRemovingAll.value = true
-    const cloudflareIds = media.map(img => img.cloudflareId)
-    cloudflareIds.forEach(id => deletingIds.value.add(id))
+    if (isRemovingAll.value || media.length === 0) return;
+
+    isRemovingAll.value = true;
+    const cloudflareIds = media.map((img) => img.cloudflareId);
+    cloudflareIds.forEach((id) => deletingIds.value.add(id));
 
     try {
       // Use single endpoint with draftId or listingId in body
       const body: { cloudflareIds: string[]; draftId?: number; listingId?: number } = {
         cloudflareIds,
-      }
-      
+      };
+
       if (draftListingId.value) {
-        body.draftId = draftListingId.value
+        body.draftId = draftListingId.value;
       } else if (editingListingId?.value) {
-        body.listingId = editingListingId.value
+        body.listingId = editingListingId.value;
       }
 
-      await useRequestFetch()('/api/draft-listings/0/media', {
-        method: 'DELETE',
+      await useRequestFetch()("/api/draft-listings/0/media", {
+        method: "DELETE",
         body,
-      })
-      
-      media.length = 0
-      
+      });
+
+      media.length = 0;
+
       toast.add({
-        title: 'Success',
-        description: `${cloudflareIds.length} image${cloudflareIds.length > 1 ? 's' : ''} deleted`,
-        color: 'success',
-        icon: 'i-lucide-image',
-      })
+        title: "Success",
+        description: `${cloudflareIds.length} image${cloudflareIds.length > 1 ? "s" : ""} deleted`,
+        color: "success",
+        icon: "i-lucide-image",
+      });
     } catch (error) {
-      console.error('Failed to delete images:', error)
+      console.error("Failed to delete images:", error);
       toast.add({
-        title: 'Error',
-        description: 'Failed to delete images. Please try again.',
-        color: 'error',
-        icon: 'i-lucide-circle-x',
-      })
+        title: "Error",
+        description: "Failed to delete images. Please try again.",
+        color: "error",
+        icon: "i-lucide-circle-x",
+      });
     } finally {
-      deletingIds.value.clear()
-      isRemovingAll.value = false
+      deletingIds.value.clear();
+      isRemovingAll.value = false;
     }
   }
 
@@ -275,14 +302,15 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     isRemovingAll,
     isUploading,
     isModerating,
-    
+    isProcessing,
+
     // Computed
     atMaxImages,
     uploadLabel,
-    
+
     // Methods
     handleFilesSelected,
     removeImageById,
     removeAllImages,
-  }
+  };
 }

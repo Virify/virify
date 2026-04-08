@@ -1,12 +1,10 @@
 export const houseImages = [
   'a08cd2c3-6cd8-4a42-aa4e-68e0d4160800',
-  'd451972a-61ee-4153-87b5-7697a4c0dc00', 
-  '6c48e550-09ea-4b56-fb5f-6d9268cd3500',
+  'd451972a-61ee-4153-87b5-7697a4c0dc00',
   'd0f1451c-5944-431d-8b40-583622460f00'
 ]
 
 export const gardenImages = [
-  '1591debc-71cc-4ffd-6ef2-f9d6ac404400',
   '55957534-6202-4033-361b-f67b7fd89000'
 ]
 
