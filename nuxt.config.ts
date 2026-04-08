@@ -1,5 +1,4 @@
 import vue from "@vitejs/plugin-vue";
-import ts from "typescript";
 
 export default defineNuxtConfig({
   extends: [
