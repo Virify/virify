@@ -3,7 +3,7 @@
     <!-- Removed overlay -->
     <Transition name="fade">
       <div v-if="isPending || isNoteRemovalPending" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-elevated/70 rounded-lg">
-        <UIcon :name="isNoteRemovalPending ? 'i-lucide-notebook-off' : 'i-lucide-heart-off'" class="w-8 h-8 text-muted-foreground mb-2" />
+        <UIcon :name="isNoteRemovalPending ? 'i-lucide-notebook-pen' : 'i-lucide-heart-off'" class="w-8 h-8 text-muted-foreground mb-2" />
         <span class="text-muted-foreground body-md">Removed</span>
       </div>
     </Transition>

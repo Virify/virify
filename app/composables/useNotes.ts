@@ -232,6 +232,7 @@ export const useNotes = () => {
         });
       },
       onSuccess: async () => {
+        notesCache.clear(); // always bust client cache regardless of calling instance state
         await refreshUserNotes();
         await refetchCurrentPage();
       },

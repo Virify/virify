@@ -192,7 +192,9 @@ export const useFavourites = () => {
       onSuccess: () => {
         // Optimistically remove from global lookups immediately
         favouriteLookups.value = favouriteLookups.value.filter(id => id !== listingId);
+        favouritesCache.clear(); // always bust client cache regardless of calling instance state
         refreshFavourites();
+        refetchCurrentPage();
       },
       onError: (error) => {
         toast.add({ title: 'Error', description: "Failed to remove from favourites", color: 'error', icon: 'i-lucide-heart-crack' });

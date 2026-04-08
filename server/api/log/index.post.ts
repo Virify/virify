@@ -6,6 +6,7 @@ const clientErrorSchema = z.object({
   message: z.string().optional(),
   stack: z.string().optional(),
   url: z.string().optional(),
+  requestId: z.string().optional(),
   data: z.unknown().optional(),
 });
 
@@ -31,6 +32,7 @@ export default defineEventHandler(async (event) => {
       source: 'client',
       status,
       url: body.url ?? 'unknown',
+      requestId: body.requestId ?? (getRequestHeader(event, 'x-request-id') ?? undefined),
       statusMessage: body.statusMessage,
       message: body.message,
       stack: body.stack,
