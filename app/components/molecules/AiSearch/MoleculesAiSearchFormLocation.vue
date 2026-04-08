@@ -106,10 +106,17 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
 /**
  *  Update radius via state when updated
  */
-function handleRadiusSelected() {
+async function handleRadiusSelected() {
   const { radius } = asObject(searchState.value)
 
+  // Update radius for location
   setLocationRadius(Number(radius) || 0)
+
+  // Let DOM refresh before showing modal, so location popover is closed
+  await nextTick()
+
+  // Emit event to parent
+  emit('location-selected')
 }
 
 /**

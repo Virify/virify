@@ -33,91 +33,61 @@ import type { SortOrder } from '~/composables/useSearchState'
  * Displays results from either traditional or AI-enhanced search
  * Results are stored in searchState composable
  */
-
 const {
   isLoading,
   searchState,
-  setResults,
+  fetchResults,
   setViewMode,
   setSortOrder,
-  setSearchPending,
-  setQueryAnalysis
 } = useSearchState()
-
-const { trackSearch } = useAnalyticsTracking()
 
 /**
  * Re-run search on page load if we have search metadata but no results
  * This handles page refreshes and back/forward navigation
  */
 onMounted(async () => {
-  const state = searchState.value
+  const {
+    results = [],
+    location,
+    radius,
+    searchType,
+  } = asObject(searchState.value)
 
   // If we have results already, nothing to do
-  if (state.results && state.results.length > 0) return
+  if ((results as unknown[])?.length > 0) return
 
-  // If we don't have a location or search type, can't re-run search
-  if (!state.location || !state.searchType) return
+  // Perform traditional search
+  if (searchType === 'traditional') {
+    const { traditionalSearchForm } = asObject(searchState.value)
 
-  // Re-run the search based on type
-  try {
-    setSearchPending(true)
-
-    if (state.searchType === 'traditional') {
-      // Use preserved form data if available
-      const formData = (state as any).traditionalSearchForm
-
-      if (!formData) {
-        navigateTo('/')
-        return
+    await fetchResults({
+      location,
+      radius
+    }, {
+      type: 'traditional',
+      body: {
+        ...asObject(traditionalSearchForm)
       }
+    })
+  }
 
-      const body = {
-        ...formData,
-        location: state.location,
-        radius: state.radius,
+  // Perform AI search
+  else if (searchType === 'ai') {
+    const { listingType, query } = asObject(searchState.value)
+
+    // Do not search if no query is provided
+    if (!query) return
+
+    await fetchResults({
+      location,
+      radius,
+    }, {
+      type: 'ai',
+      body: {
+        query,
+        listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
       }
-
-      const response = await $fetch<ListingWithFullProperty[]>('/api/search/traditional', {
-        method: 'POST',
-        body
-      })
-
-      if (response) {
-        setResults(response)
-      }
-    } else if (state.searchType === 'ai' && state.query) {
-      // Re-run AI search
-      const body = {
-        query: state.query,
-        listingType: state.listingType === 'sale' ? 'sale' : state.listingType === 'rent' ? 'rent' : 'all',
-        location: state.location,
-        radius: state.radius ?? 5,
-      }
-
-      const response = await $fetch('/api/search/rag', {
-        method: 'POST',
-        body
-      })
-
-      if (response) {
-        setResults(response.results || [])
-        if (response.queryAnalysis) {
-          setQueryAnalysis(response.queryAnalysis)
-        }
-        trackSearch({
-          listingType: response.effectiveListingType ?? body.listingType,
-          query: body.query,
-          location: state.location as GeocodingFeature,
-          radius: body.radius,
-          resultCount: response.results?.length ?? 0,
-        })
-      }
-    }
-  } catch (error) {
-    console.error('Failed to restore search:', error)
-  } finally {
-    setSearchPending(false)
+    })
   }
 })
 

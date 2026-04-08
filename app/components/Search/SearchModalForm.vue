@@ -44,7 +44,7 @@ function hideTraditionalFormLoader() {
 /**
  *  Fetch filters
  */
-const { setQuery, setListingType, searchState, setSearchPending } = useSearchState()
+const { setQuery, setListingType, searchState, updateState, setSearchPending } = useSearchState()
 const toast = useToast()
 
 const initialQuery = computed(() => {
@@ -71,14 +71,13 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
 
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
-    searchState.value = {
-      ...asObject(searchState.value),
+    updateState({
       searchType: 'traditional',
       traditionalSearchForm: formData,
       queryAnalysis,
-      results: [], // Clear old results
-      hasSearched: false
-    }
+      results: [],
+      hasSearched: true
+    })
 
     // Navigate to search results page
     emit('animate-to-dock')
@@ -107,15 +106,13 @@ async function aiSearchSubmit(query: string) {
 
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
-    searchState.value = {
-      ...asObject(searchState.value),
+    updateState({
       searchType: 'ai',
       query,
       listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
-      radius: radius ?? 5,
-      results: [], // Clear old results
-      hasSearched: false
-    }
+      radius,
+      hasSearched: true
+    })
 
     // Navigate to search results page
     emit('animate-to-dock')
