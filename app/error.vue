@@ -1,14 +1,23 @@
 <script setup lang="ts">
 const error = useError();
 
-// TODO: Remove after hotfix/homepage-500 is resolved
-console.error('[Error Page]', {
-  statusCode: error.value?.statusCode,
-  statusMessage: error.value?.statusMessage,
-  message: error.value?.message,
-  stack: error.value?.stack,
-  data: error.value?.data,
-  url: error.value?.url,
+// Report errors to the server so they appear in Railway / production logs.
+// error.vue console.error only shows in browser devtools, not server logs.
+onMounted(() => {
+  const status = error.value?.statusCode ?? 500;
+  if (status >= 400 && status < 500) return; // skip expected 4xx
+
+  $fetch('/api/log', {
+    method: 'POST',
+    body: {
+      statusCode: error.value?.statusCode,
+      statusMessage: error.value?.statusMessage,
+      message: error.value?.message,
+      stack: error.value?.stack,
+      data: error.value?.data,
+      url: window.location.href,
+    },
+  }).catch(() => {}); // fire-and-forget, never block the error page
 });
 
 const errorTitle = computed(() => {
