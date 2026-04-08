@@ -258,6 +258,10 @@ export const useEnquiries = createSharedComposable(() => {
       },
     });
 
+    // Optimistically update local state immediately — don't wait for WebSocket
+    // The WebSocket duplicate check will silently no-op if it arrives later
+    handleNewMessage(conversationId, response);
+
     return response;
   }
 
