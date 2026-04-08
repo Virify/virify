@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
     });
 
     await invalidateListingCache(listingId);
+    await invalidateMyListingsCache(user.id as number);
     await invalidateAggregatesCache(user.id as number);
 
     try {

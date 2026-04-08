@@ -4,7 +4,7 @@
       <UDashboardNavbar
         :ui="{
           title: 'title-sm m-0!',
-          right: 'flex items-center gap-4',
+          right: 'flex items-center gap-1',
         }"
       >
         <template #title>
@@ -12,7 +12,7 @@
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter ref="filterRef" :items="listings" :view-options="[]" persistence-key="dashboard-my-listings" @update:filtered="filteredListings = $event" />
+          <OrganismsDashboardFilterListings :items="listings" persistence-key="dashboard-my-listings" @update:filtered="filteredListings = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>

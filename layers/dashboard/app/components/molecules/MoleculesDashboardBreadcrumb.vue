@@ -1,6 +1,7 @@
 <template>
   <UBreadcrumb
     :items="breadcrumbItems"
+    class="text-xs"
     :ui="{
       linkLeadingIcon: 'text-secondary',
       link: 'text-foreground',

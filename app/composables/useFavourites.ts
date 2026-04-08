@@ -4,6 +4,10 @@ import { performOptimisticUpdate, performPendingRemoval } from "~/utils/optimist
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
 
+// Cache for paginated favourites - indefinite TTL, busted by user mutations
+// Keyed by userId + URL so switching users never serves stale data
+const favouritesCache = new Map<string, { favourites: UserFavouriteListingCard[]; total: number }>();
+
 /**
  * Favourites Composable
  * 
@@ -13,7 +17,7 @@ const pendingRemoval = ref<Set<number>>(new Set());
  * @returns Favourites state and actions
  */
 export const useFavourites = () => {
-  const { loggedIn } = useUserSession();
+  const { loggedIn, user } = useUserSession();
   const { showDialog } = useDialog();
   const toast = useToast();
   const requestFetch = useRequestFetch();
@@ -57,13 +61,24 @@ export const useFavourites = () => {
     currentSort.value = sort;
     currentLimit.value = limit;
 
+    // Clear pending removal state so 'Removed' overlays reset on navigation
+    pendingRemoval.value = new Set();
+
+    const url = `/api/user/favourites/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`;
+    const cacheKey = `${user.value?.id}:${url}`;
+    const cached = favouritesCache.get(cacheKey);
+    if (cached) {
+      favourites.value = cached.favourites;
+      total.value = cached.total;
+      return;
+    }
+
     loading.value = true;
     try {
-      const data = await requestFetch<{ favourites: UserFavouriteListingCard[], total: number }>(
-        `/api/user/favourites/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
-      );
+      const data = await requestFetch<{ favourites: UserFavouriteListingCard[], total: number }>(url);
       favourites.value = data.favourites || [];
       total.value = data.total || 0;
+      favouritesCache.set(cacheKey, { favourites: favourites.value, total: total.value });
     } catch (error) {
       console.error('Error fetching favourites:', error);
       favourites.value = [];
@@ -78,6 +93,8 @@ export const useFavourites = () => {
    */
   async function refetchCurrentPage() {
     if (favourites.value.length > 0 || total.value > 0) {
+      favouritesCache.clear();
+      pendingRemoval.value = new Set();
       await fetchFavourites(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
     }
   }

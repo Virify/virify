@@ -22,8 +22,10 @@ export default defineEventHandler(async (event) => {
 
     const result = await deleteFavouriteListing(user.id as number, listingId);
 
-    // Invalidate lookups cache so the next GET reflects the removal
+    // Invalidate lookups + full-page + recent cache so the next GET reflects the removal
     useStorage('cache').removeItem(`favs:lookups:${user.id}`).catch(() => {});
+    await invalidateFavouritesFullCache(user.id as number);
+    await invalidateFavouritesRecentCache(user.id as number);
     // Invalidate aggregates cache (safety net if WebSocket update is missed)
     await invalidateAggregatesCache(user.id as number);
 

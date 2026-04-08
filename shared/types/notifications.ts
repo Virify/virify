@@ -11,7 +11,11 @@ export type NotificationType =
   | 'NEW_ENQUIRY'
   | 'ENQUIRY_REPLY'
   | 'LISTING_UPDATE'
-  | 'SYSTEM';
+  | 'SYSTEM'
+  | 'VIEWING_REQUEST'
+  | 'VIEWING_ACCEPTED'
+  | 'VIEWING_REJECTED'
+  | 'VIEWING_RESCHEDULED';
 
 /**
  * User notification type - matches the database model

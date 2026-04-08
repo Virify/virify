@@ -162,6 +162,7 @@ function normalizeWhereClause(parsedResponse: any): aiSearchResult {
 
 /**
  * Generate a Prisma WHERE clause from a natural language query using OpenAI.
+ * Results are cached in Redis so identical queries never hit the AI API twice.
  *
  * @param query - The user's natural language search query.
  * @returns An object with a valid Prisma WHERE clause and query analysis.
@@ -169,8 +170,23 @@ function normalizeWhereClause(parsedResponse: any): aiSearchResult {
  */
 export async function generateWhereClauseFromQuery(query: string): Promise<aiSearchResult> {
   checkAiConfiguration();
+
+  const storage = useStorage("cache");
+  // Normalise: lowercase + collapse whitespace so trivial differences don't miss the cache
+  const cacheKey = `ai-search:${query.toLowerCase().replace(/\s+/g, " ").trim()}`;
+
+  const cached = await storage.getItem<aiSearchResult>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const aiResponse = await getAiSearchCompletion(query);
   const parsedResponse = parseAiCompletion(aiResponse);
-  return normalizeWhereClause(parsedResponse);
+  const result = normalizeWhereClause(parsedResponse);
+
+  // Store for 24 hours — same query always maps to the same WHERE clause
+  await storage.setItem(cacheKey, result, { ttl: 86400 });
+
+  return result;
 }
 

@@ -4,7 +4,7 @@
       <UDashboardNavbar
         :ui="{
           title: 'title-sm m-0!',
-          right: 'flex items-center gap-4',
+          right: 'flex items-center gap-1',
         }"
       >
         <template #title>

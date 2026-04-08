@@ -338,7 +338,7 @@ export default defineEventHandler(async (event) => {
       deviceBreakdown,
       period,
     };
-    storage.setItem(cacheKey, result, { ttl: 60 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 15 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Comprehensive analytics error:", error);

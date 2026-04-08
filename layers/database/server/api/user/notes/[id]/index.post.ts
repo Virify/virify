@@ -30,8 +30,9 @@ export default defineEventHandler(async (event) => {
 
     const result = await updateUserNote(user.id, listingId, note);
 
-    // Invalidate lookups cache so the next GET reflects the new/updated note
+    // Invalidate lookups + full-page cache so the next GET reflects the new/updated note
     useStorage('cache').removeItem(`notes:lookups:${user.id}`).catch(() => {});
+    await invalidateNotesFullCache(user.id as number);
     // Invalidate aggregates cache (safety net if WebSocket update is missed)
     if (isNewNote) await invalidateAggregatesCache(user.id as number);
 

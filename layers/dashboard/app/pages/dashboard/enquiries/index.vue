@@ -4,7 +4,7 @@
       <UDashboardNavbar
         :ui="{
           title: 'title-sm m-0!',
-          right: 'flex items-center gap-4',
+          right: 'flex items-center gap-1',
         }"
       >
         <template #title>
@@ -12,11 +12,10 @@
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter
+          <OrganismsDashboardFilterEnquiries
             ref="filterRef"
             :items="filteredEnquiries"
             :date-key="'updatedAt'"
-            enquiries
             :user-id="user?.id"
             :view-options="viewOptions"
             persistence-key="dashboard-enquiries"

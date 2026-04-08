@@ -6,6 +6,11 @@ import type { NavigationMenuItem } from "@nuxt/ui";
  */
 export function useDashboardNavigation() {
   const { aggregates } = useNotifications();
+  const { viewings } = useViewings();
+
+  const activeViewingsCount = computed(() =>
+    viewings.value.filter((v) => ["PENDING", "ACCEPTED", "RESCHEDULED"].includes(v.status)).length,
+  );
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
     {
@@ -82,15 +87,16 @@ export function useDashboardNavigation() {
         //     text: "Manage offers",
         //   },
         // },
-        // {
-        //   label: "Viewings",
-        //   type: "link",
-        //   to: "#",
-        //   icon: "i-lucide-calendar-check",
-        //   tooltip: {
-        //     text: "Schedule viewings",
-        //   },
-        // },
+        {
+          label: "Viewings",
+          type: "link",
+          to: "/dashboard/viewings",
+          icon: "i-lucide-calendar-check",
+          tooltip: {
+            text: "Schedule viewings",
+          },
+          badge: activeViewingsCount.value > 0 ? String(activeViewingsCount.value) : undefined,
+        },
         {
           label: "Enquiries",
           type: "link",

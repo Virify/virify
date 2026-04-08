@@ -4,13 +4,14 @@
       <UDashboardNavbar class="border-0" :ui="{
         title: 'title-sm m-0!',
         left: 'flex items-center gap-2',
+        right: 'flex items-center gap-1',
       }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter :items="enquiries" :enquiries="true" persistence-key="dashboard-listing-enquiries"
+          <OrganismsDashboardFilterEnquiries :items="enquiries" persistence-key="dashboard-listing-enquiries"
             :all-count="allCount" :unread-count="unreadCountLocal" @update:filtered="filteredEnquiries = $event"
             :view-options="[]" />
           <OrganismsDashboardNotificationButton />
@@ -109,7 +110,7 @@ const { activeTab: enquiryFilter, enquiriesFilter: directionFilter, sortOrderVal
 const persistentListing = ref<any>(null);
 
 // Fetch listing details explicitly to handle cases where conversations don't exist yet
-const { data: fetchedListing } = await useAsyncData(`listing-${listingId.value}`, () => requestFetch<any>(`/api/listings/${listingId.value}`), {
+const { data: fetchedListing } = await useAsyncData(`listing-${listingId.value}`, () => requestFetch<{ listing: any }>(`/api/listing/${listingId.value}`), {
   watch: [listingId],
   immediate: true,
 });
@@ -119,7 +120,7 @@ watch(
   fetchedListing,
   (newListing) => {
     if (newListing) {
-      persistentListing.value = newListing;
+      persistentListing.value = newListing.listing ?? newListing;
     }
   },
   { immediate: true }

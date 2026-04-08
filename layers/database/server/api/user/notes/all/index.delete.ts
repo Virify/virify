@@ -13,8 +13,9 @@ export default defineEventHandler(async (event) => {
 
     const result = await deleteAllUserNotes(userId as number);
 
-    // Invalidate lookups cache so the next GET returns an empty set
+    // Invalidate lookups + full-page cache so the next GET returns an empty set
     useStorage('cache').removeItem(`notes:lookups:${userId}`).catch(() => {});
+    await invalidateNotesFullCache(userId as number);
 
     return result;
   } catch (error) {

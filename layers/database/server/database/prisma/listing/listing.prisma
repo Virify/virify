@@ -33,6 +33,7 @@ model Listing {
   DailyListingStats    DailyListingStats[]
   ListingClick         ListingClick[]
   ListingShare         ListingShare[]
+  viewings             Viewing[]
 
   @@index([userId])
   @@index([propertyId])

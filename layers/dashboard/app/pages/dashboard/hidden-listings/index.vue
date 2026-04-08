@@ -4,6 +4,7 @@
       <UDashboardNavbar class="body-sm px-3" :ui="{
         title: 'title-sm m-0!',
         icon: 'text-secondary',
+        right: 'flex items-center gap-1',
       }">
 
         <template #title>
@@ -11,7 +12,7 @@
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter
+          <OrganismsDashboardFilterListings
             :items="hiddenListings"
             :date-key="'hiddenAt'"
             persistence-key="dashboard-hidden-listings"

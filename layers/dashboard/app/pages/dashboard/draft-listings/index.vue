@@ -4,7 +4,7 @@
       <UDashboardNavbar
         :ui="{
           title: 'title-sm m-0!',
-          right: 'flex items-center gap-4',
+          right: 'flex items-center gap-1',
         }"
       >
         <template #title>
@@ -12,10 +12,8 @@
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter 
-            ref="filterRef" 
-            :items="draftListings" 
-            :view-options="[]" 
+          <OrganismsDashboardFilterListings
+            :items="draftListings"
             persistence-key="dashboard-draft-listings"
             :hide-sale-rent-filter="true"
           />

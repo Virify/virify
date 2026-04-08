@@ -2,8 +2,8 @@
   <div class="relative h-full">
     <!-- Removed overlay -->
     <Transition name="fade">
-      <div v-if="isPending" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-elevated/70 rounded-lg">
-        <UIcon name="i-lucide-heart-off" class="w-8 h-8 text-muted-foreground mb-2" />
+      <div v-if="isPending || isNoteRemovalPending" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-elevated/70 rounded-lg">
+        <UIcon :name="isNoteRemovalPending ? 'i-lucide-notebook-off' : 'i-lucide-heart-off'" class="w-8 h-8 text-muted-foreground mb-2" />
         <span class="text-muted-foreground body-md">Removed</span>
       </div>
     </Transition>
@@ -13,7 +13,7 @@
       reverse
       class="p-4 border border-accented/50 bg-elevated/30 rounded-lg h-full flex flex-col transition-all duration-300"
       :class="{
-        'opacity-40 blur-xs pointer-events-none': isPending,
+        'opacity-40 blur-xs pointer-events-none': isPending || isNoteRemovalPending,
       }"
       :ui="{
         header: 'mb-0 w-full',
@@ -105,7 +105,7 @@
 import { ViewsDialogConfirmRemoveFavourite } from "#components";
 
 const { isPendingRemoval } = useFavourites();
-const { getNoteData, showNoteDialog } = useNotes();
+const { getNoteData, showNoteDialog, isNotePendingRemoval } = useNotes();
 const { showDialog } = useDialog();
 
 interface Props {
@@ -123,6 +123,14 @@ const props = defineProps<Props>();
  */
 const isPending = computed(() => {
   return !!props.fav && isPendingRemoval(props.listing?.id!);
+});
+
+/**
+ * Check if the note on this card is pending removal.
+ * Only show the overlay when this card is being used as a note card (props.note set).
+ */
+const isNoteRemovalPending = computed(() => {
+  return !!props.note && isNotePendingRemoval(props.listing?.id!);
 });
 
 /**

@@ -9,6 +9,11 @@ const total = ref(0);
 const loading = ref(false);
 const error = ref<string | null>(null);
 
+// Cache for enquiry results keyed by fetch URL
+// Long TTL — WS events bust the cache on new messages/conversations, so this is only a safety net
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const enquiriesCache = new Map<string, EnquiriesCacheEntry>();
+
 // Active enquiry being viewed in modal
 const activeEnquiry = ref<ConversationWithMinimalListing | null>(null);
 const activeEnquiryId = computed(() => activeEnquiry.value?.id ?? null);
@@ -56,6 +61,7 @@ export const useEnquiries = createSharedComposable(() => {
     page?: number;
     limit?: number;
     listingId?: number;
+    force?: boolean;
   }) {
     if (!canFetchEnquiries(loggedIn.value, currentUserId.value)) {
       enquiries.value = [];
@@ -63,14 +69,27 @@ export const useEnquiries = createSharedComposable(() => {
       return;
     }
 
+    const { force, ...fetchOptions } = options ?? {};
+    const url = buildEnquiryUrl(fetchOptions);
+
+    // Return cached data if fresh and not forced
+    if (!force) {
+      const cached = enquiriesCache.get(url);
+      if (isCacheHit(cached, CACHE_TTL_MS)) {
+        enquiries.value = cached.conversations;
+        total.value = cached.total;
+        return;
+      }
+    }
+
     loading.value = true;
     error.value = null;
 
     try {
-      const url = buildEnquiryUrl(options);
       const data = await requestFetch<{ conversations: ConversationWithMinimalListing[]; total: number }>(url);
       enquiries.value = data.conversations || [];
       total.value = data.total || 0;
+      enquiriesCache.set(url, createCacheEntry(enquiries.value, total.value));
     } catch (err) {
       console.error('Error fetching enquiries:', err);
       error.value = 'Failed to load enquiries';
@@ -124,6 +143,7 @@ export const useEnquiries = createSharedComposable(() => {
       contactedListingsLoading.value = false;
       hydratingConversations.clear();
       hydrationQueue.length = 0;
+      enquiriesCache.clear();
       processingHydrationQueue = false;
     });
   }
@@ -143,6 +163,9 @@ export const useEnquiries = createSharedComposable(() => {
       enquiries.value = [conversation, ...enquiries.value];
       total.value += 1;
     }
+
+    // Bust cache so next mount fetches fresh data
+    enquiriesCache.clear();
 
     // If listing details are missing but listingId is set, hydrate from API
     if (conversation.listingId && !conversation.listing) {
@@ -179,6 +202,9 @@ export const useEnquiries = createSharedComposable(() => {
       newList.splice(index, 1);
       enquiries.value = [updated, ...newList];
 
+      // Bust cache so next mount fetches fresh data
+      enquiriesCache.clear();
+
       // Also update activeEnquiry if it's the same conversation
       if (isActiveConversation(conversationId, activeEnquiryId.value)) {
         activeEnquiry.value = updated;
@@ -201,6 +227,9 @@ export const useEnquiries = createSharedComposable(() => {
 
       enquiries.value = [conversationToAdd, ...enquiries.value];
       total.value += 1;
+
+      // Bust cache so next mount fetches fresh data
+      enquiriesCache.clear();
 
       // Hydrate listing if it's missing but we have a listingId
       if (conversationToAdd.listingId && !conversationToAdd.listing) {

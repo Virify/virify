@@ -59,6 +59,13 @@ onMounted(async () => {
 
 const { isWaitingListMode } = useWaitingListMode()
 
+// Pre-initialise lookup composables so their useAsyncData keys are in the Nuxt SSR
+// payload on hard refresh. Without this, useFavouriteLookups / useNoteLookups only
+// initialise when AtomsFavouriteButton / AtomsNoteButton mount (client-side on search
+// pages), causing empty icons and "Add Note" on first render.
+useFavouriteLookups()
+useNoteLookups()
+
 useHead({
   htmlAttrs: {
     lang: "en-GB",

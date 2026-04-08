@@ -48,4 +48,8 @@ enum NotificationType {
   ENQUIRY_REPLY // Reply to an enquiry the user sent
   LISTING_UPDATE // Updates about user's listings (views, etc.)
   SYSTEM // System notifications
+  VIEWING_REQUEST // Viewing request received
+  VIEWING_ACCEPTED // Viewing request accepted by owner
+  VIEWING_REJECTED // Viewing request rejected by owner
+  VIEWING_RESCHEDULED // Viewing time proposed to change
 }

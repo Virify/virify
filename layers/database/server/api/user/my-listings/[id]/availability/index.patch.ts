@@ -25,8 +25,9 @@ export default defineEventHandler(async (event) => {
     const { availabilityStatus } = availabilitySchema.parse(body)
 
     await updateListingAvailabilityStatus(userId as number, Number(id), availabilityStatus)
-    // Bust the public listing page cache so availability shows immediately
+    // Bust the public listing page cache and user my-listings cache
     await invalidateListingCache(Number(id))
+    await invalidateMyListingsCache(userId as number)
 
     return { success: true }
   } catch (error) {

@@ -24,11 +24,12 @@ export default defineEventHandler(async (event) => {
     const { published } = togglePublishedSchema.parse(body)
 
     const { result, wasDraft, isDraft } = await toggleListingPublished(userId as number, Number(id), published)
-    
-    // Clear the listing cache when published status changes
+
+    // Clear the public listing cache + user my-listings cache
     const storage = useStorage('cache:listing')
     await storage.removeItem(`listing:${id}`)
-    
+    await invalidateMyListingsCache(userId as number)
+
     // If draft status changed, send aggregate update
     if (wasDraft !== isDraft) {
       try {

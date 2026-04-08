@@ -1,8 +1,12 @@
 import { ViewsDialogLogin, ViewsDialogNotes } from "#components";
-import { performMultiOptimisticUpdate } from "~/utils/optimistic-update";
+import { performMultiOptimisticUpdate, performPendingRemoval } from "~/utils/optimistic-update";
 
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
+
+// Cache for paginated notes - indefinite TTL, busted by user mutations
+// Keyed by userId + URL so switching users never serves stale data
+const notesCache = new Map<string, { notes: NoteData[]; total: number }>();
 
 /**
  * Notes Composable
@@ -11,7 +15,7 @@ const pendingRemoval = ref<Set<number>>(new Set());
  * Uses lightweight lookups for efficient hasNote/getNote checks across the app.
  */
 export const useNotes = () => {
-  const { loggedIn } = useUserSession();
+  const { loggedIn, user } = useUserSession();
   const { showDialog } = useDialog();
   const toast = useToast();
   const requestFetch = useRequestFetch();
@@ -55,13 +59,24 @@ export const useNotes = () => {
     currentSort.value = sort;
     currentLimit.value = limit;
 
+    // Clear pending removal state so 'Removed' overlays reset on navigation
+    pendingRemoval.value = new Set();
+
+    const url = `/api/user/notes/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`;
+    const cacheKey = `${user.value?.id}:${url}`;
+    const cached = notesCache.get(cacheKey);
+    if (cached) {
+      userNotes.value = cached.notes;
+      total.value = cached.total;
+      return;
+    }
+
     loading.value = true;
     try {
-      const data = await requestFetch<{ notes: NoteData[], total: number }>(
-        `/api/user/notes/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`
-      );
+      const data = await requestFetch<{ notes: NoteData[], total: number }>(url);
       userNotes.value = data.notes || [];
       total.value = data.total || 0;
+      notesCache.set(cacheKey, { notes: userNotes.value, total: total.value });
     } catch (error) {
       console.error('Error fetching notes:', error);
       userNotes.value = [];
@@ -76,6 +91,8 @@ export const useNotes = () => {
    */
   async function refetchCurrentPage() {
     if (userNotes.value.length > 0 || total.value > 0) {
+      notesCache.clear();
+      pendingRemoval.value = new Set();
       await fetchNotes(currentFilter.value, currentPage.value, currentSort.value, currentLimit.value);
     }
   }
@@ -205,26 +222,18 @@ export const useNotes = () => {
       return;
     }
 
-    await performMultiOptimisticUpdate({
-      updates: [
-        {
-          ref: noteLookups,
-          optimisticChange: (current) => current.filter((n: NoteLookup) => n.listingId !== listingId),
-        },
-        {
-          ref: userNotes,
-          optimisticChange: (current) => current.filter((n: NoteData) => n.listingId !== listingId),
-        },
-      ],
+    await performPendingRemoval({
+      pendingSet: pendingRemoval,
+      id: listingId,
       operation: async () => {
         await requestFetch(`/api/user/notes/${listingId}/`, {
           method: "DELETE",
           body: { listingId },
         });
       },
-      onSuccess: () => {
-        refreshUserNotes();
-        refetchCurrentPage();
+      onSuccess: async () => {
+        await refreshUserNotes();
+        await refetchCurrentPage();
       },
       onError: (error) => {
         console.error("Error deleting note:", error);
@@ -232,6 +241,10 @@ export const useNotes = () => {
       },
     });
   };
+
+  function isNotePendingRemoval(listingId: number): boolean {
+    return pendingRemoval.value.has(listingId);
+  }
 
   /**
    * Watch for changes in the loggedIn state
@@ -265,6 +278,7 @@ export const useNotes = () => {
     updateNote,
     deleteNote,
     hasNote,
+    isNotePendingRemoval,
     showNoteDialog,
     userNotes,
     filteredUserNotes,

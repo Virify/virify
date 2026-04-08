@@ -3,7 +3,7 @@ import { getNotificationCounts } from "~~/layers/database/server/utils/notificat
 /**
  * GET /api/notifications/counts
  * Get notification counts for the authenticated user.
- * Cached per-user for 15 seconds — same TTL as /api/notifications/aggregates.
+ * Cached per-user for 2 minutes. Busted on mark-read and dismiss.
  */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -18,6 +18,6 @@ export default defineEventHandler(async (event) => {
   if (cached) return cached;
 
   const result = await getNotificationCounts(user.id);
-  storage.setItem(cacheKey, result, { ttl: 15 }).catch(() => {});
+  storage.setItem(cacheKey, result, { ttl: 2 * 60 }).catch(() => {});
   return result;
 });

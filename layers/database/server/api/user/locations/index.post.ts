@@ -83,6 +83,8 @@ export default defineEventHandler(async (event) => {
 
       return savedLocation;
     }
+
+    useStorage('cache').removeItem(`locations:${user.id}`).catch(() => {});
   } catch (error) {
     console.log(error);
     return errorResponse(error, event);
