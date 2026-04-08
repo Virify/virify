@@ -1,53 +1,49 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :ui="{
-          title: 'title-sm m-0!',
-          right: 'flex items-center gap-1',
-        }"
-      >
+      <UDashboardNavbar :ui="{
+        title: 'title-sm m-0!',
+        right: 'flex items-center gap-1',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
 
         <template #right>
-          <OrganismsDashboardFilterEnquiries
-            ref="filterRef"
-            :items="filteredEnquiries"
-            :date-key="'updatedAt'"
-            :user-id="user?.id"
-            :view-options="viewOptions"
-            persistence-key="dashboard-enquiries"
-            @update:filtered="sortedAndFilteredEnquiries = $event"
-          />
+          <OrganismsDashboardFilterEnquiries ref="filterRef" :items="filteredEnquiries" :date-key="'updatedAt'"
+            :user-id="user?.id" :view-options="viewOptions" persistence-key="dashboard-enquiries"
+            @update:filtered="sortedAndFilteredEnquiries = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
       <MoleculesDashboardPasswordAlert />
     </template>
     <template #body>
-      <UPageList
-        ref="pageTop"
-        :class="['gap-4', view === 'grid' && (loading || sortedAndFilteredEnquiries.length > 0) ? (sortOrder === 'listing' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 uw-grid' : 'grid grid-cols-1 xl:grid-cols-2') : '']"
-      >
+      <UPageList ref="pageTop"
+        :class="['gap-4', view === 'grid' && sortedAndFilteredEnquiries.length > 0 ? (sortOrder === 'listing' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 uw-grid' : 'grid grid-cols-1 xl:grid-cols-2') : '']">
         <template v-if="loading">
           <OrganismsDashboardEnquiryCardSkeleton :cards="3" :view="view" />
         </template>
         <template v-else-if="sortedAndFilteredEnquiries.length > 0 && sortOrder !== 'listing'">
-          <OrganismsDashboardEnquiryCard v-for="enquiry in sortedAndFilteredEnquiries" :key="enquiry.id" :enquiry="enquiry" :user="user" :view="view" @click="handleOpenModal(enquiry)" @reply="handleOpenModal" />
+          <OrganismsDashboardEnquiryCard v-for="enquiry in sortedAndFilteredEnquiries" :key="enquiry.id"
+            :enquiry="enquiry" :user="user" :view="view" @click="handleOpenModal(enquiry)" @reply="handleOpenModal" />
         </template>
         <template v-else-if="sortedAndFilteredEnquiries.length > 0 && sortOrder === 'listing'">
-          <OrganismsDashboardEnquiryGroup v-for="group in groupedByListing" :key="group.listing?.id ?? 'general'" :group="group" :user="user" @click="openListingDetail" />
+          <OrganismsDashboardEnquiryGroup v-for="group in groupedByListing" :key="group.listing?.id ?? 'general'"
+            :group="group" :user="user" @click="openListingDetail" />
         </template>
         <OrganismsDashboardNoResults v-else :description="'No Enquiries found.'" />
       </UPageList>
 
-      <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
-        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit" variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
-      </div>
+      <ClientOnly>
+        <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
+          <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"
+            variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
+        </div>
+      </ClientOnly>
 
-      <OrganismsDashboardEnquiryModal v-if="user" v-model:open="modalOpen" :conversation="activeEnquiry" :user="user" />
+      <LazyOrganismsDashboardEnquiryModal v-if="user" v-model:open="modalOpen" :conversation="activeEnquiry"
+        :user="user" />
     </template>
   </UDashboardPanel>
 </template>
@@ -64,6 +60,9 @@ definePageMeta({
 });
 
 const { enquiries, loading, fetchEnquiries, total, activeEnquiry, openEnquiry, closeEnquiry } = useEnquiries();
+// On SSR only: force skeleton so stale module-level data doesn't cause hydration mismatch.
+// On client SPA navigation this is skipped — the cache-hit path handles resetting loading.
+if (import.meta.server) loading.value = true;
 const { user } = useUserSession();
 const router = useRouter();
 

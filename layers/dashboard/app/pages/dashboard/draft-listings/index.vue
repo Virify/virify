@@ -1,22 +1,17 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :ui="{
-          title: 'title-sm m-0!',
-          right: 'flex items-center gap-1',
-        }"
-      >
+      <UDashboardNavbar :ui="{
+        title: 'title-sm m-0!',
+        right: 'flex items-center gap-1',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
 
         <template #right>
-          <OrganismsDashboardFilterListings
-            :items="draftListings"
-            persistence-key="dashboard-draft-listings"
-            :hide-sale-rent-filter="true"
-          />
+          <OrganismsDashboardFilterListings :items="draftListings" persistence-key="dashboard-draft-listings"
+            :hide-sale-rent-filter="true" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
@@ -35,10 +30,7 @@
       <!-- Draft Listings Grid -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredDrafts.length > 0">
         <div v-for="draft in filteredDrafts" :key="draft.id" class="h-full">
-          <OrganismsDashboardListingCardMyListing 
-            :listing="draft" 
-            @edit="handleEditDraft"
-          />
+          <OrganismsDashboardListingCardMyListing :listing="draft" @edit="handleEditDraft" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
@@ -47,21 +39,12 @@
 
       <!-- Pagination -->
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
-        <UPagination 
-          v-model:page="page" 
-          @update:page="onPageChange" 
-          :total="total" 
-          :items-per-page="limit" 
-          variant="ghost" 
-          active-color="secondary" 
-          color="secondary" 
-          size="md" 
-          class="body-sm" 
-        />
+        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"
+          variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
       </div>
 
       <!-- Shared Listing Editor Modal -->
-      <OrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
+      <LazyOrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
     </template>
   </UDashboardPanel>
 </template>
@@ -97,8 +80,7 @@ const mapSortOrder = computed(() => {
 
 // Modal ref
 import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
-import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
-const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+const listingModal = ref<{ openForNewListing: (tier: any) => void; openForDraft: (id: number) => Promise<void>; openForListing: (id: number) => Promise<void> } | null>(null);
 
 // Handle create listing from tier table
 function handleCreateListing(tier: ListingTier) {
@@ -118,10 +100,10 @@ watch(
 // Client-side search filtering
 const filteredDrafts = computed(() => {
   if (!searchQuery.value) return draftListings.value;
-  
+
   const term = searchQuery.value.toLowerCase();
-  return draftListings.value.filter((draft) => 
-    draft.property?.address?.fullAddress?.toLowerCase().includes(term) || 
+  return draftListings.value.filter((draft) =>
+    draft.property?.address?.fullAddress?.toLowerCase().includes(term) ||
     draft.price?.toString().includes(term)
   );
 });

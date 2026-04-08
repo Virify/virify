@@ -1,18 +1,17 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :ui="{
-          title: 'title-sm m-0!',
-          right: 'flex items-center gap-1',
-        }"
-      >
+      <UDashboardNavbar :ui="{
+        title: 'title-sm m-0!',
+        right: 'flex items-center gap-1',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
 
         <template #right>
-          <OrganismsDashboardFilterListings :items="listings" persistence-key="dashboard-my-listings" @update:filtered="filteredListings = $event" />
+          <OrganismsDashboardFilterListings :items="listings" persistence-key="dashboard-my-listings"
+            @update:filtered="filteredListings = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
@@ -39,11 +38,12 @@
 
       <!-- Pagination -->
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
-        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit" variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
+        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"
+          variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
       </div>
 
       <!-- Shared Listing Editor Modal -->
-      <OrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
+      <LazyOrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
     </template>
   </UDashboardPanel>
 </template>
@@ -66,8 +66,7 @@ const filteredListings = ref<OwnedListingWithAnalytics[]>([]);
 
 // Modal ref
 import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
-import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
-const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+const listingModal = ref<{ openForNewListing: (tier: any) => void; openForDraft: (id: number) => Promise<void>; openForListing: (id: number) => Promise<void> } | null>(null);
 
 // Handle create listing from tier table
 function handleCreateListing(tier: ListingTier) {

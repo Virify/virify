@@ -1,16 +1,15 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
+import { createSharedComposable } from "@vueuse/core";
 
 /**
  * Dashboard navigation items for Nuxt UI NavigationMenu component.
  * Returns a computed value that updates when aggregates change
  */
-export function useDashboardNavigation() {
+export const useDashboardNavigation = createSharedComposable(() => {
   const { aggregates } = useNotifications();
   const { viewings } = useViewings();
 
-  const activeViewingsCount = computed(() =>
-    viewings.value.filter((v) => ["PENDING", "ACCEPTED", "RESCHEDULED"].includes(v.status)).length,
-  );
+  const activeViewingsCount = computed(() => viewings.value.filter((v) => ["PENDING", "ACCEPTED", "RESCHEDULED"].includes(v.status)).length);
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
     {
@@ -334,4 +333,4 @@ export function useDashboardNavigation() {
     dashboardNavigationitems,
     accountNavigationItems,
   };
-}
+});

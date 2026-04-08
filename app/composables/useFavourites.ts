@@ -4,13 +4,24 @@ import { performOptimisticUpdate, performPendingRemoval } from "~/utils/optimist
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
 
-// Cache for paginated favourites - indefinite TTL, busted by user mutations
-// Keyed by userId + URL so switching users never serves stale data
-const favouritesCache = new Map<string, { favourites: UserFavouriteListingCard[]; total: number }>();
+// Cache for paginated favourites with TTL — busted by user mutations
+const FAVS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const FAVS_CACHE_MAX = 20; // cap entries to prevent unbounded growth
+const favouritesCache = new Map<string, { favourites: UserFavouriteListingCard[]; total: number; ts: number }>();
+
+function getFavsCacheHit(key: string) {
+  const entry = favouritesCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > FAVS_CACHE_TTL_MS) {
+    favouritesCache.delete(key);
+    return null;
+  }
+  return entry;
+}
 
 /**
  * Favourites Composable
- * 
+ *
  * Manages user's favourite listings with optimistic updates for seamless UX.
  * Uses lightweight lookups for efficient isFavourite checks across the app.
  *
@@ -41,20 +52,15 @@ export const useFavourites = () => {
   const favourites = ref<UserFavouriteListingCard[]>([]);
 
   // Track current pagination state for refetching after add/remove
-  const currentFilter = ref<'all' | 'sale' | 'rent'>('all');
+  const currentFilter = ref<"all" | "sale" | "rent">("all");
   const currentPage = ref(1);
-  const currentSort = ref<'newest' | 'oldest'>('newest');
+  const currentSort = ref<"newest" | "oldest">("newest");
   const currentLimit = ref(20);
 
   /**
    * Fetch favourites with pagination, sort, and filter (for dashboard)
    */
-  async function fetchFavourites(
-    filter: 'all' | 'sale' | 'rent' = 'all',
-    page: number = 1,
-    sort: 'newest' | 'oldest' = 'newest',
-    limit: number = 20
-  ) {
+  async function fetchFavourites(filter: "all" | "sale" | "rent" = "all", page: number = 1, sort: "newest" | "oldest" = "newest", limit: number = 20) {
     // Store current pagination state
     currentFilter.value = filter;
     currentPage.value = page;
@@ -66,7 +72,7 @@ export const useFavourites = () => {
 
     const url = `/api/user/favourites/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`;
     const cacheKey = `${user.value?.id}:${url}`;
-    const cached = favouritesCache.get(cacheKey);
+    const cached = getFavsCacheHit(cacheKey);
     if (cached) {
       favourites.value = cached.favourites;
       total.value = cached.total;
@@ -76,12 +82,13 @@ export const useFavourites = () => {
 
     loading.value = true;
     try {
-      const data = await requestFetch<{ favourites: UserFavouriteListingCard[], total: number }>(url);
+      const data = await requestFetch<{ favourites: UserFavouriteListingCard[]; total: number }>(url);
       favourites.value = data.favourites || [];
       total.value = data.total || 0;
-      favouritesCache.set(cacheKey, { favourites: favourites.value, total: total.value });
+      if (favouritesCache.size >= FAVS_CACHE_MAX) favouritesCache.delete(favouritesCache.keys().next().value!);
+      favouritesCache.set(cacheKey, { favourites: favourites.value, total: total.value, ts: Date.now() });
     } catch (error) {
-      console.error('Error fetching favourites:', error);
+      console.error("Error fetching favourites:", error);
       favourites.value = [];
       total.value = 0;
     } finally {
@@ -128,7 +135,7 @@ export const useFavourites = () => {
 
   /**
    * Add a listing to the user's favourites
-   * 
+   *
    * Uses optimistic updates: the UI updates immediately while the API call
    * happens in the background. If the API call fails, the change is rolled back.
    *
@@ -142,7 +149,7 @@ export const useFavourites = () => {
 
     // Track the favourite action
     const { trackFavourite } = useAnalyticsTracking();
-    trackFavourite(listingId, 'add');
+    trackFavourite(listingId, "add");
 
     await performOptimisticUpdate({
       ref: favouriteLookups,
@@ -158,7 +165,7 @@ export const useFavourites = () => {
         refetchCurrentPage();
       },
       onError: (error) => {
-        toast.add({ title: 'Error', description: "Failed to add to favourites", color: 'error', icon: 'i-lucide-heart-crack' });
+        toast.add({ title: "Error", description: "Failed to add to favourites", color: "error", icon: "i-lucide-heart-crack" });
         console.error("Error adding to favourites:", error);
       },
     });
@@ -166,7 +173,7 @@ export const useFavourites = () => {
 
   /**
    * Remove a listing from the user's favourites
-   * 
+   *
    * Uses pending removal pattern: the item is marked as "pending" (showing a
    * visual overlay), then the delete happens. The item stays visible but marked
    * as removed until the user navigates away or refreshes.
@@ -179,7 +186,7 @@ export const useFavourites = () => {
 
     // Track the favourite action
     const { trackFavourite } = useAnalyticsTracking();
-    trackFavourite(listingId, 'remove');
+    trackFavourite(listingId, "remove");
 
     await performPendingRemoval({
       pendingSet: pendingRemoval,
@@ -192,13 +199,13 @@ export const useFavourites = () => {
       },
       onSuccess: () => {
         // Optimistically remove from global lookups immediately
-        favouriteLookups.value = favouriteLookups.value.filter(id => id !== listingId);
+        favouriteLookups.value = favouriteLookups.value.filter((id) => id !== listingId);
         favouritesCache.clear(); // always bust client cache regardless of calling instance state
         refreshFavourites();
         refetchCurrentPage();
       },
       onError: (error) => {
-        toast.add({ title: 'Error', description: "Failed to remove from favourites", color: 'error', icon: 'i-lucide-heart-crack' });
+        toast.add({ title: "Error", description: "Failed to remove from favourites", color: "error", icon: "i-lucide-heart-crack" });
         console.error("Error removing from favourites:", error);
       },
     });
@@ -250,6 +257,6 @@ export const useFavourites = () => {
     loading,
     searchTerm,
     categoryFilter,
-    isLoading: computed(() => loading.value || recentFavouritesStatus.value === 'pending'),
+    isLoading: computed(() => loading.value || recentFavouritesStatus.value === "pending"),
   };
 };

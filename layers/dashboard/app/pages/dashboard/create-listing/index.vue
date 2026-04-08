@@ -1,12 +1,10 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :ui="{
-          title: 'title-sm m-0!',
-          right: 'flex items-center gap-1',
-        }"
-      >
+      <UDashboardNavbar :ui="{
+        title: 'title-sm m-0!',
+        right: 'flex items-center gap-1',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
@@ -20,9 +18,9 @@
 
     <template #body>
       <OrganismsDashboardTierTable @create-listing="handleCreateListing" />
-      
+
       <!-- Shared Listing Editor Modal -->
-      <OrganismsDashboardCreateListingModal ref="listingModal" />
+      <LazyOrganismsDashboardCreateListingModal ref="listingModal" />
     </template>
   </UDashboardPanel>
 </template>
@@ -39,9 +37,7 @@ definePageMeta({
   layout: "dashboard",
 })
 
-import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
-
-const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(null);
 
 function handleCreateListing(tier: ListingTier) {
   listingModal.value?.openForNewListing(tier);

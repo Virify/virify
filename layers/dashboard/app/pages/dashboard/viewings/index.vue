@@ -39,7 +39,7 @@
   </UDashboardPanel>
 
   <!-- Reschedule modal -->
-  <OrganismsDashboardViewingRescheduleModal v-model:open="rescheduleOpen" :viewing-id="rescheduleViewingId"
+  <LazyOrganismsDashboardViewingRescheduleModal v-model:open="rescheduleOpen" :viewing-id="rescheduleViewingId"
     @submitted="onRescheduled" />
 </template>
 

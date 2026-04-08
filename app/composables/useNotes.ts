@@ -4,13 +4,24 @@ import { performMultiOptimisticUpdate, performPendingRemoval } from "~/utils/opt
 // Track items pending removal (for visual feedback) - Share across instances
 const pendingRemoval = ref<Set<number>>(new Set());
 
-// Cache for paginated notes - indefinite TTL, busted by user mutations
-// Keyed by userId + URL so switching users never serves stale data
-const notesCache = new Map<string, { notes: NoteData[]; total: number }>();
+// Cache for paginated notes with TTL — busted by user mutations
+const NOTES_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const NOTES_CACHE_MAX = 20; // cap entries to prevent unbounded growth
+const notesCache = new Map<string, { notes: NoteData[]; total: number; ts: number }>();
+
+function getNotesCacheHit(key: string) {
+  const entry = notesCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.ts > NOTES_CACHE_TTL_MS) {
+    notesCache.delete(key);
+    return null;
+  }
+  return entry;
+}
 
 /**
  * Notes Composable
- * 
+ *
  * Manages user's property notes with optimistic updates for seamless UX.
  * Uses lightweight lookups for efficient hasNote/getNote checks across the app.
  */
@@ -39,20 +50,15 @@ export const useNotes = () => {
   const userNotes = ref<NoteData[]>([]);
 
   // Track current pagination state for refetching after add/remove
-  const currentFilter = ref<'all' | 'sale' | 'rent'>('all');
+  const currentFilter = ref<"all" | "sale" | "rent">("all");
   const currentPage = ref(1);
-  const currentSort = ref<'newest' | 'oldest'>('newest');
+  const currentSort = ref<"newest" | "oldest">("newest");
   const currentLimit = ref(20);
 
   /**
    * Fetch notes with pagination, sort, and filter (for dashboard)
    */
-  async function fetchNotes(
-    filter: 'all' | 'sale' | 'rent' = 'all',
-    page: number = 1,
-    sort: 'newest' | 'oldest' = 'newest',
-    limit: number = 20
-  ) {
+  async function fetchNotes(filter: "all" | "sale" | "rent" = "all", page: number = 1, sort: "newest" | "oldest" = "newest", limit: number = 20) {
     // Store current pagination state
     currentFilter.value = filter;
     currentPage.value = page;
@@ -64,7 +70,7 @@ export const useNotes = () => {
 
     const url = `/api/user/notes/all/full?filter=${filter}&sort=${sort}&page=${page}&limit=${limit}`;
     const cacheKey = `${user.value?.id}:${url}`;
-    const cached = notesCache.get(cacheKey);
+    const cached = getNotesCacheHit(cacheKey);
     if (cached) {
       userNotes.value = cached.notes;
       total.value = cached.total;
@@ -74,12 +80,13 @@ export const useNotes = () => {
 
     loading.value = true;
     try {
-      const data = await requestFetch<{ notes: NoteData[], total: number }>(url);
+      const data = await requestFetch<{ notes: NoteData[]; total: number }>(url);
       userNotes.value = data.notes || [];
       total.value = data.total || 0;
-      notesCache.set(cacheKey, { notes: userNotes.value, total: total.value });
+      if (notesCache.size >= NOTES_CACHE_MAX) notesCache.delete(notesCache.keys().next().value!);
+      notesCache.set(cacheKey, { notes: userNotes.value, total: total.value, ts: Date.now() });
     } catch (error) {
-      console.error('Error fetching notes:', error);
+      console.error("Error fetching notes:", error);
       userNotes.value = [];
       total.value = 0;
     } finally {
@@ -142,7 +149,7 @@ export const useNotes = () => {
   /**
    * Get the notes data object for a specific listing
    * Uses lightweight lookups first, falls back to full userNotes for createdAt
-   * 
+   *
    * @param listingId  - ID of the Listing
    * @returns NoteData object or undefined
    */
@@ -160,7 +167,7 @@ export const useNotes = () => {
 
   /**
    * Update or create a note for a specific listing
-   * 
+   *
    * Uses optimistic updates: the UI updates immediately while the API call
    * happens in the background. If the API call fails, the change is rolled back.
    *
@@ -181,15 +188,11 @@ export const useNotes = () => {
       updates: [
         {
           ref: noteLookups,
-          optimisticChange: (current) =>
-            isUpdating
-              ? current.map((n: NoteLookup) => n.listingId === listingId ? { ...n, note } : n)
-              : [...current, { listingId, note }],
+          optimisticChange: (current) => (isUpdating ? current.map((n: NoteLookup) => (n.listingId === listingId ? { ...n, note } : n)) : [...current, { listingId, note }]),
         },
         {
           ref: userNotes,
-          optimisticChange: (current) =>
-            current.map((n: NoteData) => n.listingId === listingId ? { ...n, note } : n),
+          optimisticChange: (current) => current.map((n: NoteData) => (n.listingId === listingId ? { ...n, note } : n)),
         },
       ],
       operation: async () => {
@@ -204,14 +207,14 @@ export const useNotes = () => {
       },
       onError: (error) => {
         console.error("Error updating note:", error);
-        toast.add({ title: 'Error', description: errorMessage, color: 'error', icon: 'i-lucide-circle-x' });
+        toast.add({ title: "Error", description: errorMessage, color: "error", icon: "i-lucide-circle-x" });
       },
     });
   };
 
   /**
    * Delete a note for a specific listing
-   * 
+   *
    * Uses optimistic updates: the note is removed from the UI immediately while
    * the API call happens in the background. If the API call fails, the note is restored.
    *
@@ -239,7 +242,7 @@ export const useNotes = () => {
       },
       onError: (error) => {
         console.error("Error deleting note:", error);
-        toast.add({ title: 'Error', description: "Failed to delete note", color: 'error', icon: 'i-lucide-circle-x' });
+        toast.add({ title: "Error", description: "Failed to delete note", color: "error", icon: "i-lucide-circle-x" });
       },
     });
   };
@@ -295,6 +298,6 @@ export const useNotes = () => {
     // search filter state
     searchTerm,
     categoryFilter,
-    isLoading: computed(() => loading.value || recentNotesStatus.value === 'pending'),
+    isLoading: computed(() => loading.value || recentNotesStatus.value === "pending"),
   };
 };

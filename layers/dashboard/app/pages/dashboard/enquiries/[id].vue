@@ -36,7 +36,7 @@
           </div>
 
           <!-- Loading State -->
-          <div v-if="loading && !enquiries.length" class="space-y-4">
+          <div v-if="loading" class="space-y-4">
             <USkeleton class="h-32 w-full" v-for="i in 3" :key="i" />
           </div>
 
@@ -74,7 +74,8 @@
         </div>
       </div>
 
-      <OrganismsDashboardEnquiryModal v-if="user" v-model:open="modalOpen" :conversation="activeEnquiry" :user="user" />
+      <LazyOrganismsDashboardEnquiryModal v-if="user" v-model:open="modalOpen" :conversation="activeEnquiry"
+        :user="user" />
     </template>
   </UDashboardPanel>
 </template>
@@ -92,6 +93,8 @@ const requestFetch = useRequestFetch();
 
 // State from useEnquiries
 const { enquiries, total: totalCount, loading, fetchEnquiries, activeEnquiry, openEnquiry, closeEnquiry, getUnreadCount } = useEnquiries();
+// On SSR only: force skeleton so stale module-level data doesn't cause hydration mismatch.
+if (import.meta.server) loading.value = true;
 const filteredEnquiries = ref<ConversationWithMinimalListing[]>([]);;
 
 const listingId = computed(() => Number(route.params.id));
@@ -110,9 +113,10 @@ const { activeTab: enquiryFilter, enquiriesFilter: directionFilter, sortOrderVal
 const persistentListing = ref<any>(null);
 
 // Fetch listing details explicitly to handle cases where conversations don't exist yet
-const { data: fetchedListing } = await useAsyncData(`listing-${listingId.value}`, () => requestFetch<{ listing: any }>(`/api/listing/${listingId.value}`), {
+const { data: fetchedListing } = useAsyncData(`listing-${listingId.value}`, () => requestFetch<{ listing: any }>(`/api/listing/${listingId.value}`), {
   watch: [listingId],
   immediate: true,
+  server: false,
 });
 
 // Update persistentListing when fetchedListing changes
@@ -143,22 +147,22 @@ const unreadCountLocal = computed(() => {
   return enquiries.value.filter((c) => getUnreadCount(c) > 0).length;
 });
 
+// Kick off fetch synchronously in setup so loading=true is set before first render,
+// preventing a flash of stale enquiries from the index page singleton state.
+if (listingId.value) {
+  fetchEnquiries({
+    filter: enquiryFilter.value as any,
+    direction: directionFilter.value as any,
+    page: 1,
+    sort: sortOrder.value as any,
+    limit: 50,
+    listingId: listingId.value
+  });
+}
+
 watch([enquiryFilter, directionFilter, sortOrder], async () => {
   if (listingId.value) {
     await fetchEnquiries({
-      filter: enquiryFilter.value as any,
-      direction: directionFilter.value as any,
-      page: 1,
-      sort: sortOrder.value as any,
-      limit: 50,
-      listingId: listingId.value
-    });
-  }
-});
-
-onMounted(() => {
-  if (listingId.value) {
-    fetchEnquiries({
       filter: enquiryFilter.value as any,
       direction: directionFilter.value as any,
       page: 1,
