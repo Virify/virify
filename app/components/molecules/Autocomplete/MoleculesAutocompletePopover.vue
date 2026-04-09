@@ -75,7 +75,6 @@
 
 <script setup lang="ts">
 import { ViewsDialogSavedLocations } from '#components';
-import type { UserLocation } from '~~/layers/database/server/database/prisma/generated/client';
 
 const { trendingLocations } = useAnalytics();
 const locationSuggestions = ref<GeocodingFeature[]>([]);
@@ -145,36 +144,28 @@ const {
  *  Set locations
  */
 const emits = defineEmits(['location-selected'])
-const { enhanceWithBoundaryPolygon, geocodeById } = useMap()
+const { enhanceWithBoundaryPolygon } = useMap()
 
 async function setLocationFromTrending(option: TrendingLocation) {
-  // Try geocoding by locationId for precise lookup with bbox/boundary
-  let feature: GeocodingFeature | null = option.locationId
-    ? await geocodeById(option.locationId).catch(() => null)
-    : null
-
-  // Fallback: construct a minimal GeocodingFeature from lat/lon/name
-  if (!feature) {
-    feature = {
-      id: option.locationId || '',
-      type: 'Feature',
-      place_name: option.placeName || option.name,
-      place_name_en: option.placeName || option.name,
-      text: option.name,
-      geometry: { type: 'Point', coordinates: [option.lon, option.lat] },
-      properties: {},
-    }
+  const feature: GeocodingFeature = {
+    id: option.locationId,
+    type: 'Feature',
+    place_name: option.placeName || option.name,
+    place_name_en: option.placeName || option.name,
+    text: option.name,
+    geometry: { type: 'Point', coordinates: [option.lon, option.lat] },
+    properties: {},
   }
 
   const enhancedLocation = await enhanceWithBoundaryPolygon(feature)
-    .catch(() => feature as GeocodingFeature)
+    .catch(() => feature)
 
   addLocationToHistory(enhancedLocation)
   emits('location-selected', enhancedLocation)
   suppressAutocomplete.value = true
 }
 
-async function setLocationFromSaved(option: Partial<UserLocation>) {
+async function setLocationFromSaved(option: UserSavedLocation) {
   const { geocodingFeature } = asObject(option)
 
   if (geocodingFeature) {
