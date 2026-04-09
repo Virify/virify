@@ -23,7 +23,17 @@
       }">
       <AtomsCloudFlareImage v-if="getMainImage(listing?.property)" :src="getMainImage(listing?.property)!"
         alt="Listing image" variant="gallery" :placeholder="true"
-        class="w-full h-54 object-bottom object-cover rounded-lg aspect-4/3" />
+        class="w-full h-54 object-bottom object-cover rounded-lg aspect-4/3 relative" />
+        <!-- viewing badge -->
+        <UBadge
+          v-if="viewingBadgeLabel"
+          :label="viewingBadgeLabel"
+          icon="i-lucide-calendar"
+          size="lg"
+          color="secondary"
+          variant="solid"
+          class="mb-1 absolute top-2 right-2 z-1 text-xs"
+        />
 
       <template #header>
         <div class="flex flex-row justify-between">
@@ -68,16 +78,6 @@
             Add Note
           </button>
         </div>
-
-        <UBadge
-          v-if="viewingBadgeLabel"
-          :label="viewingBadgeLabel"
-          icon="i-lucide-calendar"
-          size="sm"
-          color="info"
-          variant="subtle"
-          class="mb-1"
-        />
 
         <div class="grid grid-cols-2 gap-2 items-center">
           <UButton variant="solid" size="md" color="secondary" block class="text-white! font-bold"

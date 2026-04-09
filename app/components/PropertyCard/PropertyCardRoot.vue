@@ -25,12 +25,23 @@
       <PropertyCardImage v-else-if="propertyImage" :provider="imageProvider" :src="propertyImage"
         :alt="propertyImageAlt" variant="card" class="property-card-root__image" width="491" height="368"
         loading="lazy" />
+
+      <ClientOnly>
+        <UBadge
+          v-if="viewingLabel"
+          :label="viewingLabel"
+          icon="i-lucide-calendar"
+          size="lg"
+          color="secondary"
+          variant="solid"
+          class="absolute top-2 right-2 z-1 text-xs"
+        />
+      </ClientOnly>
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price">
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
-        <ClientOnly><PropertyCardPill v-if="viewingLabel" :content="viewingLabel" /></ClientOnly>
 
         <span class="property-card-root__price-amount | title-md">
           {{ price }}

@@ -8,11 +8,6 @@
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
           {{ convertEnumToString(available!) }}
         </AtomsPill>
-        <ClientOnly>
-          <AtomsPill v-if="viewingLabel" class="o-listing-sidebar__title-offertype__item | body-xs">
-            {{ viewingLabel }}
-          </AtomsPill>
-        </ClientOnly>
       </div>
 
 
