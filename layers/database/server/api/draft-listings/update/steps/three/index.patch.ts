@@ -79,6 +79,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    await invalidateDraftListingsCache(user.id as number);
     return updatedDraftListing;
   } catch (error) {
     return errorResponse(error, event);

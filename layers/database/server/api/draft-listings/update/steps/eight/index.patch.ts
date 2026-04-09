@@ -98,7 +98,7 @@ export default defineEventHandler(async (event) => {
       select: { completedSteps: true },
     });
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: {
         ...(current && !current.completedSteps.includes(8) ? { completedSteps: { push: 8 } } : {}),
@@ -106,6 +106,8 @@ export default defineEventHandler(async (event) => {
       },
       include: { property: { include: { energyAndUtilities: true, runningCosts: true } } },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     console.log(error);
     return errorResponse(error, event);

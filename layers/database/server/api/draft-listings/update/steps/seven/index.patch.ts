@@ -179,6 +179,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    await invalidateDraftListingsCache(user.id as number);
     return result;
   } catch (error) {
     console.log("Error updating draft listing step seven:", error);

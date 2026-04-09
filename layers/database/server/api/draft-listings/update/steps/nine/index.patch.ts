@@ -217,6 +217,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
+    await invalidateDraftListingsCache(user.id as number);
     return result;
   } catch (error) {
     console.error('Step nine update error:', error);

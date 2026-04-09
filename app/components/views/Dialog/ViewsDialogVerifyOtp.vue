@@ -65,7 +65,7 @@ async function verifyOtp() {
     await $fetch("/auth/verify-otp", {
       method: "POST",
       body: {
-        otpCode: otpCode.value,
+        otpCode: otpCode.value.map(String),
         token: props.token,
         passwordToken: props.passwordToken,
       },

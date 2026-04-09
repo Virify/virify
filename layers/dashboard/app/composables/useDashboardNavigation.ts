@@ -104,7 +104,7 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "View enquiries",
           },
-          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : aggregates.value.enquiries ? String(aggregates.value.enquiries) : undefined,
+          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : undefined,
         },
         {
           label: "Favourites",

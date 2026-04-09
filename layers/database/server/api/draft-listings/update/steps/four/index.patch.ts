@@ -103,6 +103,7 @@ export default defineEventHandler(async (event) => {
       },
     });
     
+    await invalidateDraftListingsCache(user.id as number);
     return result;
   } catch (error) {
     return errorResponse(error, event);

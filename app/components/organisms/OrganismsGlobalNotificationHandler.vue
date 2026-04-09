@@ -1,9 +1,10 @@
 <template>
   <LazyOrganismsDashboardEnquiryModal 
-    v-if="isModalOpen && user" 
-    v-model:open="isModalOpen" 
+    v-if="user" 
+    v-model:open="isModalOpen"
     :conversation="modalConversation" 
-    :user="user" 
+    :user="user"
+    :new-enquiry-data="newEnquiryData"
   />
 </template>
 
@@ -11,9 +12,14 @@
 // Watch for global notifications triggered by plugins/websockets
 const { lastNotification } = useNotifications();
 const { activeEnquiryId } = useEnquiries();
-const { isModalOpen, modalConversation, openConversation, syncConversationIfOpen } = useGlobalEnquiryModal();
+const { isModalOpen, modalConversation, newEnquiryData, openConversation, closeConversation, syncConversationIfOpen } = useGlobalEnquiryModal();
 const toast = useToast();
 const { user } = useUserSession();
+
+// Clean up when the modal is closed via UModal's own controls (X button, backdrop click, etc.)
+watch(isModalOpen, (open) => {
+  if (!open) closeConversation();
+});
 
 watch(lastNotification, (notification) => {
   if (notification) {
@@ -33,7 +39,7 @@ watch(lastNotification, (notification) => {
       title: notification.title,
       description: notification.description,
       ...(notification.senderAvatar
-        ? { avatar: { src: notification.senderAvatar, alt: notification.senderUsername || 'User', name: notification.senderUsername || 'User' } }
+        ? { avatar: { src: notification.senderAvatar, alt: notification.senderUsername || 'User' } }
         : { icon: 'i-lucide-message-circle' }),
       color: 'secondary',
       onClick: async () => {

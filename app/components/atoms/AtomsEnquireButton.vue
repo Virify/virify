@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
+import { ViewsDialogLogin } from '#components'
 
 interface Props {
   listingId: number;
@@ -38,10 +38,8 @@ const isEnquiryDisabled = computed(() => {
   return !safeUserId.value || isSelf.value
 });
 
-/**
- *  Dialog
- */
 const { showDialog } = useDialog();
+const { openNewEnquiry } = useGlobalEnquiryModal();
 
 function handleEnquire() {
   if (!sessionId.value) {
@@ -52,12 +50,8 @@ function handleEnquire() {
     return;
   }
 
-  showDialog({
-    component: ViewsDialogConversation,
-    props: {
-      listingId: props.listingId,
-      receiverId: safeUserId.value
-    },
-  });
+  if (safeUserId.value !== null) {
+    openNewEnquiry(props.listingId, safeUserId.value);
+  }
 }
 </script>

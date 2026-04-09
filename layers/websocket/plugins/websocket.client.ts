@@ -107,7 +107,11 @@ export default defineNuxtPlugin(() => {
         handleNewMessage(conversationId, msg, conv);
         
         // Keep global enquiry modal in sync if it's open on this conversation.
-        const updatedConv = enquiries.value.find(c => c.id === conversationId);
+        // Fall back to activeEnquiry when the conversation isn't in the list
+        // (e.g. modal opened from search/listing page without fetchEnquiries being called).
+        const { activeEnquiry } = useEnquiries();
+        const updatedConv = enquiries.value.find(c => c.id === conversationId)
+          ?? (activeEnquiry.value?.id === conversationId ? activeEnquiry.value : undefined);
         if (updatedConv) {
           syncConversationIfOpen(updatedConv);
         }

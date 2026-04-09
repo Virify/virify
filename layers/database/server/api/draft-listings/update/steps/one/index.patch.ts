@@ -145,7 +145,7 @@ export default defineEventHandler(async (event) => {
       updateData.completedSteps = { push: 1 };
     }
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: updateData,
       include: {
@@ -153,6 +153,8 @@ export default defineEventHandler(async (event) => {
         rentalListing: true,
       },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     console.error('[Step1 PATCH] Error:', error);
     return errorResponse(error, event);

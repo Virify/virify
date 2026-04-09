@@ -131,11 +131,17 @@ export function useEnquiryModal(
 
     const mediaId = pendingMedia.value?.id;
     try {
-      await sendReply(props.conversation.id, messageContent.value, { mediaId });
+      const sentMessage = await sendReply(props.conversation.id, messageContent.value, { mediaId });
       messageContent.value = "";
       pendingMedia.value = null;
       // Reset the file input inside the footer if it exists
       if (fileInputRef.value) fileInputRef.value.value = "";
+      // Directly append the sent message — don't rely on the activeEnquiry watcher chain
+      // which is unreliable when the modal is opened from outside the dashboard.
+      if (sentMessage && !localMessages.value.find((m) => m.id === sentMessage.id)) {
+        localMessages.value = [...localMessages.value, sentMessage];
+        scrollToBottom();
+      }
     } catch (e) {
       console.error("Failed to send message", e);
     }

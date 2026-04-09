@@ -2,17 +2,16 @@
   <UModal
     v-model:open="isOpen"
     :fullscreen="isMobile"
-    :ui="{
-      overlay: 'bg-black/50 backdrop-blur-sm',
-      content: 'max-w-[1300px] w-full sm:w-[90vw]',
-      header: 'w-full justify-between',
-      title: 'flex-1 min-w-0 overflow-hidden',
-      description: 'pl-10 body-sm',
-      body: 'py-6 px-0!',
-    }"
+    :ui="modalUi"
   >
     <template #title>
+      <!-- Compose mode header -->
+      <span v-if="isComposeMode" class="title-sm">
+        {{ newEnquiryData?.listingTitle ? `Enquire about ${newEnquiryData.listingTitle}` : 'New Enquiry' }}
+      </span>
+      <!-- Chat mode header -->
       <OrganismsDashboardEnquiryChatHeader
+        v-else
         :other-user="otherUser"
         :sub-title="subTitle"
         :is-owner="isOwner"
@@ -23,7 +22,13 @@
       />
     </template>
     <template #body>
-      <div ref="chatContainer" class="overflow-y-auto px-4 scroll-smooth" :class="isMobile ? 'h-full' : 'h-[60vh]'">
+      <!-- Compose mode -->
+      <OrganismsDashboardEnquiryCompose
+        v-if="isComposeMode && newEnquiryData"
+        :new-enquiry-data="newEnquiryData"
+      />
+      <!-- Chat mode body -->
+      <div v-else ref="chatContainer" class="overflow-y-auto px-4 scroll-smooth" :class="isMobile ? 'h-full' : 'h-[60vh]'">
         <UChatMessages should-auto-scroll>
           <OrganismsDashboardEnquiryChatMessage
             v-for="message in localMessages"
@@ -34,7 +39,7 @@
         </UChatMessages>
       </div>
     </template>
-    <template #footer>
+    <template v-if="!isComposeMode" #footer>
       <OrganismsDashboardEnquiryFooter
         :conversation="conversation"
         :is-owner="isOwner"
@@ -57,6 +62,7 @@ const props = defineProps<{
   open: boolean;
   conversation: ConversationWithMinimalListing | null;
   user: User | null;
+  newEnquiryData?: { listingId: number; receiverId: number; listingTitle?: string } | null;
 }>();
 
 const emit = defineEmits<{
@@ -84,4 +90,17 @@ const {
   removePendingMedia,
   handleEnquiryAvailabilityChange,
 } = useEnquiryModal(props, emit);
+
+const isComposeMode = computed(() => !!props.newEnquiryData && !props.conversation);
+
+const modalUi = computed(() => ({
+  overlay: 'bg-black/50 backdrop-blur-sm',
+  content: 'max-w-[1300px] w-full sm:w-[90vw]',
+  header: 'w-full justify-between',
+  title: 'flex-1 min-w-0 overflow-hidden',
+  description: 'pl-10 body-sm',
+  body: isComposeMode.value ? 'p-0!' : 'py-6 px-0!',
+}));
 </script>
+
+

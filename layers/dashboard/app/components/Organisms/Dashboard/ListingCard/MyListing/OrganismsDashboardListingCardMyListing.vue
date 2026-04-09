@@ -305,9 +305,8 @@ async function handlePublish() {
     clearNuxtData((key) => String(key).startsWith('my-listings:'));
     clearNuxtData((key) => String(key).startsWith('draft-listings:'));
     // Notify the parent page to refresh its useAsyncData (card renders from page's fetchedData, not shared ref)
+    // Aggregate is updated via the WebSocket message sent by the server — no manual refetch needed
     emit('published');
-    const { fetchUserItemsAggregates } = useNotifications();
-    fetchUserItemsAggregates(true);
   } catch (error: any) {
     toast.add({
       title: 'Publish Failed',

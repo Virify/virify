@@ -189,23 +189,32 @@ export const useEnquiries = createSharedComposable(() => {
       if (updated.listingId && !updated.listing) {
         hydrateConversationListing(conversationId);
       }
-    } else if (conversation) {
-      // New conversation not in list - add it
-      const messages = conversation.messages || [];
-      const hasMessage = messageExists(messages, message.id);
+    } else {
+      // Conversation not in list.
+      // If we have a full conversation payload, add it.
+      if (conversation) {
+        const messages = conversation.messages || [];
+        const hasMessage = messageExists(messages, message.id);
+        const conversationToAdd = {
+          ...conversation,
+          messages: hasMessage ? messages : [...messages, message],
+          updatedAt: new Date(),
+        };
+        enquiries.value = [conversationToAdd, ...enquiries.value];
+        total.value += 1;
+        if (conversationToAdd.listingId && !conversationToAdd.listing) {
+          hydrateConversationListing(conversationToAdd.id);
+        }
+      }
 
-      const conversationToAdd = {
-        ...conversation,
-        messages: hasMessage ? messages : [...messages, message],
-        updatedAt: new Date(),
-      };
-
-      enquiries.value = [conversationToAdd, ...enquiries.value];
-      total.value += 1;
-
-      // Hydrate listing if it's missing but we have a listingId
-      if (conversationToAdd.listingId && !conversationToAdd.listing) {
-        hydrateConversationListing(conversationToAdd.id);
+      // Global modal opened from search/listing page (fetchEnquiries never called) —
+      // update activeEnquiry directly so the modal UI reflects the new message.
+      if (activeEnquiry.value?.id === conversationId && !messageExists(activeEnquiry.value.messages, message.id)) {
+        activeEnquiry.value = {
+          ...activeEnquiry.value,
+          messages: [...activeEnquiry.value.messages, message],
+          updatedAt: new Date(),
+        };
       }
     }
   }
@@ -268,22 +277,31 @@ export const useEnquiries = createSharedComposable(() => {
   /**
    * Start a new conversation
    */
-  async function startConversation(listingId: number, receiverId: number, message: string) {
+  async function startConversation(listingId: number, receiverId: number, message: string): Promise<ConversationWithMinimalListing | null> {
     if (!currentUserId.value || receiverId === currentUserId.value) {
-      return;
+      return null;
     }
 
     if (hasContactedListing(listingId)) {
-      return;
+      return null;
     }
 
-    await requestFetch("/api/conversation/create", {
+    const created = await requestFetch<ConversationWithMinimalListing>("/api/conversation/create", {
       method: "POST",
       body: { listingId, receiverId, message },
     });
 
+    // Re-fetch so we get the full listing/address data (create endpoint doesn't select listing relation)
+    const conversation = await requestFetch<ConversationWithMinimalListing>(`/api/conversation/${created.id}`);
+
     // Track that we've contacted this listing
     contactedListings.value.add(listingId);
+
+    // Refresh aggregates so the sender sees updated sent-enquiries count
+    const { fetchUserItemsAggregates } = useNotifications();
+    fetchUserItemsAggregates(true);
+
+    return conversation;
   }
 
   /**

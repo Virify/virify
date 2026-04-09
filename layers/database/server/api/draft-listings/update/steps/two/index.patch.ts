@@ -111,7 +111,7 @@ export default defineEventHandler(async (event) => {
       select: { completedSteps: true },
     });
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: {
         // Add step 2 to completedSteps if not already there
@@ -126,6 +126,8 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     return errorResponse(error, event);
   }

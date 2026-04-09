@@ -107,7 +107,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: {
         // Add step 5 to completedSteps if not already there
@@ -124,6 +124,8 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     console.error('[Step5 PATCH] Error:', error);
     return errorResponse(error, event);
