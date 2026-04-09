@@ -1,3 +1,5 @@
+import { hash } from 'ohash'
+
 export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
 export type ResultLayout = 'map' | 'grid' | 'split'
 
@@ -17,7 +19,7 @@ let instance: ReturnType<typeof createSearchState> | null = null;
 
 function createSearchState() {
   const searchState = ref<SearchState>({ ...defaultState });
-  const isLoading = ref(false);
+  const isLoading = shallowRef(true);
 
   /**
    *  Run a callback, if it's valid
@@ -175,7 +177,73 @@ function createSearchState() {
   };
 
   /**
-   *  Fetch results
+   *  Save state with hash key
+   *
+   *  @TODO this should probably be done as part of the actual fetch 
+   *        request in the `fetchResults` function
+   */
+  async function mockSaveHash(key: string, value: string) {
+    if (!import.meta.client) return
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        window.localStorage.setItem(key, value)
+        resolve(true)
+      }, 500)
+    })
+  }
+
+  async function mockParseHash(key?: string | string[]) {
+    if (!import.meta.client || !isString(hash)) return
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const savedSearch = window.localStorage.getItem(key as string)
+
+        if (!isString(savedSearch)) return
+
+        try {
+          const { location, query } = asObject(JSON.parse(savedSearch))
+
+          console.log({ location, query })
+        }
+        catch {
+          console.error('Unable to parse saved query')
+        }
+
+        resolve(true)
+      }, 500)
+    })
+  }
+
+  async function fetchHash(hash?: string | string[]) {
+    isLoading.value = true
+
+    await mockParseHash(hash)
+
+    isLoading.value = false
+  }
+
+  function generateHash(location: unknown, query: unknown) {
+    const saveState = { location, query }
+
+    const hashKey = hash(saveState)
+    const stringValue = JSON.stringify(saveState)
+
+    /**
+     *  @TODO
+     *  As feasibly, someone could malform this data clientside and then
+     *  generate a URL and share it, and use that to pollute other
+     *  people's Virify pages, we should review what we can do to
+     *  sanitise this data (this should be done serverside, as otherwise
+     *  someone could just ignore it anyway)
+     */
+    mockSaveHash(hashKey, stringValue)
+    navigateTo('/search/' + hashKey)
+  }
+
+  /**
+   *  Track most recent
    */
   interface RecentSearch {
     type: 'ai' | 'traditional'
@@ -190,6 +258,16 @@ function createSearchState() {
   let mostRecentLocation: RecentLocation = {}
   let mostRecentQuery: RecentSearch | null = null
 
+  function updateMostRecent(location: RecentLocation, query: RecentSearch) {
+    mostRecentLocation = location
+    mostRecentQuery = query
+
+    generateHash(location, query)
+  }
+
+  /**
+   *  Fetch results
+   */
   const toast = useToast()
   const { trackSearch } = useAnalyticsTracking()
 
@@ -263,13 +341,6 @@ function createSearchState() {
         setQueryAnalysis(queryAnalysis)
         setResults(response as unknown[])
       }
-
-      await navigateTo('/search')
-
-      window.scrollTo({
-        top: 0,
-        behavior: "instant"
-      })
     }
     catch (error) {
       console.error('Search error:', error)
@@ -282,8 +353,7 @@ function createSearchState() {
       })
     } finally {
       setSearchPending(false)
-      mostRecentQuery = queryData
-      mostRecentLocation = locationData
+      updateMostRecent(locationData, queryData)
     }
   }
 
@@ -302,6 +372,7 @@ function createSearchState() {
     updateState,
     clearState,
     fetchResults,
+    fetchHash,
     isLoading: readonly(isLoading),
   };
 }
