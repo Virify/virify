@@ -4,7 +4,7 @@
   }">
     <Map :markers="convertedMarkers" :zoom="mapZoom" :center="mapCenter" :interactive="true" @map-ready="onMapReady" />
 
-    <div v-if="!isSearching && !results.length"
+    <div v-if="hasSearched && !isSearching && !results.length"
       class="ai-search-map-view__overlay ai-search-map-view__overlay--no-results | body-lg">
       No properties found in this area
     </div>
@@ -13,10 +13,11 @@
 
 <script setup lang="ts">
 interface Props {
-  results: ListingWithFullProperty[];
-  location?: GeocodingFeatureWithBoundary | null;
-  radius?: number;
-  isSearching?: boolean;
+  results: ListingWithFullProperty[]
+  location?: GeocodingFeatureWithBoundary | null
+  radius?: number
+  isSearching?: boolean
+  hasSearched: boolean
 }
 
 const props = defineProps<Props>();

@@ -28,97 +28,37 @@ const emits = defineEmits(['search-started'])
 /**
  *  Fetch filters
  */
-const { searchState, isLoading, setSearchType, setResults, setSearchPending, setQueryAnalysis } = useSearchState()
-const { trackSearch } = useAnalyticsTracking()
-const toast = useToast()
+const { searchState, isLoading, fetchResults } = useSearchState()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   const { location, radius } = asObject(searchState.value)
 
-  if (!location) {
-    return
-  }
+  emits('search-started')
 
-  const body = {
-    ...formData,
+  await fetchResults({
     location,
-    radius,
-  }
-
-  try {
-    setSearchPending(true)
-    emits('search-started')
-
-    const response = await $fetch<ListingWithFullProperty[]>('/api/search/traditional', {
-      method: 'POST',
-      body
-    })
-
-    if (response) {
-      // Build query analysis from form data for filter badges
-      const queryAnalysis = buildQueryAnalysisFromFormData(formData)
-
-      setSearchType('traditional')
-      setQueryAnalysis(queryAnalysis)
-      setResults(response)
-      await navigateTo('/search')
-    }
-  } catch (error) {
-    console.error('Traditional search error:', error)
-    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error', icon: 'i-lucide-search-x' })
-  } finally {
-    setSearchPending(false)
-  }
+    radius
+  }, {
+    type: 'traditional',
+    body: formData
+  },)
 }
 
 async function aiSearchSubmit(query: string) {
   const { location, radius, listingType } = asObject(searchState.value)
 
-  if (!location) {
-    return
-  }
+  emits('search-started')
 
-  const body = {
-    query,
-    listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
+  await fetchResults({
     location,
-    radius: radius ?? 5,
-  }
-
-  try {
-    setSearchPending(true)
-    emits('search-started')
-
-    const response = await $fetch('/api/search/rag', {
-      method: 'POST',
-      body
-    })
-
-    if (response) {
-      setSearchType('ai')
-      setResults(response.results || [])
-
-      trackSearch({
-        listingType: response.effectiveListingType ?? body.listingType,
-        query,
-        location: location as GeocodingFeature,
-        radius: body.radius,
-        resultCount: response.results?.length ?? 0,
-      })
-
-      await navigateTo('/search')
-
-      window.scrollTo({
-        top: 0,
-        behavior: "instant"
-      })
+    radius,
+  }, {
+    type: 'ai',
+    body: {
+      query,
+      listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
     }
-  } catch (error) {
-    console.error('AI search error:', error)
-    toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error', icon: 'i-lucide-search-x' })
-  } finally {
-    setSearchPending(false)
-  }
+  })
 }
 
 function searchReset() {

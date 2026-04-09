@@ -1,5 +1,3 @@
-import { useStorage } from '@vueuse/core'
-
 export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
 export type ResultLayout = 'map' | 'grid' | 'split'
 
@@ -55,7 +53,7 @@ function createSearchState() {
    * Update listing type filter
    */
   function setListingType(value: string, callback?: () => void) {
-    if(value !== 'all' && value !== 'sale' && value !== 'rent') return
+    if (value !== 'all' && value !== 'sale' && value !== 'rent') return
     // Check value is valid
     if (!isString(value)) return
 
@@ -176,6 +174,119 @@ function createSearchState() {
     searchState.value = { ...defaultState };
   };
 
+  /**
+   *  Fetch results
+   */
+  interface RecentSearch {
+    type: 'ai' | 'traditional'
+    body: unknown
+  }
+
+  interface RecentLocation {
+    location?: unknown
+    radius?: number
+  }
+
+  let mostRecentLocation: RecentLocation = {}
+  let mostRecentQuery: RecentSearch | null = null
+
+  const toast = useToast()
+  const { trackSearch } = useAnalyticsTracking()
+
+  async function fetchResults(
+    locationData = mostRecentLocation,
+    queryData = mostRecentQuery
+  ) {
+    const { location, radius } = asObject(locationData)
+
+    if (!location || !queryData) {
+      return
+    }
+
+    const { type, body } = asObject(queryData)
+
+    const isAI = type === 'ai'
+    const validatedType = isAI ? 'ai' : 'traditional'
+
+    try {
+      setSearchPending(true)
+      setSearchType(validatedType)
+
+      /**
+       *  Perform AI search
+       */
+      if (isAI) {
+        const response = await $fetch('/api/search/rag', {
+          method: 'POST',
+          body: {
+            ...asObject(body),
+            location,
+            radius
+          } as unknown as BodyInit
+        })
+
+        const { queryAnalysis, results = [], effectiveListingType } = asObject(response)
+        const { listingType, query } = asObject(body)
+
+        if (queryAnalysis) {
+          setQueryAnalysis(queryAnalysis)
+        }
+
+        setResults(results as unknown[])
+        trackSearch({
+          listingType: effectiveListingType ?? listingType,
+          query: query as string,
+          location: location as GeocodingFeature,
+          radius: radius as number,
+          resultCount: results?.length ?? 0,
+        })
+      }
+
+      /**
+       *  Perform traditional search
+       */
+      else {
+        const formData = asObject(body) as unknown as TraditionalSearchData
+
+        const response = await $fetch('/api/search/traditional', {
+          method: 'POST',
+          body: {
+            ...formData,
+            location,
+            radius
+          }
+        })
+
+        if (!response) throw new Error('')
+
+        const queryAnalysis = buildQueryAnalysisFromFormData(formData)
+        setQueryAnalysis(queryAnalysis)
+        setResults(response as unknown[])
+      }
+
+      await navigateTo('/search')
+
+      window.scrollTo({
+        top: 0,
+        behavior: "instant"
+      })
+    }
+    catch (error) {
+      console.error('Search error:', error)
+
+      toast.add({
+        title: 'Error',
+        description: 'Search failed. Please try again.',
+        color: 'error',
+        icon: 'i-lucide-search-x'
+      })
+    } finally {
+      setSearchPending(false)
+      mostRecentQuery = queryData
+      mostRecentLocation = locationData
+    }
+  }
+
   return {
     searchState,
     setSortOrder,
@@ -190,6 +301,7 @@ function createSearchState() {
     setResults,
     updateState,
     clearState,
+    fetchResults,
     isLoading: readonly(isLoading),
   };
 }
