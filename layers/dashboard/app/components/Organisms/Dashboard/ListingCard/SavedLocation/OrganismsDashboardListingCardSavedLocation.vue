@@ -17,7 +17,7 @@
           <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-secondary" />
         </div>
         <div class="flex flex-col gap-1 min-w-0 flex-1">
-          <h3 class="title-sm m-0! truncate">{{ location.name }}</h3>
+          <h3 class="title-xs m-0! truncate">{{ location.name }}</h3>
         </div>
         <!-- Date badge - top right -->
         <UBadge 
@@ -25,7 +25,7 @@
           size="md" 
           color="secondary" 
           variant="subtle"
-          class="shrink-0"
+          class="shrink-0 self-start"
         >
           Added {{ formatDate(location.createdAt) }}
         </UBadge>
@@ -39,7 +39,7 @@
     <template #footer>
       <div class="flex flex-col gap-3 h-full">
         <!-- Actions -->
-        <div class="flex flex-wrap gap-2 mt-auto pt-2">
+        <div class="flex flex-wrap gap-2 mt-auto pt-2 body-sm">
           <UButton
             variant="subtle"
             size="xs"
@@ -48,12 +48,13 @@
             icon="i-lucide-search"
             label="Search"
             @click="handleSearch"
+            disabled
           />
           <UButton
             variant="subtle"
             size="xs"
             color="secondary"
-            class="font-semibold flex-1 justify-center"
+            class="font-semibold flex-1 justify-center cursor-pointer"
             icon="i-lucide-pencil"
             label="Edit"
             @click="handleEdit"
