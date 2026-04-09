@@ -92,6 +92,7 @@ export const useNotes = () => {
       },
       onSuccess: () => {
         refreshUserNotes();
+        toast.add({ title: successMessage, color: "success", icon: "i-lucide-notebook-pen" });
       },
       onError: (error) => {
         console.error("Error updating note:", error);
@@ -120,6 +121,7 @@ export const useNotes = () => {
       },
       onSuccess: async () => {
         await refreshUserNotes();
+        toast.add({ title: "Note deleted", color: "success", icon: "i-lucide-notebook" });
       },
       onError: (error) => {
         console.error("Error deleting note:", error);

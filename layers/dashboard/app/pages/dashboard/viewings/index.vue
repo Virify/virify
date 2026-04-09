@@ -32,7 +32,7 @@
               @reschedule="openReschedule" @cancel="handleCancel" @accept-counter="handleAcceptCounter" />
           </div>
 
-          <OrganismsDashboardNoResults v-else description="No viewings found." />
+          <OrganismsDashboardNoResults v-else type="viewings" />
         </div>
       </template>
     </template>

@@ -29,7 +29,7 @@
           <OrganismsDashboardListingCard :listing="item.listing!" :note="item.updatedAt" />
         </div>
       </OrganismsDashboardListingCardGrid>
-      <OrganismsDashboardNoResults v-else :description="'No Notes found.'" />
+      <OrganismsDashboardNoResults v-else type="notes" />
 
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
         <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"

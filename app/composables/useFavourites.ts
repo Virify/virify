@@ -54,6 +54,7 @@ export const useFavourites = () => {
       },
       onSuccess: () => {
         refreshFavourites();
+        toast.add({ title: "Added to favourites", color: "success", icon: "i-lucide-heart" });
       },
       onError: (error) => {
         toast.add({ title: "Error", description: "Failed to add to favourites", color: "error", icon: "i-lucide-heart-crack" });
@@ -92,6 +93,7 @@ export const useFavourites = () => {
         // Optimistically remove from global lookups immediately
         favouriteLookups.value = favouriteLookups.value.filter((id) => id !== listingId);
         refreshFavourites();
+        toast.add({ title: "Removed from favourites", color: "success", icon: "i-lucide-heart-off" });
       },
       onError: (error) => {
         toast.add({ title: "Error", description: "Failed to remove from favourites", color: "error", icon: "i-lucide-heart-crack" });

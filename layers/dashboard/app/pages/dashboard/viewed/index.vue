@@ -40,7 +40,7 @@
           <OrganismsDashboardListingCard :listing="item.listing!" :viewed="item.createdAt" />
         </div>
       </OrganismsDashboardListingCardGrid>
-      <OrganismsDashboardNoResults v-else :description="'No viewed listings found.'" />
+      <OrganismsDashboardNoResults v-else type="viewed listings" />
 
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
         <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"

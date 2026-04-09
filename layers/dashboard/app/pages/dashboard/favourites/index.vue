@@ -30,7 +30,7 @@
           <OrganismsDashboardListingCard :listing="item.listing!" :fav="item.createdAt" />
         </div>
       </OrganismsDashboardListingCardGrid>
-      <OrganismsDashboardNoResults v-else :description="'No Favourites found.'" />
+      <OrganismsDashboardNoResults v-else type="favourites" />
 
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
         <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"

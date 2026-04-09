@@ -32,7 +32,7 @@
           <OrganismsDashboardEnquiryGroup v-for="group in groupedByListing" :key="group.listing?.id ?? 'general'"
             :group="group" :user="user" @click="openListingDetail" />
         </template>
-        <OrganismsDashboardNoResults v-else :description="'No Enquiries found.'" />
+        <OrganismsDashboardNoResults v-else type="enquiries" />
       </UPageList>
 
       <ClientOnly>

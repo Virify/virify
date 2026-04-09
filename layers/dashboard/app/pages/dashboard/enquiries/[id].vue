@@ -70,7 +70,7 @@
           </div>
 
           <!-- No Results -->
-          <OrganismsDashboardNoResults v-else :description="'No conversations found matching your filters.'" />
+          <OrganismsDashboardNoResults v-else type="conversations" :has-filters="true" />
         </div>
       </div>
 

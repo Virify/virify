@@ -34,7 +34,7 @@
       </OrganismsDashboardListingCardGrid>
 
       <!-- No Results -->
-      <OrganismsDashboardNoResults v-else :description="'No listings found.'" />
+      <OrganismsDashboardNoResults v-else type="listings" />
 
       <!-- Pagination -->
       <div v-if="pageTotal > 0" class="flex justify-center p-4 mt-auto">

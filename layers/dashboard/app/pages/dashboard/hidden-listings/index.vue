@@ -31,7 +31,7 @@
             @unhide="removeHiddenListing" />
         </div>
       </OrganismsDashboardListingCardGrid>
-      <OrganismsDashboardNoResults v-else :description="'No Hidden Listings found.'" />
+      <OrganismsDashboardNoResults v-else type="hidden listings" />
 
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
         <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"

@@ -33,7 +33,7 @@
       </OrganismsDashboardListingCardGrid>
 
       <!-- No Results -->
-      <OrganismsDashboardNoResults v-else :description="'No archived listings found.'" />
+      <OrganismsDashboardNoResults v-else type="archived listings" />
 
       <!-- Pagination -->
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
