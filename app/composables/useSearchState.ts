@@ -194,7 +194,7 @@ function createSearchState() {
   }
 
   async function mockParseHash(key?: string | string[]) {
-    if (!import.meta.client || !isString(hash)) return
+    if (!import.meta.client || !isString(key)) return
 
     return new Promise((resolve) => {
       setTimeout(() => {
