@@ -37,6 +37,7 @@ const {
   isLoading,
   searchState,
   fetchResults,
+  fetchHash,
   setViewMode,
   setSortOrder,
 } = useSearchState()
@@ -55,6 +56,12 @@ onMounted(async () => {
 
   // If we have results already, nothing to do
   if ((results as unknown[])?.length > 0) return
+
+  // Check if hash for search page exists
+  const { params: { hash } } = useRoute()
+
+  // If so, fetch the hash
+  await fetchHash(hash)
 
   // Perform traditional search
   if (searchType === 'traditional') {
