@@ -72,13 +72,14 @@ const hasFetchedOnce = ref(false);
 
 // Open conversation modal
 function handleSelectConversation(conversationId: number) {
+  // Close slideover first so the enquiry modal renders above it
+  isOpen.value = false;
+
   // Try to find conversation in already-loaded enquiries first
   const conversation = enquiries.value.find(e => e.id === conversationId);
-  
+
   // Open modal with conversation object if available, otherwise just the ID
   openConversation(conversation || conversationId);
-  
-  // Keep slideover open for convenience - user can browse multiple notifications
 }
 
 // Fetch notifications when unread count becomes available OR slideover opens (whichever comes first)

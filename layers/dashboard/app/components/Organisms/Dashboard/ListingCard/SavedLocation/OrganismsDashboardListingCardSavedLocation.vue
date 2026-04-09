@@ -18,7 +18,7 @@
         </div>
         <div class="flex flex-col gap-1 min-w-0 flex-1">
           <h3 class="title-sm m-0! truncate">{{ location.name }}</h3>
-          <p class="body-xs text-muted-foreground m-0! truncate">{{ location.location }}</p>
+          <p class="body-xs text-muted-foreground m-0!">{{ location.location }}</p>
         </div>
         <!-- Date badge - top right -->
         <UBadge 
