@@ -199,7 +199,8 @@ const completedStepsCount = computed(() => {
   return (props.listing as any).completedSteps?.length ?? 0;
 });
 
-const isAllStepsCompleted = computed(() => completedStepsCount.value >= 9);
+const mediaCount = computed(() => (props.listing as any).property?.media?.length ?? 0);
+const isAllStepsCompleted = computed(() => completedStepsCount.value >= 9 && mediaCount.value > 0);
 
 // Computed properties for checking if data exists
 const hasImage = computed(() => !!getMainImage(props.listing?.property));
@@ -304,8 +305,9 @@ async function handlePublish() {
     // Bust the Nuxt payload cache for both pages so the next navigation re-fetches fresh data
     clearNuxtData((key) => String(key).startsWith('my-listings:'));
     clearNuxtData((key) => String(key).startsWith('draft-listings:'));
+    // Aggregate counts are updated via the WebSocket message (listings: +1, draftListings: -1)
+    // The server also invalidates the aggregates cache so any subsequent fetch is fresh
     // Notify the parent page to refresh its useAsyncData (card renders from page's fetchedData, not shared ref)
-    // Aggregate is updated via the WebSocket message sent by the server — no manual refetch needed
     emit('published');
   } catch (error: any) {
     toast.add({

@@ -1,6 +1,27 @@
 import { createSharedComposable } from "@vueuse/core";
 
 /**
+ * @fileoverview Global Notifications & Aggregates State Manager.
+ * 
+ * **Purpose:**
+ * An app-wide singleton (enforced via `createSharedComposable`) that manages user 
+ * notifications, side-panel counter badges (aggregates), and toast alerts.
+ * 
+ * **State Management:**
+ * - Strictly resets all local state whenever the authenticated user changes/logs out.
+ * - Heavily utilizes optimistic local mutations for instantly fast UI responses.
+ * - Implements deduplication (`toastedNotificationIds`) so users don't see duplicate 
+ *   toast alerts when multiple browser tabs/windows are open on the same session.
+ * 
+ * **WebSocket vs HTTP Race Condition Handling:**
+ * - **Stale Event Rejection:** Uses `lastFetchTime` to track the exact moment aggregates 
+ *   were last fetched from the database via HTTP. When an optimistic WebSocket update arrives 
+ *   via `handleAggregateUpdate`, it checks `isStaleWsEvent()`. If the WS message timestamp 
+ *   is older than `lastFetchTime`, it is discarded. This prevents "time travel" bugs where 
+ *   an out-of-order or delayed WS event overrides a fresh HTTP response.
+ */
+
+/**
  * Global state - shared across all composable instances
  */
 const aggregates = ref<UserItemsAggregates>({
@@ -147,6 +168,9 @@ export const useNotifications = createSharedComposable(() => {
       console.error("Failed to fetch notification counts", e);
     }
   }
+  
+  // Track last time aggregates were fetched from DB to ignore stale WS events
+  const lastFetchTime = ref<string | null>(null);
 
   /**
    * Fetch user item aggregates from the API
@@ -163,6 +187,8 @@ export const useNotifications = createSharedComposable(() => {
       if (data) {
         aggregates.value = data;
         aggregatesFetched.value = true;
+        // Record precise time the API request completed
+        lastFetchTime.value = new Date().toISOString();
       }
     } catch (err) {
       console.error("Failed to fetch user items aggregates:", err);
@@ -185,15 +211,20 @@ export const useNotifications = createSharedComposable(() => {
    * Optimistic local updates (+1/-1) for all aggregate types
    */
   function handleAggregateUpdate(data: AggregateUpdateMessage) {
+    if (isStaleWsEvent(data.timestamp, lastFetchTime.value)) {
+      return;
+    }
+    
     const currentCount = aggregates.value[data.aggregateType] || 0;
 
     let newCount = currentCount;
+    // Check data.operation instead of data.action which is what the message uses
     if (data.operation === "add") {
       newCount = currentCount + 1;
     } else if (data.operation === "remove") {
       newCount = Math.max(0, currentCount - 1);
     }
-
+    
     aggregates.value = {
       ...aggregates.value,
       [data.aggregateType]: newCount,

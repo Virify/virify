@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Global client-side WebSocket listener and event dispatcher.
+ * 
+ * **Purpose:**
+ * Establishes the singular client-side WebSocket connection for the logged-in user 
+ * and routes incoming real-time events to the appropriate shared composables 
+ * (e.g., `useNotifications`, `useEnquiries`).
+ * 
+ * **State Management & UI UX:**
+ * - Acts as the strict single source of truth for processing real-time updates.
+ * - Automatically triggers secondary side-effects (like calling `fetchViewings()`) to keep 
+ *   unrelated UI components in sync without requiring a page reload.
+ * 
+ * **WebSocket Race Condition & Flicker Prevention:**
+ * - Prioritizes optimistic local state updates (e.g., manually incrementing badges) 
+ *   over immediate API refetches. Because database replication/transactions can have lag, 
+ *   an immediate HTTP fetch after a WS message might return "stale" DB data, causing 
+ *   badges to flicker. Relying on the optimistic WebSockets payload avoids this perfectly.
+ */
 import { useWebSocket } from "@vueuse/core";
 
 /**

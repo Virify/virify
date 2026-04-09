@@ -1,4 +1,23 @@
 /**
+ * @fileoverview Server-side WebSocket connection and routing manager.
+ * 
+ * **Purpose:** 
+ * Acts as an in-memory pub/sub message broker. It manages server-side socket connections
+ * and routes messages strictly to the intended peers based on their user ID.
+ * 
+ * **State Management:**
+ * - Uses singleton Maps (`globalPeers` and `globalActiveConversationByUser`) outside the 
+ *   composable scope to ensure that all instances share the exact same state in memory.
+ * - Handles connection lifecycles (add/remove peers) and cleans up presence state 
+ *   when a user fully disconnects.
+ * 
+ * **Message Routing:**
+ * - Receives raw websocket payloads and strongly types them before dispatch. 
+ * - Determines whether to broadcast to a specific subset of user connections or standardizes 
+ *   global announcements.
+ */
+
+/**
  * Client-side event handlers interface
  */
 export interface WebSocketEvents {

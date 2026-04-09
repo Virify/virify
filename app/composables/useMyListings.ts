@@ -44,6 +44,9 @@ export const useMyListings = createSharedComposable(() => {
         color: "success",
         icon: "i-lucide-check-circle",
       });
+
+      const { fetchUserItemsAggregates } = useNotifications();
+      fetchUserItemsAggregates(true).catch(() => {});
     } catch (error) {
       console.error("Failed to update publish state", error);
       toast.add({ title: "Error", description: "Failed to update publish state", color: "error", icon: "i-lucide-circle-x" });

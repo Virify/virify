@@ -46,7 +46,7 @@ export default defineAppConfig({
     },
     toast: {
       slots: {
-        root: "bg-(--background-100)",
+        root: "bg-(--background-100) z-[9999]",
       },
     },
     formField: {

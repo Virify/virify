@@ -101,7 +101,7 @@ const state = reactive<Step9FormState>({
   },
 })
 
-const isFormValid = computed(() => true)
+const isFormValid = computed(() => state.property.media.length > 0)
 
 const {
   uploadProgress,

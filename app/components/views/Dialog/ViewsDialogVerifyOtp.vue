@@ -2,10 +2,10 @@
   <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Verify your email</h1>
     <p class="| body-sm">Please enter your one time pin that you have recived in your email below.</p>
-    <p v-if="errors" class="| body-sm">{{ errors }}</p>
+    <p v-if="errors" class="| py-2 body-sm text-error text-center">{{ errors }}</p>
     <MoleculesOtp v-model="otpCode" @complete="registerCompletion" />
     <AtomsDivider text="Warning" />
-    <p class="body-sm">If you close this dialog, you will need to restart the verification process.</p>
+    <p class="body-sm">If you close this dialog, you will need activate using the link sent to your email.</p>
   </div>
 </template>
 
@@ -36,7 +36,9 @@ const { hideDialog, showDialog } = useDialog();
  * Any other routes or tokens required for OtP verification should be added here
  */
 async function registerCompletion() {
-  await verifyOtp();
+  const success = await verifyOtp();
+  if (!success) return;
+
   await fetch();
   if (props.passwordToken) {
     useViewTransition(() => {
@@ -60,7 +62,8 @@ async function registerCompletion() {
 
 const errors = ref("");
 
-async function verifyOtp() {
+async function verifyOtp(): Promise<boolean> {
+  errors.value = "";
   try {
     await $fetch("/auth/verify-otp", {
       method: "POST",
@@ -70,8 +73,11 @@ async function verifyOtp() {
         passwordToken: props.passwordToken,
       },
     });
+    return true;
   } catch (error: any) {
-    errors.value = error.data.message;
+    errors.value = error?.data?.message || "Incorrect code. Please try again.";
+    otpCode.value = [];
+    return false;
   }
 }
 </script>
