@@ -19,7 +19,8 @@ const aggregates = ref<UserItemsAggregates>({
   draftListings: 0,
   archivedListings: 0,
   viewedListings: 0,
-  hiddenListings: 0
+  hiddenListings: 0,
+  viewings: 0,
 });
 const aggregatesLoading = ref(false);
 const aggregatesFetched = ref(false);
@@ -76,7 +77,8 @@ export const useNotifications = createSharedComposable(() => {
         draftListings: 0,
         archivedListings: 0,
         viewedListings: 0,
-        hiddenListings: 0
+        hiddenListings: 0,
+        viewings: 0,
       };
       aggregatesLoading.value = false;
       aggregatesFetched.value = false;

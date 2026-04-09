@@ -13,7 +13,7 @@
       </div>
 
       <USelect v-model="sortOrderValue" :items="sortOrder" option-attribute="label" value-attribute="value"
-        icon="i-lucide-arrow-down-up" color="primary" variant="ghost" size="md" class="body-sm max-w-36" :ui="{
+        icon="i-lucide-arrow-down-up" color="primary" variant="ghost" size="md" class="body-sm flex-1" :ui="{
           base: 'capitalize cursor-pointer light:bg-(--blue-400)! light:text-white!',
           content: 'z-[60]!',
           group: 'bg-(--background-100) text-(--foreground-100) p-1',
@@ -24,7 +24,7 @@
     <slot name="extra-filters" />
 
     <!-- Search -->
-    <UInput v-model="searchQuery" variant="subtle" icon="i-lucide-search" color="secondary" placeholder="Search..."
+    <UInput v-if="!hideSearch" v-model="searchQuery" variant="subtle" icon="i-lucide-search" color="secondary" placeholder="Search..."
       :highlight="false" size="md" class="body-sm flex-1 min-w-40" :ui="{
         base: 'focus-visible:outline-0! outline-primary ring-primary!',
       }" />
@@ -38,6 +38,7 @@ const props = defineProps<{
   dateKey?: keyof T;
   persistenceKey?: string;
   hideSaleRentFilter?: boolean;
+  hideSearch?: boolean;
 }>();
 
 const emit = defineEmits<{

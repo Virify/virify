@@ -10,7 +10,7 @@ export interface SendViewingNotificationOptions {
   /** Avatar URL of the sender */
   senderAvatar?: string;
   /** The type of viewing event */
-  eventType: "requested" | "accepted" | "rescheduled";
+  eventType: "requested" | "accepted" | "rescheduled" | "declined" | "cancelled";
   /** Pre-formatted proposed date/time string (e.g. "12 Jun 2025, 10:00") */
   proposedAt: string;
   /** Pre-formatted counter-proposed date/time (reschedule only) */
@@ -61,6 +61,8 @@ export async function sendViewingNotificationEmail(options: SendViewingNotificat
     requested: `${senderName} has requested a viewing — Virify`,
     accepted: `Your viewing has been confirmed — Virify`,
     rescheduled: `${senderName} has proposed a new viewing time — Virify`,
+    declined: `Your viewing request was declined — Virify`,
+    cancelled: `${senderName} has cancelled the viewing — Virify`,
   };
 
   return await sesSender(html, subjects[eventType], to);

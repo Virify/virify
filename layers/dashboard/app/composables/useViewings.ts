@@ -20,6 +20,9 @@ export const useViewings = createSharedComposable(() => {
         body: payload,
       });
       viewings.value = [...viewings.value, created];
+      // Refresh aggregates so the requester's sidebar badge updates immediately
+      const { fetchUserItemsAggregates } = useNotifications();
+      fetchUserItemsAggregates(true).catch((e) => console.error("Failed to refresh aggregates after viewing request:", e));
       return created;
     } catch (err) {
       console.error("Error requesting viewing:", err);
@@ -35,6 +38,8 @@ export const useViewings = createSharedComposable(() => {
       });
       const idx = viewings.value.findIndex((v) => v.id === id);
       if (idx !== -1) viewings.value[idx] = updated;
+      // Re-fetch to sync the shared ref and pick up cache bust from server
+      fetchViewings().catch((err) => console.error("Failed to refresh viewings after respond:", err));
       return updated;
     } catch (err) {
       console.error("Error responding to viewing:", err);
@@ -47,6 +52,8 @@ export const useViewings = createSharedComposable(() => {
       await requestFetch(`/api/viewing/${id}/cancel`, { method: "DELETE" });
       const idx = viewings.value.findIndex((v) => v.id === id);
       if (idx !== -1) viewings.value[idx] = { ...viewings.value[idx]!, status: "CANCELLED" };
+      // Re-fetch to sync the shared ref after cache bust
+      fetchViewings().catch((err) => console.error("Failed to refresh viewings after cancel:", err));
       return true;
     } catch (err) {
       console.error("Error cancelling viewing:", err);
@@ -70,18 +77,48 @@ export const useViewings = createSharedComposable(() => {
     return viewings.value.some((v) => v.listingId === listingId && v.requesterId === user.value!.id && (v.status === "PENDING" || v.status === "RESCHEDULED"));
   }
 
-  async function fetchViewings(): Promise<void> {
+  /**
+   * Return the most relevant active viewing for the current user as requester.
+   * Priority: ACCEPTED > RESCHEDULED > PENDING. CANCELLED/REJECTED are ignored.
+   */
+  function getActiveViewingForListing(listingId: number): ViewingWithDetails | null {
+    if (!user.value?.id) return null;
+    const priority: ViewingStatus[] = ['ACCEPTED', 'RESCHEDULED', 'PENDING'];
+    for (const status of priority) {
+      const found = viewings.value.find(
+        (v) => v.listingId === listingId && v.requesterId === (user.value!.id as number) && v.status === status,
+      );
+      if (found) return found;
+    }
+    return null;
+  }
+
+  /** Human-readable label for a viewing's status as a buyer. */
+  function getViewingStatusLabel(viewing: ViewingWithDetails): string {
+    if (viewing.status === 'ACCEPTED') {
+      const d = new Date(viewing.proposedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      return `Viewing on ${d}`;
+    }
+    if (viewing.status === 'RESCHEDULED') return 'New Time Proposed';
+    return 'Viewing Pending';
+  }
+
+  async function fetchViewings(sort: 'newest' | 'oldest' = 'newest'): Promise<void> {
     if (!user.value?.id) return;
+    loading.value = true;
     try {
-      const data = await requestFetch<{ viewings: ViewingWithDetails[] }>("/api/viewing");
-      viewings.value = data.viewings ?? [];
+      const data = await requestFetch<ViewingWithDetails[]>(`/api/viewing?sort=${sort}`);
+      viewings.value = data ?? [];
     } catch (err) {
       console.error("Error fetching viewings:", err);
+    } finally {
+      loading.value = false;
     }
   }
 
   return {
     viewings: readonly(viewings),
+    loading: readonly(loading),
     pendingViewings,
     pendingCount,
     requestViewing,
@@ -89,6 +126,8 @@ export const useViewings = createSharedComposable(() => {
     cancelViewing,
     getConversationViewings,
     hasActiveViewingAsRequester,
+    getActiveViewingForListing,
+    getViewingStatusLabel,
     fetchViewings,
   };
 });

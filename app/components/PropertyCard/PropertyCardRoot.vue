@@ -30,6 +30,7 @@
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price">
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
+        <ClientOnly><PropertyCardPill v-if="viewingLabel" :content="viewingLabel" /></ClientOnly>
 
         <span class="property-card-root__price-amount | title-md">
           {{ price }}
@@ -131,6 +132,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { isHidden, unhideListing } = useHiddenListings()
 const { trackClick } = useAnalyticsTracking()
+const { loggedIn } = useUserSession()
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings()
+
+onMounted(() => {
+  if (loggedIn.value && props.listingId && viewings.value.length === 0) {
+    fetchViewings().catch(() => {})
+  }
+})
+
+const viewingLabel = computed(() => {
+  if (!props.listingId) return null
+  const v = getActiveViewingForListing(props.listingId)
+  return v ? getViewingStatusLabel(v) : null
+})
 
 const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)

@@ -20,6 +20,7 @@
             :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
+            :listing-id="listing?.id"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
 
           <!-- General Property Information (Non-collapsible) -->

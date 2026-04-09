@@ -16,7 +16,7 @@ import {
 const props = defineProps<{
   senderName: string;
   senderAvatar?: string;
-  eventType: "requested" | "accepted" | "rescheduled";
+  eventType: "requested" | "accepted" | "rescheduled" | "declined" | "cancelled";
   proposedAt: string;
   counterProposedAt?: string;
   notes?: string;
@@ -29,23 +29,30 @@ const props = defineProps<{
 const previewText = computed(() => {
   if (props.eventType === "requested") return `${props.senderName} has requested a viewing`;
   if (props.eventType === "accepted") return "Your viewing has been confirmed";
+  if (props.eventType === "declined") return "Your viewing request was declined";
+  if (props.eventType === "cancelled") return `${props.senderName} has cancelled the viewing`;
   return `${props.senderName} has proposed a new viewing time`;
 });
 
 const headingText = computed(() => {
   if (props.eventType === "requested") return "Viewing Request";
   if (props.eventType === "accepted") return "Viewing Confirmed";
+  if (props.eventType === "declined") return "Viewing Declined";
+  if (props.eventType === "cancelled") return "Viewing Cancelled";
   return "New Viewing Time";
 });
 
 const bodyText = computed(() => {
   if (props.eventType === "requested") return `${props.senderName} has requested a viewing.`;
   if (props.eventType === "accepted") return "Your viewing has been confirmed.";
+  if (props.eventType === "declined") return "Your viewing request has been declined.";
+  if (props.eventType === "cancelled") return `${props.senderName} has cancelled the viewing.`;
   return `${props.senderName} has proposed a new viewing time.`;
 });
 
 const ctaLabel = computed(() => {
   if (props.eventType === "accepted") return "View Viewing Details";
+  if (props.eventType === "declined" || props.eventType === "cancelled") return "View Viewings";
   return "View Conversation";
 });
 </script>

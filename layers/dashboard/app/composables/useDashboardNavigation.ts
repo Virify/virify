@@ -7,9 +7,6 @@ import { createSharedComposable } from "@vueuse/core";
  */
 export const useDashboardNavigation = createSharedComposable(() => {
   const { aggregates } = useNotifications();
-  const { viewings } = useViewings();
-
-  const activeViewingsCount = computed(() => viewings.value.filter((v) => ["PENDING", "ACCEPTED", "RESCHEDULED"].includes(v.status)).length);
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
     {
@@ -94,7 +91,7 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "Schedule viewings",
           },
-          badge: activeViewingsCount.value > 0 ? String(activeViewingsCount.value) : undefined,
+          badge: aggregates.value.viewings > 0 ? String(aggregates.value.viewings) : undefined,
         },
         {
           label: "Enquiries",

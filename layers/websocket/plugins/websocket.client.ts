@@ -37,6 +37,7 @@ export default defineNuxtPlugin(() => {
     const { syncConversationIfOpen, isModalOpen, modalConversation } = useGlobalEnquiryModal();
     const { canDesktop } = useNotificationPreferences();
     const wsComposable = useWebSocketServer();
+    const { fetchViewings } = useViewings();
 
     const globalWebSocketEvents: WebSocketEvents = {
       /**
@@ -50,6 +51,10 @@ export default defineNuxtPlugin(() => {
           to: 0,
           timestamp: new Date().toISOString()
         });
+        // When a viewings aggregate update arrives, also refresh the shared viewings ref
+        if (aggregateType === "viewings") {
+          fetchViewings().catch((e) => console.error("Failed to refresh viewings on aggregate update:", e));
+        }
       },
       
       /**
@@ -143,6 +148,8 @@ export default defineNuxtPlugin(() => {
        * Handle notification_new - add to list and trigger toast
        */
       onNotificationNew: ({ notification }) => {
+        const isViewingNotification = (notification.type as string).startsWith("VIEWING_");
+
         // Add to notifications store
         addNotification(notification);
 
@@ -151,11 +158,19 @@ export default defineNuxtPlugin(() => {
           id: notification.id,
           title: notification.title,
           description: notification.message,
+          type: notification.type as any,
           conversationId: notification.conversationId ?? undefined,
           listingId: notification.listingId ?? undefined,
           senderUsername: notification.senderUsername ?? undefined,
           senderAvatar: notification.senderAvatar ?? undefined,
         });
+
+        // For viewing notifications: refresh the shared viewings ref and aggregates
+        // so sidebar badges and the viewings page update without a hard refresh
+        if (isViewingNotification) {
+          fetchViewings().catch((e) => console.error("Failed to refresh viewings on notification:", e));
+          fetchUserItemsAggregates(true).catch((e) => console.error("Failed to refresh aggregates on viewing notification:", e));
+        }
 
         // Trigger browser desktop notification if the user has enabled it
         // Suppress if the page is currently focused (in-app toast already shown)

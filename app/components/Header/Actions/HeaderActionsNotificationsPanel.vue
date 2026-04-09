@@ -112,6 +112,14 @@ async function handleSelect(notification: UserNotification) {
     markAsRead({ notificationId: notification.id })
   }
 
+  if ((notification.type as string)?.startsWith('VIEWING_')) {
+    const tab = notification.type === 'VIEWING_REQUEST' ? 'requested'
+      : notification.type === 'VIEWING_RESCHEDULED' ? 'rescheduled'
+      : 'all'
+    await navigateTo(`/dashboard/viewings?tab=${tab}`)
+    return
+  }
+
   if (notification.conversationId) {
     await openConversation(notification.conversationId)
   } else if (notification.listingId) {

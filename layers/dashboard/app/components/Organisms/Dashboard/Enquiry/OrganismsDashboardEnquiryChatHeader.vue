@@ -9,7 +9,18 @@
     />
     <div class="flex flex-col gap-1 min-w-0 flex-1">
       <h2 class="text-sm font-bold leading-none">{{ otherUser?.username || "Unknown User" }}</h2>
-      <p class="text-xs text-(--foreground-200)/80 max-w-full py-2 font-normal">{{ subTitle }}</p>
+      <div class="flex items-center gap-1.5">
+        <p class="text-xs text-(--foreground-200)/80 max-w-full py-2 font-normal">{{ subTitle }}</p>
+        <NuxtLink
+          v-if="listingId"
+          :to="`/listing/${listingId}`"
+          target="_blank"
+          class="text-muted-foreground hover:text-foreground transition-colors shrink-0"
+          title="View listing"
+        >
+          <UIcon name="i-lucide-external-link" class="w-3.5 h-3.5" />
+        </NuxtLink>
+      </div>
       <USelect
         v-if="isOwner && availabilityItems.length > 0"
         :model-value="availabilityStatus"
@@ -33,6 +44,7 @@ defineProps<{
   availabilityStatus: string;
   availabilityItems: { value: string | number | boolean | null; label: string }[];
   isUpdating: boolean;
+  listingId?: number | null;
 }>();
 
 defineEmits<{

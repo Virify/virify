@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Push real-time notification to the listing owner
-    const { sendMessage, createNotificationNewMessage, isUserOnline } = useWebSocketServer();
+    const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
     if (isUserOnline(recipientId)) {
       sendMessage(createNotificationNewMessage(notification as any, recipientId));
     }
@@ -88,7 +88,16 @@ export default defineEventHandler(async (event) => {
     }
 
     // Bust viewings cache for both requester and owner
-    await Promise.all([invalidateViewingsCache(user.id as number), invalidateViewingsCache(ownerId)]);
+    await Promise.all([
+      invalidateViewingsCache(user.id as number),
+      invalidateViewingsCache(ownerId),
+      invalidateAggregatesCache(user.id as number),
+      invalidateAggregatesCache(ownerId),
+    ]);
+
+    // Send live aggregate update so both parties' sidebar badges update immediately
+    sendMessage(createAggregateUpdateMessage("viewings", "add", user.id as number));
+    sendMessage(createAggregateUpdateMessage("viewings", "add", ownerId));
 
     return viewing;
   } catch (error) {

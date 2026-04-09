@@ -1,5 +1,10 @@
 <template>
-  <div v-if="listing" class="flex gap-3 p-3 h-auto w-full rounded-lg bg-background-200">
+  <NuxtLink
+    v-if="listing"
+    :to="`/listing/${listing.id}`"
+    target="_blank"
+    class="flex gap-3 p-3 h-auto w-full rounded-lg bg-background-200 hover:bg-elevated/60 transition-colors cursor-pointer group"
+  >
     <div v-if="getMainImage(listing.property)" class="w-16 h-full overflow-hidden shrink-0">
       <AtomsCloudFlareImage :src="getMainImage(listing.property)!"
         :alt="listing.property?.address?.fullAddress || 'Property'"
@@ -10,7 +15,10 @@
         <p class="text-base font-bold text-secondary leading-none">
           {{ formatCurrency((listing.price)) }}
         </p>
-        <UBadge :label="listing.rentalListing ? 'To Rent' : 'For Sale'" color="secondary" variant="soft" size="md" />
+        <div class="flex items-center gap-1.5">
+          <UBadge :label="listing.rentalListing ? 'To Rent' : 'For Sale'" color="secondary" variant="soft" size="md" />
+          <UIcon name="i-lucide-external-link" class="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
       </div>
       <p class="text-xs font-medium text-foreground mb-2">
         {{ listing.property?.type?.name || 'Property Type N/A' }}
@@ -33,7 +41,7 @@
         </span>
       </div>
     </div>
-  </div>
+  </NuxtLink>
   <div v-else class="p-3 rounded-lg bg-elevated border">
     <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
       <UIcon name="i-lucide-alert-circle" class="inline w-4 h-4 mr-1" />

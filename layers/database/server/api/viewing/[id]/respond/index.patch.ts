@@ -55,18 +55,18 @@ export default defineEventHandler(async (event) => {
       conversationId: updated.conversationId ?? null,
     });
 
-    const { sendMessage, createNotificationNewMessage, isUserOnline } = useWebSocketServer();
+    const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
     if (isUserOnline(updated.requesterId)) {
       sendMessage(createNotificationNewMessage(notification as any, updated.requesterId));
     }
 
-    // Send offline email for accept/reschedule — rejections are notification-only
-    if (!isUserOnline(updated.requesterId) && response !== "reject") {
+    // Send offline email for all response types
+    if (!isUserOnline(updated.requesterId)) {
       const prefs = await getUserNotificationPreferences(updated.requesterId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();
         const baseUrl = config.public.EMAIL_BASE_URL as string;
-        const eventType = response === "accept" ? "accepted" : "rescheduled";
+        const eventType = response === "accept" ? "accepted" : response === "reject" ? "declined" : "rescheduled";
         sendViewingNotificationEmail({
           to: prefs.email,
           senderName: user.username ?? "Someone",
@@ -87,8 +87,19 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Bust viewings cache for both parties
-    await Promise.all([invalidateViewingsCache(user.id as number), invalidateViewingsCache(updated.requesterId)]);
+    // Bust viewings + aggregates cache for both parties
+    await Promise.all([
+      invalidateViewingsCache(user.id as number),
+      invalidateViewingsCache(updated.requesterId),
+      invalidateAggregatesCache(user.id as number),
+      invalidateAggregatesCache(updated.requesterId),
+    ]);
+
+    // For REJECTED/CANCELLED statuses the active count drops; for others it stays
+    const operation = response === "reject" ? "remove" : "update";
+    // Send live aggregate updates so sidebar badges refresh immediately for both parties
+    sendMessage(createAggregateUpdateMessage("viewings", operation, user.id as number));
+    sendMessage(createAggregateUpdateMessage("viewings", operation, updated.requesterId));
 
     return updated;
   } catch (error) {

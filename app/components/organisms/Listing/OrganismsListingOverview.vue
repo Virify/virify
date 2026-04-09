@@ -8,6 +8,11 @@
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
           {{ convertEnumToString(available!) }}
         </AtomsPill>
+        <ClientOnly>
+          <AtomsPill v-if="viewingLabel" class="o-listing-sidebar__title-offertype__item | body-xs">
+            {{ viewingLabel }}
+          </AtomsPill>
+        </ClientOnly>
       </div>
 
 
@@ -51,10 +56,26 @@ interface Props {
   hasGarden?: boolean
   hasLand?: boolean
   available?: string
+  listingId?: number
 }
 
 const props = defineProps<Props>()
 console.log("OrganismsListingOverview loaded with props:", props.address);
+
+const { loggedIn } = useUserSession();
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+
+onMounted(() => {
+  if (loggedIn.value && viewings.value.length === 0) {
+    fetchViewings().catch(() => {});
+  }
+});
+
+const viewingLabel = computed(() => {
+  if (!props.listingId) return null;
+  const v = getActiveViewingForListing(props.listingId);
+  return v ? getViewingStatusLabel(v) : null;
+});
 </script>
 
 <style lang="scss">

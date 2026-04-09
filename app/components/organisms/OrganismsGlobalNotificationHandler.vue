@@ -24,9 +24,11 @@ watch(isModalOpen, (open) => {
 watch(lastNotification, (notification) => {
   if (notification) {
     const notifConvId = notification.conversationId;
+    const isViewingNotif = notification.type?.startsWith("VIEWING_");
 
     // Suppress if this client is already viewing that conversation in ANY modal
     if (
+      !isViewingNotif &&
       notifConvId && (
         activeEnquiryId.value === notifConvId ||
         (isModalOpen.value && modalConversation.value?.id === notifConvId)
@@ -40,10 +42,16 @@ watch(lastNotification, (notification) => {
       description: notification.description,
       ...(notification.senderAvatar
         ? { avatar: { src: notification.senderAvatar, alt: notification.senderUsername || 'User' } }
-        : { icon: 'i-lucide-message-circle' }),
+        : { icon: isViewingNotif ? 'i-lucide-calendar-check' : 'i-lucide-message-circle' }),
       color: 'secondary',
       onClick: async () => {
-        if (notification.conversationId) {
+        if (isViewingNotif) {
+          const type = notification.type as string;
+          const tab = type === 'VIEWING_REQUEST' ? 'requested'
+            : type === 'VIEWING_RESCHEDULED' ? 'rescheduled'
+            : 'all';
+          await navigateTo(`/dashboard/viewings?tab=${tab}`);
+        } else if (notification.conversationId) {
           await openConversation(notification.conversationId);
         } else {
           await navigateTo('/dashboard/enquiries');

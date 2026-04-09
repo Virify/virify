@@ -14,7 +14,7 @@
         <div class="flex items-center gap-2.5 min-w-0">
           <UAvatar
             :src="otherUser.avatar || undefined"
-            :name="otherUser.username || 'User'"
+            :alt="otherUser.username || 'User'"
             size="md"
             class="text-(--foreground-100) bg-(--background-200) shrink-0"
           />
@@ -33,16 +33,21 @@
     <template #body>
       <div class="flex flex-col gap-2.5">
         <!-- Address -->
-        <div v-if="address" class="flex items-start gap-2">
+        <NuxtLink
+          v-if="address"
+          :to="`/listing/${viewing.listingId}`"
+          target="_blank"
+          class="flex items-start gap-2 group"
+        >
           <UIcon name="i-lucide-map-pin" class="size-4 text-secondary shrink-0 mt-0.5" />
-          <p class="body-sm text-(--foreground-100) leading-snug">{{ address }}</p>
-        </div>
+          <p class="body-xs text-(--foreground-100) leading-snug group-hover:text-secondary group-hover:underline transition-colors">{{ address }}</p>
+        </NuxtLink>
 
         <!-- Proposed date/time -->
         <div class="flex items-start gap-2">
           <UIcon name="i-lucide-calendar" class="size-4 text-secondary shrink-0 mt-0.5" />
           <div>
-            <p class="body-sm font-semibold">{{ formattedDate }}</p>
+            <p class="body-xs">{{ formattedDate }}</p>
             <p v-if="viewing.counterProposedAt" class="body-xs text-(--foreground-200) mt-0.5">
               New proposal: {{ formatCounterDate }}
             </p>
@@ -57,25 +62,31 @@
 
         <!-- Actions -->
         <div
-          v-if="isOwner && viewing.status === 'PENDING' || !isOwner && (viewing.status === 'PENDING' || viewing.status === 'ACCEPTED' || viewing.status === 'RESCHEDULED')"
+          v-if="viewing.status === 'PENDING' || viewing.status === 'ACCEPTED' || viewing.status === 'RESCHEDULED'"
           class="flex gap-2 flex-wrap pt-2.5 border-t border-accented/30 mt-0.5"
         >
-          <!-- Owner actions -->
+          <AtomsViewingCalendarMenu :viewing="viewing" />
+          <!-- Owner actions on PENDING -->
           <template v-if="isOwner && viewing.status === 'PENDING'">
-            <UButton size="xs" color="success" variant="subtle" icon="i-lucide-check" @click="$emit('accept', viewing.id)">Accept</UButton>
-            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" @click="$emit('reject', viewing.id)">Decline</UButton>
-            <UButton size="xs" color="neutral" variant="subtle" icon="i-lucide-calendar-clock" @click="$emit('reschedule', viewing)">Reschedule</UButton>
+            <UButton size="xs" color="success" variant="subtle" icon="i-lucide-check" class="body-sm" @click="$emit('accept', viewing.id)">Accept</UButton>
+            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" class="body-sm" @click="$emit('reject', viewing.id)">Decline</UButton>
+            <UButton size="xs" color="neutral" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('reschedule', viewing)">Reschedule</UButton>
           </template>
 
-          <!-- Requester: cancel -->
+          <!-- Owner: cancel an already accepted or rescheduled viewing -->
+          <template v-if="isOwner && (viewing.status === 'ACCEPTED' || viewing.status === 'RESCHEDULED')">
+            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-calendar-x" class="body-sm" @click="$emit('cancel', viewing.id)">Cancel viewing</UButton>
+          </template>
+
+          <!-- Requester: cancel PENDING or ACCEPTED viewing -->
           <template v-if="!isOwner && (viewing.status === 'PENDING' || viewing.status === 'ACCEPTED')">
-            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" @click="$emit('cancel', viewing.id)">Cancel</UButton>
+            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" class="body-sm" @click="$emit('cancel', viewing.id)">Cancel</UButton>
           </template>
 
           <!-- Requester: accept/decline counter-proposal -->
           <template v-if="!isOwner && viewing.status === 'RESCHEDULED'">
-            <UButton size="xs" color="success" variant="subtle" icon="i-lucide-check" @click="$emit('acceptCounter', viewing.id)">Accept new time</UButton>
-            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" @click="$emit('cancel', viewing.id)">Decline</UButton>
+            <UButton size="xs" color="success" variant="subtle" icon="i-lucide-check" class="body-sm" @click="$emit('acceptCounter', viewing.id)">Accept new time</UButton>
+            <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" class="body-sm" @click="$emit('cancel', viewing.id)">Decline</UButton>
           </template>
         </div>
       </div>

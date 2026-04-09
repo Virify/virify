@@ -18,6 +18,7 @@
         :availability-status="enquiryAvailabilityStatus"
         :availability-items="enquiryAvailabilityItems"
         :is-updating="isUpdatingEnquiryStatus"
+        :listing-id="conversation?.listing?.id ?? null"
         @availability-change="handleEnquiryAvailabilityChange"
       />
     </template>

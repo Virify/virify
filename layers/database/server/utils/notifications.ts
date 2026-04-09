@@ -6,7 +6,7 @@
  * @returns UserItemsAggregates - An object containing notification counts
  */
 export async function getUserItemsAggregates(userId: number): Promise<UserItemsAggregates> {
-  const [favourites, notes, hiddenListings, enquiries, locations, listings, draftListings, archivedListings, messages, unreadMessages, unreadConversations, sentEnquiries, sentUnreadEnquiries, receivedEnquiries, receivedUnreadEnquiries] =
+  const [favourites, notes, hiddenListings, enquiries, locations, listings, draftListings, archivedListings, messages, unreadMessages, unreadConversations, sentEnquiries, sentUnreadEnquiries, receivedEnquiries, receivedUnreadEnquiries, viewings] =
     await prisma.$transaction([
       prisma.userFavouriteListing.count({
         where: {
@@ -126,6 +126,13 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
           },
         },
       }),
+      // Count active viewings (PENDING + ACCEPTED + RESCHEDULED) for this user
+      prisma.viewing.count({
+        where: {
+          OR: [{ requesterId: userId }, { ownerId: userId }],
+          status: { in: ["PENDING", "ACCEPTED", "RESCHEDULED"] },
+        },
+      }),
     ]);
 
   // Count distinct viewed listings (groupBy can't be in $transaction array)
@@ -152,5 +159,6 @@ export async function getUserItemsAggregates(userId: number): Promise<UserItemsA
     sentUnreadEnquiries,
     receivedEnquiries,
     receivedUnreadEnquiries,
+    viewings,
   };
 }

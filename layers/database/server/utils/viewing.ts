@@ -52,6 +52,7 @@ export async function getUserViewings(
   userId: number,
   role: "requester" | "owner" | "all" = "all",
   status?: ViewingStatus,
+  sort: "newest" | "oldest" = "newest",
 ) {
   const where = {
     ...(role === "requester" ? { requesterId: userId } : role === "owner" ? { ownerId: userId } : { OR: [{ requesterId: userId }, { ownerId: userId }] }),
@@ -59,7 +60,7 @@ export async function getUserViewings(
   };
   return prisma.viewing.findMany({
     where,
-    orderBy: { proposedAt: "asc" },
+    orderBy: { createdAt: sort === "oldest" ? "asc" : "desc" },
     select: viewingWithDetailsSelect,
   });
 }

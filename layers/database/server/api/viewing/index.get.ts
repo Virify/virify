@@ -11,13 +11,14 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const role = (query.role as "requester" | "owner" | "all") || "all";
     const status = query.status as ViewingStatus | undefined;
+    const sort = (query.sort as "newest" | "oldest") || "newest";
 
-    const cacheKey = `viewings:${user.id}:${role}:${status ?? "all"}`;
+    const cacheKey = `viewings:${user.id}:${role}:${status ?? "all"}:${sort}`;
     const storage = useStorage("cache");
     const cached = await storage.getItem(cacheKey);
     if (cached) return cached;
 
-    const viewings = await getUserViewings(user.id as number, role, status);
+    const viewings = await getUserViewings(user.id as number, role, status, sort);
     storage.setItem(cacheKey, viewings, { ttl: 5 * 60 }).catch(() => {});
     return viewings;
   } catch (error) {

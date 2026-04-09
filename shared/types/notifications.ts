@@ -6,7 +6,7 @@
 /**
  * Notification types - matches the database model
  */
-export type NotificationType = "NEW_MESSAGE" | "NEW_ENQUIRY" | "ENQUIRY_REPLY" | "LISTING_UPDATE" | "SYSTEM" | "VIEWING_REQUEST" | "VIEWING_ACCEPTED" | "VIEWING_REJECTED" | "VIEWING_RESCHEDULED";
+export type NotificationType = "NEW_MESSAGE" | "NEW_ENQUIRY" | "ENQUIRY_REPLY" | "LISTING_UPDATE" | "SYSTEM" | "VIEWING_REQUEST" | "VIEWING_ACCEPTED" | "VIEWING_REJECTED" | "VIEWING_RESCHEDULED" | "VIEWING_CANCELLED";
 
 /**
  * User notification type - matches the database model
@@ -65,6 +65,7 @@ export interface UserItemsAggregates {
   sentUnreadEnquiries: number; // Count of sent conversations with unread messages
   receivedEnquiries: number; // Count of conversations user received
   receivedUnreadEnquiries: number; // Count of received conversations with unread messages
+  viewings: number; // Count of user's active viewings (PENDING + ACCEPTED + RESCHEDULED)
 }
 
 /**
@@ -75,6 +76,7 @@ export interface InAppNotificationPayload {
   id: number;
   title: string;
   description: string;
+  type?: NotificationType;
   conversationId?: number;
   listingId?: number;
   senderUsername?: string;

@@ -69,6 +69,16 @@
           </button>
         </div>
 
+        <UBadge
+          v-if="viewingBadgeLabel"
+          :label="viewingBadgeLabel"
+          icon="i-lucide-calendar"
+          size="sm"
+          color="info"
+          variant="subtle"
+          class="mb-1"
+        />
+
         <div class="grid grid-cols-2 gap-2 items-center">
           <UButton variant="solid" size="md" color="secondary" block class="text-white! font-bold"
             :to="`/listing/${listing?.id}`"> View </UButton>
@@ -135,6 +145,13 @@ interface Props {
   viewed?: string | Date;
 }
 const props = defineProps<Props>();
+
+const { getActiveViewingForListing, getViewingStatusLabel } = useViewings();
+
+const viewingBadgeLabel = computed(() => {
+  const v = getActiveViewingForListing(props.listing?.id!);
+  return v ? getViewingStatusLabel(v) : null;
+});
 
 /**
  * Check if this card is pending removal.
