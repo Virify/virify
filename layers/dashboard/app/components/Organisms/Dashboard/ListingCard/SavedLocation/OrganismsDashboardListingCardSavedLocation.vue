@@ -12,13 +12,12 @@
   >
     <!-- Icon and Name Header -->
     <template #header>
-      <div class="flex items-start gap-3 w-full">
+      <div class="flex items-center gap-3 w-full">
         <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
           <UIcon name="i-lucide-map-pin" class="w-5 h-5 text-secondary" />
         </div>
         <div class="flex flex-col gap-1 min-w-0 flex-1">
           <h3 class="title-sm m-0! truncate">{{ location.name }}</h3>
-          <p class="body-xs text-muted-foreground m-0!">{{ location.location }}</p>
         </div>
         <!-- Date badge - top right -->
         <UBadge 
@@ -34,6 +33,10 @@
     </template>
 
     <template #description>
+      <p class="body-xs text-muted-foreground m-0! pt-4">{{ location.location }}</p>
+    </template>
+
+    <template #footer>
       <div class="flex flex-col gap-3 h-full">
         <!-- Actions -->
         <div class="flex flex-wrap gap-2 mt-auto pt-2">
