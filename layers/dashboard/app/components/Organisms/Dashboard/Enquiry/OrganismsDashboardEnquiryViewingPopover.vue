@@ -41,7 +41,7 @@
             <UButton
               icon="i-lucide-calendar-days"
               size="sm"
-              variant="outline"
+              variant="solid"
               class="w-full cursor-pointer body-sm"
               @click="navigateTo('/dashboard/viewings')"
             >
@@ -83,7 +83,7 @@
                 icon="i-lucide-calendar-days"
                 size="sm"
                 variant="solid"
-                class="w-full cursor-pointer body-sm"
+                class="w-full cursor-pointer body-sm text-white!"
                 @click="navigateTo('/dashboard/viewings')"
               >
                 Manage Viewings

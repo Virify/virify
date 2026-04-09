@@ -105,10 +105,10 @@ const hideAutocomplete = computed(() => {
 });
 
 /**
- * Show history when there are no suggestions OR when we're hiding autocomplete
+ * Show history when there are entries AND (no suggestions OR we're hiding autocomplete)
  */
 const showHistory = computed(() => {
-  return !locationSuggestions.value.length || hideAutocomplete.value;
+  return locationHistory.value.length > 0 && (!locationSuggestions.value.length || hideAutocomplete.value);
 })
 
 watch(loggedIn, (isAuthenticated) => {
@@ -145,19 +145,33 @@ const {
  *  Set locations
  */
 const emits = defineEmits(['location-selected'])
-const { enhanceWithBoundaryPolygon } = useMap()
+const { enhanceWithBoundaryPolygon, geocodeById } = useMap()
 
-async function setLocationFromTrending(option: Partial<TrendingLocation>) {
-  const { location } = asObject(option)
-  if (location) {
-    // Enhance location with boundary polygon before adding to history
-    const enhancedLocation = await enhanceWithBoundaryPolygon(location as GeocodingFeature)
-      .catch(() => location as GeocodingFeature)
+async function setLocationFromTrending(option: TrendingLocation) {
+  // Try geocoding by locationId for precise lookup with bbox/boundary
+  let feature: GeocodingFeature | null = option.locationId
+    ? await geocodeById(option.locationId).catch(() => null)
+    : null
 
-    addLocationToHistory(enhancedLocation)
-    emits('location-selected', enhancedLocation)
-    suppressAutocomplete.value = true
+  // Fallback: construct a minimal GeocodingFeature from lat/lon/name
+  if (!feature) {
+    feature = {
+      id: option.locationId || '',
+      type: 'Feature',
+      place_name: option.placeName || option.name,
+      place_name_en: option.placeName || option.name,
+      text: option.name,
+      geometry: { type: 'Point', coordinates: [option.lon, option.lat] },
+      properties: {},
+    }
   }
+
+  const enhancedLocation = await enhanceWithBoundaryPolygon(feature)
+    .catch(() => feature as GeocodingFeature)
+
+  addLocationToHistory(enhancedLocation)
+  emits('location-selected', enhancedLocation)
+  suppressAutocomplete.value = true
 }
 
 async function setLocationFromSaved(option: Partial<UserLocation>) {

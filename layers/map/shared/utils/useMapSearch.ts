@@ -215,20 +215,29 @@ export function useMapSearch() {
       if (res.features && res.features.length > 0) {
         const feature = res.features[0];
         
-        // For regions (counties, cities), geometry may be a Polygon, not a Point
-        // Ensure center property exists for coordinate extraction
+        // For regions (counties, cities), geometry may be a Polygon, not a Point.
+        // Ensure center property exists for coordinate extraction.
         if (feature.center?.length >= 2) {
-          // If geometry is a Polygon/MultiPolygon, extract it as boundaryPolygon
-          const boundaryPolygon = (feature.geometry?.type === 'Polygon' || feature.geometry?.type === 'MultiPolygon')
+          const isPolygonGeometry = feature.geometry?.type === 'Polygon' || feature.geometry?.type === 'MultiPolygon';
+
+          // Extract Polygon/MultiPolygon as boundaryPolygon and normalize geometry to a
+          // Point using `center` so downstream consumers (RAG schema, analytics, etc.)
+          // always receive geometry.coordinates as [lon, lat].
+          const boundaryPolygon = isPolygonGeometry
             ? { type: feature.geometry.type, coordinates: feature.geometry.coordinates }
             : undefined;
-          
+
+          const normalizedGeometry = isPolygonGeometry
+            ? { type: 'Point' as const, coordinates: feature.center as [number, number] }
+            : feature.geometry;
+
           return {
             ...feature,
-            boundaryPolygon
+            geometry: normalizedGeometry,
+            boundaryPolygon,
           } as GeocodingFeatureWithBoundary;
         }
-        
+
         // Fallback: check if geometry is a Point and use its coordinates as center
         if (feature.geometry?.type === 'Point' && feature.geometry?.coordinates?.length >= 2) {
           return {

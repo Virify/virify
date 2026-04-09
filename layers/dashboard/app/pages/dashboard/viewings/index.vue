@@ -33,7 +33,9 @@
       <!-- Tabs: Incoming / Outgoing -->
       <template v-else>
         <div class="p-4">
-          <UTabs v-model="activeTab" :items="tabs" color="secondary" class="mb-4 text-base" />
+          <UTabs v-model="activeTab" :items="tabs" color="secondary" class="mb-4 text-base" :ui="{
+            trigger: 'data-[state=active]:text-white!'
+          }" />
 
           <div v-if="filteredViewings.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             <OrganismsDashboardViewingCard v-for="viewing in filteredViewings" :key="viewing.id" :viewing="viewing"

@@ -7,7 +7,7 @@
     <template #title>
       <!-- Compose mode header -->
       <span v-if="isComposeMode" class="title-sm">
-        {{ newEnquiryData?.listingTitle ? `Enquire about ${newEnquiryData.listingTitle}` : 'New Enquiry' }}
+        {{ newEnquiryData?.listingTitle ? `Enquire about ${newEnquiryData.listingTitle}` : 'Start your enquiry' }}
       </span>
       <!-- Chat mode header -->
       <OrganismsDashboardEnquiryChatHeader

@@ -46,6 +46,12 @@ export const useHiddenListings = () => {
         });
       },
       onSuccess: () => {
+        toast.add({
+          title: "Listing hidden",
+          description: "This listing has been hidden from your results",
+          color: "success",
+          icon: "i-lucide-eye-off",
+        });
         refreshHiddenListings();
         fetchUserItemsAggregates(true).catch(() => {});
       },

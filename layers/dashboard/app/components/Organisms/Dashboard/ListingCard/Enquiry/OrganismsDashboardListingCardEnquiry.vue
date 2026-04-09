@@ -4,6 +4,7 @@
     :to="`/listing/${listing.id}`"
     target="_blank"
     class="flex gap-3 p-3 h-auto w-full rounded-lg bg-background-200 hover:bg-elevated/60 transition-colors cursor-pointer group"
+    @click.stop
   >
     <div v-if="getMainImage(listing.property)" class="w-16 h-full overflow-hidden shrink-0">
       <AtomsCloudFlareImage :src="getMainImage(listing.property)!"

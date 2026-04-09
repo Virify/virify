@@ -1,23 +1,23 @@
 <template>
   <div class="flex flex-col">
     <!-- Hint + suggestion chips -->
-    <div class="px-4 pt-5 pb-4 flex flex-col gap-3">
-      <p class="body-sm">Start your enquiry — the property owner will be notified.</p>
-      <div class="flex flex-wrap gap-2">
+    <div class="px-4 py-5 lg:py-12 flex flex-col gap-3">
+      <p class="body-sm">Here are some suggestions to help you start your enquiry or you can type your own message below:</p>
+      <div class="flex flex-wrap gap-4">
         <UBadge
           v-for="s in SUGGESTIONS"
           :key="s.label"
           :label="s.label"
-          class="cursor-pointer"
-          size="lg"
+          class="cursor-pointer body-sm"
           variant="solid"
+          icon="i-lucide-pen-line"
           :color="composeMessage === s.message ? 'primary' : 'secondary'"
           @click="composeMessage = s.message"
         />
       </div>
     </div>
     <!-- Input row — sits at the bottom, visually mirrors the chat footer -->
-    <div class="flex items-center gap-1 sm:px-2 px-2 border-t border-(--background-200) min-h-[54px]">
+    <div class="flex items-center gap-1 sm:px-2 px-2 border-t border-(--ui-border) min-h-[54px]">
       <UPopover v-model:open="emojiOpen" :ui="{ content: 'p-0 overflow-hidden' }">
         <UButton
           icon="i-lucide-smile"
