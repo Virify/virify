@@ -111,6 +111,7 @@ async function aiSearchSubmit(query: string) {
       query,
       listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
       radius,
+      results: [],
       hasSearched: true
     })
 
