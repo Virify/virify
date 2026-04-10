@@ -106,6 +106,28 @@ watch(filteredEnquiries, (items) => {
   sortedAndFilteredEnquiries.value = items;
 }, { immediate: true });
 
+// Reflect real-time WebSocket updates (new conversation OR new message bumping an existing one
+// to the top) without a full refetch. Both handleNewConversation and handleNewMessage always
+// move the changed item to enquiries[0], so we only need to watch the top item.
+watch(enquiries, (newList, oldList) => {
+  if (!newList.length || page.value !== 1) return;
+  const first = newList[0];
+  if (!first) return;
+  // Top item unchanged — nothing to do
+  if (first === oldList?.[0]) return;
+
+  const renderedIndex = sortedAndFilteredEnquiries.value.findIndex((e) => e.id === first.id);
+  if (renderedIndex === -1) {
+    // Brand new conversation — prepend
+    sortedAndFilteredEnquiries.value = [first, ...sortedAndFilteredEnquiries.value];
+  } else {
+    // Existing conversation updated and moved to top — update + move
+    const updated = [...sortedAndFilteredEnquiries.value];
+    updated.splice(renderedIndex, 1);
+    sortedAndFilteredEnquiries.value = [first, ...updated];
+  }
+}, { deep: false });
+
 const groupedByListing = computed(() => {
   if (sortOrder.value !== "listing") return [];
 

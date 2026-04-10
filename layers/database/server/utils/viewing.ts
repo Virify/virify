@@ -11,6 +11,7 @@ const viewingWithDetailsSelect = {
   proposedDates: true,
   preferredTimes: true,
   counterProposedAt: true,
+  lastProposedBy: true,
   status: true,
   notes: true,
   createdAt: true,
@@ -45,7 +46,7 @@ export async function createViewing(
   conversationId?: number,
 ) {
   return prisma.viewing.create({
-    data: { requesterId, ownerId, listingId, proposedDates, preferredTimes, notes, conversationId },
+    data: { requesterId, ownerId, listingId, proposedDates, preferredTimes, notes, conversationId, lastProposedBy: 'requester' },
     select: viewingWithDetailsSelect,
   });
 }
@@ -69,12 +70,14 @@ export async function getUserViewings(
 
 export async function updateViewingStatus(
   id: number,
-  ownerId: number,
+  userId: number,
+  role: 'owner' | 'requester',
   status: ViewingStatus,
   counterProposedAt?: Date,
 ) {
+  const where = role === 'owner' ? { id, ownerId: userId } : { id, requesterId: userId };
   return prisma.viewing.update({
-    where: { id, ownerId },
+    where,
     data: { status, counterProposedAt: counterProposedAt ?? undefined },
     select: viewingWithDetailsSelect,
   });
@@ -102,11 +105,11 @@ export async function updateViewingProposal(
   preferredTimes: string[],
   notes?: string,
 ) {
-  const status = role === 'owner' ? 'RESCHEDULED' : 'PENDING';
+  const status = 'RESCHEDULED';
   const where = role === 'owner' ? { id, ownerId: userId } : { id, requesterId: userId };
   return prisma.viewing.update({
     where,
-    data: { proposedDates, preferredTimes, notes: notes ?? undefined, status, counterProposedAt: null },
+    data: { proposedDates, preferredTimes, notes: notes ?? undefined, status, counterProposedAt: null, lastProposedBy: role },
     select: viewingWithDetailsSelect,
   });
 }

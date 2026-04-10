@@ -15,8 +15,31 @@
       </UButton>
     </template>
 
-    <!-- Owner: reschedule / cancel on ACCEPTED or RESCHEDULED -->
-    <template v-if="isOwner && (status === 'ACCEPTED' || status === 'RESCHEDULED')">
+    <!-- Owner: reschedule / cancel on ACCEPTED -->
+    <template v-if="isOwner && status === 'ACCEPTED'">
+      <UButton size="xs" color="neutral" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('reschedule', viewing)">
+        Reschedule
+      </UButton>
+      <UButton size="xs" color="error" variant="subtle" icon="i-lucide-calendar-x" class="body-sm" @click="$emit('cancel', viewing.id)">
+        Cancel viewing
+      </UButton>
+    </template>
+
+    <!-- Owner: buyer has proposed new dates — owner picks one -->
+    <template v-if="isOwner && status === 'RESCHEDULED' && viewing.lastProposedBy === 'requester'">
+      <UButton size="xs" color="success" variant="subtle" icon="i-lucide-calendar-check" class="body-sm" @click="$emit('acceptCounter', viewing.id)">
+        Choose a time
+      </UButton>
+      <UButton size="xs" color="neutral" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('reschedule', viewing)">
+        Reschedule
+      </UButton>
+      <UButton size="xs" color="error" variant="subtle" icon="i-lucide-calendar-x" class="body-sm" @click="$emit('cancel', viewing.id)">
+        Cancel viewing
+      </UButton>
+    </template>
+
+    <!-- Owner: owner already proposed — waiting for buyer response -->
+    <template v-if="isOwner && status === 'RESCHEDULED' && viewing.lastProposedBy !== 'requester'">
       <UButton size="xs" color="neutral" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('reschedule', viewing)">
         Reschedule
       </UButton>
@@ -32,11 +55,21 @@
       </UButton>
     </template>
 
-    <!-- Requester: accept owner's time or suggest new times on RESCHEDULED -->
-    <template v-if="!isOwner && status === 'RESCHEDULED'">
-      <UButton size="xs" color="success" variant="subtle" icon="i-lucide-check" class="body-sm" @click="$emit('acceptCounter', viewing.id)">
-        Accept time
+    <!-- Requester: seller has proposed new dates — buyer picks one -->
+    <template v-if="!isOwner && status === 'RESCHEDULED' && viewing.lastProposedBy === 'owner'">
+      <UButton size="xs" color="success" variant="subtle" icon="i-lucide-calendar-check" class="body-sm" @click="$emit('acceptCounter', viewing.id)">
+        Choose a time
       </UButton>
+      <UButton size="xs" color="secondary" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('counterPropose', viewing)">
+        Suggest new times
+      </UButton>
+      <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" class="body-sm" @click="$emit('cancel', viewing.id)">
+        Cancel
+      </UButton>
+    </template>
+
+    <!-- Requester: buyer already proposed — waiting for seller response -->
+    <template v-if="!isOwner && status === 'RESCHEDULED' && viewing.lastProposedBy !== 'owner'">
       <UButton size="xs" color="secondary" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('counterPropose', viewing)">
         Suggest new times
       </UButton>
@@ -47,7 +80,7 @@
 
     <!-- Requester: reschedule or cancel on ACCEPTED -->
     <template v-if="!isOwner && status === 'ACCEPTED'">
-      <UButton size="xs" color="secondary" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('counterPropose', viewing)">
+      <UButton size="xs" color="neutral" variant="subtle" icon="i-lucide-calendar-clock" class="body-sm" @click="$emit('counterPropose', viewing)">
         Reschedule
       </UButton>
       <UButton size="xs" color="error" variant="subtle" icon="i-lucide-x" class="body-sm" @click="$emit('cancel', viewing.id)">

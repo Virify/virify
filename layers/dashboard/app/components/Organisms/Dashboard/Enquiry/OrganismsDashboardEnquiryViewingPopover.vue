@@ -1,5 +1,5 @@
 <template>
-  <UPopover v-model:open="viewingPopoverOpen" :ui="{ content: 'p-4 w-[calc(100vw-2rem)] sm:w-80' }">
+  <UPopover v-model:open="viewingPopoverOpen" :ui="{ content: 'p-4 w-[calc(100vw-2rem)] sm:w-80 max-h-[min(80vh,36rem)] overflow-y-auto' }">
     <UButton
       icon="i-lucide-calendar-plus"
       variant="solid"

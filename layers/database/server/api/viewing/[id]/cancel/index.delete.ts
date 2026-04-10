@@ -41,12 +41,13 @@ export default defineEventHandler(async (event) => {
     });
 
     const { sendMessage, createAggregateUpdateMessage, createNotificationNewMessage, isUserOnline } = useWebSocketServer();
-    if (isUserOnline(otherPartyId)) {
+    const otherPartyIsOnline = isUserOnline(otherPartyId);
+    if (otherPartyIsOnline) {
       sendMessage(createNotificationNewMessage(notification as any, otherPartyId));
     }
 
     // Send offline email to the other party
-    if (!isUserOnline(otherPartyId)) {
+    if (!otherPartyIsOnline) {
       const prefs = await getUserNotificationPreferences(otherPartyId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();

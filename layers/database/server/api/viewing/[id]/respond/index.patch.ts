@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
 import { updateViewingStatus } from "~~/layers/database/server/utils/viewing";
 import { createNotification } from "~~/layers/database/server/utils/notification";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
@@ -32,7 +33,23 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: "counterProposedAt is required when rescheduling" });
     }
 
-    const updated = await updateViewingStatus(id, user.id as number, statusMap[response], counterProposedAt ? new Date(counterProposedAt) : undefined);
+    // Determine caller's role (owner can accept/reject/reschedule; requester can only accept a RESCHEDULED viewing)
+    const existing = await prisma.viewing.findUnique({ where: { id }, select: { ownerId: true, requesterId: true, status: true } });
+    if (!existing) throw createError({ statusCode: 404, statusMessage: "Viewing not found" });
+
+    let role: 'owner' | 'requester';
+    if (existing.ownerId === user.id) {
+      role = 'owner';
+    } else if (existing.requesterId === user.id) {
+      if (response !== 'accept' || existing.status !== 'RESCHEDULED') {
+        throw createError({ statusCode: 403, statusMessage: "Requesters may only accept a rescheduled viewing" });
+      }
+      role = 'requester';
+    } else {
+      throw createError({ statusCode: 403, statusMessage: "Not authorised" });
+    }
+
+    const updated = await updateViewingStatus(id, user.id as number, role, statusMap[response], counterProposedAt ? new Date(counterProposedAt) : undefined);
 
     // Notify the requester
     const notificationType = (response === "accept" ? "VIEWING_ACCEPTED" : response === "reject" ? "VIEWING_REJECTED" : "VIEWING_RESCHEDULED") as NotificationType;
@@ -56,12 +73,13 @@ export default defineEventHandler(async (event) => {
     });
 
     const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
-    if (isUserOnline(updated.requesterId)) {
+    const requesterIsOnline = isUserOnline(updated.requesterId);
+    if (requesterIsOnline) {
       sendMessage(createNotificationNewMessage(notification as any, updated.requesterId));
     }
 
     // Send offline email for all response types
-    if (!isUserOnline(updated.requesterId)) {
+    if (!requesterIsOnline) {
       const prefs = await getUserNotificationPreferences(updated.requesterId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();

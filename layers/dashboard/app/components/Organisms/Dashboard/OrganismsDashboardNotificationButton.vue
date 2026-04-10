@@ -74,6 +74,7 @@ const hasFetchedOnce = ref(false);
 function viewingTabForType(type: string): string {
   if (type === 'VIEWING_REQUEST') return 'requested';
   if (type === 'VIEWING_RESCHEDULED') return 'rescheduled';
+  if (type === 'VIEWING_ACCEPTED') return 'confirmed';
   return 'all';
 }
 

@@ -26,6 +26,12 @@ watch(lastNotification, (notification) => {
     const notifConvId = notification.conversationId;
     const isViewingNotif = notification.type?.startsWith("VIEWING_");
 
+    // Refresh viewings list so the other party sees the latest status
+    if (isViewingNotif) {
+      const { fetchViewings } = useViewings();
+      fetchViewings().catch(() => {});
+    }
+
     // Suppress if this client is already viewing that conversation in ANY modal
     if (
       !isViewingNotif &&
@@ -49,8 +55,12 @@ watch(lastNotification, (notification) => {
           const type = notification.type as string;
           const tab = type === 'VIEWING_REQUEST' ? 'requested'
             : type === 'VIEWING_RESCHEDULED' ? 'rescheduled'
+            : type === 'VIEWING_ACCEPTED' ? 'confirmed'
             : 'all';
-          await navigateTo(`/dashboard/viewings?tab=${tab}`);
+          closeConversation();
+          // Use router.push so the query param updates even when already on the viewings page
+          const router = useRouter();
+          await router.push(`/dashboard/viewings?tab=${tab}`);
         } else if (notification.conversationId) {
           await openConversation(notification.conversationId);
         } else {

@@ -33,6 +33,8 @@ export interface ViewingWithDetails {
   /** Time preferences selected by the buyer (e.g. 'Mornings', 'Evenings', freeform) */
   preferredTimes: string[];
   counterProposedAt: string | null;
+  /** Which role made the last proposal — determines who should respond */
+  lastProposedBy: string | null;
   status: ViewingStatus;
   notes: string | null;
   createdAt: string;

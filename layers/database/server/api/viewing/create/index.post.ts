@@ -69,12 +69,13 @@ export default defineEventHandler(async (event) => {
 
     // Push real-time notification to the listing owner
     const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
-    if (isUserOnline(recipientId)) {
+    const recipientIsOnline = isUserOnline(recipientId);
+    if (recipientIsOnline) {
       sendMessage(createNotificationNewMessage(notification as any, recipientId));
     }
 
     // Send offline email if the owner is not currently connected
-    if (!isUserOnline(recipientId)) {
+    if (!recipientIsOnline) {
       const prefs = await getUserNotificationPreferences(recipientId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();

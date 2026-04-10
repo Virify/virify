@@ -57,6 +57,11 @@ export default defineNuxtPlugin(() => {
     const { canDesktop } = useNotificationPreferences();
     const wsComposable = useWebSocketServer();
     const { fetchViewings } = useViewings();
+    const { registerSend } = useWebSocketClient();
+    const { setTyping } = useTypingIndicator();
+
+    // Register ws.send so composables can send frames without accessing the plugin directly
+    registerSend((data) => { if (ws.status.value === 'OPEN') ws.send(data); });
 
     const globalWebSocketEvents: WebSocketEvents = {
       /**
@@ -213,6 +218,13 @@ export default defineNuxtPlugin(() => {
        */
       onMessageRead: ({ conversationId, messageId }) => {
         handleMessageRead(conversationId, messageId);
+      },
+
+      /**
+       * Handle typing indicator from the other participant
+       */
+      onTyping: ({ from, conversationId, isTyping }) => {
+        setTyping(conversationId, isTyping ? from : null);
       },
     };
 
