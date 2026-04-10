@@ -15,7 +15,16 @@
 import { ViewsDialogLogin, ViewsDialogPasswordReset } from '#components'
 import { useDark } from '@vueuse/core'
 
-useDark()
+const isDark = useDark()
+
+onMounted(() => {
+  // Migrate users who had the old 'theme' localStorage key
+  const legacyTheme = localStorage.getItem('theme')
+  if (legacyTheme) {
+    isDark.value = legacyTheme === 'dark'
+    localStorage.removeItem('theme')
+  }
+})
 
 onMounted(async () => {
   const { path, query } = useRoute()
