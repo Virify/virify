@@ -47,6 +47,15 @@ const {
  * This handles page refreshes and back/forward navigation
  */
 onMounted(async () => {
+  await callOnce(async () => {
+    // Check if hash for search page exists
+    const { params: { hash } } = useRoute()
+
+    // If so, fetch the hash
+    await fetchHash(hash)
+  })
+
+  // Get data from current state
   const {
     results = [],
     location,
@@ -56,12 +65,6 @@ onMounted(async () => {
 
   // If we have results already, nothing to do
   if ((results as unknown[])?.length > 0) return
-
-  // Check if hash for search page exists
-  const { params: { hash } } = useRoute()
-
-  // If so, fetch the hash
-  await fetchHash(hash)
 
   // Perform traditional search
   if (searchType === 'traditional') {

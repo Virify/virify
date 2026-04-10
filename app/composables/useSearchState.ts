@@ -197,7 +197,7 @@ function createSearchState() {
     if (!import.meta.client || !isString(key)) return
 
     return new Promise((resolve) => {
-      setTimeout(() => {
+      setTimeout(async () => {
         const savedSearch = window.localStorage.getItem(key as string)
 
         if (!isString(savedSearch)) return
@@ -205,7 +205,17 @@ function createSearchState() {
         try {
           const { location, query } = asObject(JSON.parse(savedSearch))
 
-          console.log({ location, query })
+          // Set most recent search
+          mostRecentLocation = location
+          mostRecentQuery = query
+
+          // Save location
+          setLocation(location?.location)
+          setLocationRadius(location?.radius)
+
+          // @TODO save query, etc.
+
+          await fetchResults()
         }
         catch {
           console.error('Unable to parse saved query')
