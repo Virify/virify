@@ -138,10 +138,6 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     };
     
     sendBeaconEvent('/api/analytics/track/view', payload);
-
-    // Optimistically increment the viewed badge in the nav aggregates
-    const { updateAggregateCount } = useNotifications();
-    updateAggregateCount('viewedListings', 1);
   };
   
   /**

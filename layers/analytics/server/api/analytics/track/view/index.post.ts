@@ -5,6 +5,7 @@
  * Uses sendBeacon - fire-and-forget, no response needed
  */
 import * as z from "zod";
+import { invalidateAggregatesCache } from "~~/layers/database/server/utils/cache";
 
 const viewSchema = z.object({
   listingId: z.union([z.string(), z.number()]),
@@ -77,6 +78,15 @@ export default defineEventHandler(async (event) => {
       });
     }
     
+    // For logged-in users: bust the aggregates cache and push a WS update so
+    // the dashboard badge in any open tab refreshes immediately without waiting
+    // for the 5-minute cache TTL to expire.
+    if (user?.id) {
+      const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
+      sendMessage(createAggregateUpdateMessage('viewedListings', 'add', user.id));
+      invalidateAggregatesCache(user.id).catch(() => {});
+    }
+
     return { success: true };
   } catch (error) {
     // Log but don't fail - sendBeacon doesn't care about response

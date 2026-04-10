@@ -41,7 +41,7 @@
               Manage Viewings
             </UButton>
           </div>
-          <UDivider v-if="!isOwner && !activeConversationViewings.length" class="my-1" />
+          <USeparator v-if="!isOwner && !activeConversationViewings.length" class="my-1" />
         </template>
 
         <!-- Owner: empty state -->

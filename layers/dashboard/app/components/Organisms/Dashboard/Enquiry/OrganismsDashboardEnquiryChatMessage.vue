@@ -16,7 +16,15 @@
     }"
   >
     <template #content>
-      <p class="body-xs italic pb-1">{{ formatMessageTimestamp(message.createdAt) }}</p>
+      <div class="flex items-center gap-1 pb-1">
+        <p class="body-xs italic">{{ formatMessageTimestamp(message.createdAt) }}</p>
+        <UIcon
+          v-if="!isMessageFromUser(message, currentUserId)"
+          :name="message.isRead ? 'i-lucide-check-check' : 'i-lucide-check'"
+          class="size-3 shrink-0"
+          :class="message.isRead ? 'text-secondary' : 'text-(--foreground-200)'"
+        />
+      </div>
       <p
         v-if="message.content"
         :class="['body-sm break-all whitespace-pre-wrap', 'text-(--monochrome-900)']"

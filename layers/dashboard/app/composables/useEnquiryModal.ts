@@ -47,8 +47,12 @@ export function useEnquiryModal(
 
   // ─── Typing indicator ─────────────────────────────────────────────────────
 
-  // The typing user ID for the current conversation (other participant)
-  const typingUserId = computed(() => getTypingUser(props.conversation?.id));
+  // The typing user ID for the current conversation (other participant).
+  // Exclude own userId as a defensive guard against unlikely server echo.
+  const typingUserId = computed(() => {
+    const userId = getTypingUser(props.conversation?.id);
+    return userId !== null && userId !== props.user?.id ? userId : null;
+  });
 
   function sendTypingEvent(isTyping: boolean) {
     const convId = props.conversation?.id;
@@ -68,6 +72,11 @@ export function useEnquiryModal(
       if (typingStopTimer) clearTimeout(typingStopTimer);
       sendTypingEvent(false);
     }
+  });
+
+  // Scroll to bottom when the typing indicator appears so it's visible
+  watch(typingUserId, (val) => {
+    if (val !== null) scrollToBottom();
   });
 
   // ─── Computed ──────────────────────────────────────────────────────────────
@@ -261,9 +270,14 @@ export function useEnquiryModal(
         localMessages.value = [...props.conversation.messages];
         scrollToBottom();
         markMessagesAsRead();
-      } else if (!newVal && pendingMedia.value) {
-        deleteFile(pendingMedia.value.id).catch(() => {});
-        pendingMedia.value = null;
+      } else if (!newVal) {
+        // Clear typing indicator on the other end when modal closes
+        if (typingStopTimer) clearTimeout(typingStopTimer);
+        sendTypingEvent(false);
+        if (pendingMedia.value) {
+          deleteFile(pendingMedia.value.id).catch(() => {});
+          pendingMedia.value = null;
+        }
       }
     },
     { immediate: true },
