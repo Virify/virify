@@ -14,7 +14,7 @@
 
     <template #body>
       <AtomsDashboardFormContainer>
-        <UForm :schema="schema" :state="state" @submit="onSubmit">
+          <UForm ref="form" :schema="schema" :state="state" @submit="onSubmit">
           <OrganismsDashboardAccountHeroCard title="Complete your profile"
             description="Complete your profile information to fully activate your account" label="Save Changes" />
 
@@ -23,10 +23,10 @@
               description="Your public username"
               :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput v-model="state.username" type="text" icon="i-lucide-contact" placeholder="Username"
-                variant="subtle" :loading="pending" color="secondary" class="w-full md:w-80" :ui="{
+                variant="subtle" :loading="pending || checkingUsername" color="secondary" class="w-full md:w-80" :ui="{
                   base: 'placeholder:text-(--foreground-200)/50!',
                   leadingIcon: 'text-(--foreground-200)/50',
-                }" />
+                }" @blur="checkUsernameAvailability" />
             </UFormField>
 
             <USeparator class="my-4" />
@@ -110,10 +110,31 @@
 </template>
 
 <script setup lang="ts">
-import type { FormSubmitEvent } from "@nuxt/ui";
+import type { FormSubmitEvent, Form } from "@nuxt/ui";
 import { z } from "zod";
 const toast = useToast();
 const { user, fetch } = useUserSession();
+const form = ref<Form<Schema>>();
+const checkingUsername = ref(false);
+
+async function checkUsernameAvailability() {
+  const username = state.username?.trim();
+  if (!username || username === fullUser.value?.username) return;
+
+  checkingUsername.value = true;
+  try {
+    const { available } = await useRequestFetch()<{ available: boolean }>('/api/user/profile/username-check', {
+      query: { username },
+    });
+    if (!available) {
+      form.value?.setErrors([{ name: 'username', message: 'That username is already taken.' }]);
+    }
+  } catch {
+    // silently ignore network errors during availability check
+  } finally {
+    checkingUsername.value = false;
+  }
+}
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -158,7 +179,12 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       navigateTo('/dashboard');
     }
   } catch (error: any) {
-    toast.add({ title: "Error", description: error?.statusText || "An error occurred while updating profile", color: "error", icon: 'i-lucide-circle-x' });
+    const message = error?.data?.statusMessage || error?.statusMessage || 'An error occurred while updating profile';
+    if (message.toLowerCase().includes('username')) {
+      form.value?.setErrors([{ name: 'username', message }]);
+    } else {
+      toast.add({ title: 'Error', description: message, color: 'error', icon: 'i-lucide-circle-x' });
+    }
   }
 }
 </script>
