@@ -40,7 +40,8 @@
           <div v-if="filteredViewings.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             <OrganismsDashboardViewingCard v-for="viewing in filteredViewings" :key="viewing.id" :viewing="viewing"
               :current-user-id="currentUserId!" @accept="handleAccept" @reject="handleReject"
-              @reschedule="openReschedule" @cancel="handleCancel" @accept-counter="handleAcceptCounter" />
+              @reschedule="openReschedule" @cancel="handleCancel" @accept-counter="handleAcceptCounter"
+              @counter-propose="openCounterPropose" />
           </div>
 
           <OrganismsDashboardNoResults v-else type="viewings" />
@@ -49,9 +50,22 @@
     </template>
   </UDashboardPanel>
 
-  <!-- Reschedule modal -->
-  <LazyOrganismsDashboardViewingRescheduleModal v-model:open="rescheduleOpen" :viewing-id="rescheduleViewingId"
-    @submitted="onRescheduled" />
+  <!-- Reschedule / Confirm modal (owner) -->
+  <LazyOrganismsDashboardViewingRescheduleModal
+    v-model:open="rescheduleOpen"
+    :viewing-id="rescheduleViewing?.id ?? null"
+    :viewing="rescheduleViewing"
+    :mode="rescheduleMode"
+    @submitted="onRescheduled"
+  />
+
+  <!-- Counter-propose modal (buyer) -->
+  <LazyOrganismsDashboardViewingCounterProposeModal
+    v-model:open="counterProposeOpen"
+    :viewing-id="counterProposeViewing?.id ?? null"
+    :viewing="counterProposeViewing"
+    @submitted="onCounterProposed"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -105,23 +119,46 @@ const tabViewings = computed<ViewingWithDetails[]>(() => {
 
 const filteredViewings = ref<ViewingWithDetails[]>([]);
 
-// Reschedule modal
+// ─── Reschedule / Confirm modal (owner) ──────────────────────────────────────
 const rescheduleOpen = ref(false);
-const rescheduleViewingId = ref<number | null>(null);
+const rescheduleViewing = ref<ViewingWithDetails | null>(null);
+const rescheduleMode = ref<'accept' | 'reschedule'>('reschedule');
 
 function openReschedule(viewing: ViewingWithDetails) {
-  rescheduleViewingId.value = viewing.id;
+  rescheduleViewing.value = viewing;
+  rescheduleMode.value = 'reschedule';
   rescheduleOpen.value = true;
 }
 
 function onRescheduled(_viewing: ViewingWithDetails) {
   rescheduleOpen.value = false;
-  activeTab.value = "rescheduled";
+  activeTab.value = rescheduleMode.value === 'accept' ? 'confirmed' : 'rescheduled';
 }
 
+// ─── Counter-propose modal (buyer) ──────────────────────────────────────────
+const counterProposeOpen = ref(false);
+const counterProposeViewing = ref<ViewingWithDetails | null>(null);
+
+function openCounterPropose(viewing: ViewingWithDetails) {
+  counterProposeViewing.value = viewing;
+  counterProposeOpen.value = true;
+}
+
+function onCounterProposed(_viewing: ViewingWithDetails) {
+  counterProposeOpen.value = false;
+  activeTab.value = "requested";
+}
+
+// ─── Action handlers ─────────────────────────────────────────────────────────
+
 async function handleAccept(id: number) {
-  await respondToViewing(id, { response: "accept" });
-  activeTab.value = "confirmed";
+  // Instead of directly accepting, open the confirm modal so the owner picks a date+time
+  const v = viewings.value.find((v) => v.id === id);
+  if (v) {
+    rescheduleViewing.value = v;
+    rescheduleMode.value = 'accept';
+    rescheduleOpen.value = true;
+  }
 }
 
 async function handleReject(id: number) {

@@ -158,12 +158,12 @@ describe('useViewingRequest – submitViewingRequest guard', () => {
     expect(called).toBe(false);
   });
 
-  it('does not proceed when viewingDate is missing', () => {
-    const viewingDate = null;
+  it('does not proceed when viewingDates is empty', () => {
+    const viewingDates: unknown[] = [];
     let called = false;
 
-    if (!viewingDate) {
-      // early return
+    if (!viewingDates.length) {
+      // early return — requestViewing should not be called
     } else {
       called = true;
     }
@@ -171,31 +171,32 @@ describe('useViewingRequest – submitViewingRequest guard', () => {
     expect(called).toBe(false);
   });
 
-  it('builds the correct ISO payload from date and time', () => {
-    // Simulate the date+time merge logic from submitViewingRequest
-    const timeStr = '14:30';
-    const [hours, minutes] = timeStr.split(':').map(Number);
-
-    const native = new Date('2026-06-15T00:00:00.000Z');
-    native.setHours(hours!, minutes!, 0, 0);
-
-    expect(native.getHours()).toBe(hours);
-    expect(native.getMinutes()).toBe(minutes);
-    expect(typeof native.toISOString()).toBe('string');
+  it('builds the correct date strings from CalendarDate values', () => {
+    // CalendarDate.toString() returns YYYY-MM-DD; stored as UTC noon to avoid timezone edge cases
+    const dateStr = '2026-06-15';
+    const stored = new Date(dateStr + 'T12:00:00.000Z');
+    expect(stored.toLocaleDateString('en-GB', { dateStyle: 'medium' })).toBeTruthy();
+    expect(stored.getUTCHours()).toBe(12);
   });
 
   it('resets form fields after successful submission', () => {
     let viewingPopoverOpen = true;
-    let viewingTime = '14:30';
+    let viewingDates: unknown[] = [{ day: 15 }];
+    let viewingTimes = ['Mornings', 'Evenings'];
+    let viewingOtherTime = '';
     let viewingNotes = 'Some notes';
 
     // Simulate the reset after success
     viewingPopoverOpen = false;
-    viewingTime = '10:00';
+    viewingDates = [];
+    viewingTimes = [];
+    viewingOtherTime = '';
     viewingNotes = '';
 
     expect(viewingPopoverOpen).toBe(false);
-    expect(viewingTime).toBe('10:00');
+    expect(viewingDates).toHaveLength(0);
+    expect(viewingTimes).toHaveLength(0);
+    expect(viewingOtherTime).toBe('');
     expect(viewingNotes).toBe('');
   });
 });

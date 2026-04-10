@@ -1,8 +1,5 @@
 <template>
-  <UPopover
-    v-model:open="viewingPopoverOpen"
-    :ui="{ content: 'p-4 w-[calc(100vw-2rem)] sm:w-80' }"
-  >
+  <UPopover v-model:open="viewingPopoverOpen" :ui="{ content: 'p-4 w-[calc(100vw-2rem)] sm:w-80' }">
     <UButton
       icon="i-lucide-calendar-plus"
       variant="solid"
@@ -10,120 +7,59 @@
       :ui="{ leadingIcon: 'text-white' }"
       aria-label="Request a viewing"
     />
+
     <template #content>
       <div class="flex flex-col gap-3">
-        <!-- Owner: show existing viewings for this conversation -->
-        <template v-if="isOwner">
-          <h3 class="body-sm font-semibold flex items-center gap-2">
-            <UIcon name="i-lucide-calendar" class="text-secondary size-5" color="secondary" />
-            Scheduled Viewings
-          </h3>
-          <div v-if="conversationViewings.length" class="flex flex-col gap-2">
-            <div
+        <!-- Header (always for owner; only when viewings exist for buyer) -->
+        <h3
+          v-if="isOwner || conversationViewings.length"
+          class="body-sm font-semibold flex items-center gap-2"
+        >
+          <UIcon name="i-lucide-calendar" class="text-secondary size-5" />
+          Scheduled Viewings
+        </h3>
+
+        <!-- Existing viewings list -->
+        <template v-if="conversationViewings.length">
+          <div class="flex flex-col gap-2">
+            <MoleculesDashboardViewingPopoverRow
               v-for="v in conversationViewings"
               :key="v.id"
-              class="flex flex-col gap-1 border border-accented/40 rounded-md p-2"
-            >
-              <div class="flex items-center justify-between gap-2">
-                <span class="body-xs font-semibold">{{ formatViewingDate(v.proposedAt) }}</span>
-                <UBadge :color="viewingStatusColor(v.status)" size="md" variant="subtle">
-                  {{ v.status }}
-                </UBadge>
-              </div>
-              <span v-if="v.counterProposedAt" class="body-xs text-muted-foreground">
-                Counter: {{ formatViewingDate(v.counterProposedAt) }}
-              </span>
-              <span v-if="v.notes" class="body-xs text-muted-foreground italic truncate">
-                Note: {{ v.notes }}
-              </span>
-              <AtomsViewingCalendarMenu :viewing="v" class="mt-1" />
-            </div>
+              :viewing="v"
+              :is-owner="isOwner"
+              @accept-counter="acceptCounterViewing"
+              @manage="navigateTo('/dashboard/viewings')"
+            />
             <UButton
               icon="i-lucide-calendar-days"
               size="sm"
               variant="solid"
               class="w-full cursor-pointer body-sm"
+              :class="{ 'text-white!': !isOwner }"
               @click="navigateTo('/dashboard/viewings')"
             >
               Manage Viewings
             </UButton>
           </div>
-          <p v-else class="body-sm text-muted-foreground">
-            No viewings scheduled for this conversation.
-          </p>
+          <UDivider v-if="!isOwner && !activeConversationViewings.length" class="my-1" />
         </template>
-        <!-- Buyer: show existing viewings if any, then request form -->
-        <template v-else>
-          <template v-if="conversationViewings.length">
-            <h3 class="body-sm font-semibold flex items-center gap-2">
-              <UIcon name="i-lucide-calendar" class="text-secondary size-5" color="secondary" />
-              Scheduled Viewings
-            </h3>
-            <div class="flex flex-col gap-2">
-              <div
-                v-for="v in conversationViewings"
-                :key="v.id"
-                class="flex flex-col gap-1 border border-accented/40 rounded-md p-2"
-              >
-                <div class="flex items-center justify-between gap-2">
-                  <span class="body-xs font-semibold">{{ formatViewingDate(v.proposedAt) }}</span>
-                  <UBadge :color="viewingStatusColor(v.status)" size="md" variant="subtle">
-                    {{ v.status }}
-                  </UBadge>
-                </div>
-                <span v-if="v.counterProposedAt" class="body-xs text-muted-foreground">
-                  Counter: {{ formatViewingDate(v.counterProposedAt) }}
-                </span>
-                <span v-if="v.notes" class="body-xs text-muted-foreground italic truncate">
-                  Note: {{ v.notes }}
-                </span>
-                <AtomsViewingCalendarMenu :viewing="v" class="mt-1" />
-              </div>
-              <UButton
-                icon="i-lucide-calendar-days"
-                size="sm"
-                variant="solid"
-                class="w-full cursor-pointer body-sm text-white!"
-                @click="navigateTo('/dashboard/viewings')"
-              >
-                Manage Viewings
-              </UButton>
-            </div>
-          </template>
-          <template v-else>
-            <h3 class="body-sm font-semibold">Request a Viewing</h3>
-            <UCalendar
-              :model-value="(viewingDate as any)"
-              :min-value="(viewingToday as any)"
-              class="mx-auto"
-              :ui="{ headCell: 'text-secondary!' }"
-              @update:model-value="viewingDate = $event as DateValue"
-            />
-            <UFormField label="Time">
-              <UInput v-model="viewingTime" type="time" class="w-full" />
-            </UFormField>
-            <UFormField label="Notes (optional)">
-              <UTextarea
-                v-model="viewingNotes"
-                placeholder="Any additional notes..."
-                :rows="2"
-                class="w-full"
-              />
-            </UFormField>
-            <UButton
-              :disabled="!viewingDate || !viewingTime"
-              :loading="viewingSubmitting"
-              icon="i-lucide-calendar-check"
-              size="sm"
-              variant="solid"
-              :ui="{ base: 'text-white!' }"
-              class="bg-(--blue-300) cursor-pointer body-sm"
-              @click="submitViewingRequest"
-            >
-              Request Viewing
-            </UButton>
-          </template>
-        </template>
+
+        <!-- Owner: empty state -->
+        <p v-else-if="isOwner" class="body-sm text-muted-foreground">
+          No viewings scheduled for this conversation.
+        </p>
+
+        <!-- Buyer: new viewing request form (when no active viewing exists) -->
+        <MoleculesDashboardViewingRequestForm
+          v-if="!isOwner && !activeConversationViewings.length"
+          v-model:dates="viewingDates"
+          v-model:times="viewingTimes"
+          v-model:other-time="viewingOtherTime"
+          v-model:notes="viewingNotes"
+          :title="conversationViewings.length ? 'Request a New Viewing' : 'Request a Viewing'"
+          :loading="viewingSubmitting"
+          @submit="submitViewingRequest"
+        />
       </div>
     </template>
   </UPopover>
@@ -138,16 +74,16 @@ const props = defineProps<{
 }>();
 
 const {
-  viewingToday,
   viewingPopoverOpen,
-  viewingDate,
-  viewingTime,
+  viewingDates,
+  viewingTimes,
+  viewingOtherTime,
   viewingNotes,
   viewingSubmitting,
   conversationViewings,
-  formatViewingDate,
-  viewingStatusColor,
+  activeConversationViewings,
   submitViewingRequest,
+  acceptCounterViewing,
 } = useViewingRequest(
   () => props.conversation,
   () => props.isOwner,

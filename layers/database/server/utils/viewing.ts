@@ -8,7 +8,8 @@ const viewingWithDetailsSelect = {
   requesterId: true,
   ownerId: true,
   conversationId: true,
-  proposedAt: true,
+  proposedDates: true,
+  preferredTimes: true,
   counterProposedAt: true,
   status: true,
   notes: true,
@@ -38,12 +39,13 @@ export async function createViewing(
   requesterId: number,
   ownerId: number,
   listingId: number,
-  proposedAt: Date,
+  proposedDates: Date[],
+  preferredTimes: string[],
   notes?: string,
   conversationId?: number,
 ) {
   return prisma.viewing.create({
-    data: { requesterId, ownerId, listingId, proposedAt, notes, conversationId },
+    data: { requesterId, ownerId, listingId, proposedDates, preferredTimes, notes, conversationId },
     select: viewingWithDetailsSelect,
   });
 }
@@ -83,6 +85,28 @@ export async function cancelViewing(id: number, userId: number) {
   return prisma.viewing.update({
     where: { id, OR: [{ requesterId: userId }, { ownerId: userId }] },
     data: { status: "CANCELLED" },
+    select: viewingWithDetailsSelect,
+  });
+}
+
+/**
+ * Either party updates proposed dates/times.
+ * - Requester (buyer/tenant): resets counterProposedAt, sets status PENDING
+ * - Owner (landlord/seller): clears proposedDates back to these new ones, sets status RESCHEDULED
+ */
+export async function updateViewingProposal(
+  id: number,
+  userId: number,
+  role: 'requester' | 'owner',
+  proposedDates: Date[],
+  preferredTimes: string[],
+  notes?: string,
+) {
+  const status = role === 'owner' ? 'RESCHEDULED' : 'PENDING';
+  const where = role === 'owner' ? { id, ownerId: userId } : { id, requesterId: userId };
+  return prisma.viewing.update({
+    where,
+    data: { proposedDates, preferredTimes, notes: notes ?? undefined, status, counterProposedAt: null },
     select: viewingWithDetailsSelect,
   });
 }

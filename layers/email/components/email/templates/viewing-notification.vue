@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import {
   Html,
   Head,
@@ -17,7 +18,8 @@ const props = defineProps<{
   senderName: string;
   senderAvatar?: string;
   eventType: "requested" | "accepted" | "rescheduled" | "declined" | "cancelled";
-  proposedAt: string;
+  proposedDates: string[];
+  preferredTimes?: string[];
   counterProposedAt?: string;
   notes?: string;
   listingAddress?: string;
@@ -110,17 +112,27 @@ const ctaLabel = computed(() => {
             </Text>
           </div>
 
-          <!-- Proposed date/time -->
+          <!-- Proposed dates / time preferences -->
           <Section
             style="background-color: #f9fafb; border-left: 4px solid #FC7239; border-radius: 4px; padding: 20px 24px; margin: 0 0 24px 0;"
           >
             <Text
               style="color: #6b7280; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 8px 0;"
             >
-              {{ eventType === "rescheduled" ? "Original Proposed Time" : "Proposed Time" }}
+              {{ eventType === "rescheduled" ? "Original Proposed Dates" : "Proposed Dates" }}
             </Text>
-            <Text style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0;">
-              {{ proposedAt }}
+            <Text
+              v-for="date in proposedDates"
+              :key="date"
+              style="color: #1a1a1a; font-size: 16px; font-weight: 600; margin: 0 0 4px 0;"
+            >
+              {{ date }}
+            </Text>
+            <Text
+              v-if="preferredTimes && preferredTimes.length"
+              style="color: #6b7280; font-size: 14px; margin: 8px 0 0 0;"
+            >
+              Preferred times: {{ preferredTimes.join(', ') }}
             </Text>
           </Section>
 

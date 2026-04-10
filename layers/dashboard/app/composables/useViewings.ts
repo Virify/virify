@@ -61,6 +61,22 @@ export const useViewings = createSharedComposable(() => {
     }
   }
 
+  async function counterProposeViewing(id: number, payload: CounterProposeViewingPayload): Promise<ViewingWithDetails | null> {
+    try {
+      const updated = await requestFetch<ViewingWithDetails>(`/api/viewing/${id}/propose`, {
+        method: "PATCH",
+        body: payload,
+      });
+      const idx = viewings.value.findIndex((v) => v.id === id);
+      if (idx !== -1) viewings.value[idx] = updated;
+      fetchViewings().catch((err) => console.error("Failed to refresh viewings after counter-propose:", err));
+      return updated;
+    } catch (err) {
+      console.error("Error counter-proposing viewing:", err);
+      return null;
+    }
+  }
+
   // ─── Helpers ─────────────────────────────────────────────────────────────────
 
   /** Get all viewings for a specific conversation */
@@ -96,8 +112,12 @@ export const useViewings = createSharedComposable(() => {
   /** Human-readable label for a viewing's status as a buyer. */
   function getViewingStatusLabel(viewing: ViewingWithDetails): string {
     if (viewing.status === 'ACCEPTED') {
-      const d = new Date(viewing.proposedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-      return `Viewing on ${d}`;
+      const confirmedDate = viewing.counterProposedAt ?? viewing.proposedDates[0];
+      if (confirmedDate) {
+        const d = new Date(confirmedDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        return `Viewing on ${d}`;
+      }
+      return 'Viewing Confirmed';
     }
     if (viewing.status === 'RESCHEDULED') return 'New Time Proposed';
     return 'Viewing Pending';
@@ -124,6 +144,7 @@ export const useViewings = createSharedComposable(() => {
     requestViewing,
     respondToViewing,
     cancelViewing,
+    counterProposeViewing,
     getConversationViewings,
     hasActiveViewingAsRequester,
     getActiveViewingForListing,

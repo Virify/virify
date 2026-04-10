@@ -26,10 +26,10 @@ const props = defineProps<{ viewing: ViewingWithDetails }>();
 const isRescheduled = computed(() => props.viewing.status === "RESCHEDULED");
 
 const calendarDate = computed(() => {
-  const { status, proposedAt, counterProposedAt } = props.viewing;
-  if (status !== "ACCEPTED" && status !== "RESCHEDULED") return null;
-  if (status === "RESCHEDULED" && counterProposedAt) return new Date(counterProposedAt);
-  return new Date(proposedAt);
+  // Calendar export is only available once a specific time has been confirmed
+  // (set via the reschedule modal by either party)
+  const { counterProposedAt } = props.viewing;
+  return counterProposedAt ? new Date(counterProposedAt) : null;
 });
 
 const eventEnd = computed(() => {

@@ -11,8 +11,10 @@ export interface SendViewingNotificationOptions {
   senderAvatar?: string;
   /** The type of viewing event */
   eventType: "requested" | "accepted" | "rescheduled" | "declined" | "cancelled";
-  /** Pre-formatted proposed date/time string (e.g. "12 Jun 2025, 10:00") */
-  proposedAt: string;
+  /** Pre-formatted proposed date strings (e.g. ["12 Jun 2025", "14 Jun 2025"]) */
+  proposedDates: string[];
+  /** Time preferences selected by the buyer (e.g. ["Mornings", "Evenings"]) */
+  preferredTimes?: string[];
   /** Pre-formatted counter-proposed date/time (reschedule only) */
   counterProposedAt?: string;
   /** Optional notes attached to the viewing */
@@ -37,7 +39,8 @@ export async function sendViewingNotificationEmail(options: SendViewingNotificat
     senderName,
     senderAvatar,
     eventType,
-    proposedAt,
+    proposedDates,
+    preferredTimes,
     counterProposedAt,
     notes,
     conversationUrl,
@@ -48,7 +51,8 @@ export async function sendViewingNotificationEmail(options: SendViewingNotificat
     senderName,
     senderAvatar,
     eventType,
-    proposedAt,
+    proposedDates,
+    preferredTimes,
     counterProposedAt,
     notes,
     conversationUrl,

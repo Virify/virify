@@ -4,7 +4,8 @@ model Viewing {
   requesterId       Int
   ownerId           Int
   conversationId    Int?
-  proposedAt        DateTime
+  proposedDates     DateTime[]
+  preferredTimes    String[]
   counterProposedAt DateTime?
   status            ViewingStatus @default(PENDING)
   notes             String?
@@ -21,7 +22,6 @@ model Viewing {
   @@index([ownerId])
   @@index([conversationId])
   @@index([status])
-  @@index([proposedAt])
 }
 
 enum ViewingStatus {

@@ -56,7 +56,8 @@ export default defineEventHandler(async (event) => {
           senderName: user.username ?? "Someone",
           senderAvatar: user.avatar ?? undefined,
           eventType: "cancelled",
-          proposedAt: new Date(cancelled.proposedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+          proposedDates: (cancelled as any).proposedDates?.map((d: string) => new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })) ?? [],
+          preferredTimes: (cancelled as any).preferredTimes ?? undefined,
           notes: cancelled.notes ?? undefined,
           listing: listingAddress
             ? {

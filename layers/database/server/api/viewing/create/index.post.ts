@@ -5,10 +5,13 @@ import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocket
 import { getUserNotificationPreferences } from "~~/layers/database/server/utils/user";
 import { sendViewingNotificationEmail } from "~~/layers/email/server/email/send-viewing-notification";
 
+const dateOnlyRegex = /^\d{4}-\d{2}-\d{2}$/;
+
 const schema = z.object({
   listingId: z.coerce.number(),
   ownerId: z.coerce.number(),
-  proposedAt: z.string().datetime(),
+  proposedDates: z.array(z.string().regex(dateOnlyRegex, 'Each date must be in YYYY-MM-DD format')).min(1).max(10),
+  preferredTimes: z.array(z.string().max(200)).min(1).max(4),
   notes: z.string().max(1000).optional(),
   conversationId: z.coerce.number().optional(),
 });
@@ -20,7 +23,7 @@ export default defineEventHandler(async (event) => {
   try {
     if (!user.id) throw createError({ statusCode: 401 });
 
-    const { listingId, ownerId, proposedAt, notes, conversationId } = await readValidatedBody(event, schema.parse);
+    const { listingId, ownerId, proposedDates, preferredTimes, notes, conversationId } = await readValidatedBody(event, schema.parse);
 
     // Listing owners cannot request viewings of their own property
     if (user.id === ownerId) {
@@ -42,14 +45,22 @@ export default defineEventHandler(async (event) => {
     // The requester is always the non-owner; recipient is always the listing owner
     const recipientId = ownerId;
 
-    const viewing = await createViewing(user.id as number, ownerId, listingId, new Date(proposedAt), notes, conversationId);
+    // Store dates as UTC noon timestamps to avoid timezone edge cases
+    const proposedDateObjects = proposedDates.map(d => new Date(d + 'T12:00:00.000Z'));
+    const viewing = await createViewing(user.id as number, ownerId, listingId, proposedDateObjects, preferredTimes, notes, conversationId);
+
+    // Human-readable summary for the notification message
+    const firstDate = proposedDateObjects[0]!.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+    const datesSummary = proposedDates.length > 1
+      ? `${firstDate} and ${proposedDates.length - 1} other date${proposedDates.length > 2 ? 's' : ''}`
+      : firstDate;
 
     // Persist notification for the listing owner
     const notification = await createNotification({
       userId: recipientId,
       type: "VIEWING_REQUEST" as NotificationType,
       title: "New viewing request",
-      message: notes ? notes.slice(0, 120) : `A viewing has been requested for ${new Date(proposedAt).toLocaleDateString("en-GB")}`,
+      message: notes ? notes.slice(0, 120) : `Viewing requested for ${datesSummary}`,
       senderUsername: user.username ?? null,
       senderAvatar: user.avatar ?? null,
       listingId,
@@ -73,7 +84,8 @@ export default defineEventHandler(async (event) => {
           senderName: user.username ?? "Someone",
           senderAvatar: user.avatar ?? undefined,
           eventType: "requested",
-          proposedAt: new Date(proposedAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
+          proposedDates: proposedDateObjects.map(d => d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })),
+          preferredTimes,
           notes: notes,
           listing: viewing.listing
             ? {

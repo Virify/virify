@@ -17,8 +17,12 @@ export function useViewingRequest(
 
   const viewingToday = getToday(getLocalTimeZone());
   const viewingPopoverOpen = ref(false);
-  const viewingDate = ref<DateValue>(viewingToday);
-  const viewingTime = ref("10:00");
+  /** Multiple selected dates (CalendarDate[]) */
+  const viewingDates = shallowRef<DateValue[]>([]);
+  /** Selected time preferences (e.g. ['Mornings', 'Evenings']) */
+  const viewingTimes = ref<string[]>([]);
+  /** Freeform time text shown when 'Other...' is selected */
+  const viewingOtherTime = ref("");
   const viewingNotes = ref("");
   const viewingSubmitting = ref(false);
 
@@ -29,6 +33,13 @@ export function useViewingRequest(
     if (!convo?.id) return [];
     return getConversationViewings(convo.id);
   });
+
+  /** Viewings that are still active (not yet terminal) */
+  const activeConversationViewings = computed(() =>
+    conversationViewings.value.filter((v) =>
+      v.status === "PENDING" || v.status === "RESCHEDULED" || v.status === "ACCEPTED",
+    ),
+  );
 
   const hasActiveViewing = computed(() => {
     const convo = conversation();
@@ -58,21 +69,43 @@ export function useViewingRequest(
     return "neutral";
   }
 
+  /** Buyer accepts the owner's counter-proposed time directly from the popover */
+  async function acceptCounterViewing(id: number) {
+    const { respondToViewing } = useViewings();
+    const result = await respondToViewing(id, { response: "accept" });
+    if (result) {
+      toast.add({
+        title: "Viewing confirmed",
+        description: "The time has been accepted.",
+        color: "success",
+        icon: "i-lucide-calendar-check",
+      });
+      viewingPopoverOpen.value = false;
+    } else {
+      toast.add({ title: "Error", description: "Failed to confirm viewing.", color: "error", icon: "i-lucide-circle-x" });
+    }
+  }
+
   async function submitViewingRequest() {
     const convo = conversation();
     const listing = convo?.listing;
-    if (!listing?.id || !listing.userId || !viewingDate.value || !viewingTime.value) return;
+    if (!listing?.id || !listing.userId || !viewingDates.value.length || !viewingTimes.value.length) return;
+
+    // Replace 'Other...' sentinel with the freeform time text (or 'Other' if no text)
+    const finalTimes = viewingTimes.value.map(t =>
+      t === 'Other...' ? (viewingOtherTime.value.trim() || 'Other') : t,
+    ).filter(Boolean);
+
+    // Convert CalendarDate objects to YYYY-MM-DD strings
+    const proposedDates = (viewingDates.value as CalendarDate[]).map(d => d.toString());
 
     viewingSubmitting.value = true;
     try {
-      const [hours, minutes] = viewingTime.value.split(":").map(Number);
-      const native = (viewingDate.value as CalendarDate).toDate(getLocalTimeZone());
-      native.setHours(hours!, minutes!, 0, 0);
-
       await requestViewing({
         listingId: listing.id,
         ownerId: listing.userId,
-        proposedAt: native.toISOString(),
+        proposedDates,
+        preferredTimes: finalTimes,
         notes: viewingNotes.value || undefined,
         conversationId: convo?.id,
       });
@@ -85,8 +118,9 @@ export function useViewingRequest(
       });
 
       viewingPopoverOpen.value = false;
-      viewingDate.value = viewingToday;
-      viewingTime.value = "10:00";
+      viewingDates.value = [];
+      viewingTimes.value = [];
+      viewingOtherTime.value = "";
       viewingNotes.value = "";
     } catch {
       toast.add({
@@ -103,14 +137,17 @@ export function useViewingRequest(
   return {
     viewingToday,
     viewingPopoverOpen,
-    viewingDate,
-    viewingTime,
+    viewingDates,
+    viewingTimes,
+    viewingOtherTime,
     viewingNotes,
     viewingSubmitting,
     conversationViewings,
+    activeConversationViewings,
     hasActiveViewing,
     formatViewingDate,
     viewingStatusColor,
     submitViewingRequest,
+    acceptCounterViewing,
   };
 }

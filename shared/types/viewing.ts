@@ -28,7 +28,10 @@ export interface ViewingWithDetails {
   requesterId: number;
   ownerId: number;
   conversationId: number | null;
-  proposedAt: string; // ISO string
+  /** ISO strings for each date the buyer is available (stored as UTC noon) */
+  proposedDates: string[];
+  /** Time preferences selected by the buyer (e.g. 'Mornings', 'Evenings', freeform) */
+  preferredTimes: string[];
   counterProposedAt: string | null;
   status: ViewingStatus;
   notes: string | null;
@@ -43,7 +46,9 @@ export interface ViewingWithDetails {
 export interface CreateViewingPayload {
   listingId: number;
   ownerId: number;
-  proposedAt: string; // ISO string
+  /** Date strings in YYYY-MM-DD format */
+  proposedDates: string[];
+  preferredTimes: string[];
   notes?: string;
   conversationId?: number;
 }
@@ -51,5 +56,13 @@ export interface CreateViewingPayload {
 /** Payload to respond to a viewing (owner action) */
 export interface RespondViewingPayload {
   response: 'accept' | 'reject' | 'reschedule';
-  counterProposedAt?: string; // required when response = 'reschedule'
+  counterProposedAt?: string; // required when response = 'reschedule' or 'accept'
+}
+
+/** Payload for a buyer to counter-propose new dates/times */
+export interface CounterProposeViewingPayload {
+  /** Date strings in YYYY-MM-DD format */
+  proposedDates: string[];
+  preferredTimes: string[];
+  notes?: string;
 }
