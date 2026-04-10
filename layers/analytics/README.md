@@ -1,199 +1,94 @@
 # Analytics Layer
 
 ## Overview
-The Analytics layer provides comprehensive analytics functionality for the Virify application, including tracking user interactions, aggregating metrics, and providing insights into property listing performance and user engagement.
 
-## Features
-- 📊 **Analytics Aggregates**: User-specific metrics and counts
-- 👀 **Listing View Tracking**: Track and record when users view property listings
-- 📈 **User Analytics Summary**: Comprehensive analytics for user's listings performance
-- 🎯 **Event Tracking**: Custom event tracking for user interactions
-- 📱 **Real-time Metrics**: Live updates of analytics data
-- 🔍 **Performance Insights**: Detailed insights into listing performance
-- 📋 **Dashboard Integration**: Ready-to-use analytics for user dashboards
+The analytics layer tracks user interactions and provides business intelligence for the admin dashboard and user analytics pages. It uses `navigator.sendBeacon` for fire-and-forget event tracking (non-blocking, survives page unloads) and fetches aggregated analytics data for display.
+
+Two composables handle separate concerns:
+- `useAnalyticsTracking()` — outbound event tracking (POST, fire-and-forget)
+- `useAnalytics()` — inbound data fetching (GET, for dashboard and analytics display)
 
 ## Directory Structure
+
 ```
 layers/analytics/
-├── composables/              # Analytics utilities
-│   └── useAnalytics.ts      # Main analytics composable
-├── server/                  # Server-side analytics logic
-│   └── api/                 # Analytics API endpoints
-│       ├── aggregates/      # User metric aggregates
-│       ├── all/             # Complete analytics data
-│       └── listing/         # Listing-specific analytics
-├── tests/                   # Analytics testing
-└── nuxt.config.ts          # Layer configuration
+├── composables/
+│   ├── useAnalytics.ts            # Data fetching: quick, comprehensive, trending locations
+│   └── useAnalyticsTracking.ts    # Event tracking via sendBeacon
+├── server/
+│   └── api/
+│       └── analytics/
+│           ├── track/             # POST /api/analytics/track — ingest tracking events
+│           ├── quick/             # GET  /api/analytics/quick — lightweight dashboard summary
+│           ├── comprehensive/     # GET  /api/analytics/comprehensive — full time-series data
+│           ├── all/               # GET  /api/analytics/all — all analytics rollup
+│           ├── aggregates/        # GET  /api/analytics/aggregates — user item aggregates
+│           ├── listing/           # GET  /api/analytics/listing/:id — per-listing analytics
+│           ├── search/            # GET  /api/analytics/search — search analytics
+│           │   └── location/      # GET  /api/analytics/search/location — trending locations
+│           └── mortgage/          # GET  /api/analytics/mortgage — mortgage calc usage
+├── tests/
+└── utils/
 ```
 
-## API Endpoints
+## `useAnalyticsTracking()` — Event Tracking
 
-### Analytics API Endpoints
-
-- `GET    /api/analytics/aggregates/` — Get analytics aggregates (counts) for the authenticated user
-- `GET    /api/analytics/all/` — Get all analytics data for the authenticated user
-
-#### Listing Analytics
-- `GET    /api/analytics/listing/all/` — Get analytics summary for all user's listings
-- `POST   /api/analytics/listing/track-view/` — Track a listing view event
-
-#### Search Analytics
-- `POST   /api/analytics/search/` — Track an AI-powered search event
-- `GET    /api/analytics/search/location/` — Get trending AI search locations
-
----
-
-> **Note:** All endpoints require authentication. Some endpoints may require specific permissions or payloads. See code for request/response details.
-
-## Composables
-
-### `useAnalytics()`
-
-The main composable providing analytics functionality:
-
-```typescript
+```ts
 const {
-  analytics,                    // User analytics summary
-  aggregates,                   // Analytics aggregates (counts)
-  aggregatesLoading,           // Loading state for aggregates
-  aggregatesError,             // Error state for aggregates
-  trackListingView,            // Function to track listing views
-  fetchAnalyticsAggregates,    // Function to fetch aggregates
-  getAggregateCount           // Function to get specific aggregate count
+  trackListingView,
+  trackListingImpression,
+  trackSearch,
+  trackMortgageCalculation,
+  trackContactEnquiry,
+} = useAnalyticsTracking()
+```
+
+All tracking methods use `navigator.sendBeacon('/api/analytics/track', payload)` — non-blocking and fire-and-forget. A stable `sessionId` (nanoid, stored in `useState`) deduplicates repeated views within a session. Cookie consent is checked before including `sessionId` — declined users are tracked anonymously (`sessionId: null`).
+
+## `useAnalytics()` — Data Fetching
+
+```ts
+const {
+  // Quick analytics (dashboard homepage, lightweight)
+  quickAnalytics,
+  isQuickLoading,
+  fetchQuickAnalytics,
+
+  // Comprehensive analytics (analytics page, full time-series)
+  comprehensiveAnalytics,
+  isComprehensiveLoading,
+  fetchComprehensiveAnalytics,
+  selectedPeriod,    // '7d' | '30d' | '90d'
+
+  // User content
+  recentlyViewedListings,
+  recentOwnedListings,
+  allUserListings,
+
+  // Trending
+  trendingLocations,
+
+  // Orchestration
+  refreshAll,
 } = useAnalytics()
 ```
 
-### Usage Examples
+`useAnalytics` is a `createSharedComposable` singleton. It also orchestrates refreshing recent favourites and notes from `useDashboardRecentItems()` after user interactions that might change those lists.
 
-#### Track Listing View
-```typescript
-// Track when a user views a property listing
-await trackListingView(listingId, userId);
-```
+## Analytics Modes
 
-#### Get User Analytics
-```typescript
-// Fetch user's analytics aggregates
-await fetchAnalyticsAggregates();
+| Mode | Endpoint | Use case |
+|------|----------|---------|
+| Quick | `/api/analytics/quick` | Dashboard homepage summary cards — fast, low DB cost |
+| Comprehensive | `/api/analytics/comprehensive?period=30d` | Full analytics page with time-series charts |
+| Aggregates | `/api/analytics/aggregates` | User item counts (favourites, notes, views, etc.) |
 
-// Get specific count
-const propertyCount = getAggregateCount('properties');
-const viewCount = getAggregateCount('views');
-```
+## Privacy & Consent
 
-#### Dashboard Integration
-```vue
-<template>
-  <div class="analytics-dashboard">
-    <div class="metric-card">
-      <h3>Total Properties</h3>
-      <p>{{ getAggregateCount('properties') }}</p>
-    </div>
-    
-    <div class="metric-card">
-      <h3>Total Views</h3>
-      <p>{{ getAggregateCount('views') }}</p>
-    </div>
-    
-    <div class="metric-card">
-      <h3>Favorites</h3>
-      <p>{{ getAggregateCount('favorites') }}</p>
-    </div>
-  </div>
-</template>
+- Cookie consent is checked via `useCookieConsent()` before including `sessionId`
+- Users who decline tracking are tracked anonymously (`sessionId: null`)
+- No PII is included in tracking payloads
 
-<script setup>
-const { aggregates, fetchAnalyticsAggregates, getAggregateCount } = useAnalytics();
+## Integration
 
-// Fetch analytics on component mount
-await fetchAnalyticsAggregates();
-</script>
-```
-
-## Data Types
-
-### Analytics Aggregates
-```typescript
-interface AnalyticsAggregates {
-  properties: number;      // Total properties owned
-  views: number;          // Total property views
-  favorites: number;      // Times properties were favorited
-  notes: number;         // Property notes created
-  messages: number;      // Messages sent/received
-}
-```
-
-### Listing Analytics
-```typescript
-interface ListingAnalytics {
-  listingId: number;
-  viewCount: number;
-  favoriteCount: number;
-  noteCount: number;
-  lastViewed: Date;
-  averageTimeOnListing: number;
-}
-```
-
-## Migration from Account Counts
-
-This layer replaces the old account counts functionality with proper analytics terminology and enhanced features:
-
-### Migration Guide
-| Old | New |
-|-----|-----|
-| `useAccountCounts` | `useAnalytics` |
-| `AccountCounts` type | `AnalyticsAggregates` type |
-| `/api/account/counts` | `/api/analytics/aggregates/` |
-| `getCount()` | `getAggregateCount()` |
-| `fetchAccountCounts()` | `fetchAnalyticsAggregates()` |
-
-### Enhanced Features
-- **Expanded Metrics**: More detailed analytics beyond simple counts
-- **Performance Tracking**: Track listing performance over time
-- **User Engagement**: Measure user interaction with listings
-- **Real-time Updates**: Live analytics updates as users interact
-- **Historical Data**: Track trends and changes over time
-
-## Best Practices
-
-### Performance
-- **Batch Tracking**: Group multiple analytics events for efficient processing
-- **Async Operations**: Use async/await for all analytics API calls
-- **Error Handling**: Always handle analytics errors gracefully
-- **Caching**: Cache analytics data to reduce API calls
-
-### Privacy
-- **User Consent**: Ensure proper user consent for analytics tracking
-- **Data Minimization**: Only track necessary data points
-- **Anonymization**: Consider anonymizing sensitive data
-- **GDPR Compliance**: Follow data protection regulations
-
-### Implementation
-- **Non-blocking**: Analytics should not block user interactions
-- **Fallbacks**: Provide fallback values when analytics fail
-- **Testing**: Test analytics in different scenarios
-- **Documentation**: Document all tracked events and metrics
-
-## Configuration
-
-Add analytics configuration to your environment:
-```env
-# Analytics settings
-ANALYTICS_ENABLED=true
-ANALYTICS_BATCH_SIZE=50
-ANALYTICS_FLUSH_INTERVAL=30000
-```
-
-Configure in your Nuxt config:
-```typescript
-export default defineNuxtConfig({
-  runtimeConfig: {
-    analytics: {
-      enabled: process.env.ANALYTICS_ENABLED === 'true',
-      batchSize: parseInt(process.env.ANALYTICS_BATCH_SIZE || '50'),
-      flushInterval: parseInt(process.env.ANALYTICS_FLUSH_INTERVAL || '30000')
-    }
-  }
-})
-```
+`nuxt-gtag` is also configured in the root `nuxt.config.ts` for Google Analytics alongside the custom internal analytics.
