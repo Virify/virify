@@ -57,6 +57,10 @@ async function loginUser({ target }: SubmitEvent) {
       return;
     }
 
+    if (password.value.length < 8) {
+      return;
+    }
+
     // Post data
     let turnstileToken: string;
     try {
