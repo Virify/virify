@@ -123,6 +123,9 @@ const accountLinks = computed(() => {
 async function logOut() {
   await clear()
 
+  // Notify other open tabs to also log out
+  try { new BroadcastChannel('virify:auth').postMessage({ type: 'logout' }) } catch {}
+
   const { path } = useRoute()
 
   if (path.startsWith('/account')) {

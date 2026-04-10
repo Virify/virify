@@ -1,53 +1,41 @@
 # Content Layer
 
-The **Content Layer** in Virify is responsible for managing and delivering all CMS-driven and structured content, such as property descriptions, static pages, and editorial content. It typically integrates with a headless CMS (e.g., Sanity) and provides APIs and utilities for accessing and rendering content throughout the application.
+## Overview
 
----
+The content layer provides the pages and components for rendering CMS-driven static content. It is a thin presentation layer — the actual content data is authored in Sanity (see `layers/sanity/`) and fetched at runtime using `@nuxtjs/sanity`.
 
-## 🚀 Features
-- Centralized content management (properties, pages, guides, etc.)
-- Real-time editing and preview (when using Sanity Studio)
-- API endpoints for fetching content
-- Utilities for rich text rendering and content blocks
-- Extensible schema for new content types
+## Directory Structure
 
----
+```
+layers/content/
+├── app/
+│   ├── components/
+│   │   ├── SanityContent.vue          # Portable-text renderer for Sanity rich text
+│   │   ├── atoms/                     # Content-specific atoms (e.g., breadcrumbs)
+│   │   └── molecules/                 # Content-specific molecules (e.g., guide cards)
+│   └── pages/
+│       ├── cookie/                    # /cookie-policy
+│       ├── guides/                    # /guides and /guides/:slug
+│       ├── privacy/                   # /privacy-policy
+│       └── terms/                     # /terms
+└── nuxt.config.ts
+```
 
-## 🏗️ Directory Structure
-- `schemas/` – Content schemas and types
-- `server/` – API endpoints for content delivery
-- `utils/` – Content utilities (e.g., rich text rendering)
-- `tests/` – Content-related tests
+## Pages
 
----
+| Route | Description |
+|-------|-------------|
+| `/cookie-policy` | Cookie policy page — content from `cookieType` Sanity schema |
+| `/guides` | Guides listing page — fetches all guides from `guideType` schema |
+| `/guides/:slug` | Individual guide page — fetches single guide by slug |
+| `/privacy-policy` | Privacy policy — content from `privacyType` Sanity schema |
+| `/terms` | Terms and conditions — content from `termsType` Sanity schema |
 
-## ⚙️ Setup
+## `SanityContent.vue`
 
-### Docker
-- Content services (e.g., Sanity Studio) are started automatically with `make up`
-- Access the CMS at the configured port (see [Sanity Layer](../sanity/README.md))
+The core component for rendering Sanity portable-text blocks. Used on every content page to render rich text with headings, paragraphs, links, and embedded content blocks authored in the Sanity Studio.
 
-### Local
-- Run the CMS locally (see [Sanity Layer](../sanity/README.md))
-- Ensure environment variables for CMS API keys are set in `.env`
+## Related
 
----
-
-## 🧩 Extending Content
-- Add new schemas in `schemas/`
-- Create new API endpoints in `server/` for custom content needs
-- Use provided utilities for rendering content in the UI
-
----
-
-## 🏆 Best Practices
-- Keep content schemas versioned and documented
-- Use preview features for editorial workflows
-- Validate content before publishing
-- Test content rendering in the UI
-
----
-
-## 🔗 Related Docs
-- [Sanity Layer](../sanity/README.md)
-- [UI Layer](../ui/README.md)
+- [Sanity Layer](../sanity/README.md) — content authoring, schema definitions, and Sanity Studio
+- Content is fetched using `useSanityQuery()` from `@nuxtjs/sanity` — no custom API endpoints in this layer

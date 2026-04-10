@@ -1,10 +1,11 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
+import { createSharedComposable } from "@vueuse/core";
 
 /**
  * Dashboard navigation items for Nuxt UI NavigationMenu component.
  * Returns a computed value that updates when aggregates change
  */
-export function useDashboardNavigation() {
+export const useDashboardNavigation = createSharedComposable(() => {
   const { aggregates } = useNotifications();
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
@@ -82,15 +83,16 @@ export function useDashboardNavigation() {
         //     text: "Manage offers",
         //   },
         // },
-        // {
-        //   label: "Viewings",
-        //   type: "link",
-        //   to: "#",
-        //   icon: "i-lucide-calendar-check",
-        //   tooltip: {
-        //     text: "Schedule viewings",
-        //   },
-        // },
+        {
+          label: "Viewings",
+          type: "link",
+          to: "/dashboard/viewings",
+          icon: "i-lucide-calendar-check",
+          tooltip: {
+            text: "Schedule viewings",
+          },
+          badge: aggregates.value.viewings > 0 ? String(aggregates.value.viewings) : undefined,
+        },
         {
           label: "Enquiries",
           type: "link",
@@ -99,7 +101,7 @@ export function useDashboardNavigation() {
           tooltip: {
             text: "View enquiries",
           },
-          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : aggregates.value.enquiries ? String(aggregates.value.enquiries) : undefined,
+          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : undefined,
         },
         {
           label: "Favourites",
@@ -134,11 +136,12 @@ export function useDashboardNavigation() {
         {
           label: "Viewed",
           type: "link",
-          to: "#",
+          to: "/dashboard/viewed",
           icon: "i-lucide-eye",
           tooltip: {
-            text: "Recently viewed properties",
+            text: "Recently viewed properties" + (aggregates.value.viewedListings ? ` (${aggregates.value.viewedListings})` : ""),
           },
+          badge: aggregates.value.viewedListings ? String(aggregates.value.viewedListings) : undefined,
         },
         {
           label: "Analytics",
@@ -328,4 +331,4 @@ export function useDashboardNavigation() {
     dashboardNavigationitems,
     accountNavigationItems,
   };
-}
+});

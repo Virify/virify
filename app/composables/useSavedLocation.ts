@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core";
 
 export const useSavedLocation = createSharedComposable(() => {
   const entries = useState<UserSavedLocation[]>('saved-locations', () => [])
+  const toast = useToast()
 
   /**
    *  Get all entries (alias of addEntry, but with no arguments)
@@ -47,7 +48,9 @@ export const useSavedLocation = createSharedComposable(() => {
     }).then(async () => {
       // Refresh entries
       await getEntries()
+      toast.add({ title: 'Location saved', color: 'success', icon: 'i-lucide-map-pin' })
     }).catch(() => {
+      toast.add({ title: 'Error', description: 'Failed to save location', color: 'error', icon: 'i-lucide-map-pin-off' })
       throw createError({
         status: 500,
         statusMessage: 'Unable to save new location'
@@ -90,6 +93,9 @@ export const useSavedLocation = createSharedComposable(() => {
       method: "DELETE"
     }).then(async () => {
       await getEntries()
+      toast.add({ title: 'Location removed', color: 'success', icon: 'i-lucide-map-pin-off' })
+    }).catch(() => {
+      toast.add({ title: 'Error', description: 'Failed to remove location', color: 'error', icon: 'i-lucide-map-pin-off' })
     })
   }
 
@@ -103,7 +109,9 @@ export const useSavedLocation = createSharedComposable(() => {
       body: { id: entryId, name }
     }).then(async () => {
       await getEntries()
+      toast.add({ title: 'Location name updated', color: 'success', icon: 'i-lucide-map-pin' })
     }).catch(() => {
+      toast.add({ title: 'Error', description: 'Failed to update location name', color: 'error', icon: 'i-lucide-map-pin-off' })
       throw createError({ status: 500, statusMessage: 'Unable to update location name' })
     })
   }

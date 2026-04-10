@@ -1,202 +1,127 @@
 # WebSocket Layer
 
 ## Overview
-The WebSocket layer provides real-time messaging and communication functionality for the Virify platform. It enables instant messaging between users, typing indicators, and real-time notifications using a unified composable architecture.
 
-## Features
-- 💬 Real-time messaging between users
-- ⌨️ Typing indicators with debouncing
-- 🔔 Live notifications and events
-- 🔗 Persistent WebSocket connections
-- 🛡️ Secure peer management with user sessions
-- 📨 Type-safe message routing and validation
-- 🎯 Event-driven UI updates
+The WebSocket layer provides the real-time messaging backbone for Virify. It uses Nitro's experimental WebSocket support to maintain persistent connections, and exposes a single `useWebSocketServer` composable that handles both server-side routing and client-side event dispatching.
 
-## Architecture
-
-### Unified Composable System
-The layer uses a single composable (`useWebSocketServer`) that handles:
-- **Server-side**: Incoming message validation and routing to connected peers
-- **Client-side**: Outgoing message handling and UI event dispatching
-
-### Message Flow
-```
-CLIENT A → SERVER (handleIncomingMessages) → CLIENT B (handleOutgoingMessages) → UI Events
-```
+The client plugin (`plugins/websocket.client.ts`) establishes one connection per browser session and distributes incoming events to the relevant composables (`useEnquiries`, `useNotifications`, `useViewings`, etc.).
 
 ## Directory Structure
+
 ```
 layers/websocket/
 ├── composables/
-│   └── useWebSocketServer.ts    # Unified WebSocket composable
+│   └── useWebSocketServer.ts    # Unified server + client composable
+├── plugins/
+│   └── websocket.client.ts      # Global Nuxt plugin — single connection point
 ├── server/
 │   └── api/
 │       └── _ws/
-│           └── connection.ts    # WebSocket connection handler
-└── nuxt.config.ts              # Layer configuration
+│           └── connection.ts    # Nitro WebSocket endpoint
+└── nuxt.config.ts               # Enables nitro.experimental.websocket + WS_BASE_URL
 ```
 
 ## Message Types
 
-### New Message
-```typescript
-{
-  type: "new_message",
-  conversationId: number,
-  message: MessageWithUser,
-  recipients: number[],
-  from: number
-}
+Defined in `shared/types/websocket.ts`:
+
+| Type | Direction | Purpose |
+|------|-----------|---------|
+| `new_message` | Server → Client | Deliver a new chat message |
+| `new_conversation` | Server → Client | Notify recipient of a new conversation |
+| `typing` | Bidirectional | Typing indicator (high-frequency, debounced) |
+| `message_read` | Bidirectional | Read receipt for a message |
+| `connection_status` | Server → Client | User online/offline status change |
+| `aggregate_update` | Server → Client | A badge count changed (e.g. unread messages +1) |
+| `notification_new` | Server → Client | A new `UserNotification` record was created |
+| `conversation_presence` | Client → Server | User opened or closed a conversation view |
+
+## `useWebSocketServer` Composable
+
+The composable is used on **both** server endpoints and the client plugin.
+
+### Server-side (used inside Nitro event handlers)
+
+```ts
+const ws = useWebSocketServer()
+
+// Register / unregister a peer (called by connection.ts automatically)
+ws.addPeer(userId, peer)
+ws.removePeer(userId, peer)
+
+// Send to specific user(s) or broadcast
+ws.sendToPeers([userId1, userId2], message)
+ws.sendToAll(message)
+ws.sendMessage(message)  // auto-routes based on message.to
+
+// Presence queries
+ws.isUserOnline(userId)
+ws.isUserViewingConversation(userId, conversationId)
 ```
 
-### Typing Indicator
-```typescript
-{
-  type: "typing",
-  conversationId: number,
-  to: number,
-  isTyping: boolean,
-  from: number
-}
+### Type-safe message constructors
+
+```ts
+createNewMessageMessage(conversationId, message, to, from?, conversation?)
+createNewConversationMessage(conversation, to, from?)
+createTypingMessage(conversationId, to, isTyping)
+createMessageReadMessage(conversationId, messageId, to)
+createConnectionStatusMessage(userId, isOnline, to)
+createAggregateUpdateMessage(aggregateType, operation, to)
+createNotificationNewMessage(notification, to)
 ```
 
-### New Conversation
-```typescript
-{
-  type: "new_conversation",
-  conversation: ConversationWithMinimalListing,
-  recipients: number[],
-  from: number
-}
-```
+### Client-side (used in `websocket.client.ts`)
 
-## Usage
+```ts
+const ws = useWebSocketServer()
 
-### Client-Side Implementation
-```vue
-<script setup>
-import { useWebSocket } from "@vueuse/core";
-import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
-
-// WebSocket connection
-const config = useRuntimeConfig();
-const { status, data, send } = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection");
-
-// WebSocket utilities
-const { createTypingMessage, handleOutgoingMessages } = useWebSocketServer();
-
-// Event handlers for UI updates
-const webSocketEvents = {
-  onNewMessage: ({ conversationId, message }) => {
-    // Update UI with new message
-  },
-  onTyping: ({ from, conversationId, isTyping }) => {
-    // Show/hide typing indicator
-  },
-  onNewConversation: ({ conversation }) => {
-    // Add new conversation to UI
-  }
-};
-
-// Route incoming WebSocket messages to event handlers
-watchEffect(() => {
-  if (data.value) {
-    handleOutgoingMessages(data.value, webSocketEvents);
-  }
-});
-
-// Send typing indicator
-function sendTyping(conversationId, recipientId, isTyping) {
-  const message = createTypingMessage(conversationId, recipientId, isTyping);
-  send(JSON.stringify(message));
-}
-</script>
-```
-
-### Server-Side Message Broadcasting
-```typescript
-// In API routes
-import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
-
-const { sendMessage, createNewMessageMessage } = useWebSocketServer();
-
-// Broadcast message to all conversation participants
-const messageToSend = createNewMessageMessage(
-  conversationId,
-  newMessage,
-  [senderId, receiverId], // Send to both sender and receiver
-  senderId
-);
-
-sendMessage(messageToSend);
-```
-
-## Event Handlers
-
-### handleIncomingMessages (Server)
-Processes messages received from clients:
-- Validates message format and user permissions
-- Routes messages to appropriate recipients
-- Manages peer connections
-
-### handleOutgoingMessages (Client)
-Processes messages received from server:
-- Parses incoming WebSocket data
-- Routes to appropriate UI event handlers
-- Updates client-side state
-
-## Best Practices
-
-### Message Validation
-- Always validate message types and required fields
-- Check user permissions before processing messages
-- Handle malformed messages gracefully
-
-### UI Updates
-- Use event handlers for clean separation of concerns
-- Prevent duplicate message processing
-- Auto-scroll to new messages when appropriate
-
-### Connection Management
-- Handle connection loss and reconnection
-- Clean up peer connections on user disconnect
-- Gracefully handle session expiration
-
-### Performance
-- Debounce typing indicators to reduce spam
-- Use efficient message routing to specific recipients
-- Implement heartbeat for connection health
-
-## Configuration
-
-Add WebSocket URL to your runtime config:
-```typescript
-// nuxt.config.ts
-export default defineNuxtConfig({
-  runtimeConfig: {
-    public: {
-      WS_BASE_URL: process.env.WS_BASE_URL || 'ws://localhost:3000'
-    }
-  }
+ws.handleOutgoingMessages(rawData, {
+  onNewMessage:        ({ conversationId, message }) => { ... },
+  onNewConversation:   ({ conversation }) => { ... },
+  onTyping:            ({ from, conversationId, isTyping }) => { ... },
+  onMessageRead:       ({ conversationId, messageId }) => { ... },
+  onAggregateUpdate:   ({ aggregateType, operation }) => { ... },
+  onNotificationNew:   ({ notification }) => { ... },
 })
 ```
 
-## Testing
+## Connection Handler (`server/api/_ws/connection.ts`)
 
-The layer includes comprehensive tests for:
-- Message creation and validation
-- Peer management
-- Event handler routing
-- Connection lifecycle
+The Nitro WebSocket endpoint implements the full peer lifecycle:
 
-Run tests with:
+| Hook | Behaviour |
+|------|-----------|
+| `upgrade(req)` | Validates user session via `requireUserSession()` — rejects unauthenticated connections |
+| `open(peer)` | Registers peer against `userId`, emits presence update |
+| `close(peer)` | Unregisters peer, cleans up presence state |
+| `message(peer, msg)` | Routes: pings return pong; `typing` and `message_read` frames are validated against participant cache (60s TTL) before routing; `new_message` frames are rejected (HTTP-only) |
+
+**Security notes:**
+- `new_message` frames from clients are silently dropped — messages are only sent via the HTTP API
+- For `typing` and `message_read`, the server overwrites the client-supplied `to` field with the real participant list from DB (validated via participant cache)
+- Participant cache has a 60s TTL with a 10s cleanup interval to avoid per-frame DB hits on high-frequency typing events
+
+## Client Plugin (`plugins/websocket.client.ts`)
+
+Runs once per browser session. Responsibilities:
+- Opens the WebSocket connection to `$config.public.WS_BASE_URL + "/api/_ws/connection"`
+- Supplies `handleOutgoingMessages()` callback handlers for all 6 message types
+- Routes events to: `useNotifications()`, `useEnquiries()`, `useGlobalEnquiryModal()`, `useViewings()`
+- Applies **optimistic local state updates** to avoid UI flicker caused by DB replication lag after a WebSocket event
+- Auto-reconnects up to 3 times at 1-second intervals on unexpected disconnection
+
+## Global Singleton State
+
+`useWebSocketServer` maintains two module-level `Map`s accessible from all server events:
+
+| Map | Key | Value | Purpose |
+|-----|-----|-------|---------|
+| `globalPeers` | `userId` | `Set<Peer>` | Supports multiple tabs per user |
+| `globalActiveConversationByUser` | `userId` | `conversationId \| null` | Used to suppress notification toasts when recipient is already viewing that conversation |
+
+## Environment Variables
+
 ```bash
-pnpm test
+WS_BASE_URL=wss://virify.co.uk   # Public WebSocket base URL
 ```
-
-## Security Considerations
-
-- All WebSocket connections require valid user sessions
-- Messages are validated before routing
-- Peer isolation prevents cross-user message leakage
-- Session expiration automatically disconnects users

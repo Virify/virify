@@ -6,12 +6,7 @@
 /**
  * Notification types - matches the database model
  */
-export type NotificationType = 
-  | 'NEW_MESSAGE'
-  | 'NEW_ENQUIRY'
-  | 'ENQUIRY_REPLY'
-  | 'LISTING_UPDATE'
-  | 'SYSTEM';
+export type NotificationType = "NEW_MESSAGE" | "NEW_ENQUIRY" | "ENQUIRY_REPLY" | "LISTING_UPDATE" | "SYSTEM" | "VIEWING_REQUEST" | "VIEWING_ACCEPTED" | "VIEWING_REJECTED" | "VIEWING_RESCHEDULED" | "VIEWING_CANCELLED";
 
 /**
  * User notification type - matches the database model
@@ -57,6 +52,7 @@ export interface UserItemsAggregates {
   favourites: number;
   notes: number;
   hiddenListings: number;
+  viewedListings: number;
   enquiries: number;
   locations: number;
   listings: number; // Count of user's active (non-archived) listings
@@ -69,6 +65,7 @@ export interface UserItemsAggregates {
   sentUnreadEnquiries: number; // Count of sent conversations with unread messages
   receivedEnquiries: number; // Count of conversations user received
   receivedUnreadEnquiries: number; // Count of received conversations with unread messages
+  viewings: number; // Count of user's active viewings (PENDING + ACCEPTED + RESCHEDULED)
 }
 
 /**
@@ -79,6 +76,7 @@ export interface InAppNotificationPayload {
   id: number;
   title: string;
   description: string;
+  type?: NotificationType;
   conversationId?: number;
   listingId?: number;
   senderUsername?: string;
@@ -91,4 +89,3 @@ export interface InAppNotificationPayload {
 // Reserved for future use when implementing push notifications, email notifications, etc.
 
 export type NotificationCategory = keyof UserItemsAggregates;
-

@@ -20,8 +20,9 @@ export default defineEventHandler(async (event) => {
 
     await unhideListingForUser(user.id, listingId);
 
-    // Invalidate lookups cache and aggregates badge
+    // Invalidate lookups + full-page cache and aggregates badge
     useStorage("cache").removeItem(`hidden-listings:lookups:${user.id}`).catch(() => {});
+    await invalidateHiddenListingsFullCache(user.id as number);
     await invalidateAggregatesCache(user.id as number);
 
     return { success: true };

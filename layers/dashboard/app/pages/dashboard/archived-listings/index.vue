@@ -1,18 +1,17 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :ui="{
-          title: 'title-sm m-0!',
-          right: 'flex items-center gap-4',
-        }"
-      >
+      <UDashboardNavbar :ui="{
+        title: 'title-sm m-0!',
+        right: 'flex items-center gap-1',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
 
         <template #right>
-          <OrganismsDashboardFilter ref="filterRef" :items="listings" :view-options="[]" persistence-key="dashboard-archived-listings" @update:filtered="filteredListings = $event" />
+          <OrganismsDashboardFilterListings :items="listings" persistence-key="dashboard-archived-listings"
+            @update:filtered="filteredListings = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
@@ -28,20 +27,22 @@
       <!-- Archived Listings Grid -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredListings.length > 0">
         <div v-for="listing in filteredListings" :key="listing.id" class="h-full">
-          <OrganismsDashboardListingCardMyListing :listing="listing" @edit="handleEditListing" />
+          <OrganismsDashboardListingCardMyListing :listing="listing" @edit="handleEditListing"
+            @restored="handleRestored" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
       <!-- No Results -->
-      <OrganismsDashboardNoResults v-else :description="'No archived listings found.'" />
+      <OrganismsDashboardNoResults v-else type="archived listings" />
 
       <!-- Pagination -->
       <div v-if="total > 0" class="flex justify-center p-4 mt-auto">
-        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit" variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
+        <UPagination v-model:page="page" @update:page="onPageChange" :total="total" :items-per-page="limit"
+          variant="ghost" active-color="secondary" color="secondary" size="md" class="body-sm" />
       </div>
 
       <!-- Shared Listing Editor Modal -->
-      <OrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
+      <LazyOrganismsDashboardCreateListingModal ref="listingModal" @close="handleModalClose" />
     </template>
   </UDashboardPanel>
 </template>
@@ -56,16 +57,44 @@ definePageMeta({
   layout: "dashboard",
 });
 
-import OrganismsDashboardCreateListingModal from '~~/layers/dashboard/app/components/Organisms/Dashboard/CreateListing/OrganismsDashboardCreateListingModal.vue';
+import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
 
-const { listings, loading, fetchMyListings, total } = useMyListings();
+// Use local state instead of the shared singleton to avoid clobbering
+// my-listings data when navigating between active and archived pages
+const requestFetch = useRequestFetch();
+const listings = ref<OwnedListingWithAnalytics[]>([]);
+const loading = ref(true);
+const total = ref(0);
+
 const pageTop = ref<HTMLElement | null>(null);
 const page = ref(1);
 const limit = ref(20);
 const filteredListings = ref<OwnedListingWithAnalytics[]>([]);
-const listingModal = ref<InstanceType<typeof OrganismsDashboardCreateListingModal> | null>(null);
+const listingModal = ref<{ openForNewListing: (tier: any) => void; openForDraft: (id: number) => Promise<void>; openForListing: (id: number) => Promise<void> } | null>(null);
 
-const { sortOrderValue, searchQuery } = useDashboardListFilter(ref([]), {
+async function fetchArchivedListings(
+  pg: number = 1,
+  sort: string = 'new',
+  take: number = 20,
+  saleRent: string = 'all',
+) {
+  loading.value = true;
+  try {
+    const data = await requestFetch<{ listings: OwnedListingWithAnalytics[]; total: number }>(
+      `/api/user/my-listings/?status=archived&sort=${sort}&page=${pg}&take=${take}&saleRent=${saleRent}`
+    );
+    listings.value = data.listings || [];
+    total.value = data.total || 0;
+  } catch (error) {
+    console.error('Error fetching archived listings:', error);
+    listings.value = [];
+    total.value = 0;
+  } finally {
+    loading.value = false;
+  }
+}
+
+const { sortOrderValue, saleRentFilter, searchQuery } = useDashboardListFilter(ref([]), {
   persistenceKey: "dashboard-archived-listings",
   hideListingSort: true,
 });
@@ -76,18 +105,21 @@ const mapSortOrder = computed(() => {
   return "new";
 });
 
+onMounted(async () => {
+  await fetchArchivedListings(1, mapSortOrder.value, limit.value, saleRentFilter.value);
+});
+
 watch(
-  [mapSortOrder],
+  [saleRentFilter, mapSortOrder],
   async () => {
     page.value = 1;
-    await fetchMyListings('archived', 1, mapSortOrder.value as any, limit.value);
+    await fetchArchivedListings(1, mapSortOrder.value, limit.value, saleRentFilter.value);
   },
-  { immediate: true }
 );
 
 async function onPageChange(newPage: number) {
   page.value = newPage;
-  await fetchMyListings('archived', newPage, mapSortOrder.value as any, limit.value);
+  await fetchArchivedListings(newPage, mapSortOrder.value, limit.value, saleRentFilter.value);
 
   const el = (pageTop.value as any)?.$el ?? pageTop.value;
   const scrollContainer = el?.closest(".overflow-y-auto, .overflow-y-scroll, .overflow-auto");
@@ -98,8 +130,16 @@ async function handleEditListing(_payload: { id: number; isDraft: boolean }) {
   // Archived listings cannot be edited directly — use "Convert to Draft" on the card
 }
 
+function handleRestored(id: number) {
+  const idx = listings.value.findIndex((l) => l.id === id);
+  if (idx !== -1) {
+    listings.value.splice(idx, 1);
+    total.value -= 1;
+  }
+}
+
 function handleModalClose() {
-  fetchMyListings('archived', page.value, mapSortOrder.value as any, limit.value);
+  fetchArchivedListings(page.value, mapSortOrder.value, limit.value, saleRentFilter.value);
 }
 
 watch([listings, searchQuery], () => {

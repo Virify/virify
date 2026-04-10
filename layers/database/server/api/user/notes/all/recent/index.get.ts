@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const notes = await getRecentUserNotes(userId as number, 8);
-    storage.setItem(cacheKey, notes, { ttl: 30 }).catch(() => {});
+    storage.setItem(cacheKey, notes, { ttl: 2 * 60 }).catch(() => {});
     return notes;
   } catch (error) {
     console.error("Error fetching recent notes:", error);

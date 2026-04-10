@@ -78,6 +78,8 @@ async function loginUser({ target }: SubmitEvent) {
       },
     })
       .then(() => {
+        // Notify other open tabs to refresh their session
+        try { new BroadcastChannel('virify:auth').postMessage({ type: 'login' }) } catch {}
         emits('form-success');
       })
       .catch((error) => {

@@ -1,3 +1,22 @@
+/**
+ * @fileoverview Global client-side WebSocket listener and event dispatcher.
+ * 
+ * **Purpose:**
+ * Establishes the singular client-side WebSocket connection for the logged-in user 
+ * and routes incoming real-time events to the appropriate shared composables 
+ * (e.g., `useNotifications`, `useEnquiries`).
+ * 
+ * **State Management & UI UX:**
+ * - Acts as the strict single source of truth for processing real-time updates.
+ * - Automatically triggers secondary side-effects (like calling `fetchViewings()`) to keep 
+ *   unrelated UI components in sync without requiring a page reload.
+ * 
+ * **WebSocket Race Condition & Flicker Prevention:**
+ * - Prioritizes optimistic local state updates (e.g., manually incrementing badges) 
+ *   over immediate API refetches. Because database replication/transactions can have lag, 
+ *   an immediate HTTP fetch after a WS message might return "stale" DB data, causing 
+ *   badges to flicker. Relying on the optimistic WebSockets payload avoids this perfectly.
+ */
 import { useWebSocket } from "@vueuse/core";
 
 /**
@@ -11,7 +30,22 @@ import { useWebSocket } from "@vueuse/core";
  */
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
-  const { loggedIn, user } = useUserSession();
+  const { loggedIn, user, clear: clearSession, fetch: fetchSession } = useUserSession();
+
+  // Listen for login/logout events from other tabs (BroadcastChannel)
+  if (import.meta.client) {
+    try {
+      const authChannel = new BroadcastChannel('virify:auth');
+      authChannel.addEventListener('message', async (event) => {
+        if (event.data?.type === 'logout' && loggedIn.value) {
+          await clearSession();
+          navigateTo('/');
+        } else if (event.data?.type === 'login' && !loggedIn.value) {
+          await fetchSession();
+        }
+      });
+    } catch {}
+  }
 
   const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
     autoConnect: false,
@@ -37,6 +71,12 @@ export default defineNuxtPlugin(() => {
     const { syncConversationIfOpen, isModalOpen, modalConversation } = useGlobalEnquiryModal();
     const { canDesktop } = useNotificationPreferences();
     const wsComposable = useWebSocketServer();
+    const { fetchViewings } = useViewings();
+    const { registerSend } = useWebSocketClient();
+    const { setTyping } = useTypingIndicator();
+
+    // Register ws.send so composables can send frames without accessing the plugin directly
+    registerSend((data) => { if (ws.status.value === 'OPEN') ws.send(data); });
 
     const globalWebSocketEvents: WebSocketEvents = {
       /**
@@ -50,6 +90,10 @@ export default defineNuxtPlugin(() => {
           to: 0,
           timestamp: new Date().toISOString()
         });
+        // When a viewings aggregate update arrives, also refresh the shared viewings ref
+        if (aggregateType === "viewings") {
+          fetchViewings().catch((e) => console.error("Failed to refresh viewings on aggregate update:", e));
+        }
       },
       
       /**
@@ -107,7 +151,11 @@ export default defineNuxtPlugin(() => {
         handleNewMessage(conversationId, msg, conv);
         
         // Keep global enquiry modal in sync if it's open on this conversation.
-        const updatedConv = enquiries.value.find(c => c.id === conversationId);
+        // Fall back to activeEnquiry when the conversation isn't in the list
+        // (e.g. modal opened from search/listing page without fetchEnquiries being called).
+        const { activeEnquiry } = useEnquiries();
+        const updatedConv = enquiries.value.find(c => c.id === conversationId)
+          ?? (activeEnquiry.value?.id === conversationId ? activeEnquiry.value : undefined);
         if (updatedConv) {
           syncConversationIfOpen(updatedConv);
         }
@@ -139,6 +187,8 @@ export default defineNuxtPlugin(() => {
        * Handle notification_new - add to list and trigger toast
        */
       onNotificationNew: ({ notification }) => {
+        const isViewingNotification = (notification.type as string).startsWith("VIEWING_");
+
         // Add to notifications store
         addNotification(notification);
 
@@ -147,11 +197,19 @@ export default defineNuxtPlugin(() => {
           id: notification.id,
           title: notification.title,
           description: notification.message,
+          type: notification.type as any,
           conversationId: notification.conversationId ?? undefined,
           listingId: notification.listingId ?? undefined,
           senderUsername: notification.senderUsername ?? undefined,
           senderAvatar: notification.senderAvatar ?? undefined,
         });
+
+        // For viewing notifications: refresh the shared viewings ref and aggregates
+        // so sidebar badges and the viewings page update without a hard refresh
+        if (isViewingNotification) {
+          fetchViewings().catch((e) => console.error("Failed to refresh viewings on notification:", e));
+          fetchUserItemsAggregates(true).catch((e) => console.error("Failed to refresh aggregates on viewing notification:", e));
+        }
 
         // Trigger browser desktop notification if the user has enabled it
         // Suppress if the page is currently focused (in-app toast already shown)
@@ -175,6 +233,13 @@ export default defineNuxtPlugin(() => {
        */
       onMessageRead: ({ conversationId, messageId }) => {
         handleMessageRead(conversationId, messageId);
+      },
+
+      /**
+       * Handle typing indicator from the other participant
+       */
+      onTyping: ({ from, conversationId, isTyping }) => {
+        setTyping(conversationId, isTyping ? from : null);
       },
     };
 

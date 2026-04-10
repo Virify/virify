@@ -4,7 +4,7 @@ import type { AnalyticsAggregates } from "~~/shared/types/analytics";
 /**
  * Handler for GET /api/analytics/aggregates/
  * Returns the analytics aggregates for various user metrics.
- * Cached per-user for 30 seconds (matches sibling analytics endpoints).
+ * Cached per-user for 5 minutes (TTL-only — analytics data is latency-tolerant).
  */
 export default defineEventHandler(async (event): Promise<AnalyticsAggregates> => {
   const { user } = await requireUserSession(event);
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event): Promise<AnalyticsAggregates> =>
     if (cached) return cached;
 
     const result = await getAnalyticsAggregates(user.id as number);
-    storage.setItem(cacheKey, result, { ttl: 30 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 5 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Error fetching analytics aggregates:", error);

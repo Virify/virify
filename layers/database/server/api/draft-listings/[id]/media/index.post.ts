@@ -2,8 +2,9 @@ import { z } from 'zod';
 
 /**
  * POST /api/draft-listings/[id]/media
- * Add media images to a draft listing (bulk create)
- * Called automatically after Cloudflare upload completes
+ * Add media images to a draft or live listing (bulk create).
+ * Supports both draftId and listingId in the request body.
+ * Called automatically after Cloudflare upload completes.
  */
 
 const mediaItemSchema = z.object({
@@ -23,6 +24,8 @@ const mediaItemSchema = z.object({
 
 const requestSchema = z.object({
   media: z.array(mediaItemSchema).min(1),
+  draftId: z.number().int().positive().optional(),
+  listingId: z.number().int().positive().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -30,34 +33,53 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
   try {
-    const draftId = parseInt(getRouterParam(event, 'id') || '0');
-    
-    if (!draftId) {
+    const routeId = parseInt(getRouterParam(event, 'id') || '0');
+    const body = await readBody(event);
+    const { media, draftId: bodyDraftId, listingId } = requestSchema.parse(body);
+
+    // Use body params if provided, otherwise fall back to route param (draft)
+    const draftId = bodyDraftId ?? (listingId ? undefined : routeId);
+
+    if (!draftId && !listingId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Draft ID is required',
+        statusMessage: 'Either draftId or listingId must be provided',
       });
     }
 
-    const body = await readBody(event);
-    const { media } = requestSchema.parse(body);
+    let propertyId: number;
 
-    // Verify draft ownership and get property ID
-    const existingDraft = await prisma.draftListing.findUnique({
-      where: { id: draftId, userId: user.id },
-      include: {
-        property: true,
-      },
-    });
-
-    if (!existingDraft || !existingDraft.property) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: 'Draft listing or property not found',
+    if (listingId) {
+      // LIVE LISTING
+      const existingListing = await prisma.listing.findUnique({
+        where: { id: listingId, userId: user.id },
+        include: { property: true },
       });
-    }
 
-    const propertyId = existingDraft.property.id;
+      if (!existingListing || !existingListing.property) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Listing or property not found',
+        });
+      }
+
+      propertyId = existingListing.property.id;
+    } else {
+      // DRAFT LISTING
+      const existingDraft = await prisma.draftListing.findUnique({
+        where: { id: draftId, userId: user.id },
+        include: { property: true },
+      });
+
+      if (!existingDraft || !existingDraft.property) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: 'Draft listing or property not found',
+        });
+      }
+
+      propertyId = existingDraft.property.id;
+    }
 
     // Create media records
     const mediaToCreate = media.map((m) => ({
@@ -84,6 +106,11 @@ export default defineEventHandler(async (event) => {
     await prisma.media.createMany({
       data: mediaToCreate,
     });
+
+    // Bust the listing detail cache when images are added to a live listing
+    if (listingId) {
+      invalidateListingCache(listingId).catch(() => {});
+    }
 
     // Return created media
     const createdMedia = await prisma.media.findMany({

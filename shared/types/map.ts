@@ -146,8 +146,10 @@ export type GeocodingResponse = {
  * Trending location type for tracking popular search locations
  */
 export type TrendingLocation = {
-  id: string;
+  locationId: string;
   name: string;
-  location: GeocodingFeature;
+  placeName: string;
+  lat: number;
+  lon: number;
   count: number;
 }

@@ -3,6 +3,17 @@
     <div class="p-listing" role="presentation">
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
+        <ClientOnly>
+          <UBadge
+            v-if="viewingLabel"
+            :label="viewingLabel"
+            icon="i-lucide-calendar"
+            size="lg"
+            color="secondary"
+            variant="solid"
+            class="mb-1 absolute top-2 right-2 z-1 text-xs"
+            />
+        </ClientOnly>
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
@@ -10,6 +21,17 @@
           <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
             role="presentation">
             <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
+            <ClientOnly>
+              <UBadge
+                v-if="viewingLabel"
+                :label="viewingLabel"
+                icon="i-lucide-calendar"
+                size="lg"
+                color="secondary"
+                variant="solid"
+                class="mb-1 absolute top-2 right-2 z-1 text-xs"
+                />
+            </ClientOnly>
           </div>
 
           <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
@@ -20,6 +42,7 @@
             :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
+            :listing-id="listing?.id"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
 
           <!-- General Property Information (Non-collapsible) -->
@@ -128,6 +151,17 @@
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
               <div class="p-listing__sidebar-carousel">
                 <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
+                <ClientOnly>
+                  <UBadge
+                    v-if="viewingLabel"
+                    :label="viewingLabel"
+                    icon="i-lucide-calendar"
+                    size="lg"
+                    color="secondary"
+                    variant="solid"
+                    class="mb-1 absolute top-2 right-2 z-1 text-xs"
+                    />
+                </ClientOnly>
               </div>
             </div>
           </Transition>
@@ -372,11 +406,24 @@ useIntersectionObserver($desktopCarousel, ([entry]) => {
   isImagesVisible.value = !!entry?.isIntersecting;
 });
 
+const { loggedIn } = useUserSession();
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+
+const viewingLabel = computed(() => {
+  const id = props.listing?.id;
+  if (!id) return null;
+  const v = getActiveViewingForListing(id);
+  return v ? getViewingStatusLabel(v) : null;
+});
+
 onMounted(() => {
   window.addEventListener("scroll", parallaxCarousel, { passive: true });
   // Track listing view only for published listings, not drafts
   if (!props.isDraft && props.listing && props.listing.id) {
     trackView(props.listing.id);
+  }
+  if (loggedIn.value && viewings.value.length === 0) {
+    fetchViewings().catch(() => {});
   }
 });
 
@@ -506,6 +553,7 @@ ul {
   &__main-carousel,
   &__sidebar-carousel {
     overflow: hidden;
+    position: relative;
   }
 
   &__main-carousel {
@@ -529,6 +577,14 @@ ul {
 
   &__sidebar-carousel {
     margin-bottom: var(--size-24);
+  }
+
+  &__image-badge {
+    position: absolute;
+    top: var(--size-12);
+    right: var(--size-12);
+    z-index: 10;
+    pointer-events: none;
   }
 
   /**

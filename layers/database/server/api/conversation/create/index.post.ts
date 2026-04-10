@@ -5,6 +5,7 @@ import { createEnquiryNotification } from "~~/layers/database/server/utils/notif
 import { getUserNotificationPreferences } from "~~/layers/database/server/utils/user";
 import { sendEnquiryNotificationEmail } from "~~/layers/email/server/email/send-enquiry-notification";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
+import { invalidateConversationSentCache } from "~~/layers/database/server/utils/cache";
 import type { ConversationWithMinimalListing } from "~~/shared/types/conversation";
 
 const conversationSchema = z.object({
@@ -54,6 +55,9 @@ export default defineEventHandler(async (event) => {
     // Create the conversation
     const conversation = (await createConversation(userId, receiverId, message, listingId)) as ConversationWithMinimalListing;
     const firstMessage = conversation.messages[0];
+
+    // Bust sent-conversations cache so the Enquire button updates immediately
+    invalidateConversationSentCache(userId as number).catch(() => {});
 
     // Track enquiry if it's related to a listing
     if (listingId) {

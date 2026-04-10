@@ -1,7 +1,7 @@
 /**
  * Get recent user favourites (last 7 days, limited to 8 items)
  * Used for dashboard homepage.
- * Cached per-user for 30 seconds to absorb concurrent dashboard mounts.
+ * Cached per-user for 5 minutes. Busted on any favourite add/remove.
  *
  * GET /api/user/favourites/all/recent
  */
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const favourites = await getRecentFavourites(userId as number, 10);
-    storage.setItem(cacheKey, favourites, { ttl: 30 }).catch(() => {});
+    storage.setItem(cacheKey, favourites, { ttl: 30 * 60 }).catch(() => {});
     return favourites;
   } catch (error) {
     console.error("Error fetching recent favourites:", error);

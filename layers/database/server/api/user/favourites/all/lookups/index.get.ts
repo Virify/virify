@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const result = await getUserFavouriteLookups(userId as number);
-    storage.setItem(cacheKey, result, { ttl: 60 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 30 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Error fetching favourite lookups:", error);

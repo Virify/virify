@@ -11,6 +11,7 @@ const hiddenListingsQuerySchema = z.object({
  * Get user's hidden listings with full listing data (paginated)
  *
  * GET /api/user/hidden-listings/all/full
+ * Cached per user+query params (5 min). Busted on hide/unhide.
  */
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -21,14 +22,22 @@ export default defineEventHandler(async (event) => {
     if (!userId) throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
     const query = await getValidatedQuery(event, hiddenListingsQuerySchema.parse);
-    const skip = (query.page - 1) * query.limit;
+    const cacheKey = `hidden:full:${userId}:${query.filter}:${query.sort}:${query.page}:${query.limit}`;
+    const storage = useStorage('cache');
 
-    return await getAllUserHiddenListings(userId as number, {
+    const cached = await storage.getItem(cacheKey);
+    if (cached) return cached;
+
+    const skip = (query.page - 1) * query.limit;
+    const result = await getAllUserHiddenListings(userId as number, {
       skip,
       take: query.limit,
       sort: query.sort,
       filter: query.filter,
     });
+
+    storage.setItem(cacheKey, result, { ttl: 60 * 60 }).catch(() => {});
+    return result;
   } catch (error) {
     console.error("Error fetching hidden listings:", error);
     return errorResponse(error, event);

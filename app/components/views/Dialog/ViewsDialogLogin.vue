@@ -1,7 +1,7 @@
 <template>
   <div class="| flow dialog-container dialog-container-xs">
     <h1 class="| title-xl">Welcome back</h1>
-    <p v-if="successMessage" class="success | body-md">{{ successMessage }}</p>
+    <p v-if="successMessage" class="| body-md">{{ successMessage }}</p>
     <p v-if="fromProtectedPage" class="protected-page-message | body-md">
       Login is required to view this page - please login below
     </p>
@@ -73,9 +73,6 @@ async function formSuccess() {
 }
 </script>
 <style>
-.success {
-  color: var(--secondary--500);
-}
 
 .protected-page-message {
   margin-bottom: var(--size-16);

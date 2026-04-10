@@ -18,12 +18,13 @@ export default defineEventHandler(async (event) => {
     console.log(`[DELETE /api/user/my-listings/${id}] Archiving listing for user ${userId}`)
     
     const result = await archiveListing(userId as number, Number(id))
-    
+
     console.log(`[DELETE /api/user/my-listings/${id}] Successfully archived:`, result)
-    
-    // Clear the listing cache when archived
+
+    // Clear the public listing cache + user my-listings cache
     const storage = useStorage('cache:listing')
     await storage.removeItem(`listing:${id}`)
+    await invalidateMyListingsCache(userId as number)
     await invalidateAggregatesCache(userId as number)
     
     // Send websocket update for listings count change

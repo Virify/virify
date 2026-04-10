@@ -1,19 +1,7 @@
-/**
- * Mortgage Calculator Client-Side Utilities
- */
-
-import type {
-  MortgageBuyerType,
-  MortgageResult,
-  BuyerTypeOption,
-} from '~~/shared/types/mortgage'
-import {
-  BUYER_TYPE_OPTIONS,
-  formatCurrency,
-} from '~~/shared/types/mortgage'
 
 export interface MortgageFormData {
   buyerType: MortgageBuyerType | null
+  repaymentType: MortgageRepaymentType
   propertyPrice: number
   deposit: number
   termYears: number
@@ -151,6 +139,7 @@ export function getRateInfoString(result: MortgageResult): string {
 export function getDefaultFormData(propertyPrice?: number): MortgageFormData {
   return {
     buyerType: null,
+    repaymentType: 'REPAYMENT',
     propertyPrice: propertyPrice ?? 0,
     deposit: 0,
     termYears: 0,

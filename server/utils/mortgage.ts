@@ -23,7 +23,7 @@ export function getMinDepositPercentage(buyerType: MortgageBuyerType): number {
     case 'HOME_MOVER':
       return 5
     case 'BUY_TO_LET':
-      return 25
+      return 20
     case 'REMORTGAGE':
       return 10
     default:
@@ -91,7 +91,7 @@ export function calculateMonthlyPayment(
 }
 
 /**
- * Calculate mortgage result for a given rate
+ * Calculate mortgage result for a given rate (repayment mortgage)
  */
 export function calculateMortgageResult(
   loanAmount: number,
@@ -115,6 +115,37 @@ export function calculateMortgageResult(
     monthlyPayment: Math.round(monthlyPayment * 100) / 100,
     totalPayment: Math.round(totalPayment * 100) / 100,
     totalInterest: Math.round(totalInterest * 100) / 100,
+    loanAmount,
+  }
+}
+
+/**
+ * Calculate interest-only mortgage result for a given rate
+ * Monthly payment covers interest only; capital remains outstanding at end of term
+ */
+export function calculateInterestOnlyResult(
+  loanAmount: number,
+  termYears: number,
+  rate: { rateType: string; rate: number }
+): {
+  rateType: string
+  rate: number
+  monthlyPayment: number
+  totalPayment: number
+  totalInterest: number
+  loanAmount: number
+} {
+  const monthlyPayment = Math.round((loanAmount * (rate.rate / 100) / 12) * 100) / 100
+  const totalInterest = Math.round(monthlyPayment * termYears * 12 * 100) / 100
+  // Total cost includes interest payments plus repayment of the outstanding capital
+  const totalPayment = Math.round((totalInterest + loanAmount) * 100) / 100
+
+  return {
+    rateType: rate.rateType,
+    rate: rate.rate,
+    monthlyPayment,
+    totalPayment,
+    totalInterest,
     loanAmount,
   }
 }

@@ -101,9 +101,12 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Invalidate listing cache so modal shows fresh data
+      // Invalidate listing detail cache and my-listings page cache
       const storage = useStorage('cache:listing');
-      await storage.removeItem(`listing:${listingId}`);
+      await Promise.all([
+        storage.removeItem(`listing:${listingId}`),
+        invalidateMyListingsCache(user.id as number),
+      ]);
 
       return result;
     }
@@ -145,7 +148,7 @@ export default defineEventHandler(async (event) => {
       updateData.completedSteps = { push: 1 };
     }
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: updateData,
       include: {
@@ -153,6 +156,8 @@ export default defineEventHandler(async (event) => {
         rentalListing: true,
       },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     console.error('[Step1 PATCH] Error:', error);
     return errorResponse(error, event);

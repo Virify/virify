@@ -2,9 +2,9 @@
  * Handler for GET /api/notifications/aggregates/
  * Returns user notification counts for navigation badges.
  *
- * Per-user short-TTL cache (15 seconds): shields rapid clustered requests
- * (e.g. multiple components mounting simultaneously) without serving
- * meaningfully stale badge counts.
+ * Per-user cache (5 minutes): busted on every badge-affecting mutation
+ * (fav/note/hide add/delete, publish, archive, restore, mark-read).
+ * TTL is a safety net for missed WS events only.
  */
 export default defineEventHandler(async (event): Promise<UserItemsAggregates> => {
   const { user } = await requireUserSession(event);
@@ -19,7 +19,7 @@ export default defineEventHandler(async (event): Promise<UserItemsAggregates> =>
 
     const result = await getUserItemsAggregates(user.id as number);
     // Fire-and-forget cache write — don't block the response
-    storage.setItem(cacheKey, result, { ttl: 15 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 5 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Error fetching user items aggregates:", error);
