@@ -128,6 +128,10 @@ export const navigationGroups: AccountNavigationGroup[] = [
 export const logout = async () => {
   const { clear } = useUserSession()
   await clear()
+  // Notify other open tabs to also log out
+  if (import.meta.client) {
+    try { new BroadcastChannel('virify:auth').postMessage({ type: 'logout' }) } catch {}
+  }
   const route = useRoute()
   if (route.path.startsWith('/account')) {
     navigateTo('/')

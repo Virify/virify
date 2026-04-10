@@ -52,17 +52,19 @@ export default defineEventHandler(async (event) => {
     const updated = await updateViewingStatus(id, user.id as number, role, statusMap[response], counterProposedAt ? new Date(counterProposedAt) : undefined);
 
     // Notify the requester
+    // Notify the OTHER party (whoever didn't take the action)
+    const notifyUserId = role === 'owner' ? updated.requesterId : updated.ownerId;
     const notificationType = (response === "accept" ? "VIEWING_ACCEPTED" : response === "reject" ? "VIEWING_REJECTED" : "VIEWING_RESCHEDULED") as NotificationType;
     const notificationTitle = response === "accept" ? "Viewing confirmed" : response === "reject" ? "Viewing declined" : "Viewing time changed";
     const notificationMessage =
       response === "reschedule" && counterProposedAt
         ? `A new time has been proposed: ${new Date(counterProposedAt).toLocaleDateString("en-GB")}`
         : response === "accept"
-          ? "Your viewing request has been accepted"
+          ? `${user.username ?? "The other party"} confirmed the viewing time`
           : "Your viewing request has been declined";
 
     const notification = await createNotification({
-      userId: updated.requesterId,
+      userId: notifyUserId,
       type: notificationType,
       title: notificationTitle,
       message: notificationMessage,
@@ -73,14 +75,14 @@ export default defineEventHandler(async (event) => {
     });
 
     const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
-    const requesterIsOnline = isUserOnline(updated.requesterId);
-    if (requesterIsOnline) {
-      sendMessage(createNotificationNewMessage(notification as any, updated.requesterId));
+    const otherPartyIsOnline = isUserOnline(notifyUserId);
+    if (otherPartyIsOnline) {
+      sendMessage(createNotificationNewMessage(notification as any, notifyUserId));
     }
 
     // Send offline email for all response types
-    if (!requesterIsOnline) {
-      const prefs = await getUserNotificationPreferences(updated.requesterId);
+    if (!otherPartyIsOnline) {
+      const prefs = await getUserNotificationPreferences(notifyUserId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();
         const baseUrl = config.public.EMAIL_BASE_URL as string;
@@ -108,16 +110,16 @@ export default defineEventHandler(async (event) => {
 
     // Bust viewings + aggregates cache for both parties
     await Promise.all([
-      invalidateViewingsCache(user.id as number),
+      invalidateViewingsCache(updated.ownerId),
       invalidateViewingsCache(updated.requesterId),
-      invalidateAggregatesCache(user.id as number),
+      invalidateAggregatesCache(updated.ownerId),
       invalidateAggregatesCache(updated.requesterId),
     ]);
 
     // For REJECTED/CANCELLED statuses the active count drops; for others it stays
     const operation = response === "reject" ? "remove" : "update";
     // Send live aggregate updates so sidebar badges refresh immediately for both parties
-    sendMessage(createAggregateUpdateMessage("viewings", operation, user.id as number));
+    sendMessage(createAggregateUpdateMessage("viewings", operation, updated.ownerId));
     sendMessage(createAggregateUpdateMessage("viewings", operation, updated.requesterId));
 
     return updated;

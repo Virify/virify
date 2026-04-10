@@ -48,6 +48,8 @@ function handleNavClick(item: any) {
 
 async function logout() {
   await clear()
+  // Notify other open tabs to also log out
+  try { new BroadcastChannel('virify:auth').postMessage({ type: 'logout' }) } catch {}
   const route = useRoute()
   if (route.path.startsWith('/account')) {
     navigateTo('/')

@@ -30,7 +30,22 @@ import { useWebSocket } from "@vueuse/core";
  */
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
-  const { loggedIn, user } = useUserSession();
+  const { loggedIn, user, clear: clearSession, fetch: fetchSession } = useUserSession();
+
+  // Listen for login/logout events from other tabs (BroadcastChannel)
+  if (import.meta.client) {
+    try {
+      const authChannel = new BroadcastChannel('virify:auth');
+      authChannel.addEventListener('message', async (event) => {
+        if (event.data?.type === 'logout' && loggedIn.value) {
+          await clearSession();
+          navigateTo('/');
+        } else if (event.data?.type === 'login' && !loggedIn.value) {
+          await fetchSession();
+        }
+      });
+    } catch {}
+  }
 
   const ws = useWebSocket(config.public.WS_BASE_URL + "/api/_ws/connection", {
     autoConnect: false,
