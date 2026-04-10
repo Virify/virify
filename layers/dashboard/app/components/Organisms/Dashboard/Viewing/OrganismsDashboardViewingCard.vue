@@ -1,6 +1,7 @@
 <template>
   <UPageCard
     variant="subtle"
+    :class="{ 'opacity-60': isCancelledOrRejected }"
     :ui="{
       root: 'gap-0! bg-elevated border border-accented/50 hover:border-accented transition-colors duration-200',
       header: 'w-full mb-0 pb-3 border-b border-accented/30',
@@ -155,5 +156,9 @@ const statusColor = computed(
 
 const statusLabel = computed(
   () => VIEWING_STATUS_LABEL[props.viewing.status] ?? props.viewing.status,
+);
+
+const isCancelledOrRejected = computed(
+  () => props.viewing.status === "CANCELLED" || props.viewing.status === "REJECTED",
 );
 </script>

@@ -81,6 +81,10 @@ export const useNavigation = (): NavigationComposable => {
 
   async function logout() {
     await session.clear?.();
+    // Notify other open tabs to also log out
+    if (import.meta.client) {
+      try { new BroadcastChannel('virify:auth').postMessage({ type: 'logout' }) } catch {}
+    }
     navigateTo("/");
     closeMobileMenu();
   }

@@ -18,6 +18,9 @@ export function useEnquiryModal(
   const { markAsRead } = useNotifications();
   const { setAvailabilityStatus } = useMyListings();
   const { uploadFile, deleteFile, getFileUrl, isUploading } = useCloudflareR2();
+  const { sendRaw } = useWebSocketClient();
+  const { createTypingMessage } = useWebSocketServer();
+  const { setTyping, getTypingUser } = useTypingIndicator();
   const toast = useToast();
   const breakpoints = useBreakpoints(breakpointsTailwind);
   const activeBreakpoints = breakpoints.active();
@@ -34,12 +37,38 @@ export function useEnquiryModal(
   const isDeletingMedia = ref(false);
   const fileInputRef = ref<HTMLInputElement | null>(null);
   const emojiPickerOpen = ref(false);
+  let typingStopTimer: ReturnType<typeof setTimeout> | null = null;
 
   const enquiryAvailabilityStatus = ref<string>(
     props.conversation?.listing?.saleListing?.availabilityStatus ??
       props.conversation?.listing?.rentalListing?.availabilityStatus ??
       "AVAILABLE",
   );
+
+  // ─── Typing indicator ─────────────────────────────────────────────────────
+
+  // The typing user ID for the current conversation (other participant)
+  const typingUserId = computed(() => getTypingUser(props.conversation?.id));
+
+  function sendTypingEvent(isTyping: boolean) {
+    const convId = props.conversation?.id;
+    const toUserId = otherUser.value?.id;
+    if (!convId || !toUserId) return;
+    sendRaw(JSON.stringify(createTypingMessage(convId, toUserId, isTyping)));
+  }
+
+  watch(messageContent, (val) => {
+    if (!props.open) return;
+    if (val.length > 0) {
+      sendTypingEvent(true);
+      if (typingStopTimer) clearTimeout(typingStopTimer);
+      // Auto-send stop after 3s of no key presses
+      typingStopTimer = setTimeout(() => sendTypingEvent(false), 3000);
+    } else {
+      if (typingStopTimer) clearTimeout(typingStopTimer);
+      sendTypingEvent(false);
+    }
+  });
 
   // ─── Computed ──────────────────────────────────────────────────────────────
 
@@ -132,6 +161,9 @@ export function useEnquiryModal(
     const mediaId = pendingMedia.value?.id;
     try {
       const sentMessage = await sendReply(props.conversation.id, messageContent.value, { mediaId });
+      // Stop typing indicator immediately on send
+      if (typingStopTimer) clearTimeout(typingStopTimer);
+      sendTypingEvent(false);
       messageContent.value = "";
       pendingMedia.value = null;
       // Reset the file input inside the footer if it exists
@@ -269,6 +301,7 @@ export function useEnquiryModal(
     otherUser,
     subTitle,
     enquiryAvailabilityItems,
+    typingUserId,
     // Cloudflare
     isUploading,
     getFileUrl,

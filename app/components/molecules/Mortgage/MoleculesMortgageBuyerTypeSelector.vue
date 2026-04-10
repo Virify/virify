@@ -6,7 +6,7 @@
         @update:model-value="$emit('update:modelValue', $event)" />
     </div>
     <p class="m-buyer-type-selector__help | body-xs">
-      Your buyer type affects the minimum deposit required and the rates available to you.
+      Your buyer type affects the rates and deposit requirements typically available to you. Eligibility criteria vary by lender.
     </p>
   </div>
 </template>

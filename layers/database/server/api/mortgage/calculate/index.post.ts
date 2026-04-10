@@ -7,6 +7,7 @@ const calculationSchema = z.object({
   buyerType: z.enum(["FIRST_TIME_BUYER", "HOME_MOVER", "BUY_TO_LET", "REMORTGAGE"]),
   rateType: z.enum(["FIXED_2_YEAR", "FIXED_3_YEAR", "FIXED_5_YEAR", "FIXED_10_YEAR", "VARIABLE", "TRACKER"]).optional(),
   customInterestRate: z.number().min(0).max(15).nullable().optional(),
+  repaymentType: z.enum(["REPAYMENT", "INTEREST_ONLY"]).optional().default("REPAYMENT"),
 });
 
 // Cache duration: 4 weeks in seconds (to match monthly cron)
@@ -74,7 +75,9 @@ export default defineEventHandler(async (event): Promise<MortgageCalculationResp
     });
   }
 
-  const { propertyPrice, deposit, termYears, buyerType, rateType, customInterestRate } = validation.data;
+  const { propertyPrice, deposit, termYears, buyerType, rateType, customInterestRate, repaymentType } = validation.data;
+
+  const calcResult = repaymentType === 'INTEREST_ONLY' ? calculateInterestOnlyResult : calculateMortgageResult;
 
   // Calculate LTV
   const loanAmount = propertyPrice - deposit;
@@ -97,7 +100,7 @@ export default defineEventHandler(async (event): Promise<MortgageCalculationResp
   try {
     // If user provided a custom interest rate, use only that
     if (customInterestRate !== null && customInterestRate !== undefined) {
-      const customResult = calculateMortgageResult(loanAmount, termYears, {
+      const customResult = calcResult(loanAmount, termYears, {
         rateType: "CUSTOM",
         rate: customInterestRate,
       });
@@ -113,6 +116,7 @@ export default defineEventHandler(async (event): Promise<MortgageCalculationResp
           ltvBracket,
           termYears,
           buyerType,
+          repaymentType,
           results: [customResult],
           usingDefaultRates: false,
           usingCustomRate: true,
@@ -130,7 +134,7 @@ export default defineEventHandler(async (event): Promise<MortgageCalculationResp
 
     // Calculate results for each rate type
     const results: MortgageResult[] = applicableRates.map((rate: { rateType: string; rate: number }) => {
-      return calculateMortgageResult(loanAmount, termYears, rate);
+      return calcResult(loanAmount, termYears, rate);
     });
 
     // Get the latest rate fetch date if using database rates
@@ -151,6 +155,7 @@ export default defineEventHandler(async (event): Promise<MortgageCalculationResp
         ltvBracket,
         termYears,
         buyerType,
+        repaymentType,
         results,
         usingDefaultRates: useDefaultRates,
         ratesLastUpdated,

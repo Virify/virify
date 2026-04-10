@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
     const notification = await createNotification({
       userId: notifyUserId,
-      type: "VIEWING_REQUEST" as NotificationType,
+      type: "VIEWING_RESCHEDULED" as NotificationType,
       title: notificationTitle,
       message: notificationMessage,
       senderUsername: user.username ?? null,
@@ -63,11 +63,12 @@ export default defineEventHandler(async (event) => {
     });
 
     const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
-    if (isUserOnline(notifyUserId)) {
+    const notifyUserIsOnline = isUserOnline(notifyUserId);
+    if (notifyUserIsOnline) {
       sendMessage(createNotificationNewMessage(notification as any, notifyUserId));
     }
 
-    if (!isUserOnline(notifyUserId)) {
+    if (!notifyUserIsOnline) {
       const prefs = await getUserNotificationPreferences(notifyUserId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();
@@ -99,12 +100,15 @@ export default defineEventHandler(async (event) => {
     await Promise.all([
       invalidateViewingsCache(user.id as number),
       invalidateViewingsCache(updated.ownerId),
+      invalidateViewingsCache(updated.requesterId),
       invalidateAggregatesCache(user.id as number),
       invalidateAggregatesCache(updated.ownerId),
+      invalidateAggregatesCache(updated.requesterId),
     ]);
 
     sendMessage(createAggregateUpdateMessage("viewings", "update", user.id as number));
     sendMessage(createAggregateUpdateMessage("viewings", "update", updated.ownerId));
+    sendMessage(createAggregateUpdateMessage("viewings", "update", updated.requesterId));
 
     return updated;
   } catch (error) {

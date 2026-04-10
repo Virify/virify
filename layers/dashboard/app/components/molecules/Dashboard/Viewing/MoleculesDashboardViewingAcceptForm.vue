@@ -6,7 +6,7 @@
       :is-date-unavailable="isDateUnavailable"
       class="mx-auto"
       :ui="{ headCell: 'text-secondary!', cellTrigger: 'data-unavailable:text-secondary!' }"
-      @update:model-value="modelValue = $event as DateValue"
+      @update:model-value="(modelValue = $event as DateValue)"
     />
 
     <!-- Quick-pick buttons derived from the requester's time preferences -->
@@ -16,10 +16,10 @@
         <UButton
           v-for="btn in timeRangeButtons"
           :key="btn.label"
-          size="xs"
+          size="md"
           :variant="time === btn.time ? 'solid' : 'subtle'"
-          color="secondary"
-          class="body-xs cursor-pointer"
+          color="primary"
+          :class="['body-xs cursor-pointer', time === btn.time ? 'text-white!' : '']"
           @click="time = btn.time"
         >
           {{ btn.label }}

@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { prisma } from "~~/layers/database/server/utils/prisma-client";
 import { updateViewingStatus } from "~~/layers/database/server/utils/viewing";
 import { createNotification } from "~~/layers/database/server/utils/notification";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
@@ -32,20 +33,38 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: "counterProposedAt is required when rescheduling" });
     }
 
-    const updated = await updateViewingStatus(id, user.id as number, statusMap[response], counterProposedAt ? new Date(counterProposedAt) : undefined);
+    // Determine caller's role (owner can accept/reject/reschedule; requester can only accept a RESCHEDULED viewing)
+    const existing = await prisma.viewing.findUnique({ where: { id }, select: { ownerId: true, requesterId: true, status: true } });
+    if (!existing) throw createError({ statusCode: 404, statusMessage: "Viewing not found" });
+
+    let role: 'owner' | 'requester';
+    if (existing.ownerId === user.id) {
+      role = 'owner';
+    } else if (existing.requesterId === user.id) {
+      if (response !== 'accept' || existing.status !== 'RESCHEDULED') {
+        throw createError({ statusCode: 403, statusMessage: "Requesters may only accept a rescheduled viewing" });
+      }
+      role = 'requester';
+    } else {
+      throw createError({ statusCode: 403, statusMessage: "Not authorised" });
+    }
+
+    const updated = await updateViewingStatus(id, user.id as number, role, statusMap[response], counterProposedAt ? new Date(counterProposedAt) : undefined);
 
     // Notify the requester
+    // Notify the OTHER party (whoever didn't take the action)
+    const notifyUserId = role === 'owner' ? updated.requesterId : updated.ownerId;
     const notificationType = (response === "accept" ? "VIEWING_ACCEPTED" : response === "reject" ? "VIEWING_REJECTED" : "VIEWING_RESCHEDULED") as NotificationType;
     const notificationTitle = response === "accept" ? "Viewing confirmed" : response === "reject" ? "Viewing declined" : "Viewing time changed";
     const notificationMessage =
       response === "reschedule" && counterProposedAt
         ? `A new time has been proposed: ${new Date(counterProposedAt).toLocaleDateString("en-GB")}`
         : response === "accept"
-          ? "Your viewing request has been accepted"
+          ? `${user.username ?? "The other party"} confirmed the viewing time`
           : "Your viewing request has been declined";
 
     const notification = await createNotification({
-      userId: updated.requesterId,
+      userId: notifyUserId,
       type: notificationType,
       title: notificationTitle,
       message: notificationMessage,
@@ -56,13 +75,14 @@ export default defineEventHandler(async (event) => {
     });
 
     const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
-    if (isUserOnline(updated.requesterId)) {
-      sendMessage(createNotificationNewMessage(notification as any, updated.requesterId));
+    const otherPartyIsOnline = isUserOnline(notifyUserId);
+    if (otherPartyIsOnline) {
+      sendMessage(createNotificationNewMessage(notification as any, notifyUserId));
     }
 
     // Send offline email for all response types
-    if (!isUserOnline(updated.requesterId)) {
-      const prefs = await getUserNotificationPreferences(updated.requesterId);
+    if (!otherPartyIsOnline) {
+      const prefs = await getUserNotificationPreferences(notifyUserId);
       if (prefs?.receiveEmailNotifications) {
         const config = useRuntimeConfig();
         const baseUrl = config.public.EMAIL_BASE_URL as string;
@@ -90,16 +110,16 @@ export default defineEventHandler(async (event) => {
 
     // Bust viewings + aggregates cache for both parties
     await Promise.all([
-      invalidateViewingsCache(user.id as number),
+      invalidateViewingsCache(updated.ownerId),
       invalidateViewingsCache(updated.requesterId),
-      invalidateAggregatesCache(user.id as number),
+      invalidateAggregatesCache(updated.ownerId),
       invalidateAggregatesCache(updated.requesterId),
     ]);
 
     // For REJECTED/CANCELLED statuses the active count drops; for others it stays
     const operation = response === "reject" ? "remove" : "update";
     // Send live aggregate updates so sidebar badges refresh immediately for both parties
-    sendMessage(createAggregateUpdateMessage("viewings", operation, user.id as number));
+    sendMessage(createAggregateUpdateMessage("viewings", operation, updated.ownerId));
     sendMessage(createAggregateUpdateMessage("viewings", operation, updated.requesterId));
 
     return updated;

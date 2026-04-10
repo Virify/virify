@@ -13,7 +13,7 @@
         :min-value="(today as any)"
         multiple
         class="mx-auto"
-        :ui="{ headCell: 'text-secondary!', cellTrigger: 'data-unavailable:text-secondary!' }"
+        :ui="{ headCell: 'text-secondary!', cellTrigger: 'data-unavailable:text-secondary! data-disabled:line-through data-disabled:opacity-40' }"
         @update:model-value="modelValue = $event as DateValue[]"
       />
     </div>

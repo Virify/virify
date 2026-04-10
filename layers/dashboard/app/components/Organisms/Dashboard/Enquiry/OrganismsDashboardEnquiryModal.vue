@@ -38,6 +38,17 @@
             :current-user-id="user?.id!"
           />
         </UChatMessages>
+        <!-- Typing indicator -->
+        <Transition name="fade">
+          <div v-if="typingUserId" class="mt-2 mb-1 body-xs text-(--foreground-200) flex items-center gap-1.5">
+            <span class="flex gap-0.5">
+              <span class="inline-block w-1 h-1 rounded-full bg-(--foreground-200) animate-bounce [animation-delay:0ms]"></span>
+              <span class="inline-block w-1 h-1 rounded-full bg-(--foreground-200) animate-bounce [animation-delay:150ms]"></span>
+              <span class="inline-block w-1 h-1 rounded-full bg-(--foreground-200) animate-bounce [animation-delay:300ms]"></span>
+            </span>
+            {{ otherUser?.username ?? 'The other person' }} is typing...
+          </div>
+        </Transition>
       </div>
     </template>
     <template v-if="!isComposeMode" #footer>
@@ -86,6 +97,7 @@ const {
   otherUser,
   subTitle,
   enquiryAvailabilityItems,
+  typingUserId,
   handleSendMessage,
   handleFileChange,
   removePendingMedia,

@@ -35,7 +35,7 @@ describe("getSelectedBuyerType", () => {
   });
 
   it("returns buy to let option", () => {
-    expect(getSelectedBuyerType("BUY_TO_LET")?.minDeposit).toBe(25);
+    expect(getSelectedBuyerType("BUY_TO_LET")?.minDeposit).toBe(20);
   });
 });
 
@@ -44,8 +44,8 @@ describe("getMinDepositPercentage", () => {
     expect(getMinDepositPercentage("FIRST_TIME_BUYER")).toBe(5);
   });
 
-  it("returns 25 for BUY_TO_LET", () => {
-    expect(getMinDepositPercentage("BUY_TO_LET")).toBe(25);
+  it("returns 20 for BUY_TO_LET", () => {
+    expect(getMinDepositPercentage("BUY_TO_LET")).toBe(20);
   });
 
   it("returns 10 for REMORTGAGE", () => {

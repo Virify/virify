@@ -99,6 +99,11 @@ watch(sortOrderValue, (sort) => {
 const route = useRoute();
 const activeTab = ref((route.query.tab as string) || "all");
 
+// Keep activeTab in sync when navigating to this page from a toast while already on it
+watch(() => route.query.tab, (tab) => {
+  if (tab) activeTab.value = tab as string;
+});
+
 const confirmedViewings = computed(() => viewings.value.filter((v) => v.status === "ACCEPTED"));
 const requestedViewings = computed(() => viewings.value.filter((v) => v.status === "PENDING"));
 const rescheduledViewings = computed(() => viewings.value.filter((v) => v.status === "RESCHEDULED"));
@@ -172,7 +177,12 @@ async function handleCancel(id: number) {
 }
 
 async function handleAcceptCounter(id: number) {
-  await respondToViewing(id, { response: "accept" });
-  activeTab.value = "confirmed";
+  // Open the confirm modal so the buyer picks a specific date+time from the seller's proposed dates
+  const v = viewings.value.find((v) => v.id === id);
+  if (v) {
+    rescheduleViewing.value = v;
+    rescheduleMode.value = 'accept';
+    rescheduleOpen.value = true;
+  }
 }
 </script>

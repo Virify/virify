@@ -7,6 +7,7 @@ model Viewing {
   proposedDates     DateTime[]
   preferredTimes    String[]
   counterProposedAt DateTime?
+  lastProposedBy    String?       @default("requester")
   status            ViewingStatus @default(PENDING)
   notes             String?
   createdAt         DateTime      @default(now())
