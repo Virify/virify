@@ -14,7 +14,7 @@
 // Global head configuration
 useHead({
   meta: [
-    { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content' },
     { name: 'mobile-web-app-capable', content: 'yes' },
     { name: 'theme-color', content: '#0F0F25' },
     { name: 'application-name', content: 'Virify' },
