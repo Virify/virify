@@ -72,11 +72,16 @@ export default defineNuxtPlugin(() => {
     const { canDesktop } = useNotificationPreferences();
     const wsComposable = useWebSocketServer();
     const { fetchViewings } = useViewings();
-    const { registerSend } = useWebSocketClient();
+    const { registerSend, setWsConnected } = useWebSocketClient();
     const { setTyping } = useTypingIndicator();
 
     // Register ws.send so composables can send frames without accessing the plugin directly
     registerSend((data) => { if (ws.status.value === 'OPEN') ws.send(data); });
+
+    // Keep wsConnected in sync so dashboard components can poll when WS is down
+    watchEffect(() => {
+      setWsConnected(ws.status.value === 'OPEN');
+    });
 
     const globalWebSocketEvents: WebSocketEvents = {
       /**

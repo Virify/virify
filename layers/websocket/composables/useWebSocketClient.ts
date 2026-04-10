@@ -17,6 +17,13 @@
 
 let _sendFn: ((data: string) => void) | null = null;
 
+/**
+ * Reactive singleton tracking whether the WebSocket is currently open.
+ * Updated by the plugin; consumed by dashboard components to decide whether
+ * to fall back to HTTP polling for notification counts.
+ */
+const _wsConnected = ref(false);
+
 export function useWebSocketClient() {
   function registerSend(fn: (data: string) => void) {
     _sendFn = fn;
@@ -26,5 +33,9 @@ export function useWebSocketClient() {
     _sendFn?.(data);
   }
 
-  return { registerSend, sendRaw };
+  function setWsConnected(connected: boolean) {
+    _wsConnected.value = connected;
+  }
+
+  return { registerSend, sendRaw, setWsConnected, wsConnected: readonly(_wsConnected) };
 }

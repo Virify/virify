@@ -7,8 +7,11 @@
   <ViewsDialog />
 </template>
 <script lang="ts" setup>
+import { useEventListener, useIntervalFn } from '@vueuse/core'
+
 const { fetchUserItemsAggregates, fetchNotifications, fetchNotificationCounts } = useNotifications()
 const { viewings, fetchViewings } = useViewings()
+const { wsConnected } = useWebSocketClient()
 
 // Initialize lookups for favourites and notes (needed for hasNote/isFavourite checks)
 // Destructure refresh so we can force a client-side fetch on mount.
@@ -39,6 +42,29 @@ onMounted(async () => {
     fetchViewings().catch(e => console.error("Failed to fetch viewings", e))
   }
 })
+
+// When the WebSocket is not connected, poll every 30 s so that notifications
+// created server-side (and stored in the DB) still surface to the user.
+// When the user re-connects via WebSocket the interval is effectively idle since
+// the WS will push updates instead.
+if (import.meta.client) {
+  const { pause, resume } = useIntervalFn(() => {
+    if (wsConnected.value) return
+    fetchNotificationCounts().catch(e => console.error("[poll] Failed to fetch notification counts", e))
+    fetchUserItemsAggregates(true).catch(e => console.error("[poll] Failed to fetch aggregates", e))
+  }, 30_000)
+
+  // Also refresh immediately on tab visibility change when WS is not connected
+  // (covers the case where user returns to the tab after a long absence)
+  useEventListener(document, 'visibilitychange', () => {
+    if (document.visibilityState === 'visible' && !wsConnected.value) {
+      fetchNotificationCounts().catch(e => console.error("[visibility] Failed to fetch notification counts", e))
+      fetchUserItemsAggregates(true).catch(e => console.error("[visibility] Failed to fetch aggregates", e))
+    }
+  })
+
+  onUnmounted(() => pause())
+}
 </script>
 <style lang="scss">
 @media (min-width: 1921px) {

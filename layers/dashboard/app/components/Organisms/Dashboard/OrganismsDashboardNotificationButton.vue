@@ -112,5 +112,13 @@ if (import.meta.client) {
       hasFetchedOnce.value = true;
     }
   }, { immediate: true });
+
+  // When the panel opens, always do a force-refresh so that notifications
+  // created while the WebSocket was offline are shown immediately.
+  watch(isOpen, (open) => {
+    if (open) {
+      fetchNotifications({ force: true });
+    }
+  });
 }
 </script>
