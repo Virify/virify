@@ -53,7 +53,15 @@ async function resetPassword({ target }) {
     // If errors exist, show them
     if (errors) {
       formErrors.value = errors;
+      return;
+    }
 
+    // Ensure both passwords match
+    if (password.value !== confirm.value) {
+      formErrors.value = {
+        title: 'Passwords do not match',
+        message: 'Please make sure both passwords are the same.',
+      };
       return;
     }
 
