@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
     const result = await deleteUserSavedLocation(Number(id), user.id);
 
     useStorage('cache').removeItem(`locations:${user.id}`).catch(() => {});
+    useStorage('cache:aggregates').removeItem(`aggregates:user:${user.id}`).catch(() => {});
 
     // Send a WebSocket message to update the user's locations count
     const aggregateMessage = createAggregateUpdateMessage("locations", "remove", user.id);
