@@ -27,11 +27,13 @@ export default defineEventHandler(async (event) => {
 
     return await handleProfileCreation(event, user.id);
   } catch (error: any) {
-    console.error("Error updating user profile:", error);
-    return createError({
-      statusCode: 500,
-      statusMessage: error.statusMessage,
-      statusText: error.statusMessage,
+    // Prisma unique constraint violation — username already taken
+    if (error?.code === 'P2002' && error?.meta?.target?.includes('username')) {
+      throw createError({ statusCode: 400, statusMessage: 'That username is already taken. Please choose another.' });
+    }
+    throw createError({
+      statusCode: error.statusCode || 500,
+      statusMessage: error.statusMessage || 'An unexpected error occurred.',
     });
   }
 });

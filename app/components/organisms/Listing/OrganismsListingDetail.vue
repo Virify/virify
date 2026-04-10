@@ -140,7 +140,7 @@
             <MoleculesListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
           </div>
 
-          <div class="p-listing__section">
+          <div class="p-listing__section" v-if="!loggedIn">
             <MoleculesListingAdvert :title="advertTitle" :description="advertDescription" :link="advertLink"
               :linkText="advertLinkText" />
           </div>
@@ -245,23 +245,13 @@ const hasRooms = computed(() => {
   );
 });
 
-const advertTitle = computed(() => {
-  return isWaitingListMode ? 'Join the waiting list to list your property with Virify!' : 'List your property with Virify!';
-});
+const advertTitle = computed(() => 'List your property with Virify!');
 
-const advertDescription = computed(() => {
-  return isWaitingListMode
-    ? 'Virify is launching soon! Join our waiting list to be among the first to list your property on our smart, modern platform.'
-    : 'Ready to sell or rent? Get your home in front of the right buyers and renters with Virify’s smart, modern platform.';
-});
+const advertDescription = computed(() => 'Ready to sell or rent? Get your home in front of the right buyers and renters with Virify\'s smart, modern platform.');
 
-const advertLinkText = computed(() => {
-  return isWaitingListMode ? 'Join Waiting List' : 'List Your Property';
-});
+const advertLinkText = computed(() => 'List Your Property');
 
-const advertLink = computed(() => {
-  return isWaitingListMode ? '/' : '/account/create-listing';
-});
+const advertLink = computed(() => '/dashboard/create-listing');
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {

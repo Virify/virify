@@ -73,6 +73,7 @@ export default defineEventHandler(async (event) => {
       });
       // Bust the per-user cache so the next GET returns fresh data
       useStorage('cache').removeItem(`locations:${user.id}`).catch(() => {});
+      useStorage('cache:aggregates').removeItem(`aggregates:user:${user.id}`).catch(() => {});
 
       // if updated location has no ID, it means it's a new location
       if (!newLocation?.id) {

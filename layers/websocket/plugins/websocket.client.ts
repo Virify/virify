@@ -242,8 +242,10 @@ export default defineNuxtPlugin(() => {
 
       /**
        * Handle typing indicator from the other participant
+       * Guard against own echo: skip if the sender is ourselves
        */
       onTyping: ({ from, conversationId, isTyping }) => {
+        if (from === user.value?.id) return;
         setTyping(conversationId, isTyping ? from : null);
       },
     };

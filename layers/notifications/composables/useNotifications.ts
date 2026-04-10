@@ -350,6 +350,17 @@ export const useNotifications = createSharedComposable(() => {
     return getUnreadNotifications(notifications.value);
   });
 
+  /**
+   * Directly increment or decrement an aggregate count (optimistic local update)
+   */
+  function updateAggregateCount(key: keyof UserItemsAggregates, delta: number) {
+    const current = aggregates.value[key] || 0;
+    aggregates.value = {
+      ...aggregates.value,
+      [key]: Math.max(0, current + delta),
+    } as UserItemsAggregates;
+  }
+
   return {
     // Aggregates
     aggregates,
@@ -358,6 +369,7 @@ export const useNotifications = createSharedComposable(() => {
     fetchUserItemsAggregates,
     getAggregateCount,
     handleAggregateUpdate,
+    updateAggregateCount,
 
     // Notifications
     notifications,

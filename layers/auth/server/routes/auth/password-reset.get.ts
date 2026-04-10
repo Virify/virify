@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
     if (!user) throw createError({ statusCode: 404, statusMessage: "Invalid token." });
     
-    sendRedirect(event, "/password/reset?passwordToken=" + passwordToken);
+    sendRedirect(event, "/?showResetPassword=true&passwordToken=" + passwordToken);
     
   }
   catch (error) {
