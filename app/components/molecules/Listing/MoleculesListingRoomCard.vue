@@ -1,8 +1,11 @@
 <template>
   <li class="listing-room-card">
     <div v-if="item.media && item.media.length > 0 && item.media[0]" class="listing-room-card__image">
-      <AtomsCloudFlareImage :src="item.media[0].image!" :alt="item.media[0].metadata!" variant="card"
+      <AtomsCloudFlareImage :src="item.media[0]?.image!" :alt="item.media[0]?.metadata!" variant="card"
         class="w-full h-full aspect-4/3 object-cover" />
+    </div>
+    <div v-else class="listing-room-card__image listing-room-card__image--placeholder">
+      <UIcon name="i-lucide-image-off" class="listing-room-card__placeholder-icon size-20" />
     </div>
     <div class="listing-room-card__content | body-sm">
       <!-- Title row with icon, title, and info button -->
@@ -94,6 +97,18 @@ const features = computed(() => {
     img {
       width: 100%;
     }
+
+    &--placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--background-300);
+    }
+  }
+
+  &__placeholder-icon {
+
+    color: var(--monochrome-500);
   }
 
   &__content {

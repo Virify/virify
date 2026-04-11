@@ -2,8 +2,11 @@
   <li class="listing-outdoor-space-card">
     <div v-if="outdoorSpace.media && outdoorSpace.media.length > 0 && outdoorSpace.media[0]"
       class="listing-outdoor-space-card__image">
-      <AtomsCloudFlareImage :src="outdoorSpace.media[0].image!" :alt="outdoorSpace.media[0].metadata!" variant="card"
+      <AtomsCloudFlareImage :src="outdoorSpace.media[0]?.image!" :alt="outdoorSpace.media[0]?.metadata!" variant="card"
         class="| image-sm" />
+    </div>
+    <div v-else class="listing-outdoor-space-card__image listing-outdoor-space-card__image--placeholder">
+      <UIcon name="i-lucide-image-off" class="listing-outdoor-space-card__placeholder-icon size-20" />
     </div>
     <div class="listing-outdoor-space-card__content | body-sm">
       <!-- Title row with icon and info button -->
@@ -97,6 +100,17 @@ const features = computed(() => {
     img {
       width: 100%;
     }
+
+    &--placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--background-300);
+    }
+  }
+
+  &__placeholder-icon {
+    color: var(--monochrome-500);
   }
 
   &__content {
