@@ -77,10 +77,11 @@
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
-          <UFormField label="Availability" name="availabilityStatus" description="Current availability" required eagerValidation>
+          <UFormField label="Availability" name="availabilityStatus" :description="isEditingLiveListing ? 'Current availability' : 'Available once published'" required eagerValidation>
             <USelect
               v-model="state.saleListing!.availabilityStatus"
-              :items="saleAvailabilityItems"
+              :items="isEditingLiveListing ? saleAvailabilityItems : availableOnlyItems"
+              :disabled="!isEditingLiveListing"
               color="secondary"
               class="w-full"
             />
@@ -124,10 +125,11 @@
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-40 sm:max-w-48">
-          <UFormField label="Availability" name="availabilityStatus" description="Current availability" required eagerValidation>
+          <UFormField label="Availability" name="availabilityStatus" :description="isEditingLiveListing ? 'Current availability' : 'Available once published'" required eagerValidation>
             <USelect
               v-model="state.rentalListing!.availabilityStatus"
-              :items="rentalAvailabilityItems"
+              :items="isEditingLiveListing ? rentalAvailabilityItems : availableOnlyItems"
+              :disabled="!isEditingLiveListing"
               color="secondary"
               class="w-full"
             />
@@ -140,7 +142,11 @@
 
 <script setup lang="ts">
 
-const { getStepData } = useCreateListingSteps()
+const { getStepData, editingListingId } = useCreateListingSteps()
+
+// Drafts are locked to AVAILABLE — only published listings can change availability
+const isEditingLiveListing = computed(() => editingListingId.value !== null)
+const availableOnlyItems = [{ value: 'AVAILABLE', label: 'Available' }]
 
 // Form state - initialize with saved data if exists
 const savedData = getStepData(1) as Step1FormData | undefined
