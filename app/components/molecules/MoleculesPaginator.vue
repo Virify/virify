@@ -166,19 +166,20 @@ const formattedPagination = computed(() => {
 .m-paginator {
   display: flex;
   align-items: center;
+  justify-content: center;
   list-style: none;
-  margin: var(--size-24) 0;
+  margin: var(--size-24) auto;
   padding: 0;
   gap: var(--size-4);
 
   &__list-item {
 
     &--previous {
-      margin-right: auto;
+      margin-right: var(--size-32);
     }
 
     &--next {
-      margin-left: auto;
+      margin-left: var(--size-32);
     }
   }
 
@@ -204,6 +205,7 @@ const formattedPagination = computed(() => {
     color: var(--foreground-200);
     transition: color, background-color;
     transition-duration: var(--animation-fast);
+    cursor: pointer;
 
     &:disabled {
       pointer-events: none;
