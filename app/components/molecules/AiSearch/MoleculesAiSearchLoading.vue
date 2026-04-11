@@ -1,7 +1,7 @@
 <template>
   <div class="m-ai-search-loading">
     <img src="/img/v-loader.svg" class="m-ai-search-loading__spinner" />
-    <p class="m-ai-search-loading__content | body-lg">
+    <p class="m-ai-search-loading__content | body-lg" data-allow-mismatch="text">
       {{ loadingMessage }}
     </p>
   </div>
