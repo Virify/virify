@@ -82,7 +82,8 @@ watch(useRoute(), close)
   margin: 0;
   padding: var(--size-32) 0;
   width: 100%;
-  height: 100%;
+  height: var(--rv-height, 100%);
+  top: var(--rv-offset, 0px);
   max-width: none;
   max-height: none;
   overflow: auto;

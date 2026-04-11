@@ -14,7 +14,7 @@
 // Global head configuration
 useHead({
   meta: [
-    { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content' },
+    { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content' },
     { name: 'mobile-web-app-capable', content: 'yes' },
     { name: 'theme-color', content: '#0F0F25' },
     { name: 'application-name', content: 'Virify' },
@@ -41,4 +41,9 @@ useHead({
     { rel: 'apple-touch-icon', sizes: '1024x1024', href: '/apple-touch-icon-1024x1024.png' },
   ]
 })
+
+// Initialize dynamic viewport height listeners globally so that --rv-height is maintained at all times
+if (import.meta.client) {
+  useDynamicViewportHeight();
+}
 </script>

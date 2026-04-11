@@ -1,64 +1,54 @@
 import type { ShallowRef } from "vue"
+import { createSharedComposable } from "@vueuse/core"
 
 interface DynamicViewportHeight {
   height: ShallowRef<string>
   isOpen: ShallowRef<boolean>
 }
 
-export function useDynamicViewportHeight(): DynamicViewportHeight {
-  let timeout: NodeJS.Timeout | null = null
-
+// Make it a shared composable to only bind one global resize/scroll listener
+export const useDynamicViewportHeight = createSharedComposable((): DynamicViewportHeight => {
   const height = shallowRef('100dvh')
   const isOpen = shallowRef(false)
 
-  /**
-   *  Update viewport height
-   */
   function updateViewportSize() {
     if (!window.visualViewport) return
 
-    // Save values
+    // iOS and Android Chrome both reliably update visualViewport height on keyboard open
     height.value = window.visualViewport.height + 'px'
     isOpen.value = window.innerHeight !== window.visualViewport.height
+
+    // Set globally on root so any modal/dialog can use var(--rv-height, 100%)
+    document.documentElement.style.setProperty('--rv-height', height.value)
+    
+    // Also export offset top strictly for iOS where keyboard can push visual viewport out of physical window bounds 
+    const offset = window.visualViewport.offsetTop || 0
+    document.documentElement.style.setProperty('--rv-offset', offset + 'px')
   }
 
   onMounted(() => {
     updateViewportSize()
 
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', updateViewportSize)
+      window.visualViewport.addEventListener('scroll', updateViewportSize)
+    }
+
     if ('virtualkeyboard' in navigator) {
-      /**
-       *  @TODO
-       *  The VirtualKeyboard API is not yet widely available and not
-       *  currently recognised by TS
-       */
       // @ts-ignore: is type unknown
       navigator.virtualkeyboard.addEventListener('geometrychange', updateViewportSize)
-    }
-    else {
-      /**
-       *  @TODO
-       *  The VirtualKeyboard has patchy support, and JS does not provide
-       *  any event for resizing when a virtual keyboard shows. Focus events
-       *  can be used, but are unreliable. The simplest fix for the time
-       *  being is just to constantly ping for resize changes and update
-       *  accordingly. Absolutely horrible, but once the VirtualKeyboard API
-       *  has wider support, this can be removed :)
-       */
-      timeout = setInterval(updateViewportSize, 500)
     }
   })
 
   onBeforeUnmount(() => {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', updateViewportSize)
+      window.visualViewport.removeEventListener('scroll', updateViewportSize)
+    }
+
     if ('virtualkeyboard' in navigator) {
       // @ts-ignore: is type unknown
       navigator.virtualkeyboard.removeEventListener('geometrychange', updateViewportSize)
-    }
-    else {
-      /**
-       *  @TODO
-       *  Also to remove here
-       */
-      if (timeout) clearTimeout(timeout)
     }
   })
 
@@ -66,4 +56,4 @@ export function useDynamicViewportHeight(): DynamicViewportHeight {
     height,
     isOpen
   }
-}
+})

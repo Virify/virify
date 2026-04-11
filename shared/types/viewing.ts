@@ -29,9 +29,9 @@ export interface ViewingWithDetails {
   ownerId: number;
   conversationId: number | null;
   /** ISO strings for each date the buyer is available (stored as UTC noon) */
-  proposedDates: string[];
+  proposedDates: readonly string[];
   /** Time preferences selected by the buyer (e.g. 'Mornings', 'Evenings', freeform) */
-  preferredTimes: string[];
+  preferredTimes: readonly string[];
   counterProposedAt: string | null;
   /** Which role made the last proposal — determines who should respond */
   lastProposedBy: string | null;
