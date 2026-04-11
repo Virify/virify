@@ -1,25 +1,29 @@
 import type { ShallowRef } from "vue"
+import { createSharedComposable } from "@vueuse/core"
 
 interface DynamicViewportHeight {
   height: ShallowRef<string>
   isOpen: ShallowRef<boolean>
 }
 
-export function useDynamicViewportHeight(): DynamicViewportHeight {
-  let timeout: NodeJS.Timeout | null = null
-
+// Make it a shared composable to only bind one global resize/scroll listener
+export const useDynamicViewportHeight = createSharedComposable((): DynamicViewportHeight => {
   const height = shallowRef('100dvh')
   const isOpen = shallowRef(false)
 
-  /**
-   *  Update viewport height
-   */
   function updateViewportSize() {
     if (!window.visualViewport) return
 
-    // Save values
+    // iOS and Android Chrome both reliably update visualViewport height on keyboard open
     height.value = window.visualViewport.height + 'px'
     isOpen.value = window.innerHeight !== window.visualViewport.height
+
+    // Set globally on root so any modal/dialog can use var(--rv-height, 100%)
+    document.documentElement.style.setProperty('--rv-height', height.value)
+    
+    // Also export offset top strictly for iOS where keyboard can push visual viewport out of physical window bounds 
+    const offset = window.visualViewport.offsetTop || 0
+    document.documentElement.style.setProperty('--rv-offset', offset + 'px')
   }
 
   onMounted(() => {
@@ -57,4 +61,4 @@ export function useDynamicViewportHeight(): DynamicViewportHeight {
     height,
     isOpen
   }
-}
+})

@@ -2,7 +2,7 @@
   <UModal
     v-model:open="isOpen"
     :fullscreen="isMobile"
-    :style="isMobile ? { height: viewportHeight } : undefined"
+    :style="isMobile ? { height: 'var(--rv-height, 100%)', top: 'var(--rv-offset, 0px)', 'max-height': 'none' } : undefined"
     :ui="modalUi"
   >
     <template #title>
@@ -86,7 +86,7 @@ const isOpen = usePropModel(props, "open", emit);
 
 // Constrain fullscreen modal to the visual viewport so the input isn't
 // covered when the on-screen keyboard opens (interactive-widget=overlays-content).
-const { height: viewportHeight } = useDynamicViewportHeight();
+useDynamicViewportHeight();
 
 const {
   messageContent,
