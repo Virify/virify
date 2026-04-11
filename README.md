@@ -69,6 +69,38 @@ pnpm db:setup          # run migrations + seed demo data
 
 ### Manual setup
 
+#### Install PostgreSQL with PostGIS (macOS via Homebrew)
+
+The main database runs locally. PPD and waiting list point directly to their production instances — just set `PPD_DATABASE_URL` and `WAITING_LIST_DATABASE_URL` in `.env` to the remote connection strings and generate the clients.
+
+```bash
+brew install postgresql@17
+brew install postgis
+
+# postgresql@17 is keg-only — add it to your PATH
+echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Start PostgreSQL service
+brew services start postgresql@17
+
+# Create a PostgreSQL user with a password (replace values as needed)
+psql -c "CREATE USER yourname WITH PASSWORD 'yourpassword';"
+psql -c "ALTER USER yourname CREATEDB;"
+
+# Create and configure the main database
+createdb -U yourname virify
+psql -U yourname -d virify -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+```
+
+Then set your `DATABASE_URL` in `.env` using that username and password:
+
+```
+DATABASE_URL="postgresql://yourname:yourpassword@localhost:5432/virify"
+```
+
+#### Install dependencies and run
+
 ```bash
 pnpm install
 
