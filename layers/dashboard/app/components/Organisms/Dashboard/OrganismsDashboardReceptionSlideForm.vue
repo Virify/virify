@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="reception" class="space-y-6">
+      <UForm v-if="reception" ref="formRef" :state="reception" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Reception Name" :name="`property.reception.${receptionIndex}.name`" description="Please add a reception name" required eagerValidation>
+        <UFormField label="Reception Name" name="name" description="Please add a reception name" required eagerValidation>
           <UInput
             v-model="reception.name"
             placeholder="e.g. Living Room, Lounge"
@@ -81,7 +81,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.reception.${receptionIndex}.description`" description="Add any details about this reception" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this reception" hint="optional">
           <UTextarea
             v-model="reception.description"
             placeholder="Describe this reception..."
@@ -90,7 +90,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -107,8 +107,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!reception || !isReceptionComplete(reception) || isSaving"
-          :loading="isSaving"
+          :disabled="!reception || !isReceptionComplete(reception) || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -171,8 +171,17 @@ function isReceptionComplete(reception: ReceptionData): boolean {
   return Boolean(reception.name && reception.type && reception.floor !== null && reception.floor !== undefined)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.reception) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.reception.name },
+    { name: 'description', value: props.reception.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

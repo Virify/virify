@@ -2,8 +2,8 @@
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="font-medium title-xs mb-0!">
-        Bedrooms 
-        <span class="body-xs text-(--foreground-200)/60 font-normal">optional</span>
+        Bedrooms<span class="text-error">*</span>
+        <p class="inline body-xs text-(--foreground-200)/60 font-normal">required</p>
       </h3>
 
       <UButton

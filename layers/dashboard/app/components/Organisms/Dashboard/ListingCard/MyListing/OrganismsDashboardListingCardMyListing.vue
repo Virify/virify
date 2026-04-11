@@ -160,9 +160,10 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-  'edit': [payload: { id: number; isDraft: boolean }]
-  'restored': [id: number]
+  'edit': [{ id: number; isDraft: boolean }]
+  'restored': [number]
   'published': []
+  'deleted': [number]
 }>()
 
 const { archiveListing, restoreListing, setPublished, setAvailabilityStatus } = useMyListings();
@@ -387,6 +388,7 @@ async function handleDiscardConfirm() {
     const { deleteDraft } = useDraftListings();
     await deleteDraft(draftId);
     discardDialog.value?.close();
+    emit('deleted', draftId);
   } catch (error) {
     // Error already handled in composable
   } finally {

@@ -15,6 +15,7 @@ const { activeEnquiryId } = useEnquiries();
 const { isModalOpen, modalConversation, newEnquiryData, openConversation, closeConversation, syncConversationIfOpen } = useGlobalEnquiryModal();
 const toast = useToast();
 const { user } = useUserSession();
+const { canDesktop } = useNotificationPreferences();
 
 // Clean up when the modal is closed via UModal's own controls (X button, backdrop click, etc.)
 watch(isModalOpen, (open) => {
@@ -68,6 +69,23 @@ watch(lastNotification, (notification) => {
         }
       },
     });
+
+    // Fire browser desktop notification if user has enabled it and permission is granted
+    if (import.meta.client && canDesktop.value && Notification.permission === 'granted') {
+      const desktopNotif = new Notification(notification.title, {
+        body: notification.description,
+        icon: notification.senderAvatar || '/img/logo.png',
+      });
+
+      desktopNotif.onclick = () => {
+        window.focus();
+        if (notification.conversationId) {
+          openConversation(notification.conversationId).catch(() => {});
+        } else {
+          navigateTo('/dashboard/enquiries');
+        }
+      };
+    }
   }
 });
 </script>

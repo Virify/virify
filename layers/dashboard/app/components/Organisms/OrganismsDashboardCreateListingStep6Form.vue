@@ -6,6 +6,7 @@
     :is-valid="isFormValid"
     api-endpoint="/api/draft-listings/update/steps/six/"
     :get-submission-data="getSubmissionData"
+    :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
@@ -349,4 +350,9 @@ const getSubmissionData = () => {
     }
   }
 }
+
+// Explicit text fields to moderate before saving
+const getFieldsToModerate = () => [
+  { name: 'property.outdoorSpace.description', value: state.property.outdoorSpace.description },
+]
 </script>

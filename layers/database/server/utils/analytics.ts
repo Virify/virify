@@ -498,7 +498,7 @@ export async function getViewedListingsPaginated(
   options?: {
     skip?: number;
     take?: number;
-    sort?: "newest" | "oldest";
+    sort?: "newest" | "oldest" | "listing-newest" | "listing-oldest";
     filter?: "all" | "sale" | "rent";
     period?: "30" | "60" | "all";
   },
@@ -521,7 +521,14 @@ export async function getViewedListingsPaginated(
     whereClause.listing = { rentalListing: { isNot: null } };
   }
 
-  const orderBy = sort === "oldest" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
+  let orderBy: any
+  if (sort === "listing-newest") {
+    orderBy = { listing: { publishedAt: "desc" } }
+  } else if (sort === "listing-oldest") {
+    orderBy = { listing: { publishedAt: "asc" } }
+  } else {
+    orderBy = sort === "oldest" ? { createdAt: "asc" as const } : { createdAt: "desc" as const }
+  }
 
   // Get distinct listing IDs first for accurate total count
   const distinctIds = await prisma.listingView.findMany({

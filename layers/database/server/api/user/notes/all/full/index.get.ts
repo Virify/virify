@@ -3,7 +3,7 @@ import * as z from "zod";
 
 const notesQuerySchema = z.object({
   filter: z.enum(['all', 'sale', 'rent']).optional().default('all'),
-  sort: z.enum(['newest', 'oldest']).optional().default('newest'),
+  sort: z.enum(['newest', 'oldest', 'listing-newest', 'listing-oldest']).optional().default('newest'),
   page: z.coerce.number().min(1).optional().default(1),
   limit: z.coerce.number().min(1).max(100).optional().default(20),
 });

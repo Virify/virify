@@ -91,7 +91,7 @@
         <USeparator class="my-3" />
         <div class="flex justify-between items-center w-full">
           <p v-if="showFavDate" class="body-xs">
-            Added on:
+            Favourite added on:
             {{
               new Date(showFavDate).toLocaleDateString("en-GB", {
                 day: "2-digit",
@@ -101,7 +101,7 @@
             }}
           </p>
           <p v-if="showNotesDate" class="body-xs">
-            Updated on:
+            Note updated on:
             {{
               new Date(showNotesDate).toLocaleDateString("en-GB", {
                 day: "2-digit",

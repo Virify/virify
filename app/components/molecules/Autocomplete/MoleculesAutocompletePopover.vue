@@ -48,9 +48,11 @@
         <h3 class="m-autocomplete-popover__title | title-3xs faded-text">History</h3>
 
         <MoleculesAutocompleteList :options="locationHistory" v-slot="{ option, rowClass, actionClass }">
-          <button type="button" :class="rowClass" @click.prevent="setLocation(option)">
+          <button type="button" :class="rowClass" @click.prevent="selectFromHistory(option)">
             {{ option.place_name_en || option.place_name }}
           </button>
+
+          <MoleculesAutocompleteSaveLocation :option="(option as GeocodingFeature)" :custom-class="actionClass" />
 
           <button type="button" aria-label="Remove saved location" :class="actionClass" class="| faded-icon"
             @click.prevent="removeLocationFromHistory(option)">
@@ -191,6 +193,13 @@ async function setLocation(option: MaybeRef<GeocodingFeature>) {
 
   addLocationToHistory(enhancedLocation)
   emits('location-selected', enhancedLocation)
+  suppressAutocomplete.value = true
+}
+
+function selectFromHistory(option: GeocodingFeature) {
+  // History items are already enhanced — emit directly without re-enhancing
+  addLocationToHistory(option)
+  emits('location-selected', option)
   suppressAutocomplete.value = true
 }
 

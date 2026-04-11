@@ -26,8 +26,11 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    const { invalidateDraftListingsCache } = await import("~~/layers/database/server/utils/cache");
-    await invalidateDraftListingsCache(user.id as number);
+    const { invalidateDraftListingsCache, invalidateAggregatesCache } = await import("~~/layers/database/server/utils/cache");
+    await Promise.all([
+      invalidateDraftListingsCache(user.id as number),
+      invalidateAggregatesCache(user.id as number),
+    ]);
 
     return {
       success: true,
