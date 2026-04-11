@@ -13,7 +13,8 @@
 
         <template #right>
           <OrganismsDashboardFilterListings :items="viewedListings" :date-key="'createdAt'"
-            persistence-key="dashboard-viewed" @update:filtered="filteredViewed = $event">
+            persistence-key="dashboard-viewed" hide-availability-filter listing-date-sort
+            @update:filtered="filteredViewed = $event">
             <template #extra-filters>
               <USelect v-model="period" :items="periodOptions" option-attribute="label" value-attribute="value"
                 icon="i-lucide-calendar-days" color="primary" variant="ghost" size="md" class="body-sm w-full" :ui="{
@@ -75,12 +76,12 @@ const period = useCookie<'30' | '60' | 'all'>('dashboard-viewed-period', {
 })
 
 const periodOptions = [
-  { label: 'Last 30 days', value: '30' },
-  { label: 'Last 60 days', value: '60' },
+  { label: 'Viewed in last 30 days', value: '30' },
+  { label: 'Viewed in last 60 days', value: '60' },
   { label: 'All time', value: 'all' },
 ]
 
-const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-viewed' })
+const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-viewed', listingDateSort: true })
 
 // Reset to page 1 when filters change
 watch([saleRentFilter, sortOrderValue, period], () => { page.value = 1 })

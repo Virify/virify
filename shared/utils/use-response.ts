@@ -1,5 +1,6 @@
-import { H3Event, setResponseStatus } from "h3";
+import { H3Event, setResponseStatus, createError } from "h3";
 import { z } from "zod";
+import { handlePrismaError } from '~~/layers/database/server/utils/errors/prisma-error-handler'
 
 /**
  * Utility function to create standardized HTTP responses.

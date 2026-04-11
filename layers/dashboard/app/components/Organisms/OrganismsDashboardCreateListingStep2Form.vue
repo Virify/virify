@@ -6,6 +6,7 @@
     :is-valid="isFormValid"
     api-endpoint="/api/draft-listings/update/steps/two/"
     :get-submission-data="getSubmissionData"
+    :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
@@ -276,6 +277,13 @@ function getSubmissionData() {
       yearBuilt: state.property.yearBuilt,
     }
   }
+}
+
+// Explicit text fields to moderate before saving
+function getFieldsToModerate() {
+  return [
+    { name: 'property.description', value: state.property.description },
+  ]
 }
 
 // Handle step events

@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="bathroom" class="space-y-6">
+      <UForm v-if="bathroom" ref="formRef" :state="bathroom" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Bathroom Name" :name="`property.bathroomFeatures.${bathroomIndex}.name`" description="Please add a bathroom name" required eagerValidation>
+        <UFormField label="Bathroom Name" name="name" description="Please add a bathroom name" required eagerValidation>
           <UInput
             v-model="bathroom.name"
             placeholder="e.g. Master En Suite, Family Bathroom"
@@ -69,7 +69,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.bathroomFeatures.${bathroomIndex}.description`" description="Add any details about this bathroom" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this bathroom" hint="optional">
           <UTextarea
             v-model="bathroom.description"
             placeholder="Describe this bathroom..."
@@ -78,7 +78,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -95,8 +95,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!bathroom || !step4Validation.isBathroomComplete(bathroom) || isSaving"
-          :loading="isSaving"
+          :disabled="!bathroom || !step4Validation.isBathroomComplete(bathroom) || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -154,8 +154,17 @@ function handleFeatureToggle(feature: string, checked: boolean) {
   props.bathroom.features = toggleRoomFeature(props.bathroom.features, feature, checked)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.bathroom) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.bathroom.name },
+    { name: 'description', value: props.bathroom.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

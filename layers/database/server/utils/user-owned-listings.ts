@@ -64,9 +64,10 @@ export async function getUserOwnedListingsWithAnalytics(
     skip?: number
     sort?: "new" | "old" | "premium" | "featured" | "basic"
     saleRent?: "all" | "sale" | "rent"
+    availability?: "all" | "AVAILABLE" | "UNDER_OFFER" | "SOLD"
   }
 ): Promise<{ listings: OwnedListingWithAnalytics[]; total: number }> {
-  const { status = "all", search = "", take = 50, skip = 0, sort = "new", saleRent = "all" } = opts || {}
+  const { status = "all", search = "", take = 50, skip = 0, sort = "new", saleRent = "all", availability = "all" } = opts || {}
 
   const where: Prisma.ListingWhereInput = { userId }
 
@@ -98,6 +99,24 @@ export async function getUserOwnedListingsWithAnalytics(
     where.rentalListing = null
   } else if (saleRent === "rent") {
     where.rentalListing = { isNot: null }
+  }
+
+  // Apply availability filter
+  if (availability === "AVAILABLE") {
+    where.OR = [
+      { saleListing: { availabilityStatus: 'AVAILABLE' } },
+      { rentalListing: { availabilityStatus: 'AVAILABLE' } },
+    ]
+  } else if (availability === "UNDER_OFFER") {
+    where.OR = [
+      { saleListing: { availabilityStatus: 'UNDER_OFFER' } },
+      { rentalListing: { availabilityStatus: 'LET_AGREED' } },
+    ]
+  } else if (availability === "SOLD") {
+    where.OR = [
+      { saleListing: { availabilityStatus: 'SOLD' } },
+      { rentalListing: { availabilityStatus: 'LET' } },
+    ]
   }
 
   // Apply search filters

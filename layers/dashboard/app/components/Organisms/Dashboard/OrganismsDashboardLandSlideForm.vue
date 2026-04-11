@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="land" class="space-y-6">
+      <UForm v-if="land" ref="formRef" :state="land" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Land Name" :name="`property.outdoorSpace.land.${landIndex}.name`" description="Please add a land parcel name" required eagerValidation>
+        <UFormField label="Land Name" name="name" description="Please add a land parcel name" required eagerValidation>
           <UInput
             v-model="land.name"
             placeholder="e.g. Paddock, Woodland"
@@ -57,7 +57,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.outdoorSpace.land.${landIndex}.description`" description="Add any details about this land parcel" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this land parcel" hint="optional">
           <UTextarea
             v-model="land.description"
             placeholder="Describe this land..."
@@ -66,7 +66,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -83,8 +83,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!land || !isLandValid || isSaving"
-          :loading="isSaving"
+          :disabled="!land || !isLandValid || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -147,8 +147,17 @@ function handleFeatureToggle(feature: string, checked: boolean) {
   props.land.features = toggleRoomFeature(props.land.features ?? [], feature, checked)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.land) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.land.name },
+    { name: 'description', value: props.land.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

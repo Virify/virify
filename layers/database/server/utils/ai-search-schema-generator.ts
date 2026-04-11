@@ -42,6 +42,7 @@ function loadSchemaFiles(): string {
     "property/outdoor-space/garden.prisma",
     "property/outdoor-space/yard.prisma",
     "property/outdoor-space/land.prisma",
+    "user/user.prisma",
   ];
   
   let schemaText = "\n\nRELEVANT PRISMA SCHEMA:\n\n";
@@ -122,6 +123,7 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
       - price, archived, published, moveInDate, listingTier, userId, propertyId
       - saleListing (optional relation - use { isNot: null } for presence)
       - rentalListing (optional relation - use { isNot: null } for presence)
+      - user (optional relation - use { is: { username: ... } } for username filtering)
       
       PROPERTY MODEL FIELDS (inside property.is ONLY):
       - numberBedrooms, numberBathrooms, numberReceptions, type, classification
@@ -274,6 +276,22 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     - Rent query: { "rentalListing": { "is": { "rentFrequency": "MONTHLY" } } }
 
     In "usedTerms" ALWAYS use: "For sale" or "To rent" — NEVER "saleListing" or "rentalListing".
+
+    ═══════════════════════════════════════════════════════════════════════════════
+    USERNAME / USER SEARCH
+    ═══════════════════════════════════════════════════════════════════════════════
+
+    Listings have an optional user relation (User model with username String? @unique).
+    Use this for queries about who listed a property.
+
+    PATTERNS:
+    - "by [username]", "listed by [username]", "from [username]" → { "user": { "is": { "username": { "equals": "username", "mode": "insensitive" } } } }
+    - "listings by @username" → strip the "@" prefix and match: { "user": { "is": { "username": { "equals": "username", "mode": "insensitive" } } } }
+
+    NOTES:
+    - Username matching is ALWAYS case-insensitive.
+    - "user" is a top-level Listing field — NEVER nest it inside property: { is: { ... } }
+    - In "usedTerms" use the full phrase: "Listed by @username" or "By username"
 
     ═══════════════════════════════════════════════════════════════════════════════
     AMENITY SEARCH RULES

@@ -25,9 +25,11 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     enquiries?: boolean
     /** Whether to hide the Listing sort option */
     hideListingSort?: boolean
+    /** Whether to include listing date sort options (Listing: Newest / Listing: Oldest) */
+    listingDateSort?: boolean
   } = {}
 ) => {
-  const { dateKey = 'createdAt', userId, persistenceKey, enquiries = false, hideListingSort = false } = options
+  const { dateKey = 'createdAt', userId, persistenceKey, enquiries = false, hideListingSort = false, listingDateSort = false } = options
   const route = useRoute()
   const router = useRouter()
 
@@ -51,6 +53,13 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
         maxAge: 60 * 60 * 24 * 365 
       })
     : ref<DashboardSaleRentFilter>('all')
+
+  const availabilityFilter = persistenceKey
+    ? useCookie<DashboardAvailabilityFilter>(`${persistenceKey}-availability`, { 
+        default: () => 'all', 
+        maxAge: 60 * 60 * 24 * 365 
+      })
+    : ref<DashboardAvailabilityFilter>('all')
 
   const enquiriesFilter = persistenceKey
     ? useCookie<DashboardEnquiriesFilter>(`${persistenceKey}-enquiries`, { 
@@ -124,6 +133,13 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
       })
     }
 
+    if (listingDateSort) {
+      options.push(
+        { label: 'Listing: Newest', value: 'listing-newest', icon: 'i-lucide-building-2' },
+        { label: 'Listing: Oldest', value: 'listing-oldest', icon: 'i-lucide-building' },
+      )
+    }
+
     return options
   })
   
@@ -134,6 +150,18 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     { label: 'All', value: 'all', icon: 'i-lucide-home' },
     { label: 'Sale', value: 'sale', icon: 'i-lucide-tag' },
     { label: 'Rent', value: 'rent', icon: 'i-lucide-key' }
+  ]
+
+  /**
+   * Availability filter options
+   * UNDER_OFFER maps to UNDER_OFFER (sale) / LET_AGREED (rental)
+   * SOLD maps to SOLD (sale) / LET (rental)
+   */
+  const availabilityOptions = [
+    { label: 'All', value: 'all', icon: 'i-lucide-circle-dot' },
+    { label: 'Available', value: 'AVAILABLE', icon: 'i-lucide-circle-check' },
+    { label: 'Under Offer / Let Agreed', value: 'UNDER_OFFER', icon: 'i-lucide-clock' },
+    { label: 'Sold / Let', value: 'SOLD', icon: 'i-lucide-circle-x' },
   ]
 
   /**
@@ -207,12 +235,14 @@ export const useDashboardListFilter = <T extends Record<string, any>>(
     searchQuery,
     sortOrderValue,
     saleRentFilter,
+    availabilityFilter,
     enquiriesFilter,
     directionOptions,
     tabItems,
     viewOptions,
     sortOrder,
     saleRentOptions,
+    availabilityOptions,
     filteredItems,
     activeTab,
     activeView,

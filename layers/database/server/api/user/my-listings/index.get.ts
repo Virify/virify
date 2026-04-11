@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
       page?: string | number
       sort?: string
       saleRent?: string
+      availability?: string
     }
 
     const take = query.take ? Number(query.take) : 20
@@ -24,10 +25,11 @@ export default defineEventHandler(async (event) => {
     const search = query.search ?? ""
     const sort = query.sort ?? 'new'
     const saleRent = query.saleRent ?? 'all'
+    const availability = query.availability ?? 'all'
 
     // Skip cache when a free-text search term is provided — unique per keystroke
     if (!search) {
-      const cacheKey = `my-listings:${userId}:${status}:${sort}:${page}:${take}:${saleRent}`;
+      const cacheKey = `my-listings:${userId}:${status}:${sort}:${page}:${take}:${saleRent}:${availability}`;
       const storage = useStorage('cache');
       const cached = await storage.getItem(cacheKey);
       if (cached) return cached;
@@ -39,6 +41,7 @@ export default defineEventHandler(async (event) => {
         skip,
         sort: sort as any,
         saleRent: saleRent as any,
+        availability: availability as any,
       })
 
       storage.setItem(cacheKey, result, { ttl: 30 * 60 }).catch(() => {})
@@ -52,6 +55,7 @@ export default defineEventHandler(async (event) => {
       skip,
       sort: sort as any,
       saleRent: saleRent as any,
+      availability: availability as any,
     })
 
     return { listings, total }

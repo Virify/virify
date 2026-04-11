@@ -13,7 +13,8 @@
 
         <template #right>
           <OrganismsDashboardFilterListings :items="favourites" :date-key="'createdAt'"
-            persistence-key="dashboard-favourites" @update:filtered="filteredFavourites = $event" />
+            persistence-key="dashboard-favourites" hide-availability-filter listing-date-sort
+            @update:filtered="filteredFavourites = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
       </UDashboardNavbar>
@@ -59,7 +60,7 @@ const limit = 20
 const pageTop = ref<HTMLElement | null>(null)
 const filteredFavourites = ref<UserFavouriteListingCard[]>([])
 
-const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-favourites' })
+const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-favourites', listingDateSort: true })
 
 // Reset to page 1 when filters change
 watch([saleRentFilter, sortOrderValue], () => { page.value = 1 })

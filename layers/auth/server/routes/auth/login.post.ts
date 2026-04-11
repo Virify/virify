@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { email, password, turnstileToken } = await readValidatedBody(event, loginSchema.parse);
+    const { email: rawEmail, password, turnstileToken } = await readValidatedBody(event, loginSchema.parse);
+    const email = rawEmail.toLowerCase();
 
     const clientIp = getRequestIP(event, { xForwardedFor: true }) || '';
     const isValidToken = await verifyTurnstileToken(turnstileToken, clientIp);

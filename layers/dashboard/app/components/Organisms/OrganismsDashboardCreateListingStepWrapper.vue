@@ -1,5 +1,5 @@
 <template>
-  <UForm :schema="schema" :state="state" @submit="onSubmit" @error="onFormError" :validateOn="['input']"
+  <UForm ref="formRef" :schema="schema" :state="state" @submit="onSubmit" @error="onFormError" :validateOn="['input']"
     class="flex flex-col h-full">
     <!-- Scrollable Form Content -->
     <div class="flex-1 space-y-8 py-4 px-0 lg:px-6 lg:overflow-y-auto">
@@ -19,14 +19,19 @@
           Cancel
         </UButton>
 
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <UButton type="button" variant="solid" color="secondary" size="sm" @click="handleSaveProgress"
-            :disabled="!isValid || isSaving" :loading="isSaving" class="body-sm text-white! cursor-pointer">
+            :disabled="!isValid || isSaving || isModerating" :loading="isSaving || isModerating" class="body-sm text-white! cursor-pointer">
             Save Progress
           </UButton>
 
-          <UButton type="submit" color="secondary" variant="solid" size="sm" :disabled="!isValid || isSaving"
-            :loading="isSaving" class="body-sm text-white! cursor-pointer">
+          <UButton v-if="stepNumber > 1" type="button" variant="solid" color="secondary" size="sm" @click="previousStep"
+            icon="i-lucide-arrow-left" class="body-sm cursor-pointer text-white!">
+            Back
+          </UButton>
+
+          <UButton type="submit" color="secondary" variant="solid" size="sm" :disabled="!isValid || isSaving || isModerating"
+            :loading="isSaving || isModerating" trailing-icon="i-lucide-arrow-right" class="body-sm text-white! cursor-pointer">
             {{ stepNumber === 9 ? 'Complete' : 'Next Step' }}
           </UButton>
         </div>
@@ -37,6 +42,8 @@
 
 <script setup lang="ts">
 import type { ZodSchema } from 'zod'
+import type { FormError } from '#ui/types'
+import type { ModerationField } from '~~/app/composables/useModerateFields'
 
 interface Props {
   stepNumber: number
@@ -45,6 +52,8 @@ interface Props {
   isValid: boolean
   apiEndpoint: string
   getSubmissionData: () => Record<string, any>
+  /** Explicit list of user-entered text fields to run through moderation before saving. */
+  getFieldsToModerate?: () => ModerationField[]
 }
 
 const props = defineProps<Props>()
@@ -54,9 +63,13 @@ const emit = defineEmits<{
   completed: []
 }>()
 
-const { saveStep, isSaving } = useCreateListingSteps()
+const { saveStep, isSaving, previousStep } = useCreateListingSteps()
 const closeModal = inject<() => void>('closeModal')
 const toast = useToast()
+const { moderateFields, isModerating } = useModerateFields()
+
+// Ref to the UForm so we can call setErrors() for moderation failures
+const formRef = ref<{ setErrors: (errors: FormError[]) => void } | null>(null)
 
 // Cancel handler
 function onCancel() {
@@ -88,6 +101,12 @@ async function handleSaveProgress() {
 // Delegate to composable's saveStep
 async function handleSave(advance: boolean) {
   if (!props.isValid || isSaving.value) return
+
+  // Run moderation on any text fields the step has declared
+  if (props.getFieldsToModerate) {
+    const passed = await moderateFields(props.getFieldsToModerate(), formRef)
+    if (!passed) return
+  }
 
   const result = await saveStep(
     props.stepNumber,

@@ -13,6 +13,7 @@
 
         <template #right>
           <OrganismsDashboardFilterListings :items="userNotes" :date-key="'updatedAt'" persistence-key="dashboard-notes"
+            hide-availability-filter listing-date-sort
             @update:filtered="filteredUserNotes = $event" />
           <OrganismsDashboardNotificationButton />
         </template>
@@ -59,7 +60,7 @@ const limit = 20
 const pageTop = ref<HTMLElement | null>(null)
 const filteredUserNotes = ref<NoteData[]>([])
 
-const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-notes' })
+const { saleRentFilter, sortOrderValue } = useDashboardListFilter(ref([]), { persistenceKey: 'dashboard-notes', listingDateSort: true })
 
 // Reset to page 1 when filters change
 watch([saleRentFilter, sortOrderValue], () => { page.value = 1 })

@@ -2,6 +2,7 @@ import { createSharedComposable } from "@vueuse/core"
 import type { DraftListing } from '~~/layers/database/server/database/prisma/generated/client'
 import type { DraftListingWithFullPayload } from '~~/shared/types/draft'
 import { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
+import { redactDeep } from '~~/shared/utils/redactContactInfo'
 
 /**
  * useCreateListingSteps - Shared composable for managing the 10-step listing creation flow
@@ -365,6 +366,9 @@ export const useCreateListingSteps = createSharedComposable(() => {
         }
       }
       
+      // Redact any phone numbers / email addresses from free-text fields before persisting
+      submissionData = redactDeep(submissionData)
+
       // PATCH to update the step (same endpoint handles both draft and live)
       const response = await useRequestFetch()<DraftListing>(apiEndpoint, {
         method: 'PATCH',
@@ -471,6 +475,9 @@ export const useCreateListingSteps = createSharedComposable(() => {
         }
       }
       
+      // Redact any phone numbers / email addresses from free-text fields before persisting
+      submissionData = redactDeep(submissionData)
+
       // Same endpoint handles both draft and live
       const response = await useRequestFetch()<DraftListing>(apiEndpoint, {
         method: 'PATCH',

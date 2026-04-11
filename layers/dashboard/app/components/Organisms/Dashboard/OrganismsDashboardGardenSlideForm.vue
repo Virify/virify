@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="garden" class="space-y-6">
+      <UForm v-if="garden" ref="formRef" :state="garden" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Garden Name" :name="`property.outdoorSpace.garden.${gardenIndex}.name`" description="Please add a garden name" required eagerValidation>
+        <UFormField label="Garden Name" name="name" description="Please add a garden name" required eagerValidation>
           <UInput
             v-model="garden.name"
             placeholder="e.g. Front Garden, Back Garden"
@@ -84,7 +84,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.outdoorSpace.garden.${gardenIndex}.description`" description="Add any details about this garden" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this garden" hint="optional">
           <UTextarea
             v-model="garden.description"
             placeholder="Describe this garden..."
@@ -93,7 +93,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -110,8 +110,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!garden || !isGardenValid || isSaving"
-          :loading="isSaving"
+          :disabled="!garden || !isGardenValid || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -176,8 +176,17 @@ function handleFeatureToggle(feature: string, checked: boolean) {
   props.garden.features = toggleRoomFeature(props.garden.features ?? [], feature, checked)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.garden) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.garden.name },
+    { name: 'description', value: props.garden.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

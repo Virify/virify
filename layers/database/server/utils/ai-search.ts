@@ -152,9 +152,12 @@ function normalizeWhereClause(parsedResponse: any): aiSearchResult {
     whereClause = parsedResponse;
   }
 
-  // Always ensure published is true
+  // Always ensure published is true and archived is false (match traditional search behaviour)
   if (!whereClause.published) {
     whereClause.published = true;
+  }
+  if (whereClause.archived === undefined) {
+    whereClause.archived = false;
   }
 
   return { whereClause, queryAnalysis };
