@@ -53,8 +53,6 @@ export const useDynamicViewportHeight = createSharedComposable((): DynamicViewpo
       // @ts-ignore: is type unknown
       navigator.virtualkeyboard.removeEventListener('geometrychange', updateViewportSize)
     }
-
-    if (timeout) clearInterval(timeout)
   })
 
   return {
