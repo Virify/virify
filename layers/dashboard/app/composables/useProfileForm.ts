@@ -91,6 +91,7 @@ export async function useProfileForm(formRef: Ref<{ setErrors: (errors: FormErro
       { name: "firstName", value: event.data.firstName },
       { name: "lastName", value: event.data.lastName },
       { name: "username", value: event.data.username },
+      { name: "bio", value: event.data.bio },
     ].filter((f): f is { name: string; value: string } => !!f.value?.trim());
 
     const results = await Promise.all(fieldsToCheck.map(async (f) => ({ name: f.name, ...(await checkText(f.value)) })));
