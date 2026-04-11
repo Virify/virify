@@ -1,5 +1,6 @@
-export type DashboardSortOrder = 'newest' | 'oldest' | 'listing'
+export type DashboardSortOrder = 'newest' | 'oldest' | 'listing' | 'listing-newest' | 'listing-oldest'
 export type DashboardSaleRentFilter = 'all' | 'sale' | 'rent'
 export type DashboardEnquiriesFilter = 'all' | 'sent' | 'received'
 export type DashboardConversationFilter = 'all' | 'unread'
 export type DashboardViewType = 'grid' | 'list'
+export type DashboardAvailabilityFilter = 'all' | 'AVAILABLE' | 'UNDER_OFFER' | 'SOLD'

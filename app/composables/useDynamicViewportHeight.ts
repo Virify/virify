@@ -29,11 +29,14 @@ export const useDynamicViewportHeight = createSharedComposable((): DynamicViewpo
   onMounted(() => {
     updateViewportSize()
 
+    // visualViewport resize fires on both iOS Safari and Android Chrome
+    // when the on-screen keyboard opens/closes — this is the most reliable approach
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', updateViewportSize)
       window.visualViewport.addEventListener('scroll', updateViewportSize)
     }
 
+    // VirtualKeyboard API (Chrome 94+) as an additional listener for explicit keyboard events
     if ('virtualkeyboard' in navigator) {
       // @ts-ignore: is type unknown
       navigator.virtualkeyboard.addEventListener('geometrychange', updateViewportSize)
@@ -50,6 +53,8 @@ export const useDynamicViewportHeight = createSharedComposable((): DynamicViewpo
       // @ts-ignore: is type unknown
       navigator.virtualkeyboard.removeEventListener('geometrychange', updateViewportSize)
     }
+
+    if (timeout) clearInterval(timeout)
   })
 
   return {

@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
+import { updateLocationByAddressId } from "~~/layers/database/server/utils/location";
 
 const publishSchema = z.object({
   draftId: z.number().int().positive(),
@@ -298,6 +299,11 @@ export default defineEventHandler(async (event) => {
     // Done after the response so it doesn't block the publish flow
     const address = draft.property?.address;
     if (address?.lat && address?.lon && draft.propertyId) {
+      // Safety-net: ensure PostGIS geometry column is set so the listing appears in spatial search.
+      // This is a no-op if step 2 already wrote the geometry; it's cheap and idempotent.
+      updateLocationByAddressId(address.id, address.lon, address.lat)
+        .catch((err) => console.error("[Publish] Failed to update PostGIS location:", err));
+
       const { findNearbyAmenities } = useMapSearch();
       findNearbyAmenities(address.lat, address.lon)
         .then((amenitiesData) => {

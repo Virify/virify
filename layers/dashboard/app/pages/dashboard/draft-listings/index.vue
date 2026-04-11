@@ -30,7 +30,7 @@
       <!-- Draft Listings Grid -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="filteredDrafts.length > 0">
         <div v-for="draft in filteredDrafts" :key="draft.id" class="h-full">
-          <OrganismsDashboardListingCardMyListing :listing="draft" @edit="handleEditDraft" @published="handlePublished" />
+          <OrganismsDashboardListingCardMyListing :listing="draft" @edit="handleEditDraft" @published="handlePublished" @deleted="handleDeleted" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
@@ -132,6 +132,14 @@ async function handleEditDraft(payload: { id: number; isDraft: boolean }) {
 
 function handleModalClose() {
   refresh()
+}
+
+function handleDeleted(draftId: number) {
+  if (!fetchedData.value) return
+  fetchedData.value = {
+    drafts: fetchedData.value.drafts.filter((d) => d.id !== draftId),
+    total: Math.max(0, fetchedData.value.total - 1),
+  }
 }
 
 function handlePublished() {

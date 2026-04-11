@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="otherRoom" class="space-y-6">
+      <UForm v-if="otherRoom" ref="formRef" :state="otherRoom" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Room Name" :name="`property.otherRoom.${otherRoomIndex}.name`" description="Please add a room name" required eagerValidation>
+        <UFormField label="Room Name" name="name" description="Please add a room name" required eagerValidation>
           <UInput
             v-model="otherRoom.name"
             placeholder="e.g. Home Office, Gym"
@@ -81,7 +81,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.otherRoom.${otherRoomIndex}.description`" description="Add any details about this room" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this room" hint="optional">
           <UTextarea
             v-model="otherRoom.description"
             placeholder="Describe this room..."
@@ -90,7 +90,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -107,8 +107,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!otherRoom || !isOtherRoomComplete(otherRoom) || isSaving"
-          :loading="isSaving"
+          :disabled="!otherRoom || !isOtherRoomComplete(otherRoom) || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -171,8 +171,17 @@ function isOtherRoomComplete(room: OtherRoomData): boolean {
   return Boolean(room.name && room.type && room.floor !== null && room.floor !== undefined)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.otherRoom) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.otherRoom.name },
+    { name: 'description', value: props.otherRoom.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

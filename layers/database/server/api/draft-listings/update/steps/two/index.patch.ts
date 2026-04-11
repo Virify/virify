@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { step2Schema } from "~~/shared/utils/listing-step2-schema";
+import { updateLocationByAddressId } from "~~/layers/database/server/utils/location";
 
 /**
  * Step 2: Property Details API Endpoint
@@ -57,6 +58,11 @@ export default defineEventHandler(async (event) => {
         create: addressData,
       });
       addressId = address.id;
+
+      // Populate the PostGIS geometry column so spatial (radius) search can find this property
+      if (property.address.lat && property.address.lon) {
+        await updateLocationByAddressId(address.id, property.address.lon, property.address.lat);
+      }
     }
 
     const propertyUpdate = {

@@ -6,6 +6,7 @@
     :is-valid="isFormValid"
     api-endpoint="/api/draft-listings/update/steps/eight/"
     :get-submission-data="getSubmissionData"
+    :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
@@ -290,6 +291,14 @@ function getSubmissionData() {
       },
     },
   }
+}
+
+// Explicit text fields to moderate before saving
+function getFieldsToModerate() {
+  return [
+    { name: 'property.energyAndUtilities.description', value: state.property.energyAndUtilities.description },
+    { name: 'property.runningCosts.description', value: state.property.runningCosts.description },
+  ]
 }
 
 // Handle step completion

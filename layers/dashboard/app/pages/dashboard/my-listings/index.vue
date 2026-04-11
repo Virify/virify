@@ -70,7 +70,7 @@ const limit = 20
 
 const listingModal = ref<{ openForNewListing: (tier: any) => void; openForDraft: (id: number) => Promise<void>; openForListing: (id: number) => Promise<void> } | null>(null)
 
-const { sortOrderValue, searchQuery, saleRentFilter } = useDashboardListFilter(ref([]), {
+const { sortOrderValue, searchQuery, saleRentFilter, availabilityFilter } = useDashboardListFilter(ref([]), {
   persistenceKey: "dashboard-my-listings",
   hideListingSort: true,
 })
@@ -78,13 +78,13 @@ const { sortOrderValue, searchQuery, saleRentFilter } = useDashboardListFilter(r
 const mapSortOrder = computed(() => sortOrderValue.value === "newest" ? "new" : "old")
 
 // Reset to page 1 when filters change
-watch([saleRentFilter, mapSortOrder], () => { page.value = 1 })
+watch([saleRentFilter, availabilityFilter, mapSortOrder], () => { page.value = 1 })
 
 // Return data so it's serialized in SSR payload and available during hydration
 const { data: fetchedData, pending: loading, refresh } = useAsyncData(
-  () => `my-listings:${user.value?.id}:${saleRentFilter.value}:${mapSortOrder.value}:${page.value}`,
+  () => `my-listings:${user.value?.id}:${saleRentFilter.value}:${availabilityFilter.value}:${mapSortOrder.value}:${page.value}`,
   () => requestFetch<{ listings: OwnedListingWithAnalytics[]; total: number }>(
-    `/api/user/my-listings/?status=all&sort=${mapSortOrder.value}&page=${page.value}&take=${limit}&saleRent=${saleRentFilter.value}`
+    `/api/user/my-listings/?status=all&sort=${mapSortOrder.value}&page=${page.value}&take=${limit}&saleRent=${saleRentFilter.value}&availability=${availabilityFilter.value}`
   ),
   { server: true }
 )

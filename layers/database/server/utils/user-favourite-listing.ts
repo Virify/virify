@@ -31,7 +31,7 @@ export async function getUserFavourites(
   options?: {
     skip?: number;
     take?: number;
-    sort?: "newest" | "oldest";
+    sort?: "newest" | "oldest" | "listing-newest" | "listing-oldest";
     filter?: "all" | "sale" | "rent";
   }
 ): Promise<{ favourites: UserFavouriteListingCard[], total: number }> {
@@ -54,7 +54,14 @@ export async function getUserFavourites(
     };
   }
 
-  const orderBy = sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" };
+  let orderBy: any
+  if (sort === "listing-newest") {
+    orderBy = { listing: { publishedAt: "desc" } }
+  } else if (sort === "listing-oldest") {
+    orderBy = { listing: { publishedAt: "asc" } }
+  } else {
+    orderBy = sort === "oldest" ? { createdAt: "asc" } : { createdAt: "desc" }
+  }
 
   const [favourites, total] = await Promise.all([
     prisma.userFavouriteListing.findMany({

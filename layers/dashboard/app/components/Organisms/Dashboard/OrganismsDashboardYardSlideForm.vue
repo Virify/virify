@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="yard" class="space-y-6">
+      <UForm v-if="yard" ref="formRef" :state="yard" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Yard Name" :name="`property.outdoorSpace.yard.${yardIndex}.name`" description="Please add a yard name" required eagerValidation>
+        <UFormField label="Yard Name" name="name" description="Please add a yard name" required eagerValidation>
           <UInput
             v-model="yard.name"
             placeholder="e.g. Courtyard, Side Yard"
@@ -84,7 +84,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.outdoorSpace.yard.${yardIndex}.description`" description="Add any details about this yard" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this yard" hint="optional">
           <UTextarea
             v-model="yard.description"
             placeholder="Describe this yard..."
@@ -93,7 +93,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -110,8 +110,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!yard || !isYardValid || isSaving"
-          :loading="isSaving"
+          :disabled="!yard || !isYardValid || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -176,8 +176,17 @@ function handleFeatureToggle(feature: string, checked: boolean) {
   props.yard.features = toggleRoomFeature(props.yard.features ?? [], feature, checked)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.yard) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.yard.name },
+    { name: 'description', value: props.yard.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

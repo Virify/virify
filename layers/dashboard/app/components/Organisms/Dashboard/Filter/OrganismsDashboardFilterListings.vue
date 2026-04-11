@@ -1,25 +1,29 @@
 <template>
   <OrganismsDashboardFilterShell ref="shell">
-    <!-- Category + Sort on same row -->
-    <div class="flex items-center gap-2 w-full">
-      <div v-if="!hideSaleRentFilter" class="flex-1">
-        <USelect v-model="saleRentFilter" :items="saleRentOptions" option-attribute="label" value-attribute="value"
-          icon="i-lucide-funnel" color="primary" variant="ghost" size="md" class="body-sm w-full" :ui="{
-            base: 'capitalize cursor-pointer light:bg-(--blue-400)! light:text-white!',
-            content: 'z-[60]!',
-            group: 'bg-(--blue-100) text-(--foreground-100) p-1',
-            item: 'hover:bg-(--background-200)',
-          }" trailing-icon="i-lucide-chevron-down" />
-      </div>
+    <!-- Filters stacked -->
+    <USelect v-if="!hideSaleRentFilter" v-model="saleRentFilter" :items="saleRentOptions" option-attribute="label" value-attribute="value"
+      icon="i-lucide-funnel" color="primary" variant="ghost" size="md" class="body-sm w-full" :ui="{
+        base: 'capitalize cursor-pointer light:bg-(--blue-400)! light:text-white!',
+        content: 'z-[60]!',
+        group: 'bg-(--blue-100) text-(--foreground-100) p-1',
+        item: 'hover:bg-(--background-200)',
+      }" trailing-icon="i-lucide-chevron-down" />
 
-      <USelect v-model="sortOrderValue" :items="sortOrder" option-attribute="label" value-attribute="value"
-        icon="i-lucide-arrow-down-up" color="primary" variant="ghost" size="md" class="body-sm flex-1" :ui="{
-          base: 'capitalize cursor-pointer light:bg-(--blue-400)! light:text-white!',
-          content: 'z-[60]!',
-          group: 'bg-(--background-100) text-(--foreground-100) p-1',
-          item: 'hover:bg-(--background-200)',
-        }" trailing-icon="i-lucide-chevron-down" />
-    </div>
+    <USelect v-if="!hideAvailabilityFilter" v-model="availabilityFilter" :items="availabilityOptions" option-attribute="label" value-attribute="value"
+      icon="i-lucide-circle-dot" color="primary" variant="ghost" size="md" class="body-sm w-full" :ui="{
+        base: 'capitalize cursor-pointer light:bg-(--blue-400)! light:text-white!',
+        content: 'z-[60]!',
+        group: 'bg-(--blue-100) text-(--foreground-100) p-1',
+        item: 'hover:bg-(--background-200)',
+      }" trailing-icon="i-lucide-chevron-down" />
+
+    <USelect v-model="sortOrderValue" :items="sortOrder" option-attribute="label" value-attribute="value"
+      icon="i-lucide-arrow-down-up" color="primary" variant="ghost" size="md" class="body-sm w-full" :ui="{
+        base: 'capitalize cursor-pointer light:bg-(--blue-400)! light:text-white!',
+        content: 'z-[60]!',
+        group: 'bg-(--background-100) text-(--foreground-100) p-1',
+        item: 'hover:bg-(--background-200)',
+      }" trailing-icon="i-lucide-chevron-down" />
 
     <slot name="extra-filters" />
 
@@ -38,6 +42,8 @@ const props = defineProps<{
   dateKey?: keyof T;
   persistenceKey?: string;
   hideSaleRentFilter?: boolean;
+  hideAvailabilityFilter?: boolean;
+  listingDateSort?: boolean;
   hideSearch?: boolean;
 }>();
 
@@ -50,12 +56,15 @@ const shell = useTemplateRef('shell');
 const filterState = useDashboardListFilter(toRef(props, 'items'), {
   dateKey: props.dateKey,
   persistenceKey: props.persistenceKey,
+  listingDateSort: props.listingDateSort,
 });
 
 const {
   filteredItems,
   saleRentFilter,
   saleRentOptions,
+  availabilityFilter,
+  availabilityOptions,
   sortOrderValue,
   sortOrder,
   searchQuery,

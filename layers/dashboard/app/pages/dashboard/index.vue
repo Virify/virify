@@ -44,8 +44,8 @@
             description: 'body-xs text-white',
             body: 'flex flex-col justify-evenly',
           }" />
-        <UPageCard title="Search Properties" description="Find your perfect home with our search tools"
-          icon="i-lucide-search" to="/search"
+        <UPageCard title="My Viewings" description="Manage your upcoming property viewings" icon="i-lucide-calendar-check"
+          to="/dashboard/viewings"
           class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
           :ui="{
             root: 'bg-[#2b3945]! ring-0',
