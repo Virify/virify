@@ -7,27 +7,18 @@
     :parts="[{ text: message.content ?? '' }]"
     :id="String(message.id)"
     :ui="{
-      container: 'pb-1',
+      container: 'pb-0',
       content:
-        'min-w-60 ' +
+        'min-w-[8rem] ' +
         (isMessageFromUser(message, currentUserId)
           ? 'bg-secondary/90 text-(--monochrome-900)/70'
           : 'bg-primary/100 text-(--monochrome-600)'),
     }"
   >
     <template #content>
-      <div class="flex items-center gap-1 pb-1">
-        <p class="body-xs italic">{{ formatMessageTimestamp(message.createdAt) }}</p>
-        <UIcon
-          v-if="!isMessageFromUser(message, currentUserId)"
-          :name="message.isRead ? 'i-lucide-check-check' : 'i-lucide-check'"
-          class="size-3 shrink-0"
-          :class="message.isRead ? 'text-secondary' : 'text-(--foreground-200)'"
-        />
-      </div>
       <p
         v-if="message.content"
-        :class="['body-sm break-all whitespace-pre-wrap', 'text-(--monochrome-900)']"
+        :class="['body-sm break-words whitespace-pre-wrap', 'text-(--monochrome-900)']"
       >
         {{ message.content }}
       </p>
@@ -65,7 +56,8 @@
           {{ message.userMedia.originalName }}
         </a>
       </div>
-      <div class="flex mt-1 items-center gap-1">
+      <!-- Avatar + sender + timestamp on one compact row -->
+      <div class="flex items-center gap-1 mt-1 flex-wrap">
         <UAvatar
           :src="message.sender.avatar || undefined"
           :alt="message.sender.username!"
@@ -73,9 +65,16 @@
           :ui="{
             root: message.sender.avatar ? 'bg-transparent' : 'bg-(--background-200)',
           }"
-          size="lg"
+          size="2xs"
         />
-        <p class="body-xs italic py-1">{{ getConvoMessagePoV(message, currentUserId) }}</p>
+        <p class="body-xs italic">{{ getConvoMessagePoV(message, currentUserId) }}</p>
+        <p class="body-xs italic ml-auto">{{ formatMessageTimestamp(message.createdAt) }}</p>
+        <UIcon
+          v-if="!isMessageFromUser(message, currentUserId)"
+          :name="message.isRead ? 'i-lucide-check-check' : 'i-lucide-check'"
+          class="size-3 shrink-0"
+          :class="message.isRead ? 'text-secondary' : 'opacity-60'"
+        />
       </div>
     </template>
   </UChatMessage>
