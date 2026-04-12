@@ -1,7 +1,7 @@
 <template>
   <div class="o-results">
     <template v-if="isLoading">
-      <div class="o-results__title o-results__title--skeleton | skeleton"></div>
+      <MoleculesResultsContextSkeleton />
 
       <div class="o-results__grid">
         <PropertyCardSkeleton v-for="key of 10" :key />
@@ -9,10 +9,8 @@
     </template>
 
     <template v-else>
-      <div v-if="hasSearchInfo" class="o-results__header">
-        <MoleculesResultsContext :count="results.length" :query-analysis="queryAnalysis" :location="location"
-          :radius="radius" @open-popover="$emit('open-popover', $event)" />
-      </div>
+      <MoleculesResultsContext v-if="hasSearchInfo" :count="results.length" :query-analysis="queryAnalysis"
+        :location="location" :radius="radius" @open-popover="$emit('open-popover', $event)" />
 
       <div class="o-results__grid">
         <PropertyCardRoot v-for="result of paginatedResults" :key="result.listingId" v-bind="result" />
@@ -144,19 +142,6 @@ watch(() => props.results, (newResults) => {
 <style lang="scss">
 .o-results {
   container-type: inline-size;
-
-  &__header {
-    margin-bottom: var(--size-16);
-  }
-
-  &__title {
-    margin: 0 0 var(--size-12);
-
-    &--skeleton {
-      width: 12ch;
-      height: 2.6ch;
-    }
-  }
 
   &__grid {
     display: grid;
