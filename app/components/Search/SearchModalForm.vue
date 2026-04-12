@@ -1,6 +1,8 @@
 <template>
   <div role="presentation" class="search-form-modal">
-    <OrganismsFilterSwitcher v-if="hasLocation" class="search-form-modal__switcher">
+    <MoleculesAiSearchFormLocation class="search-form-modal__location" />
+
+    <OrganismsFilterSwitcher v-if="hasLocation" class="search-form-modal__switcher js-search-modal-initial-focus">
       <template v-slot:traditional>
         <OrganismsTraditionalSearchFormSkeleton v-if="isTraditionalFormLoading" />
 
@@ -13,8 +15,6 @@
           @reset-search="searchReset" />
       </template>
     </OrganismsFilterSwitcher>
-
-    <MoleculesAiSearchFormLocation class="search-form-modal__location" />
   </div>
 </template>
 
@@ -149,14 +149,9 @@ const hasLocation = computed(() => {
   flex-direction: column;
   gap: var(--size-16);
 
-  &__location {
-    order: 1;
-  }
-
   &__switcher {
     interpolate-size: allow-keywords;
 
-    order: 2;
     height: calc-size(max-content, size);
     transition: height, margin;
     transition-duration: var(--animation-slow);
