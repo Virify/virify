@@ -84,7 +84,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "select", conversationId: number): void;
+  (e: "select", notification: UserNotification): void;
   (e: "loadMore"): void;
 }>();
 
@@ -92,10 +92,7 @@ const { dismissNotification } = useNotifications();
 
 const sentinel = ref<HTMLElement | null>(null);
 const handleSelect = async (notification: UserNotification) => {
-  const conversationId = notification?.conversationId;
-  if (!conversationId) return;
-
-  emit('select', conversationId);
+  emit('select', notification);
 };
 
 const handleDismiss = async (notificationId: number) => {

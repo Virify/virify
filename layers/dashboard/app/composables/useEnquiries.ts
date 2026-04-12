@@ -24,13 +24,13 @@ let processingHydrationQueue = false;
 
 /**
  * Streamlined enquiries composable for dashboard
- * 
+ *
  * Responsibilities:
  * - Fetch and manage enquiries state
  * - Handle WebSocket updates (add/update enquiries and messages)
  * - Track active enquiry for modal
  * - Provide actions: sendReply, markAsRead
- * 
+ *
  * Usage:
  * - Dashboard enquiries pages (index.vue, [id].vue)
  * - Enquiry modal (OrganismsDashboardEnquiryModal.vue)
@@ -49,31 +49,25 @@ export const useEnquiries = createSharedComposable(() => {
   /**
    * Fetch enquiries from API with filters
    */
-  async function fetchEnquiries(options?: {
-    filter?: 'all' | 'unread';
-    direction?: 'all' | 'sent' | 'received';
-    sort?: 'newest' | 'oldest' | 'listing';
-    page?: number;
-    limit?: number;
-    listingId?: number;
-  }) {
+  async function fetchEnquiries(options?: { filter?: "all" | "unread"; direction?: "all" | "sent" | "received"; sort?: "newest" | "oldest" | "listing"; page?: number; limit?: number; listingId?: number }) {
     if (!canFetchEnquiries(loggedIn.value, currentUserId.value)) {
       enquiries.value = [];
       total.value = 0;
       return;
     }
 
+    const url = buildEnquiryUrl(options ?? {});
+
     loading.value = true;
     error.value = null;
 
     try {
-      const url = buildEnquiryUrl(options);
       const data = await requestFetch<{ conversations: ConversationWithMinimalListing[]; total: number }>(url);
       enquiries.value = data.conversations || [];
       total.value = data.total || 0;
     } catch (err) {
-      console.error('Error fetching enquiries:', err);
-      error.value = 'Failed to load enquiries';
+      console.error("Error fetching enquiries:", err);
+      error.value = "Failed to load enquiries";
       enquiries.value = [];
       total.value = 0;
     } finally {
@@ -93,10 +87,10 @@ export const useEnquiries = createSharedComposable(() => {
 
     contactedListingsLoading.value = true;
     try {
-      const listingIds = await requestFetch<number[]>('/api/conversation/sent');
+      const listingIds = await requestFetch<number[]>("/api/conversation/sent");
       contactedListings.value = new Set(listingIds);
     } catch (err) {
-      console.error('Error hydrating contacted listings:', err);
+      console.error("Error hydrating contacted listings:", err);
     } finally {
       contactedListingsLoading.value = false;
     }
@@ -104,28 +98,35 @@ export const useEnquiries = createSharedComposable(() => {
 
   // Auto-hydrate on login (client only)
   if (import.meta.client) {
-    watch(() => loggedIn.value, (isLoggedIn) => {
-      if (isLoggedIn) {
-        hydrateContactedListings()
-      } else {
-        contactedListings.value = new Set()
-      }
-    }, { immediate: true })
+    watch(
+      () => loggedIn.value,
+      (isLoggedIn) => {
+        if (isLoggedIn) {
+          hydrateContactedListings();
+        } else {
+          contactedListings.value = new Set();
+        }
+      },
+      { immediate: true },
+    );
 
     // Reset all state when the logged-in user changes (login/logout/switch)
-    watch(() => user.value?.id, (newId, oldId) => {
-      if (newId === oldId) return;
-      enquiries.value = [];
-      total.value = 0;
-      loading.value = false;
-      error.value = null;
-      activeEnquiry.value = null;
-      contactedListings.value = new Set();
-      contactedListingsLoading.value = false;
-      hydratingConversations.clear();
-      hydrationQueue.length = 0;
-      processingHydrationQueue = false;
-    });
+    watch(
+      () => user.value?.id,
+      (newId, oldId) => {
+        if (newId === oldId) return;
+        enquiries.value = [];
+        total.value = 0;
+        loading.value = false;
+        error.value = null;
+        activeEnquiry.value = null;
+        contactedListings.value = new Set();
+        contactedListingsLoading.value = false;
+        hydratingConversations.clear();
+        hydrationQueue.length = 0;
+        processingHydrationQueue = false;
+      },
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -155,7 +156,7 @@ export const useEnquiries = createSharedComposable(() => {
    * Updates existing conversation or adds new one
    */
   function handleNewMessage(conversationId: number, message: MessageWithUser, conversation?: ConversationWithMinimalListing) {
-    const index = enquiries.value.findIndex(e => e.id === conversationId);
+    const index = enquiries.value.findIndex((e) => e.id === conversationId);
 
     if (index !== -1) {
       // Update existing conversation
@@ -188,23 +189,32 @@ export const useEnquiries = createSharedComposable(() => {
       if (updated.listingId && !updated.listing) {
         hydrateConversationListing(conversationId);
       }
-    } else if (conversation) {
-      // New conversation not in list - add it
-      const messages = conversation.messages || [];
-      const hasMessage = messageExists(messages, message.id);
+    } else {
+      // Conversation not in list.
+      // If we have a full conversation payload, add it.
+      if (conversation) {
+        const messages = conversation.messages || [];
+        const hasMessage = messageExists(messages, message.id);
+        const conversationToAdd = {
+          ...conversation,
+          messages: hasMessage ? messages : [...messages, message],
+          updatedAt: new Date(),
+        };
+        enquiries.value = [conversationToAdd, ...enquiries.value];
+        total.value += 1;
+        if (conversationToAdd.listingId && !conversationToAdd.listing) {
+          hydrateConversationListing(conversationToAdd.id);
+        }
+      }
 
-      const conversationToAdd = {
-        ...conversation,
-        messages: hasMessage ? messages : [...messages, message],
-        updatedAt: new Date(),
-      };
-
-      enquiries.value = [conversationToAdd, ...enquiries.value];
-      total.value += 1;
-
-      // Hydrate listing if it's missing but we have a listingId
-      if (conversationToAdd.listingId && !conversationToAdd.listing) {
-        hydrateConversationListing(conversationToAdd.id);
+      // Global modal opened from search/listing page (fetchEnquiries never called) —
+      // update activeEnquiry directly so the modal UI reflects the new message.
+      if (activeEnquiry.value?.id === conversationId && !messageExists(activeEnquiry.value.messages, message.id)) {
+        activeEnquiry.value = {
+          ...activeEnquiry.value,
+          messages: [...activeEnquiry.value.messages, message],
+          updatedAt: new Date(),
+        };
       }
     }
   }
@@ -235,24 +245,20 @@ export const useEnquiries = createSharedComposable(() => {
   /**
    * Send a reply message
    */
-  async function sendReply(
-    conversationId: number,
-    content: string,
-    options?: { suppressNotification?: boolean; mediaId?: number }
-  ) {
+  async function sendReply(conversationId: number, content: string, options?: { suppressNotification?: boolean; mediaId?: number }) {
     const hasContent = content.trim().length > 0;
     const hasMedia = !!options?.mediaId;
 
     if (!hasContent && !hasMedia) {
-      throw new Error('A message or attachment is required');
+      throw new Error("A message or attachment is required");
     }
 
     if (!currentUserId.value) {
-      throw new Error('User is not authenticated');
+      throw new Error("User is not authenticated");
     }
 
-    const response = await $fetch<MessageWithUser>('/api/conversation/reply/', {
-      method: 'POST',
+    const response = await requestFetch<MessageWithUser>("/api/conversation/reply/", {
+      method: "POST",
       body: {
         message: hasContent ? content : undefined,
         userMediaId: options?.mediaId,
@@ -261,28 +267,41 @@ export const useEnquiries = createSharedComposable(() => {
       },
     });
 
+    // Optimistically update local state immediately — don't wait for WebSocket
+    // The WebSocket duplicate check will silently no-op if it arrives later
+    handleNewMessage(conversationId, response);
+
     return response;
   }
 
   /**
    * Start a new conversation
    */
-  async function startConversation(listingId: number, receiverId: number, message: string) {
+  async function startConversation(listingId: number, receiverId: number, message: string): Promise<ConversationWithMinimalListing | null> {
     if (!currentUserId.value || receiverId === currentUserId.value) {
-      return;
+      return null;
     }
 
     if (hasContactedListing(listingId)) {
-      return;
+      return null;
     }
 
-    await requestFetch('/api/conversation/create', {
-      method: 'POST',
+    const created = await requestFetch<ConversationWithMinimalListing>("/api/conversation/create", {
+      method: "POST",
       body: { listingId, receiverId, message },
     });
 
+    // Re-fetch so we get the full listing/address data (create endpoint doesn't select listing relation)
+    const conversation = await requestFetch<ConversationWithMinimalListing>(`/api/conversation/${created.id}`);
+
     // Track that we've contacted this listing
     contactedListings.value.add(listingId);
+
+    // Refresh aggregates so the sender sees updated sent-enquiries count
+    const { fetchUserItemsAggregates } = useNotifications();
+    fetchUserItemsAggregates(true);
+
+    return conversation;
   }
 
   /**
@@ -293,12 +312,12 @@ export const useEnquiries = createSharedComposable(() => {
     handleMessageRead(conversationId, messageId);
 
     try {
-      await $fetch('/api/conversation/mark-read', {
-        method: 'POST',
+      await requestFetch("/api/conversation/mark-read", {
+        method: "POST",
         body: { messageId, conversationId },
       });
     } catch (err) {
-      console.error('Error marking message as read:', err);
+      console.error("Error marking message as read:", err);
       // Could revert optimistic update here if needed
     }
   }
@@ -321,25 +340,25 @@ export const useEnquiries = createSharedComposable(() => {
 
     while (hydrationQueue.length) {
       const conversationId = hydrationQueue.shift();
-      if (typeof conversationId !== 'number') continue;
+      if (typeof conversationId !== "number") continue;
 
       try {
         // Only fetch if the conversation exists locally and lacks listing data
-        const local = enquiries.value.find(c => c.id === conversationId);
+        const local = enquiries.value.find((c) => c.id === conversationId);
         if (!local || !local.listingId || local.listing) continue;
 
         const conversation = await requestFetch<ConversationWithMinimalListing>(`/api/conversation/${conversationId}`);
         if (!conversation?.listing) continue;
 
         // Merge the hydrated conversation, preserving local ordering
-        enquiries.value = enquiries.value.map((c) => c.id === conversationId ? conversation : c);
+        enquiries.value = enquiries.value.map((c) => (c.id === conversationId ? conversation : c));
 
         // Keep modal in sync if this is the active enquiry
         if (activeEnquiry.value?.id === conversationId) {
           activeEnquiry.value = conversation;
         }
       } catch (err) {
-        console.error('Error hydrating conversation listing:', err);
+        console.error("Error hydrating conversation listing:", err);
       } finally {
         hydratingConversations.delete(conversationId);
       }
@@ -381,7 +400,7 @@ export const useEnquiries = createSharedComposable(() => {
    * Check if user can start a conversation for a listing
    */
   function canStartConversation(listingId: number, receiverId?: number | null): boolean {
-    if (!receiverId || typeof receiverId !== 'number' || isNaN(receiverId)) return false;
+    if (!receiverId || typeof receiverId !== "number" || isNaN(receiverId)) return false;
     if (receiverId === currentUserId.value) return false;
     if (hasContactedListing(listingId)) return false;
     return true;
@@ -391,13 +410,13 @@ export const useEnquiries = createSharedComposable(() => {
    * Get conversation button state for UI
    */
   function getConversationButtonState(listingId: number, receiverId?: number | null) {
-    const safeReceiverId = typeof receiverId === 'number' && !isNaN(receiverId) ? receiverId : null;
+    const safeReceiverId = typeof receiverId === "number" && !isNaN(receiverId) ? receiverId : null;
     const isSelf = safeReceiverId !== null && currentUserId.value === safeReceiverId;
     const alreadyContacted = hasContactedListing(listingId);
 
     return {
       isDisabled: !safeReceiverId || alreadyContacted || contactedListingsLoading.value || isSelf,
-      label: isSelf ? 'Self Listing' : alreadyContacted ? 'Message sent' : 'Contact now',
+      label: isSelf ? "Self Listing" : alreadyContacted ? "Message sent" : "Contact now",
       canStart: canStartConversation(listingId, receiverId),
     };
   }
@@ -407,9 +426,7 @@ export const useEnquiries = createSharedComposable(() => {
    */
   function getUnreadCount(conversation: ConversationWithMinimalListing): number {
     if (!currentUserId.value || !conversation.messages) return 0;
-    return conversation.messages.filter(
-      m => !m.isRead && m.receiverId === currentUserId.value
-    ).length;
+    return conversation.messages.filter((m) => !m.isRead && m.receiverId === currentUserId.value).length;
   }
 
   /**
@@ -423,7 +440,7 @@ export const useEnquiries = createSharedComposable(() => {
     // State (not readonly to allow component compatibility)
     enquiries,
     total: readonly(total),
-    loading: readonly(loading),
+    loading,
     error: readonly(error),
     currentUserId: readonly(currentUserId),
 

@@ -4,7 +4,7 @@
       <UDashboardNavbar
         :ui="{
           title: 'title-sm m-0!',
-          right: 'flex items-center gap-4',
+          right: 'flex items-center gap-1',
         }"
       >
         <template #title>
@@ -47,7 +47,7 @@
       </OrganismsDashboardListingCardGrid>
 
       <!-- No Results -->
-      <OrganismsDashboardNoResults v-else :description="'No saved locations yet. Save a location from search to see it here!'" />
+      <OrganismsDashboardNoResults v-else type="saved locations" />
     </template>
   </UDashboardPanel>
 </template>

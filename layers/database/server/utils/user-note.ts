@@ -32,7 +32,7 @@ export async function getAllUserNotes(
   options?: {
     skip?: number;
     take?: number;
-    sort?: "newest" | "oldest";
+    sort?: "newest" | "oldest" | "listing-newest" | "listing-oldest";
     filter?: "all" | "sale" | "rent";
   }
 ): Promise<{ notes: NoteData[], total: number }> {
@@ -55,7 +55,14 @@ export async function getAllUserNotes(
     };
   }
 
-  const orderBy = sort === "oldest" ? { updatedAt: "asc" } : { updatedAt: "desc" };
+  let orderBy: any
+  if (sort === "listing-newest") {
+    orderBy = { listing: { publishedAt: "desc" } }
+  } else if (sort === "listing-oldest") {
+    orderBy = { listing: { publishedAt: "asc" } }
+  } else {
+    orderBy = sort === "oldest" ? { updatedAt: "asc" } : { updatedAt: "desc" }
+  }
 
   const [notes, total] = await Promise.all([
     prisma.userNote.findMany({

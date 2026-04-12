@@ -1,17 +1,13 @@
 <template>
-  <div v-for="n in cards" :key="n">
-    <UPageCard
-      variant="naked"
-      reverse
-      class="p-4 border border-accented/50 bg-elevated/30 rounded-lg h-full flex flex-col"
-      :ui="{
+  <div v-for="n in cards" :key="n" class="h-full">
+    <UPageCard variant="naked" reverse
+      class="p-4 border border-accented/50 bg-elevated/30 rounded-lg h-full flex flex-col" :ui="{
         header: 'mb-0 w-full',
         title: 'my-1',
         description: 'text-(--foreground-100) w-full flex-1 flex flex-col justify-between',
         footer: 'mt-1 pt-0 w-full',
         body: 'w-full flex flex-col flex-1',
-      }"
-    >
+      }">
       <!-- Image Skeleton -->
       <USkeleton class="w-full h-54 rounded-lg aspect-4/3" />
 
@@ -19,7 +15,7 @@
         <div class="flex flex-row justify-between items-start">
           <!-- Price Skeleton -->
           <USkeleton class="h-6 w-24" />
-          
+
           <!-- Badges Skeleton -->
           <div class="flex gap-1.5">
             <USkeleton class="h-6 w-16 rounded-full" />

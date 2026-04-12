@@ -35,49 +35,19 @@
 </template>
 
 <script setup lang="ts">
-const isDark = ref(false)
+import { useDark } from '@vueuse/core'
 
-onMounted(() => {
-  // Check for saved preference or default to light mode
-  const savedTheme = localStorage.getItem('theme')
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  
-  isDark.value = savedTheme === 'dark' || (!savedTheme && prefersDark)
-  applyTheme()
-
-  // Listen for system theme changes
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  const handleChange = (e: MediaQueryListEvent) => {
-    if (!localStorage.getItem('theme')) {
-      isDark.value = e.matches
-      applyTheme()
-    }
+const isDark = useDark({
+  onChanged(isDark) {
+    if (import.meta.server) return
+    document.documentElement.classList.toggle('dark', isDark)
+    document.documentElement.classList.toggle('light', !isDark)
+    document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
   }
-  mediaQuery.addEventListener('change', handleChange)
-
-  onUnmounted(() => {
-    mediaQuery.removeEventListener('change', handleChange)
-  })
 })
-
-function applyTheme() {
-  const html = document.documentElement
-  
-  if (isDark.value) {
-    html.classList.add('dark')
-    html.classList.remove('light')
-    html.style.colorScheme = 'dark'
-  } else {
-    html.classList.add('light')
-    html.classList.remove('dark')
-    html.style.colorScheme = 'light'
-  }
-}
 
 function toggleTheme() {
   isDark.value = !isDark.value
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
-  applyTheme()
 }
 </script>
 

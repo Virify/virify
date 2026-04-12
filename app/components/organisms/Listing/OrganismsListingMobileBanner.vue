@@ -33,6 +33,18 @@
             </AtomsPill>
           </h2>
 
+          <ClientOnly>
+            <div v-if="viewingLabel" class="flex justify-center mt-4">
+              <UBadge
+                :label="viewingLabel"
+                icon="i-lucide-calendar"
+                size="md"
+                color="secondary"
+                variant="solid"
+              />
+            </div>
+          </ClientOnly>
+
           <p role="presentation" class="o-listing-mobile-banner__additional-info-address | body-md">
             {{ address }}
           </p>
@@ -291,6 +303,22 @@ useVerticalDrag($backdrop, {
     openExpanded()
   }
 })
+
+// Viewing badge
+const { loggedIn } = useUserSession();
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+
+onMounted(() => {
+  if (loggedIn.value && props.listingId && viewings.value.length === 0) {
+    fetchViewings().catch(() => {});
+  }
+});
+
+const viewingLabel = computed(() => {
+  if (!props.listingId) return null;
+  const v = getActiveViewingForListing(props.listingId);
+  return v ? getViewingStatusLabel(v) : null;
+});
 
 // Methods
 function openExpanded() {

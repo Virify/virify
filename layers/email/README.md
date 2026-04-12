@@ -1,115 +1,95 @@
 # Email Layer
 
 ## Overview
-The email layer manages all transactional email communications in the Virify platform. It utilizes Vue Email for component-based email templates and AWS SES (Simple Email Service) for reliable email delivery.
 
-## Features
-- 📧 Vue Email for component-based templates
-- ⚡ AWS SES integration for reliable delivery
-- 🎨 Responsive email templates
-- 🔍 Email preview and testing tools
-- 📝 Reusable email components
+The email layer handles all transactional email delivery for Virify. Templates are built as Vue single-file components with `@vue-email/components`, server-side rendered to HTML, and sent via AWS SES (`@aws-sdk/client-ses`).
+
+A preview tool at `/email-preview-tool` lets you visually inspect all templates in development.
 
 ## Directory Structure
-- `components/`: Email template components
-  - Reusable email layout components
-  - Transactional email templates
-- `server/`: Email sending logic and AWS SES integration
-- `tests/`: Email testing and validation
 
-## Setup
-
-### Prerequisites
-- AWS SES credentials
-- AWS SES verified email addresses
-
-### Configuration
-Add AWS credentials to your `.env`:
-```env
-AWS_ACCESS_KEY_ID=your_access_key
-AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_REGION=your_aws_region
+```
+layers/email/
+├── components/email/templates/       # Vue Email SFC templates (7 templates)
+│   ├── contact-enquiry.vue           # Contact form response
+│   ├── enquiry-notification.vue      # New enquiry / enquiry reply
+│   ├── password-reset.vue            # Password reset OTP + link
+│   ├── support-request.vue           # Support ticket confirmation
+│   ├── user-activation.vue           # Account activation OTP + link
+│   ├── viewing-notification.vue      # Viewing request / confirmation
+│   └── waiting-list-confirmation.vue # Waiting list sign-up confirmation
+├── server/
+│   ├── email/                        # Per-template send functions
+│   │   ├── send-contact-enquiry.ts
+│   │   ├── send-enquiry-notification.ts
+│   │   ├── send-password-reset.ts
+│   │   ├── send-support-request.ts
+│   │   ├── send-user-activation.ts
+│   │   ├── send-viewing-notification.ts
+│   │   └── send-waiting-list-confirmation.ts
+│   └── utils/
+│       └── ses-sender.ts             # Core AWS SES sender
+└── tests/
+    ├── email-send.test.ts
+    ├── email-templates.test.ts
+    └── email-templates-extended.test.ts
 ```
 
 ## Email Templates
-The email layer includes templates for:
-- **Welcome emails**: New user onboarding
-- **Password reset**: Secure password recovery
-- **Email verification**: Account verification flow
-- **Property notifications**: New listing alerts
-- **System alerts**: Important system communications
-- **Account updates**: Profile and setting changes
 
-### Email Components
-```vue
-<template>
-  <VEmail>
-    <VHead>
-      <VTitle>Welcome to Virify</VTitle>
-    </VHead>
-    <VBody>
-      <VContainer>
-        <VSection>
-          <VText>Welcome to the future of property management</VText>
-          <VButton href="https://virify.com/login">
-            Get Started
-          </VButton>
-        </VSection>
-      </VContainer>
-    </VBody>
-  </VEmail>
-</template>
+| Template | Trigger | Key Props |
+|----------|---------|-----------|
+| `user-activation.vue` | Account sign-up | `token`, `otpCode` |
+| `password-reset.vue` | Forgot password | `passwordToken` |
+| `enquiry-notification.vue` | New enquiry / reply | `senderName`, `message`, `listingAddress`, `listingImage`, `isReply` |
+| `contact-enquiry.vue` | Contact form submission | `name`, `email`, `message` |
+| `support-request.vue` | Support form submission | `ticketNumber`, `subject`, `message` |
+| `viewing-notification.vue` | Viewing request/confirmation | `listingAddress`, `proposedDate`, `status` |
+| `waiting-list-confirmation.vue` | Waiting list sign-up | `email` |
+
+## How Email Sending Works
+
+Templates are Vue SFCs that use `@vue-email/components` (`Html`, `Body`, `Section`, `Text`, `Button`, `Img`, etc.). The server-side send function:
+
+1. Calls `render(TemplateName, props)` from `@vue-email/render` to produce HTML.
+2. Passes the HTML to `ses-sender.ts` which creates an `SES.SendEmailCommand`.
+3. SES delivers from `no-reply@virify.co.uk` (region: `eu-west-2`).
+
+```ts
+// server/email/send-enquiry-notification.ts (pattern)
+import { render } from "@vue-email/render"
+import EnquiryNotification from "../../components/email/templates/enquiry-notification.vue"
+
+export async function sendEnquiryNotificationEmail(options: EnquiryNotificationOptions) {
+  const html = await render(EnquiryNotification, options)
+  await sesSender({ to: options.recipientEmail, subject: "New enquiry on your listing", html })
+}
 ```
 
-### Sending Emails
-```typescript
-// Server-side email sending
-import { sendEmail } from "~~/layers/email/server/utils/send-email";
+Each send function is a named Nitro auto-import available to any server endpoint.
 
-await sendEmail({
-  to: user.email,
-  subject: "Welcome to Virify",
-  template: "welcome",
-  props: {
-    userName: user.name,
-    loginUrl: "https://virify.com/login"
-  }
-});
-```
-  </VEmail>
-</template>
+## Environment Variables
+
+```bash
+# AWS SES credentials (server-side only)
+SES_ACCESS_KEY_ID=AKIA...
+SES_SECRET_ACCESS_KEY=...
+
+# Base URL injected into email links and images
+EMAIL_BASE_URL=https://virify.co.uk   # public
+INTERNAL_EMAIL=team@virify.co.uk      # public — internal recipient
 ```
 
-### Preview Tool
-Access the email preview tool at `/email-preview-tool` to:
-- **Test email templates**: Preview all email types
-- **Preview on different screen sizes**: Desktop, mobile, tablet
-- **Verify email content**: Check formatting and links
-- **Debug template issues**: Identify rendering problems
-- **Test with sample data**: Use realistic test data
-- **Export HTML**: Get compiled email HTML
+## Email Preview Tool
 
-## AWS SES Configuration
+Navigate to `/email-preview-tool` in development to see a live render of any template. The preview middleware (`app/middleware/email-test.ts`) guards this route.
 
-### Verified Identities
-Ensure your sending email addresses are verified in AWS SES:
-1. Log into AWS SES Console
-2. Navigate to "Verified identities"
-3. Add and verify your domain or email addresses
-4. Configure DKIM authentication for better deliverability
+## Testing
 
-### Production Setup
-For production deployments:
-- Move out of AWS SES sandbox mode
-- Set up proper SPF, DKIM, and DMARC records
-- Monitor bounce and complaint rates
-- Configure SNS notifications for delivery events
-
-## Best Practices
-- **Design mobile-first**: Ensure templates work on all devices
-- **Test across email clients**: Gmail, Outlook, Apple Mail, etc.
-- **Use semantic HTML structure**: Proper heading hierarchy and accessibility
-- **Include plain text versions**: For better deliverability
+Tests use Vitest with a mocked AWS SES client:
+- `email-send.test.ts` — verifies the SES `SendEmailCommand` is called with correct parameters
+- `email-templates.test.ts` — renders `user-activation` and `password-reset` templates and asserts HTML output
+- `email-templates-extended.test.ts` — covers remaining 5 templates
 - **Follow email deliverability best practices**: Avoid spam triggers
 - **Handle email sending errors gracefully**: Retry logic and error logging
 - **Track email metrics**: Open rates, click rates, bounces

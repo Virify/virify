@@ -12,18 +12,41 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogLogin } from '#components'
+import { ViewsDialogLogin, ViewsDialogPasswordReset } from '#components'
 import { useDark } from '@vueuse/core'
 
-useDark()
+const isDark = useDark()
+
+onMounted(() => {
+  // Migrate users who had the old 'theme' localStorage key
+  const legacyTheme = localStorage.getItem('theme')
+  if (legacyTheme) {
+    isDark.value = legacyTheme === 'dark'
+    localStorage.removeItem('theme')
+  }
+})
 
 onMounted(async () => {
   const { path, query } = useRoute()
 
+  const { showDialog } = useDialog()
+
+  // Check if we should show the password reset dialog (from email link)
+  if (query.showResetPassword && query.passwordToken) {
+    const cleanQuery = objectWithoutKey(objectWithoutKey(query, 'showResetPassword'), 'passwordToken')
+    showDialog({
+      component: ViewsDialogPasswordReset,
+      props: { passwordToken: query.passwordToken as string },
+      onClose: async () => {
+        await navigateTo({ path, query: cleanQuery }, { replace: true })
+      }
+    })
+    return
+  }
+
   // Check if we should show the login dialog (from authentication middleware)
   if (!query.showLogin) return
 
-  const { showDialog } = useDialog()
   const { loggedIn } = useUserSession()
   const cleanQuery = objectWithoutKey(query, 'showLogin')
 
@@ -58,6 +81,13 @@ onMounted(async () => {
 })
 
 const { isWaitingListMode } = useWaitingListMode()
+
+// Pre-initialise lookup composables so their useAsyncData keys are in the Nuxt SSR
+// payload on hard refresh. Without this, useFavouriteLookups / useNoteLookups only
+// initialise when AtomsFavouriteButton / AtomsNoteButton mount (client-side on search
+// pages), causing empty icons and "Add Note" on first render.
+useFavouriteLookups()
+useNoteLookups()
 
 useHead({
   htmlAttrs: {

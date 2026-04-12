@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     if (cached) return cached;
 
     const result = await getRecentUserNotes(user.id as number);
-    storage.setItem(cacheKey, result, { ttl: 30 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 2 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.log(error);

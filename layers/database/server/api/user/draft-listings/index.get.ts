@@ -1,10 +1,11 @@
 /**
  * Handler for GET /api/user/draft-listings/
- * Returns paginated draft listings for the authenticated user
+ * Returns paginated draft listings for the authenticated user.
+ * Cached per user+params (2 min). Busted on draft create/delete/publish.
  */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
-  
+
   if (!user) {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
@@ -13,19 +14,25 @@ export default defineEventHandler(async (event) => {
   const page = Number(query.page) || 1;
   const take = Math.min(Number(query.take) || 20, 100); // Cap at 100
   const skip = (page - 1) * take;
-  const sort = (query.sort as string) === 'old' ? 'asc' : 'desc';
-  const search = (query.search as string) || '';
+  const sort = (query.sort as string) === "old" ? "asc" : "desc";
+  const search = (query.search as string) || "";
 
   try {
+    // Skip cache for free-text search (too many unique keys)
+    if (!search.trim()) {
+      const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
+      const storage = useStorage("cache");
+      const cached = await storage.getItem(cacheKey);
+      if (cached) return cached;
+    }
+
     // Build where clause
     const where: any = { userId: user.id };
-    
+
     // Apply search if provided
     if (search.trim()) {
-      where.OR = [
-        { property: { address: { fullAddress: { contains: search, mode: 'insensitive' } } } },
-      ];
-      
+      where.OR = [{ property: { address: { fullAddress: { contains: search, mode: "insensitive" } } } }];
+
       const numericSearch = Number(search);
       if (!Number.isNaN(numericSearch)) {
         where.OR.push({ price: numericSearch });
@@ -42,10 +49,10 @@ export default defineEventHandler(async (event) => {
           saleListing: true,
           property: {
             include: {
-              media: { 
-                select: { 
-                  image: true, 
-                  metadata: true, 
+              media: {
+                select: {
+                  image: true,
+                  metadata: true,
                   sortOrder: true,
                   bedroomId: true,
                   bathroomId: true,
@@ -57,7 +64,7 @@ export default defineEventHandler(async (event) => {
                   landId: true,
                   yardId: true,
                 },
-                orderBy: { sortOrder: 'asc' as const },
+                orderBy: { sortOrder: "asc" as const },
               },
               address: true,
               type: { select: { name: true } },
@@ -82,7 +89,14 @@ export default defineEventHandler(async (event) => {
       }),
     ]);
 
-    return { drafts, total };
+    const result = { drafts, total };
+    if (!search.trim()) {
+      const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
+      useStorage("cache")
+        .setItem(cacheKey, result, { ttl: 30 * 60 })
+        .catch(() => {});
+    }
+    return result;
   } catch (error) {
     console.error("Error fetching draft listings:", error);
     throw createError({ statusCode: 500, statusMessage: "Internal Server Error" });

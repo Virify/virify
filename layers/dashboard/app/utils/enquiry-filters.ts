@@ -59,3 +59,30 @@ export function findConversation(conversations: any[], conversationId: number | 
 export function isListingContacted(conversationId: number | null): boolean {
   return conversationId !== null && conversationId > 0;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CACHE UTILITIES
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type EnquiriesCacheEntry = {
+  timestamp: number;
+  conversations: ConversationWithMinimalListing[];
+  total: number;
+};
+
+/**
+ * Returns true if a cache entry exists and is within the TTL window
+ */
+export function isCacheHit(entry: EnquiriesCacheEntry | undefined, ttlMs: number): entry is EnquiriesCacheEntry {
+  return !!entry && Date.now() - entry.timestamp < ttlMs;
+}
+
+/**
+ * Create a new cache entry with the current timestamp
+ */
+export function createCacheEntry(
+  conversations: ConversationWithMinimalListing[],
+  total: number
+): EnquiriesCacheEntry {
+  return { timestamp: Date.now(), conversations, total };
+}

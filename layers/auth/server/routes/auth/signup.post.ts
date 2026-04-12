@@ -11,7 +11,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     const requestBody = await readBody(event);
-    const { email, turnstileToken } = userSchema.parse(requestBody);
+    const { email: rawEmail, turnstileToken } = userSchema.parse(requestBody);
+    const email = rawEmail.toLowerCase();
 
     const clientIp = getRequestIP(event, { xForwardedFor: true }) || '';
     const isValidToken = await verifyTurnstileToken(turnstileToken, clientIp);

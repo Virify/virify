@@ -12,7 +12,7 @@ import { UserWithVerification, UserWithVerificationAndMembership } from "~~/shar
 export async function findUser(email: string): Promise<UserWithVerificationAndMembership | null> {
   return prisma.user.findUnique({
     where: {
-      email,
+      email: email.toLowerCase(),
     },
     include: {
       membership: true,

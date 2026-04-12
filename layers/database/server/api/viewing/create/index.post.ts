@@ -1,0 +1,120 @@
+import * as z from "zod";
+import { createViewing } from "~~/layers/database/server/utils/viewing";
+import { createNotification } from "~~/layers/database/server/utils/notification";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
+import { getUserNotificationPreferences } from "~~/layers/database/server/utils/user";
+import { sendViewingNotificationEmail } from "~~/layers/email/server/email/send-viewing-notification";
+
+const dateOnlyRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+const schema = z.object({
+  listingId: z.coerce.number(),
+  ownerId: z.coerce.number(),
+  proposedDates: z.array(z.string().regex(dateOnlyRegex, 'Each date must be in YYYY-MM-DD format')).min(1).max(10),
+  preferredTimes: z.array(z.string().max(200)).min(1).max(4),
+  notes: z.string().max(1000).optional(),
+  conversationId: z.coerce.number().optional(),
+});
+
+export default defineEventHandler(async (event) => {
+  const { errorResponse } = useResponse();
+  const { user } = await requireUserSession(event);
+
+  try {
+    if (!user.id) throw createError({ statusCode: 401 });
+
+    const { listingId, ownerId, proposedDates, preferredTimes, notes, conversationId } = await readValidatedBody(event, schema.parse);
+
+    // Listing owners cannot request viewings of their own property
+    if (user.id === ownerId) {
+      throw createError({ statusCode: 403, statusMessage: "Listing owners cannot request viewings of their own property" });
+    }
+
+    // Block duplicate active viewing requests (PENDING or RESCHEDULED)
+    const existingViewing = await prisma.viewing.findFirst({
+      where: {
+        listingId,
+        requesterId: user.id as number,
+        status: { in: ["PENDING", "RESCHEDULED"] },
+      },
+    });
+    if (existingViewing) {
+      throw createError({ statusCode: 409, statusMessage: "You already have an active viewing request for this property" });
+    }
+
+    // The requester is always the non-owner; recipient is always the listing owner
+    const recipientId = ownerId;
+
+    // Store dates as UTC noon timestamps to avoid timezone edge cases
+    const proposedDateObjects = proposedDates.map(d => new Date(d + 'T12:00:00.000Z'));
+    const viewing = await createViewing(user.id as number, ownerId, listingId, proposedDateObjects, preferredTimes, notes, conversationId);
+
+    // Human-readable summary for the notification message
+    const firstDate = proposedDateObjects[0]!.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+    const datesSummary = proposedDates.length > 1
+      ? `${firstDate} and ${proposedDates.length - 1} other date${proposedDates.length > 2 ? 's' : ''}`
+      : firstDate;
+
+    // Persist notification for the listing owner
+    const notification = await createNotification({
+      userId: recipientId,
+      type: "VIEWING_REQUEST" as NotificationType,
+      title: "New viewing request",
+      message: notes ? notes.slice(0, 120) : `Viewing requested for ${datesSummary}`,
+      senderUsername: user.username ?? null,
+      senderAvatar: user.avatar ?? null,
+      listingId,
+      conversationId: conversationId ?? null,
+    });
+
+    // Push real-time notification to the listing owner
+    const { sendMessage, createNotificationNewMessage, createAggregateUpdateMessage, isUserOnline } = useWebSocketServer();
+    const recipientIsOnline = isUserOnline(recipientId);
+    if (recipientIsOnline) {
+      sendMessage(createNotificationNewMessage(notification as any, recipientId));
+    }
+
+    // Send offline email if the owner is not currently connected
+    if (!recipientIsOnline) {
+      const prefs = await getUserNotificationPreferences(recipientId);
+      if (prefs?.receiveEmailNotifications) {
+        const config = useRuntimeConfig();
+        const baseUrl = config.public.EMAIL_BASE_URL as string;
+        sendViewingNotificationEmail({
+          to: prefs.email,
+          senderName: user.username ?? "Someone",
+          senderAvatar: user.avatar ?? undefined,
+          eventType: "requested",
+          proposedDates: proposedDateObjects.map(d => d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })),
+          preferredTimes,
+          notes: notes,
+          listing: viewing.listing
+            ? {
+                address: (viewing.listing as any).property?.address?.fullAddress ?? "",
+                price: viewing.listing.price ? `£${Number(viewing.listing.price).toLocaleString()}` : undefined,
+                image: (viewing.listing as any).property?.media?.[0]?.image ?? undefined,
+              }
+            : undefined,
+          conversationUrl: `${baseUrl}/dashboard/${conversationId ? `enquiries/${conversationId}` : "viewings"}`,
+        }).catch((err) => console.error("Failed to send viewing request email:", err));
+      }
+    }
+
+    // Bust viewings cache for both requester and owner
+    await Promise.all([
+      invalidateViewingsCache(user.id as number),
+      invalidateViewingsCache(ownerId),
+      invalidateAggregatesCache(user.id as number),
+      invalidateAggregatesCache(ownerId),
+    ]);
+
+    // Send live aggregate update so both parties' sidebar badges update immediately
+    sendMessage(createAggregateUpdateMessage("viewings", "add", user.id as number));
+    sendMessage(createAggregateUpdateMessage("viewings", "add", ownerId));
+
+    return viewing;
+  } catch (error) {
+    console.error("Error creating viewing:", error);
+    return errorResponse(error, event);
+  }
+});

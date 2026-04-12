@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { FormError, FormErrorEvent, FormSubmitEvent } from '@nuxt/ui';
+import type { FormError, FormErrorEvent, FormSubmitEvent } from "@nuxt/ui";
 
 export function useSecurityForm() {
   const { user, fetch } = useUserSession();
@@ -14,19 +14,19 @@ export function useSecurityForm() {
   const showConfirmNewPassword = ref(false);
 
   const state = reactive<Schema>({
-    email: user.value?.email || '',
+    email: user.value?.email || "",
     currentPassword: null,
     newPassword: null,
     confirmNewPassword: null,
   });
 
-  // Watch for user changes to update email if it wasn't modified yet? 
+  // Watch for user changes to update email if it wasn't modified yet?
   // Or just initial state. The page uses user.value?.email || ''
-  
+
   const isUserVerified = computed(() => isVerified(user.value));
 
   const isChangingPassword = computed(() => {
-    return !!state.currentPassword || !!state.newPassword || !!state.confirmNewPassword
+    return !!state.currentPassword || !!state.newPassword || !!state.confirmNewPassword;
   });
 
   const schema = computed(() => {
@@ -44,7 +44,7 @@ export function useSecurityForm() {
 
     // For unverified users...
     if (!isUserVerified.value && !state.newPassword && !isEmailChanged) {
-        return false;
+      return false;
     }
 
     if (isUserVerified.value && !isEmailChanged && !isChangingPassword.value) {
@@ -67,50 +67,53 @@ export function useSecurityForm() {
 
   async function onSubmit(event: FormSubmitEvent<Schema>) {
     submitErrors.value = null;
-    
+
     // Safety check just in case
     if (!isValidSubmission.value) return;
 
-    const querySchema = !isUserVerified.value ? 'set-password' : (isChangingPassword.value ? 'full' : 'base');
+    const querySchema = !isUserVerified.value ? "set-password" : isChangingPassword.value ? "full" : "base";
 
     try {
-      const response = await $fetch<Schema>("/api/user/security", {
+      const response = await useRequestFetch()<Schema>("/api/user/security", {
         method: "PATCH",
         body: event.data,
         query: {
           schema: querySchema,
-        }
+        },
       });
 
-      if(response) {
+      if (response) {
         toast.add({
-          title: 'Success',
-          description: 'Your security settings have been updated.',
-          color: 'success',
-          icon: 'i-lucide-shield-check',
-        })
+          title: "Success",
+          description: "Your security settings have been updated.",
+          color: "success",
+          icon: "i-lucide-shield-check",
+        });
         await fetch();
         clearForm();
       }
-
     } catch (error: any) {
-      if(error.status === 400) {
-        submitErrors.value = [{
-          name: 'newPassword',
-          message: 'New password must not be the same as the current password.',
-        }]
+      if (error.status === 400) {
+        submitErrors.value = [
+          {
+            name: "newPassword",
+            message: "New password must not be the same as the current password.",
+          },
+        ];
       } else if (error.status === 401) {
-        submitErrors.value = [{
-          name: 'currentPassword',
-          message: 'Current password is incorrect.',
-        }]
+        submitErrors.value = [
+          {
+            name: "currentPassword",
+            message: "Current password is incorrect.",
+          },
+        ];
       } else {
         toast.add({
-          title: 'Error',
+          title: "Error",
           description: error.statusText || error.message || "An error occurred",
-          color: 'error',
-          icon: 'i-lucide-shield-x',
-        })
+          color: "error",
+          icon: "i-lucide-shield-x",
+        });
       }
     }
   }
@@ -128,6 +131,6 @@ export function useSecurityForm() {
     isValidSubmission,
     clearSubmitErrors,
     clearForm,
-    onSubmit
+    onSubmit,
   };
 }

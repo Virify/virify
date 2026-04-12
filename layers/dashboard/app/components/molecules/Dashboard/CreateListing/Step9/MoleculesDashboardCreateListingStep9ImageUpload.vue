@@ -2,7 +2,7 @@
   <div class="space-y-4">
     <!-- File Upload -->
     <UFormField label="Property Images" name="property.media" description="Drag and drop images or click to browse"
-      hint="optional" eager-validation>
+      hint="At least one image is required" eager-validation required>
       <UFileUpload v-model="localFiles" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" multiple
         :disabled="isUploading || atMaxImages" :icon="uploadError ? 'i-lucide-alert-circle' : 'i-lucide-image'"
         :label="uploadError || uploadLabel"
@@ -25,8 +25,7 @@
     <!-- Upload Progress -->
     <div v-if="isUploading" class="space-y-2">
       <div class="flex items-center justify-between">
-        <span class="body-sm text-muted">Uploading {{ uploadingCount }} image{{ uploadingCount > 1 ? 's' : ''
-          }}...</span>
+        <span class="body-sm text-muted">{{ uploadProgress < 100 ? `Uploading ${uploadingCount} image${uploadingCount > 1 ? 's' : ''}...` : uploadLabel }}</span>
         <span class="body-sm font-medium">{{ Math.round(uploadProgress) }}%</span>
       </div>
       <UProgress :value="uploadProgress" color="secondary" />

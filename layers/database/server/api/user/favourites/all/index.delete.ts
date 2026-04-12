@@ -13,8 +13,10 @@ export default defineEventHandler(async (event) => {
 
     const result = await deleteAllFavourites(userId as number);
 
-    // Invalidate lookups cache so the next GET returns an empty set
+    // Invalidate lookups + full-page + recent cache so the next GET returns an empty set
     useStorage('cache').removeItem(`favs:lookups:${userId}`).catch(() => {});
+    await invalidateFavouritesFullCache(userId as number);
+    await invalidateFavouritesRecentCache(userId as number);
 
     return result;
   } catch (error) {

@@ -113,7 +113,7 @@ export const step4Validation = {
    * Check if all bedrooms are valid
    */
   areBedroomsValid: (bedrooms: BedroomData[]): boolean => {
-    if (!bedrooms || bedrooms.length === 0) return true // Optional
+    if (!bedrooms || bedrooms.length === 0) return false // At least 1 bedroom required
     return bedrooms.every(step4Validation.isBedroomComplete)
   },
 
@@ -129,7 +129,7 @@ export const step4Validation = {
    * Check if Step 4 form is valid
    */
   isStep4Valid: (data: Step4FormData): boolean => {
-    if (!data?.property) return true // No data yet is valid (bedrooms/bathrooms are optional)
+    if (!data?.property) return false // No data yet — must add at least 1 bedroom
     return step4Validation.areBedroomsValid(data.property.bedroomFeatures || []) &&
            step4Validation.areBathroomsValid(data.property.bathroomFeatures || [])
   },

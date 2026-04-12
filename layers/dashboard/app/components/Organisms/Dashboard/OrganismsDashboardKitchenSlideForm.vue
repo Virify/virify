@@ -6,9 +6,9 @@
     :ui="slideoverUiConfig"
   >
     <template #body>
-      <div v-if="kitchen" class="space-y-6">
+      <UForm v-if="kitchen" ref="formRef" :state="kitchen" class="space-y-6">
         <!-- Name -->
-        <UFormField label="Kitchen Name" :name="`property.kitchenFeatures.${kitchenIndex}.name`" description="Please add a kitchen name" required eagerValidation>
+        <UFormField label="Kitchen Name" name="name" description="Please add a kitchen name" required eagerValidation>
           <UInput
             v-model="kitchen.name"
             placeholder="e.g. Main Kitchen, Breakfast Kitchen"
@@ -68,7 +68,7 @@
         </UFormField>
 
         <!-- Description -->
-        <UFormField label="Description" :name="`property.kitchenFeatures.${kitchenIndex}.description`" description="Add any details about this kitchen" hint="optional">
+        <UFormField label="Description" name="description" description="Add any details about this kitchen" hint="optional">
           <UTextarea
             v-model="kitchen.description"
             placeholder="Describe this kitchen..."
@@ -77,7 +77,7 @@
             class="w-full"
           />
         </UFormField>
-      </div>
+      </UForm>
     </template>
 
     <template #footer>
@@ -94,8 +94,8 @@
         <UButton
           color="secondary"
           variant="solid"
-          :disabled="!kitchen || !isKitchenComplete(kitchen) || isSaving"
-          :loading="isSaving"
+          :disabled="!kitchen || !isKitchenComplete(kitchen) || isSaving || isModerating"
+          :loading="isSaving || isModerating"
           class="body-sm text-white!"
           @click="handleDone"
         >
@@ -158,8 +158,17 @@ function isKitchenComplete(kitchen: KitchenData): boolean {
   return Boolean(kitchen.name && kitchen.floor !== null && kitchen.floor !== undefined)
 }
 
+const { moderateFields, isModerating } = useModerateFields()
+const formRef = useTemplateRef('formRef')
+
 // Handle done
-function handleDone() {
+async function handleDone() {
+  if (!props.kitchen) return
+  const passed = await moderateFields([
+    { name: 'name', value: props.kitchen.name },
+    { name: 'description', value: props.kitchen.description },
+  ], formRef as any)
+  if (!passed) return
   isOpen.value = false
   emit('done')
 }

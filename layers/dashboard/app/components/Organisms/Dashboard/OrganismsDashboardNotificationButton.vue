@@ -28,7 +28,7 @@
           :notifications="unreadNotifications" 
           :hasMore="notificationHasMore"
           :loading="notificationsLoading"
-          @select="handleSelectConversation($event)" 
+          @select="handleNotificationSelect($event)" 
           @loadMore="loadMoreNotifications()"
         />
       </template>
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-const { aggregates, notificationCounts, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading } = useNotifications();
+const { aggregates, notificationCounts, unreadNotifications, fetchNotifications, loadMoreNotifications, notificationHasMore, notificationsLoading, markAsRead } = useNotifications();
 const { openConversation } = useGlobalEnquiryModal();
 const { enquiries } = useEnquiries();
 
@@ -70,15 +70,31 @@ const isOpen = computed({
 
 const hasFetchedOnce = ref(false);
 
-// Open conversation modal
-function handleSelectConversation(conversationId: number) {
-  // Try to find conversation in already-loaded enquiries first
-  const conversation = enquiries.value.find(e => e.id === conversationId);
-  
-  // Open modal with conversation object if available, otherwise just the ID
-  openConversation(conversation || conversationId);
-  
-  // Keep slideover open for convenience - user can browse multiple notifications
+// Map notification type to the correct viewings tab
+function viewingTabForType(type: string): string {
+  if (type === 'VIEWING_REQUEST') return 'requested';
+  if (type === 'VIEWING_RESCHEDULED') return 'rescheduled';
+  if (type === 'VIEWING_ACCEPTED') return 'confirmed';
+  return 'all';
+}
+
+// Route based on notification type
+function handleNotificationSelect(notification: UserNotification) {
+  // Close slideover first so whatever opens renders above it
+  isOpen.value = false;
+
+  if ((notification.type as string)?.startsWith('VIEWING_')) {
+    markAsRead({ notificationId: notification.id });
+    navigateTo(`/dashboard/viewings?tab=${viewingTabForType(notification.type as string)}`);
+    return;
+  }
+
+  if (notification.conversationId) {
+    const conversation = enquiries.value.find(e => e.id === notification.conversationId);
+    openConversation(conversation || notification.conversationId);
+  } else if (notification.listingId) {
+    navigateTo(`/listing/${notification.listingId}`);
+  }
 }
 
 // Fetch notifications when unread count becomes available OR slideover opens (whichever comes first)
@@ -96,5 +112,13 @@ if (import.meta.client) {
       hasFetchedOnce.value = true;
     }
   }, { immediate: true });
+
+  // When the panel opens, always do a force-refresh so that notifications
+  // created while the WebSocket was offline are shown immediately.
+  watch(isOpen, (open) => {
+    if (open) {
+      fetchNotifications({ force: true });
+    }
+  });
 }
 </script>

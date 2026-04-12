@@ -24,8 +24,9 @@ export default defineEventHandler(async (event) => {
 
     const result = await deleteUserNote(user.id, listingId);
 
-    // Invalidate lookups cache so the next GET reflects the deletion
+    // Invalidate lookups + full-page cache so the next GET reflects the deletion
     useStorage('cache').removeItem(`notes:lookups:${user.id}`).catch(() => {});
+    await invalidateNotesFullCache(user.id as number);
     // Invalidate aggregates cache (safety net if WebSocket update is missed)
     await invalidateAggregatesCache(user.id as number);
 

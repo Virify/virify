@@ -1,5 +1,6 @@
 import type { TrackListingViewBody } from "~~/shared/types/analytics";
 import { recordListingView } from "~~/layers/database/server/utils/analytics";
+import { invalidateAggregatesCache } from "~~/layers/database/server/utils/cache";
 import * as z from "zod";
 
 const trackListingViewSchema = z.object({
@@ -19,6 +20,11 @@ export default defineEventHandler(async (event) => {
     
     // Record the view in the database using the utility function
     await recordListingView(listingId, userId, sessionId?.toString() || null);
+
+    // Bust the aggregates cache so the sidebar badge updates immediately
+    if (userId) {
+      invalidateAggregatesCache(userId).catch(() => {});
+    }
 
     // SendBeacon doesn't process responses, but we return something anyway
     return { success: true };

@@ -57,6 +57,10 @@ async function loginUser({ target }: SubmitEvent) {
       return;
     }
 
+    if (password.value.length < 8) {
+      return;
+    }
+
     // Post data
     let turnstileToken: string;
     try {
@@ -78,6 +82,8 @@ async function loginUser({ target }: SubmitEvent) {
       },
     })
       .then(() => {
+        // Notify other open tabs to refresh their session
+        try { new BroadcastChannel('virify:auth').postMessage({ type: 'login' }) } catch {}
         emits('form-success');
       })
       .catch((error) => {

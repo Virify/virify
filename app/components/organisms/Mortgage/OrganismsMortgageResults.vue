@@ -19,6 +19,11 @@
         <MoleculesMortgageResultsSummary :loan-amount="result.loanAmount" :ltv="result.ltv"
           :term-years="result.termYears" />
 
+        <div v-if="result.repaymentType === 'INTEREST_ONLY'" class="o-mortgage-results__notice o-mortgage-results__notice--warning">
+          <AtomsIcon icon="property/info" :size="14" />
+          <span class="| body-xs">Interest-only mortgage: monthly payments cover interest only. The full loan amount ({{ formatCurrency(result.loanAmount) }}) remains outstanding and must be repaid separately at the end of the term.</span>
+        </div>
+
         <div v-if="result.usingCustomRate" class="o-mortgage-results__notice o-mortgage-results__notice--custom">
           <AtomsIcon icon="property/info" :size="14" />
           <span class="| body-xs">Using your custom interest rate of {{ result.results[0]?.rate?.toFixed(2) }}%</span>
@@ -128,6 +133,11 @@ const interestPercentage = computed(() =>
     background: var(--background-200);
     border-radius: var(--border-radius-md);
     margin-bottom: var(--size-16);
+
+    &--warning {
+      background: rgba(var(--warning-500-rgb, 234, 179, 8), 0.1);
+      align-items: flex-start;
+    }
   }
 
   &__disclaimer {

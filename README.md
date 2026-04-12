@@ -1,152 +1,325 @@
 # Virify
 
-A modern property management and listing platform built with Nuxt 3, featuring an extensible layer-based architecture and real-time messaging capabilities.
+The UK's first open property marketplace. AI-powered property search and verified private listings, built with Nuxt 3.
 
-## 📋 Overview
+## Overview
 
-Virify is a comprehensive property management system that allows users to:
-- List and manage properties with detailed information
-- Search properties with interactive maps and advanced filtering
-- Save favorites and add personal notes
-- Real-time messaging between users
-- Secure user authentication and authorization
-- Send automated transactional emails
-- Process and display property media with analytics
+Virify is a full-stack property platform where private sellers/landlords can list properties directly, and buyers/tenants can search, enquire, arrange viewings, and manage everything from a personal dashboard.
 
-## 🏗 Architecture
+**Key capabilities:**
+- Private property listings (sale and rental) with a 10-step creation wizard
+- AI-powered and map-based property search
+- Real-time messaging between buyers and sellers
+- Viewing request and negotiation system
+- Saved searches, favourites, notes, hidden listings
+- Transactional emails via AWS SES
+- Analytics dashboard for listing performance
+- Waiting list and pre-paid data (PPD) databases
+- Sanity CMS for guides and editorial content
+- Admin panel for platform management
 
-The application is built using a modular layer architecture for better separation of concerns and maintainability:
+---
 
-### Core Layers
-- [Auth Layer](./layers/auth/README.md) - Authentication and authorization
-- [Database Layer](./layers/database/README.md) - Prisma ORM and PostgreSQL integration
-- [Email Layer](./layers/email/README.md) - Transactional emails with Vue Email and AWS SES
-- [Map Layer](./layers/map/README.md) - MapTiler integration for property locations
-- [UI Layer](./layers/ui/README.md) - Reusable component library and design system
-- [WebSocket Layer](./layers/websocket/README.md) - Real-time messaging and notifications
-- [Analytics Layer](./layers/analytics/README.md) - User behavior tracking and insights
-## 🚀 Getting Started
+## Architecture
+
+Built with a **modular Nuxt layer system** — each feature area is a self-contained layer that extends the root config. Layers are applied in order in `nuxt.config.ts`:
+
+```
+cloudflare → ui → email → database → auth → map → analytics
+         → websocket → seed → content → sanity → dashboard → admin
+```
+
+Each layer can contribute: pages, components, composables, server API endpoints, middleware, and runtime config.
+
+| Layer | Purpose | README |
+|---|---|---|
+| `cloudflare` | Cloudflare Images, R2 storage, Turnstile CAPTCHA | [→](./layers/cloudflare/README.md) |
+| `ui` | Design system, SCSS, shared components | [→](./layers/ui/README.md) |
+| `email` | Vue Email templates + AWS SES delivery | [→](./layers/email/README.md) |
+| `database` | Prisma ORM, 3 PostgreSQL databases, all API endpoints | [→](./layers/database/README.md) |
+| `auth` | Login, signup, OTP, password reset, sessions | [→](./layers/auth/README.md) |
+| `map` | MapTiler SDK, markers, polygon drawing, geocoding | [→](./layers/map/README.md) |
+| `analytics` | Listing view tracking, engagement metrics | [→](./layers/analytics/README.md) |
+| `websocket` | Real-time messaging and event broadcasting | [→](./layers/websocket/README.md) |
+| `seed` | DB migrations, seeding, admin password management | [→](./layers/seed/README.md) |
+| `content` | Static content delivery (guides, pages) | [→](./layers/content/README.md) |
+| `sanity` | Sanity CMS integration for editorial content | [→](./layers/sanity/README.md) |
+| `dashboard` | Authenticated user dashboard (all features) | [→](./layers/dashboard/README.md) |
+| `admin` | Platform admin panel | [→](./layers/admin/README.md) |
+| `notifications` | Notification types, preferences, in-app alerts | [→](./layers/notifications/README.md) |
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
-- PostgreSQL
+
+- Node.js 18+
 - pnpm
-- Docker (optional)
+- PostgreSQL (or Docker)
 
-### Quick Start with Docker
+### Quick start with Docker
 
-1. Create and configure your `.env` file:
 ```bash
-cp .env.example .env
+cp .env.example .env   # configure env vars
+make up                # builds and starts app + PostgreSQL containers
+make exec              # enter the app container shell
+pnpm db:setup          # run migrations + seed demo data
 ```
 
-2. Start the application:
+### Manual setup
+
+#### Install PostgreSQL with PostGIS (macOS via Homebrew)
+
+The main database runs locally. PPD and waiting list point directly to their production instances — just set `PPD_DATABASE_URL` and `WAITING_LIST_DATABASE_URL` in `.env` to the remote connection strings and generate the clients.
+
 ```bash
-make up
+brew install postgresql@17
+brew install postgis
+
+# postgresql@17 is keg-only — add it to your PATH
+echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+
+# Start PostgreSQL service
+brew services start postgresql@17
+
+# Create a PostgreSQL user with a password (replace values as needed)
+psql -c "CREATE USER yourname WITH PASSWORD 'yourpassword';"
+psql -c "ALTER USER yourname CREATEDB;"
+
+# Create and configure the main database
+createdb -U yourname virify
+psql -U yourname -d virify -c "CREATE EXTENSION IF NOT EXISTS postgis;"
 ```
 
-3. Access the container shell:
-```bash
-make exec
+Then set your `DATABASE_URL` in `.env` using that username and password:
+
+```
+DATABASE_URL="postgresql://yourname:yourpassword@localhost:5432/virify"
 ```
 
-### Manual Setup
+#### Install dependencies and run
 
-1. Install dependencies:
 ```bash
 pnpm install
-```
 
-2. Set up your database:
-```bash
-# Generate Prisma client
+# Generate all Prisma clients (main + ppd + waiting-list)
 pnpm pgen
+pnpm pgen:ppd
+pnpm pgen:waiting-list
 
 # Run migrations
-pnpm prisma migrate dev
+pnpm db:migrate-dev
 
-# Seed the database
-pnpm seed
-```
+# Seed the database (demo data)
+pnpm db:setup
 
-3. Start the development server:
-```bash
+# Start dev server
 pnpm dev
 ```
 
-## 🛠 Development
+---
 
-### Available Scripts
+## Database
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm preview` - Preview production build
-- `pnpm test` - Run tests
-- `pnpm test:full` - Run all tests including E2E
-- `pnpm pgen` - Generate Prisma client
-- `pnpm db-push` - Push database changes
-- `pnpm seed` - Seed the database
+Virify uses **three separate PostgreSQL databases**, each with its own Prisma schema and generated client:
 
-### Docker Commands
+| Database | Script prefix | Purpose |
+|---|---|---|
+| Main (`prisma/`) | `pgen`, `db:migrate-dev`, `db-studio` | All platform data (users, listings, viewings, enquiries, etc.) |
+| Pre-paid data (`prisma-ppd/`) | `pgen:ppd`, `db:migrate-dev:ppd`, `db-studio:ppd` | UK Land Registry price-paid property records |
+| Waiting list (`prisma-waiting-list/`) | `pgen:waiting-list`, `migrate-dev:waiting-list`, `db-studio:waiting-list` | Waiting list signups |
 
-- `make up` - Start containers
-- `make down` - Stop containers
-- `make exec` - Enter app container
-- `make exec-db` - Enter database container
+**After any schema change**, regenerate the relevant Prisma client before running the app.
 
-## 📁 Project Structure
+---
 
-```
-├── app/                  # Main application code
-│   ├── components/       # Vue components (atoms, molecules, organisms)
-│   ├── composables/      # Vue composables
-│   ├── pages/           # Page components
-│   ├── middleware/      # Route middleware
-│   ├── layouts/         # Page layouts
-│   └── utils/           # Utility functions
-├── layers/              # Feature layers
-│   ├── analytics/      # Analytics and tracking
-│   ├── auth/           # Authentication layer
-│   ├── database/       # Database layer
-│   ├── email/          # Email functionality
-│   ├── map/            # Map integration
-│   ├── ui/             # UI components
-│   └── websocket/      # Real-time messaging
-├── shared/             # Shared types and utilities
-│   ├── types/          # TypeScript type definitions
-│   └── utils/          # Shared utility functions
-└── public/             # Static assets
-```
+## Scripts Reference
 
-## 🧪 Testing
+### Prisma / Database
 
-Run tests using:
 ```bash
-# Unit tests
-pnpm test
+pnpm pgen                    # Generate main Prisma client
+pnpm pgen:ppd                # Generate pre-paid data Prisma client
+pnpm pgen:waiting-list       # Generate waiting-list Prisma client
 
-# Full test suite including E2E
-pnpm test:full
+pnpm db:migrate-dev          # Create + apply migration (main DB, dev)
+pnpm db:migrate-dev:ppd      # Create + apply migration (ppd DB, dev)
+pnpm migrate-dev:waiting-list # Create + apply migration (waiting-list DB, dev)
+
+pnpm db:migrate-deploy       # Apply existing migrations (main DB, production)
+
+pnpm db-studio               # Open Prisma Studio for main DB
+pnpm db-studio:ppd           # Open Prisma Studio for ppd DB
+pnpm db-studio:waiting-list  # Open Prisma Studio for waiting-list DB
+
+pnpm db-push                 # Push schema to main DB (no migration file)
+pnpm db-push:ppd             # Push schema to ppd DB (no migration file)
+
+pnpm prisma-format           # Format main schema.prisma
+pnpm prisma-validate         # Validate main schema.prisma
 ```
 
-## 📚 Documentation
+### Seeding & Setup
 
-Each layer contains its own documentation:
-- [Auth Layer Documentation](./layers/auth/README.md)
-- [Database Layer Documentation](./layers/database/README.md) 
-- [Email Layer Documentation](./layers/email/README.md)
-- [Map Layer Documentation](./layers/map/README.md)
-- [UI Layer Documentation](./layers/ui/README.md)
-- [WebSocket Layer Documentation](./layers/websocket/README.md)
-- [Analytics Layer Documentation](./layers/analytics/README.md)
+```bash
+pnpm db:setup                # Full local setup: reset → full seed → hash admin password → fetch rates
+pnpm db:setup:prod           # Production setup: reset → base seed → hash admin password → fetch rates
+pnpm db:reset                # Drop all data and recreate schema (destructive)
+pnpm db:seed:base            # Minimal seed: admin user + property types only
+pnpm db:seed:full            # Full seed: base + demo properties, listings, fake users
+pnpm db:migrate              # Run pending migrations (prisma migrate deploy)
+pnpm db:fetch-rates          # Fetch latest mortgage rates via OpenAI
+pnpm db:update-admin-password # Hash + update admin password on a remote instance
+pnpm redis:flush             # Flush Redis/Nitro storage cache
+```
 
-## 🔐 Environment Variables
+### PPD (Pre-paid Data) Seeding
 
-Required environment variables:
-- `DATABASE_URL` - PostgreSQL connection string
-- `MAPTILER_API_KEY` - MapTiler API key for maps
+```bash
+pnpm seed:address            # Extract and geocode addresses from PPD source
+pnpm seed:upload-images      # Upload seed images to Cloudflare
+pnpm seed:remove-images      # Remove seed images from Cloudflare
+```
 
-# Virify
+### Build & Dev
+
+```bash
+pnpm dev                     # Start Nuxt dev server (http://localhost:3000)
+pnpm build                   # Build for production (generates all 3 Prisma clients first)
+pnpm preview                 # Preview production build
+pnpm start                   # Start compiled server (.output/server/index.mjs)
+pnpm test                    # Run unit tests (Vitest)
+```
+
+### Docker (via Makefile)
+
+```bash
+make up                      # Build and start all containers
+make down                    # Stop and remove containers
+make start                   # Start existing containers
+make stop                    # Stop containers
+make exec                    # Shell into the webapp container
+make exec-db                 # Shell into the database container
+```
+
+---
+
+## Project Structure
+
+```
+├── app/                         # Root application code
+│   ├── components/              # Global components (atoms, molecules, organisms)
+│   ├── composables/             # Global composables (search, navigation, auth, etc.)
+│   ├── layouts/                 # Page layouts (default)
+│   ├── middleware/              # Route middleware (authenticated, draft-owner, etc.)
+│   ├── pages/                   # Public-facing pages
+│   │   ├── index.vue            # Homepage
+│   │   ├── search/              # Property search
+│   │   ├── listing/             # Individual listing pages
+│   │   ├── price-paid/          # UK Land Registry data browser
+│   │   ├── mortgage-calculator/ # Mortgage calculator tool
+│   │   └── contact/ support/    # Static/support pages
+│   ├── tests/                   # App-level unit tests
+│   └── utils/                   # Auto-imported utilities (viewing, mortgage, etc.)
+├── layers/                      # Feature layers (see table above)
+├── server/                      # Root server middleware and plugins
+├── shared/                      # Shared across app + server
+│   ├── types/                   # TypeScript types (viewing, notifications, etc.)
+│   └── utils/                   # Pure utility functions (auto-imported)
+├── public/                      # Static assets
+├── docs/                        # Architecture diagrams
+├── nuxt.config.ts               # Root Nuxt config (layer order, modules, SEO, security)
+├── vitest.config.ts             # Vitest config (jsdom environment)
+├── docker-compose.yml           # Docker services
+└── Makefile                     # Docker convenience commands
+```
+
+---
+
+## Testing
+
+Tests use **Vitest** with jsdom environment.
+
+```bash
+pnpm test           # Run all unit tests
+```
+
+- App-level tests: `app/tests/`
+- Layer tests: `layers/*/tests/` and `layers/dashboard/tests/`
+- Shared utils tests: `shared/tests/`
+- Setup file: `tests/setup/nuxt.ts`
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | ✅ | Main PostgreSQL connection string |
+| `PPD_DATABASE_URL` | ✅ | Pre-paid data PostgreSQL connection string |
+| `WAITING_LIST_DATABASE_URL` | ✅ | Waiting list PostgreSQL connection string |
+| `ADMIN_EMAIL` | ✅ | Admin account email |
+| `ADMIN_PASSWORD` | ✅ | Admin initial password (plain text, hashed on startup) |
+| `ADMIN_USERNAME` | ✅ | Admin account username |
+| `MAPTILER_API_KEY` | ✅ | MapTiler API key |
+| `OPENAI_API_KEY` | ✅ | OpenAI API key (AI search + mortgage rates) |
+| `SES_ACCESS_KEY_ID` | ✅ | AWS SES access key |
+| `SES_SECRET_ACCESS_KEY` | ✅ | AWS SES secret key |
+| `EMAIL_BASE_URL` | ✅ | Base URL used in email links |
+| `INTERNAL_EMAIL` | ✅ | Internal notification recipient address |
+| `CF_IMAGES_API_KEY` | ✅ | Cloudflare Images API key |
+| `CF_ACCOUNT_ID` | ✅ | Cloudflare account ID |
+| `CF_ACCOUNT_HASH` | ✅ | Cloudflare Images delivery hash |
+| `CF_SITE_KEY` | ✅ | Cloudflare Turnstile site key (public) |
+| `CF_SECRET_KEY` | ✅ | Cloudflare Turnstile secret key |
+| `CF_R2_TOKEN` | ✅ | Cloudflare R2 API token |
+| `CF_R2_BUCKET` | ✅ | Cloudflare R2 bucket name |
+| `CF_R2_URL` | ✅ | Cloudflare R2 public base URL |
+| `CF_ACCESS_KEY` | ✅ | Cloudflare R2 S3-compatible access key |
+| `CF_SECRET_ACCESS_KEY` | ✅ | Cloudflare R2 S3-compatible secret key |
+| `TASK_SECRET` | ✅ | Secret for scheduled/admin task endpoints |
+| `DEPLOYMENT_ENV` | ✅ | `development` / `staging` / `production` / `waiting-list` |
+| `SANITY_PROJECT_ID` | ✅ | Sanity project ID |
+| `SANITY_DATASET` | ✅ | Sanity dataset name |
+| `SANITY_API_VERSION` | ✅ | Sanity API version |
+
+---
+
+## Deployment
+
+The app is deployed via **Railway**. Key commands:
+
+```bash
+railway link                         # Connect local CLI to Railway project
+railway run pnpm db:setup            # Run setup on staging/preview environment
+railway run pnpm db:setup:prod       # Run setup on production environment
+railway run pnpm db:update-admin-password  # Update admin password remotely
+```
+
+Build command: `pnpm build` — this generates all three Prisma clients before the Nuxt build.
+
+---
+
+## Documentation
+
+Detailed architecture docs live in each layer:
+
+- [Dashboard layer](./layers/dashboard/README.md) — caching, WebSocket, viewings, chat, listing creation
+- [Database layer](./layers/database/README.md) — schema, API endpoints, cache utilities
+- [Seed layer](./layers/seed/README.md) — seeding flows, PPD import, admin password management
+- [Auth layer](./layers/auth/README.md) — login, signup, OTP, password reset
+- [WebSocket layer](./layers/websocket/README.md) — real-time message types and routing
+- [Email layer](./layers/email/README.md) — templates, AWS SES, preview tool
+- [Cloudflare layer](./layers/cloudflare/README.md) — Images, R2, Turnstile
+- [Map layer](./layers/map/README.md) — MapTiler, markers, polygon search
+- [Analytics layer](./layers/analytics/README.md) — listing view tracking, engagement
+- [Notifications layer](./layers/notifications/README.md) — notification types, preferences, badges
+- [Admin layer](./layers/admin/README.md) — admin panel overview
+- [UI layer](./layers/ui/README.md) — design system, SCSS, component library
+- [Sanity layer](./layers/sanity/README.md) — CMS setup and schemas
+- [Content layer](./layers/content/README.md) — content delivery
 
 Virify is a modern property management and listing platform built with Nuxt 4, featuring a modular, extensible architecture and real-time capabilities. This guide will help you onboard as a contributor, whether you want to run the project locally or with Docker, and will explain the structure and nuances of each layer.
 

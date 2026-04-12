@@ -65,12 +65,16 @@ export default defineEventHandler(async (event) => {
 
       const savedLocation = await updateUserSavedLocation(id, user.id, {
         name,
-        geocodingFeature,
+        geocodingFeature: geocodingFeature as GeocodingFeature,
         lat,
         lon,
         location,
         bbox: locationBbox,
       });
+      // Bust the per-user cache so the next GET returns fresh data
+      useStorage('cache').removeItem(`locations:${user.id}`).catch(() => {});
+      useStorage('cache:aggregates').removeItem(`aggregates:user:${user.id}`).catch(() => {});
+
       // if updated location has no ID, it means it's a new location
       if (!newLocation?.id) {
         const aggregateMessage = createAggregateUpdateMessage("locations", "add", user.id);

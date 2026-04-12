@@ -85,9 +85,12 @@ export default defineEventHandler(async (event) => {
         include: { property: { include: { energyAndUtilities: true, runningCosts: true } } },
       });
 
-      // Invalidate listing cache so modal shows fresh data
+      // Invalidate listing detail cache and my-listings page cache
       const storage = useStorage('cache:listing');
-      await storage.removeItem(`listing:${listingId}`);
+      await Promise.all([
+        storage.removeItem(`listing:${listingId}`),
+        invalidateMyListingsCache(user.id as number),
+      ]);
 
       return result;
     }
@@ -98,7 +101,7 @@ export default defineEventHandler(async (event) => {
       select: { completedSteps: true },
     });
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: {
         ...(current && !current.completedSteps.includes(8) ? { completedSteps: { push: 8 } } : {}),
@@ -106,6 +109,8 @@ export default defineEventHandler(async (event) => {
       },
       include: { property: { include: { energyAndUtilities: true, runningCosts: true } } },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     console.log(error);
     return errorResponse(error, event);

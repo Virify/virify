@@ -5,7 +5,7 @@
  * Returns minimal data for fast loading - no time-series, just current totals
  * 
  * Uses pre-aggregated DailyUserStats for performance
- * Cached per-user for 30 seconds to shield simultaneous dashboard mounts.
+ * Cached per-user for 5 minutes (TTL-only — analytics data is latency-tolerant).
  */
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
@@ -99,7 +99,7 @@ export default defineEventHandler(async (event) => {
       },
     };
 
-    storage.setItem(cacheKey, result, { ttl: 30 }).catch(() => {});
+    storage.setItem(cacheKey, result, { ttl: 5 * 60 }).catch(() => {});
     return result;
   } catch (error) {
     console.error("Quick analytics error:", error);

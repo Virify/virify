@@ -66,7 +66,19 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const { loggedIn } = useUserSession();
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
 
+onMounted(() => {
+  if (loggedIn.value && viewings.value.length === 0) {
+    fetchViewings().catch(() => {});
+  }
+});
+
+const viewingLabel = computed(() => {
+  const v = getActiveViewingForListing(props.listingId);
+  return v ? getViewingStatusLabel(v) : null;
+});
 
 const newBuild = computed(() => {
   // if built in the last 3 years, return "New build"

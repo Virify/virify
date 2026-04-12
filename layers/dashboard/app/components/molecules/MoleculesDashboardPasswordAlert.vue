@@ -37,10 +37,10 @@ const verified = computed(() => isVerified(user.value));
 
 const status = computed(() => {
   if (!verified.value && !hasUsername.value) {
-    return "Please complete your profile to fully activate your account.";
+    return "Please complete your profile to fully activate your account. If you do not set a password you will need to use the forgot password feature to access your account in the future.";
   }
   if (!verified.value && hasUsername.value) {
-    return "Please create a password to fully activate your account.";
+    return "Please create a password to fully activate your account. If you do not set a password you will need to use the forgot password feature to access your account in the future.";
   }
   if (verified.value && !hasUsername.value) {
     return "Please create a username to fully activate your account.";

@@ -87,9 +87,12 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Invalidate listing cache so modal shows fresh data
+      // Invalidate listing detail cache and my-listings page cache
       const storage = useStorage('cache:listing');
-      await storage.removeItem(`listing:${listingId}`);
+      await Promise.all([
+        storage.removeItem(`listing:${listingId}`),
+        invalidateMyListingsCache(user.id as number),
+      ]);
 
       return result;
     }
@@ -107,7 +110,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: {
         // Add step 5 to completedSteps if not already there
@@ -124,6 +127,8 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     console.error('[Step5 PATCH] Error:', error);
     return errorResponse(error, event);

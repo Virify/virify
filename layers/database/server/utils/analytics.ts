@@ -19,7 +19,7 @@ export interface TrackSearchParams {
 export async function getAnalyticsAggregates(userId: number): Promise<AnalyticsAggregates> {
   // TODO: Implement actual analytics queries
   // This should return business intelligence metrics, not user notification counts
-  
+
   const [totalListings, totalEnquiries] = await prisma.$transaction([
     prisma.listing.count({
       where: {
@@ -37,7 +37,7 @@ export async function getAnalyticsAggregates(userId: number): Promise<AnalyticsA
     // Business metrics
     totalListings,
     totalEnquiries,
-    
+
     // TODO: Implement these analytics when available
     totalPageViews: 0,
     uniqueVisitors: 0,
@@ -68,7 +68,7 @@ export async function getUserListingIds(userId: number) {
     },
   });
 
-  return listings.map((listing: { id: any; }) => listing.id);
+  return listings.map((listing: { id: any }) => listing.id);
 }
 
 /**
@@ -115,11 +115,7 @@ export async function getTotalListingViews(userId: number): Promise<number> {
 /**
  * Get views for user's listings in a specific date range
  */
-export async function getListingViewsByDateRange(
-  userId: number,
-  startDate: Date,
-  endDate: Date
-): Promise<number> {
+export async function getListingViewsByDateRange(userId: number, startDate: Date, endDate: Date): Promise<number> {
   const listingIds = await getUserListingIds(userId);
   if (listingIds.length === 0) return 0;
 
@@ -212,13 +208,13 @@ export async function getRecentlyViewedCount(userId: number): Promise<number> {
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const result = await prisma.listingView.groupBy({
-    by: ['listingId'],
+    by: ["listingId"],
     where: {
       userId,
       createdAt: { gte: thirtyDaysAgo },
     },
   });
-  
+
   return result.length;
 }
 
@@ -355,26 +351,25 @@ export async function getUserListingAnalytics(userId: number) {
       },
     }),
     // Recently viewed listings (last 30 days, unique)
-    prisma.listingView.groupBy({
-      by: ['listingId'],
-      where: {
-        userId,
-        createdAt: { gte: thirtyDaysAgo },
-      },
-    }).then(result => result.length),
+    prisma.listingView
+      .groupBy({
+        by: ["listingId"],
+        where: {
+          userId,
+          createdAt: { gte: thirtyDaysAgo },
+        },
+      })
+      .then((result) => result.length),
   ]);
 
   // Calculate percentage change
   let percentageChange = 0;
   if (twoMonthsAgoViews > 0) {
-    percentageChange = Math.round(
-      ((previousMonthViews - twoMonthsAgoViews) / twoMonthsAgoViews) * 100
-    );
+    percentageChange = Math.round(((previousMonthViews - twoMonthsAgoViews) / twoMonthsAgoViews) * 100);
   }
 
   // Calculate average views per listing
-  const averageViewsPerListing =
-    totalListings > 0 ? Math.round(totalViews / totalListings) : 0;
+  const averageViewsPerListing = totalListings > 0 ? Math.round(totalViews / totalListings) : 0;
 
   return {
     // Seller analytics
@@ -405,13 +400,29 @@ export async function getUserListingAnalytics(userId: number) {
  * @returns The created ListingView record
  */
 export async function recordListingView(listingId: number | string, userId?: number | null, sessionId?: string | null) {
-  return prisma.listingView.create({
+  const view = await prisma.listingView.create({
     data: {
       listingId: typeof listingId === "string" ? parseInt(listingId) : listingId,
       userId,
       sessionId,
     },
   });
+
+  // Clean up views older than 90 days for this user (fire-and-forget)
+  if (userId) {
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    prisma.listingView
+      .deleteMany({
+        where: {
+          userId,
+          createdAt: { lt: ninetyDaysAgo },
+        },
+      })
+      .catch(() => {});
+  }
+
+  return view;
 }
 
 /**
@@ -463,7 +474,7 @@ export async function getRecentViewedListings(userId: number, limit: number = 6)
     where: {
       userId,
     },
-    distinct: ['listingId'],
+    distinct: ["listingId"],
     orderBy: {
       createdAt: "desc",
     },
@@ -477,20 +488,88 @@ export async function getRecentViewedListings(userId: number, limit: number = 6)
 }
 
 /**
+ * Get paginated viewed listings for a user (distinct by listingId)
+ * @param userId ID of the user
+ * @param options Pagination, sort, and filter options
+ * @returns Object with viewedListings array and total count
+ */
+export async function getViewedListingsPaginated(
+  userId: number,
+  options?: {
+    skip?: number;
+    take?: number;
+    sort?: "newest" | "oldest" | "listing-newest" | "listing-oldest";
+    filter?: "all" | "sale" | "rent";
+    period?: "30" | "60" | "all";
+  },
+): Promise<{ viewedListings: RecentlyViewed[]; total: number }> {
+  const { skip, take, sort = "newest", filter = "all", period = "30" } = options || {};
+
+  const whereClause: any = { userId };
+
+  // Apply date range filter
+  if (period !== "all") {
+    const days = parseInt(period);
+    const since = new Date();
+    since.setDate(since.getDate() - days);
+    whereClause.createdAt = { gte: since };
+  }
+
+  if (filter === "sale") {
+    whereClause.listing = { saleListing: { isNot: null } };
+  } else if (filter === "rent") {
+    whereClause.listing = { rentalListing: { isNot: null } };
+  }
+
+  let orderBy: any
+  if (sort === "listing-newest") {
+    orderBy = { listing: { publishedAt: "desc" } }
+  } else if (sort === "listing-oldest") {
+    orderBy = { listing: { publishedAt: "asc" } }
+  } else {
+    orderBy = sort === "oldest" ? { createdAt: "asc" as const } : { createdAt: "desc" as const }
+  }
+
+  // Get distinct listing IDs first for accurate total count
+  const distinctIds = await prisma.listingView.findMany({
+    where: whereClause,
+    distinct: ["listingId"],
+    select: { listingId: true },
+  });
+
+  const total = distinctIds.length;
+
+  const viewedListings = await prisma.listingView.findMany({
+    where: whereClause,
+    distinct: ["listingId"],
+    orderBy,
+    skip,
+    take,
+    include: {
+      listing: {
+        select: listingCardFields,
+      },
+    },
+  });
+
+  return { viewedListings, total };
+}
+
+/**
  * Tracks a search with location, radius, query, results, and optional user
- * 
+ *
  * @param params Search tracking parameters
  * @returns The created or updated track record
  */
 export async function trackSearch(params: TrackSearchParams): Promise<TrackSearch> {
   const { listingType, query, location, radius, resultCount, userId } = params;
-  
+
   const listingTypeUpper = listingType.toLocaleUpperCase();
-  const locationId = location.id || '';
+  const locationId = location.id || "";
   const locationPlaceName = location.place_name_en || location.place_name;
   const locationText = location.text;
   const [locationLon, locationLat] = location.geometry.coordinates;
-  
+
   // Check if this search combination already exists
   const existing = await prisma.trackSearch.findUnique({
     where: {
@@ -502,14 +581,14 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
       },
     },
   });
-  
+
   if (existing) {
     // Update existing record - increment count and add userId if not already present
     const userIds = existing.userIds;
     if (userId && !userIds.includes(userId)) {
       userIds.push(userId);
     }
-    
+
     return prisma.trackSearch.update({
       where: { id: existing.id },
       data: {
@@ -521,7 +600,7 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
       },
     });
   }
-  
+
   // Create new record with count = 1
   return prisma.trackSearch.create({
     data: {
@@ -540,7 +619,6 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
   });
 }
 
-
 /**
  * Get trending searches based on unique user count
  * @param limit Maximum number of trending searches to return
@@ -553,11 +631,9 @@ export async function getTrendingSearches(limit: number = 10): Promise<TrackSear
     },
     take: limit * 3, // Get more to sort by userIds length
   });
-  
+
   // Sort by number of unique users and take top results
-  return searches
-    .sort((a, b) => b.userIds.length - a.userIds.length)
-    .slice(0, limit);
+  return searches.sort((a, b) => b.userIds.length - a.userIds.length).slice(0, limit);
 }
 
 /**
@@ -572,7 +648,7 @@ export async function getRecentSearchQueries(limit: number = 6): Promise<string[
       resultCount: { gt: 0 },
     },
     orderBy: {
-      updatedAt: 'desc',
+      updatedAt: "desc",
     },
     select: {
       query: true,
@@ -606,16 +682,16 @@ export async function getTrendingLocations(limit: number = 5) {
   // So we get all searches, aggregate by locationText, and pick the best locationId for each
   const searches = await prisma.trackSearch.findMany({
     where: {
-      locationId: { not: '' }, // Only include searches with valid locationId
+      locationId: { not: "" }, // Only include searches with valid locationId
     },
     orderBy: {
-      count: 'desc',
+      count: "desc",
     },
     take: 100, // Get enough to aggregate
   });
-  
+
   // Aggregate by locationText, keeping the highest count entry for each
-  const locationMap = new Map<string, typeof searches[0]>();
+  const locationMap = new Map<string, (typeof searches)[0]>();
   for (const search of searches) {
     const key = search.locationText.toLowerCase();
     const existing = locationMap.get(key);
@@ -623,13 +699,13 @@ export async function getTrendingLocations(limit: number = 5) {
       locationMap.set(key, search);
     }
   }
-  
+
   // Sort by count and take top N
   const sorted = Array.from(locationMap.values())
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
-  
-  return sorted.map(s => ({
+
+  return sorted.map((s) => ({
     locationId: s.locationId, // For geocoding on frontend
     name: s.locationText,
     placeName: s.locationPlaceName,

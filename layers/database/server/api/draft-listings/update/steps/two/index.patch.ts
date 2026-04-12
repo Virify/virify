@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { step2Schema } from "~~/shared/utils/listing-step2-schema";
+import { updateLocationByAddressId } from "~~/layers/database/server/utils/location";
 
 /**
  * Step 2: Property Details API Endpoint
@@ -57,6 +58,11 @@ export default defineEventHandler(async (event) => {
         create: addressData,
       });
       addressId = address.id;
+
+      // Populate the PostGIS geometry column so spatial (radius) search can find this property
+      if (property.address.lat && property.address.lon) {
+        await updateLocationByAddressId(address.id, property.address.lon, property.address.lat);
+      }
     }
 
     const propertyUpdate = {
@@ -98,9 +104,12 @@ export default defineEventHandler(async (event) => {
         },
       });
 
-      // Invalidate listing cache so modal shows fresh data
+      // Invalidate listing detail cache and my-listings page cache
       const storage = useStorage('cache:listing');
-      await storage.removeItem(`listing:${listingId}`);
+      await Promise.all([
+        storage.removeItem(`listing:${listingId}`),
+        invalidateMyListingsCache(user.id as number),
+      ]);
 
       return result;
     }
@@ -111,7 +120,7 @@ export default defineEventHandler(async (event) => {
       select: { completedSteps: true },
     });
 
-    return await prisma.draftListing.update({
+    const draftResult = await prisma.draftListing.update({
       where: { id: draftId!, userId: user.id },
       data: {
         // Add step 2 to completedSteps if not already there
@@ -126,6 +135,8 @@ export default defineEventHandler(async (event) => {
         },
       },
     });
+    await invalidateDraftListingsCache(user.id as number);
+    return draftResult;
   } catch (error) {
     return errorResponse(error, event);
   }

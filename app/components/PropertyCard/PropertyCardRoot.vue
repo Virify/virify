@@ -25,6 +25,18 @@
       <PropertyCardImage v-else-if="propertyImage" :provider="imageProvider" :src="propertyImage"
         :alt="propertyImageAlt" variant="card" class="property-card-root__image" width="491" height="368"
         loading="lazy" />
+
+      <ClientOnly>
+        <UBadge
+          v-if="viewingLabel"
+          :label="viewingLabel"
+          icon="i-lucide-calendar"
+          size="lg"
+          color="secondary"
+          variant="solid"
+          class="absolute top-2 right-2 z-1 text-xs"
+        />
+      </ClientOnly>
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
@@ -131,6 +143,20 @@ const props = withDefaults(defineProps<Props>(), {
 
 const { isHidden, unhideListing } = useHiddenListings()
 const { trackClick } = useAnalyticsTracking()
+const { loggedIn } = useUserSession()
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings()
+
+onMounted(() => {
+  if (loggedIn.value && props.listingId && viewings.value.length === 0) {
+    fetchViewings().catch(() => {})
+  }
+})
+
+const viewingLabel = computed(() => {
+  if (!props.listingId) return null
+  const v = getActiveViewingForListing(props.listingId)
+  return v ? getViewingStatusLabel(v) : null
+})
 
 const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
@@ -230,7 +256,7 @@ const imageCarouselArray = computed(() => {
   &__hidden-overlay {
     position: absolute;
     inset: 0;
-    z-index: 10;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;

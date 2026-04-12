@@ -12,6 +12,32 @@
           @update:model-value="updateFormField('buyerType', $event as MortgageBuyerType)" />
       </div>
 
+      <!-- Repayment Type -->
+      <div class="o-mortgage-form__field">
+        <label class="o-mortgage-form__label | body-sm text-medium">Repayment Type</label>
+        <div class="o-mortgage-form__repayment-options">
+          <AtomsMortgageRadioOption
+            value="REPAYMENT"
+            :model-value="formData.repaymentType"
+            label="Repayment"
+            description="Pay off interest and capital each month"
+            name="repayment-type"
+            @update:model-value="updateFormField('repaymentType', $event as MortgageRepaymentType)"
+          />
+          <AtomsMortgageRadioOption
+            value="INTEREST_ONLY"
+            :model-value="formData.repaymentType"
+            label="Interest Only"
+            description="Pay interest only — capital remains outstanding at end of term"
+            name="repayment-type"
+            @update:model-value="updateFormField('repaymentType', $event as MortgageRepaymentType)"
+          />
+        </div>
+        <p v-if="formData.repaymentType === 'INTEREST_ONLY'" class="o-mortgage-form__help | body-xs">
+          With interest-only, your monthly payments are lower but you'll need to repay the full loan amount separately at the end of the term.
+        </p>
+      </div>
+
       <!-- Property Price & Deposit Row -->
       <div class="o-mortgage-form__row">
         <div class="o-mortgage-form__field o-mortgage-form__field--half">
@@ -265,6 +291,18 @@ function updateFormField<K extends keyof MortgageFormData>(
     display: flex;
     align-items: center;
     gap: var(--size-8);
+  }
+
+  &__repayment-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--size-8);
+    width: 100%;
+    align-items: stretch;
+
+    @media (max-width: 500px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__help {

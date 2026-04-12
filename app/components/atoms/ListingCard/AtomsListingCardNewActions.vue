@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ViewsDialogConversation, ViewsDialogLogin } from '#components'
+import { ViewsDialogLogin } from '#components'
 
 interface Props {
   listingId: number;
@@ -23,6 +23,7 @@ const props = defineProps<Props>();
 
 const { showDialog } = useDialog();
 const { user } = useUserSession();
+const { openNewEnquiry } = useGlobalEnquiryModal();
 
 const safeUserId = computed(() =>
   typeof props.userId === 'number' && !isNaN(props.userId) ? props.userId : null
@@ -46,10 +47,7 @@ function onContact() {
   }
 
   if (safeUserId.value !== null && !isSelf.value) {
-    showDialog({
-      component: ViewsDialogConversation,
-      props: { listingId: props.listingId, receiverId: safeUserId.value },
-    });
+    openNewEnquiry(props.listingId, safeUserId.value);
   }
 }
 </script>

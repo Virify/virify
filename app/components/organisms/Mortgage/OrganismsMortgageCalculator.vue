@@ -68,6 +68,7 @@ async function calculateMortgage() {
         termYears,
         buyerType: formData.value.buyerType,
         customInterestRate: formData.value.customInterestRate,
+        repaymentType: formData.value.repaymentType,
       },
     })
 

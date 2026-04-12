@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
   try {
-    const draftId = getRouterParam(event, 'id');
-    
+    const draftId = getRouterParam(event, "id");
+
     if (!draftId || isNaN(Number(draftId))) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Invalid draft listing ID"
+        statusMessage: "Invalid draft listing ID",
       });
     }
 
@@ -20,18 +20,23 @@ export default defineEventHandler(async (event) => {
     // Delete the draft listing - only if it belongs to the authenticated user
     // Prisma will throw if the record doesn't exist
     await prisma.draftListing.delete({
-      where: { 
+      where: {
         id: draftIdNum,
-        userId: user.id
-      }
+        userId: user.id,
+      },
     });
+
+    const { invalidateDraftListingsCache, invalidateAggregatesCache } = await import("~~/layers/database/server/utils/cache");
+    await Promise.all([
+      invalidateDraftListingsCache(user.id as number),
+      invalidateAggregatesCache(user.id as number),
+    ]);
 
     return {
       success: true,
       message: "Draft listing deleted successfully",
-      deletedId: draftIdNum
+      deletedId: draftIdNum,
     };
-
   } catch (error) {
     console.error("Error deleting draft listing:", error);
     return errorResponse(error, event);

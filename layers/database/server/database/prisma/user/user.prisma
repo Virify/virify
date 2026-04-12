@@ -40,6 +40,8 @@ model User {
   DailyUserStats           DailyUserStats[]
   ListingClick             ListingClick[]
   ListingShare             ListingShare[]
+  viewingRequests          Viewing[]             @relation("ViewingRequests")
+  viewingsAsOwner          Viewing[]             @relation("ViewingAsOwner")
 
   @@index([addressId])
   @@index([email])

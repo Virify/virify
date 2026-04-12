@@ -16,6 +16,10 @@ export type MortgageBuyerType =
   | 'BUY_TO_LET'
   | 'REMORTGAGE'
 
+export type MortgageRepaymentType =
+  | 'REPAYMENT'
+  | 'INTEREST_ONLY'
+
 export type MortgageLtvBracket = 
   | 'LTV_60'
   | 'LTV_75'
@@ -41,6 +45,7 @@ export interface MortgageCalculationRequest {
   termYears?: number
   buyerType: MortgageBuyerType
   rateType?: MortgageRateType
+  repaymentType?: MortgageRepaymentType
 }
 
 export interface MortgageResult {
@@ -61,6 +66,7 @@ export interface MortgageCalculationData {
   ltvBracket: string
   termYears: number
   buyerType: string
+  repaymentType: MortgageRepaymentType
   results: MortgageResult[]
   usingDefaultRates: boolean
   usingCustomRate?: boolean
@@ -138,8 +144,8 @@ export const BUYER_TYPE_OPTIONS: BuyerTypeOption[] = [
   {
     value: 'BUY_TO_LET',
     key: 'Buy to Let',
-    info: 'Purchasing a property to rent out',
-    minDeposit: 25,
+    info: 'Purchasing a property to rent out. Deposit requirements typically range from 20–25%, varying by lender.',
+    minDeposit: 20,
   },
   {
     value: 'REMORTGAGE',

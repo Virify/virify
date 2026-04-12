@@ -19,6 +19,8 @@ export default defineEventHandler(async (event) => {
 
     const updated = await updateUserSavedLocationName(id, user.id, name);
 
+    useStorage('cache').removeItem(`locations:${user.id}`).catch(() => {});
+
     const aggregateMessage = createAggregateUpdateMessage("locations", "update", user.id);
     sendMessage(aggregateMessage);
 

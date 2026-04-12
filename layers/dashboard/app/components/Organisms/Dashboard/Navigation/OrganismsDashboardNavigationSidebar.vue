@@ -12,9 +12,9 @@
       class="border-0 ring-0"
       :ui="{
         header: 'p-4 border-none',
-        root: 'bg-background text-sm',
+        root: 'bg-(--background-100)! dark:bg-(--background-200)! text-sm',
         body: 'border-none',
-        content: 'bg-background',
+        content: 'bg-(--background-100)! dark:bg-(--background-200)!',
         footer: 'border-none w-full',
         overlay: 'backdrop-blur-sm',
         toggle: '!text-foreground hover:!bg-white/10',
@@ -31,9 +31,6 @@
         <UDashboardSidebarCollapse
           v-if="!collapsed"
           class="hover:bg-white/5 rounded-md transition-colors"
-          :ui="{
-            leadingIcon: 'text-foreground',
-          }"
         />
       </div>
     </template>
@@ -84,9 +81,6 @@
             <UDashboardSidebarCollapse
               v-if="collapsed"
               class="hover:bg-background/90 rounded-md transition-colors"
-              :ui="{
-                leadingIcon: 'text-foreground',
-              }"
             />
           </template>
           <!-- popover badges -->
