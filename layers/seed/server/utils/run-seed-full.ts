@@ -180,8 +180,8 @@ async function seedFullDatabase() {
     console.log('✅ Listings distributed.')
 
     console.log('📊 Generating daily user stats...')
-    // Generate daily stats for a subset of users (admin + first 100 users for performance)
-    const usersForStats = [1, ...userIds.slice(0, 100)]
+    // Generate daily stats for a subset of users (admin + first 50 users for performance)
+    const usersForStats = [1, ...userIds.slice(0, 50)]
     let statsGenerated = 0
     for (const userId of usersForStats) {
       await generateDailyUserStats(userId)

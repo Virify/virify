@@ -179,8 +179,8 @@ export const generateListingImpressions = async (listingId: number): Promise<num
 export const generateDailyListingStats = async (listingId: number, userId: number): Promise<number> => {
   const stats = [];
   
-  // Generate stats for the past 14 days
-  for (let daysAgo = 0; daysAgo < 14; daysAgo++) {
+  // Generate stats for the past 7 days
+  for (let daysAgo = 0; daysAgo < 7; daysAgo++) {
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
     date.setHours(0, 0, 0, 0); // Normalize to midnight
@@ -228,8 +228,8 @@ export const generateDailyListingStats = async (listingId: number, userId: numbe
 export const generateDailyUserStats = async (userId: number): Promise<number> => {
   const stats = [];
   
-  // Generate stats for the past 14 days
-  for (let daysAgo = 0; daysAgo < 14; daysAgo++) {
+  // Generate stats for the past 7 days
+  for (let daysAgo = 0; daysAgo < 7; daysAgo++) {
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
     date.setHours(0, 0, 0, 0); // Normalize to midnight
