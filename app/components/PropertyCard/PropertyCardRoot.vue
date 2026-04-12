@@ -36,6 +36,11 @@
           variant="solid"
           class="absolute top-2 right-2 z-1 text-xs"
         />
+        <AtomsPriceReducedBadge
+          :price-history="priceHistory"
+          :current-price="currentPriceNumber"
+          class="absolute top-2 left-2 z-1 text-xs"
+        />
       </ClientOnly>
     </div>
 
@@ -44,8 +49,7 @@
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
 
         <span class="property-card-root__price-amount | title-md">
-          {{ price }}
-
+          {{ price }}            <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
           <sub v-if="rentFrequency" class="property-card-root__price-frequency">{{ rentFrequency }}</sub>
         </span>
       </h2>
@@ -124,6 +128,8 @@ interface Props {
   price?: string
   priceLabel?: string
   rentFrequency?: string
+  priceHistory?: PriceHistoryEntry[]
+  currentPriceNumber?: number
   overview?: string
   overviewAddress?: string
   dateChanged?: string
@@ -161,6 +167,8 @@ const viewingLabel = computed(() => {
 const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
 )
+
+const hasPriceHistory = computed(() => !!props.priceHistory?.length)
 
 /**
  *  Conditionally show as links

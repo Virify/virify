@@ -20,8 +20,8 @@ export const generateRandomDate = ()  => {
  */
 export const generateRentalObject = (): Prisma.RentalListingCreateWithoutListingInput => {
   return {
-    deposit: roundFloat(faker.number.float({ min: 1000, max: 10000 }), 2),
-    holdingDeposit: roundFloat(faker.number.float({ min: 1000, max: 10000 }), 2),
+    deposit: Math.round(faker.number.float({ min: 1000, max: 10000 })),
+    holdingDeposit: Math.round(faker.number.float({ min: 1000, max: 10000 })),
     rentFrequency: faker.helpers.arrayElement(Object.values(RentalPriceType)),
     isBillsIncluded: faker.datatype.boolean(),
     rentalLength: faker.helpers.arrayElement(['SHORT_TERM', 'LONG_TERM']),
@@ -306,8 +306,8 @@ interface ListingBatchItem {
  */
 const generateBaseListingData = (propertyId: number, userId: number, isRental: boolean, tier?: ListingTier) => ({
   price: isRental 
-    ? roundFloat(faker.number.float({ min: 300, max: 3000 }), 2)
-    : roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
+    ? Math.round(faker.number.float({ min: 300, max: 3000 }))
+    : Math.round(faker.number.float({ min: 100000, max: 1000000 })),
   moveInDate: faker.date.future(),
   listingTier: tier ?? generateWeightedListingTier(),
   listingStartDate: new Date(),
@@ -319,6 +319,43 @@ const generateBaseListingData = (propertyId: number, userId: number, isRental: b
   propertyId,
   userId,
 });
+
+/**
+ * Generate price history for a listing — simulates 1–3 price changes.
+ * Generates historical prices working backwards from the current price.
+ * @param isIncrease When true, the price has increased over time (old price is lower than current).
+ *                   When false (default), the price has been reduced (old price was higher).
+ */
+export const generatePriceHistory = async (listingId: number, currentPrice: number, isIncrease = false): Promise<void> => {
+  const changeCount = faker.number.int({ min: 1, max: 3 });
+  const entries = [];
+  let price = currentPrice;
+
+  for (let i = 0; i < changeCount; i++) {
+    const changePct = faker.number.float({ min: 1, max: 15 });
+    // Decrease: old price was higher (price was reduced over time)
+    // Increase: old price was lower (price has gone up over time)
+    const oldPrice = isIncrease
+      ? Math.round(price * (1 - changePct / 100))
+      : Math.round(price * (1 + changePct / 100));
+    const changePercent = ((price - oldPrice) / oldPrice) * 100;
+    const daysAgo = faker.number.int({ min: (i + 1) * 7, max: (i + 1) * 60 });
+    const createdAt = new Date();
+    createdAt.setDate(createdAt.getDate() - daysAgo);
+
+    entries.push({
+      listingId,
+      oldPrice,
+      newPrice: price,
+      changePercent,
+      createdAt,
+    });
+
+    price = oldPrice; // walk further back in time
+  }
+
+  await prisma.listingPriceHistory.createMany({ data: entries });
+};
 
 /**
  * Batch create listings with their rental/sale records.
@@ -347,8 +384,14 @@ export const batchCreateListings = async (items: ListingBatchItem[]): Promise<nu
               : { saleListing: { create: generateSaleObject() } }
             ),
           },
-          select: { id: true, userId: true },
+          select: { id: true, userId: true, price: true },
         });
+
+        // 50% of listings get price history; of those, 50% are price increases
+        if (Math.random() < 0.5) {
+          const isIncrease = Math.random() < 0.5;
+          await generatePriceHistory(result.id, result.price, isIncrease);
+        }
 
         // Start analytics immediately for this listing (don't wait for all listings first)
         analyticsPromises.push(
@@ -388,7 +431,7 @@ export const batchCreateListings = async (items: ListingBatchItem[]): Promise<nu
 export const generateRentalListing = async (propertyId: number, userId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
-      price: roundFloat(faker.number.float({ min: 300, max: 3000 }), 2),
+      price: Math.round(faker.number.float({ min: 300, max: 3000 })),
       moveInDate: faker.date.future(),
       listingTier: generateWeightedListingTier(),
       listingStartDate: new Date(),
@@ -436,7 +479,7 @@ export const generateRentalListing = async (propertyId: number, userId: number):
 export const generateSaleListing = async (propertyId: number, userId: number): Promise<Prisma.ListingCreateInput> => {
   const listing: Listing = await prisma.listing.create({
     data: {
-      price: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
+      price: Math.round(faker.number.float({ min: 100000, max: 1000000 })),
       moveInDate: faker.date.future(),
       listingTier: generateWeightedListingTier(),
       listingStartDate: new Date(),

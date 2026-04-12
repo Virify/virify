@@ -12,13 +12,18 @@
       <AtomsCloudFlareImage v-if="hasImage" :src="listing.image?.[0]?.image"
         :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'" variant="card" :placeholder="true"
         class="summary-card__image" />
+      <AtomsPriceReducedBadge
+        :price-history="listing.priceHistory"
+        :current-price="listing.price ?? undefined"
+        class="summary-card__price-reduced-badge"
+      />
     </div>
     <!-- Content -->
     <div class="summary-card__content">
       <!-- Price and Actions -->
       <div class="summary-card__header">
         <div class="summary-card__price | title-md">
-          <p class="summary-card__price-value">{{ formattedPrice }}</p>
+          <p class="summary-card__price-value">{{ formattedPrice }} <AtomsPriceHistoryPopover v-if="listing.priceHistory?.length" :price-history="listing.priceHistory!" :current-price="listing.price!" /></p>
           <p class="summary-card__price-type | body-xs">
             {{ formattedPriceType }}
           </p>
@@ -226,6 +231,13 @@ const isFeaturedOrPremium = computed(() => isFeatured.value || isPremium.value);
     overflow: hidden;
     position: relative;
     z-index: 1;
+  }
+
+  &__price-reduced-badge {
+    left: var(--size-8);
+    position: absolute;
+    top: var(--size-8);
+    z-index: 2;
   }
 
   &__image {

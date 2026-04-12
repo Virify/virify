@@ -43,6 +43,8 @@
             :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null"
             :listing-id="listing?.id"
+            :price-history="listing?.ListingPriceHistory ?? undefined"
+            :current-price-number="listing?.price ?? undefined"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
 
           <!-- General Property Information (Non-collapsible) -->
@@ -175,6 +177,8 @@
             :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
             :agent="listing?.user || {}"
+            :price-history="listing?.ListingPriceHistory ?? undefined"
+            :current-price-number="listing?.price ?? undefined"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
             :is-draft="isDraft" />
         </div>
@@ -195,6 +199,8 @@
         :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
         :chain-free="listing?.saleListing ? listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
         :agent="listing?.user || {}"
+        :price-history="listing?.ListingPriceHistory ?? undefined"
+        :current-price-number="listing?.price ?? undefined"
         :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
         :is-draft="isDraft" />
     </client-only>
