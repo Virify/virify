@@ -1,24 +1,40 @@
 <template>
   <div class="m-results-context">
-    <AtomsPill v-if="hasSearchInfo" class="m-results-context__pill m-results-context__pill--info | body-sm">
-      <AtomsIcon icon="content/search" width="16" height="16" />
+    <h2 class="m-results-context__title | title-md">
       {{ count }} {{ count === 1 ? 'property' : 'properties' }} found
-    </AtomsPill>
-    <AtomsPill v-for="term in searchTerms" :key="term"
-      class="m-results-context__pill m-results-context__pill--term | body-sm" @click="openFilters">
-      <AtomsIcon icon="explore/ai" width="16" height="16" />
-      {{ term }}
-    </AtomsPill>
-    <AtomsPill v-if="locationName" class="m-results-context__pill m-results-context__pill--location | body-sm"
-      @click="openLocation">
-      <AtomsIcon icon="explore/map" width="16" height="16" />
-      {{ locationName }}
-    </AtomsPill>
-    <AtomsPill v-if="radiusText" class="m-results-context__pill m-results-context__pill--radius | body-sm"
-      @click="openLocation">
-      <AtomsIcon icon="explore/map" width="16" height="16" />
-      {{ radiusText }}
-    </AtomsPill>
+    </h2>
+
+    <ul class="m-results-context__list">
+      <li>
+        <button type="button" class="m-results-context__button" aria-label="Expand location"
+          @click.prevent="openLocation">
+          <AtomsIcon icon="explore/map" width="16" height="16" />
+
+          <span class="m-results-context__tag">
+            {{ locationName }},
+          </span>
+
+          <span class="m-results-context__tag">
+            {{ radiusText }}
+          </span>
+        </button>
+      </li>
+
+      <li>
+        <button v-if="visibleSearchTerms.length" type="button" class="m-results-context__button"
+          aria-label="Expand filters" @click.prevent="openFilters">
+          <AtomsIcon icon="explore/ai" width="16" height="16" />
+
+          <span class="m-results-context__tag" v-for="term in visibleSearchTerms" :key="term">
+            {{ term }}
+          </span>
+
+          <span v-if="overflowSearchTerms" class="m-results-context__overflow">
+            and {{ overflowSearchTerms }} more
+          </span>
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -58,11 +74,40 @@ function openLocation() {
 /**
  * Search terms from query analysis - capitalized
  */
-const searchTerms = computed(() => {
-  if (!props.queryAnalysis?.usedTerms) return []
-  return props.queryAnalysis.usedTerms.map(term =>
-    term.charAt(0).toUpperCase() + term.slice(1)
-  )
+const searchTermsFormatted = computed(() => {
+  const { usedTerms } = asObject(props.queryAnalysis)
+
+  // If no search terms exist, return nothing
+  if (!Array.isArray(usedTerms)) return []
+
+  // Format the list
+  return usedTerms.filter(isString).map(term => {
+    return term.charAt(0).toUpperCase() + term.slice(1)
+  })
+})
+
+const visibleSearchTerms = computed(() => {
+  const usedTerms = searchTermsFormatted.value
+
+  // If less than 4 used terms exist, return as-is
+  if (usedTerms.length < 4) {
+    return searchTermsFormatted.value
+  }
+
+  // Else only return the first 2
+  return usedTerms.slice(0, 2)
+})
+
+const overflowSearchTerms = computed(() => {
+  const usedTerms = searchTermsFormatted.value
+
+  // If less than 4 used terms exist, no overflow
+  if (usedTerms.length < 4) {
+    return 0
+  }
+
+  // Else overflow is total length minus 2
+  return usedTerms.length - 2
 })
 
 /**
@@ -82,64 +127,82 @@ const radiusText = computed(() => {
   return `Within ${props.radius} Miles`
 })
 
-/**
- * Check if we have any search info to display
- */
-const hasSearchInfo = computed(() => {
-  return searchTerms.value.length > 0 || locationName.value || radiusText.value
-})
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
+
 .m-results-context {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--size-8);
+  --results-context-gap: var(--size-4);
+  --results-context-spacing: var(--size-8);
+
+  overflow: hidden;
 
   &__title {
     margin: 0;
   }
 
-  &__pill {
+  &__list {
+    list-style: none;
+    margin: var(--size-10) 0 var(--size-32);
+    padding: 0;
     display: flex;
+    flex-wrap: wrap;
+    gap: var(--results-context-gap);
+    column-gap: var(--results-context-spacing);
+
+    // To allow overflow auto on child flexed elements
+    li {
+      overflow: hidden;
+    }
+  }
+
+  &__button {
+    display: flex;
+    overflow: auto;
+    max-width: 100%;
     align-items: center;
-    gap: var(--size-8);
-    padding: var(--size-8) var(--size-16);
-    text-transform: capitalize;
+    gap: var(--results-context-gap);
+    white-space: nowrap;
+    font-size: var(--font-xs);
+    line-height: var(--lineheight-sm);
+    font-weight: var(--font-semisemibold);
+    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
+    border-radius: var(--border-radius-lg);
+    padding: var(--results-context-gap);
     cursor: pointer;
-    transition: all 0.2s ease;
-    border-radius: var(--border-radius-pill);
-    font-weight: var(--font-semibold);
-    color: var(--monochrome-900);
 
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    @include mq.tablet {
+      font-size: var(--font-sm);
     }
 
-    &--info {
-      cursor: default;
-      background: light-dark(var(--monochrome-800), var(--monochrome-200));
-      border: none;
-      color: var(--foreground-100);
-
-      &:hover {
-        transform: none;
-        box-shadow: none;
-      }
+    .a-icon {
+      color: light-dark(var(--blue-400), var(--blue-600));
+      margin: 0 var(--size-4) 0 var(--size-6);
+      width: var(--size-24);
+      height: var(--size-24);
+      flex: 0 0 auto;
     }
+  }
 
-    &--term {
-      background: light-dark(var(--primary-500), var(--primary-400));
-      border: none;
-    }
+  &__tag {
+    display: block;
+    color: light-dark(var(--primary-400), var(--monochrome-900));
+    border: 1px solid var(--primary-background-200);
+    background: var(--primary-background-100);
+    padding: var(--size-4) var(--size-10);
+    border-radius: var(--border-radius-sm);
+    transition: border-color var(--animation-fast) var(--ease-in-out);
+  }
 
-    &--location,
-    &--radius {
-      background: light-dark(var(--blue-500), var(--blue-500));
-      border: none;
-    }
+  &__overflow {
+    display: block;
+    margin-right: calc(var(--results-context-gap) * 3);
+    margin-left: var(--results-context-gap);
+  }
+
+  &__button:hover &__tag {
+    border-color: var(--primary-500);
   }
 }
 </style>
