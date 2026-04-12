@@ -2,6 +2,7 @@ import * as z from "zod";
 
 const ppdSchema = z.object({
   postcode: z.string(),
+  street: z.string().optional(),
 });
 
 const propertyTypeMap: Record<string, string> = {
@@ -19,17 +20,9 @@ const durationMap: Record<string, string> = {
 
 export default defineEventHandler(async (event) => {
   try {
-    const { postcode } = await readValidatedBody(event, ppdSchema.parse);
+    const { postcode, street } = await readValidatedBody(event, ppdSchema.parse);
 
-    // Example usage of the Prisma clients
-    const ppdData = await ppdPrisma.pricePaid.findMany({
-      where: {
-        postcode: postcode.toUpperCase(),
-      },
-      orderBy: {
-        transfer_date: "desc",
-      },
-    });
+    const ppdData = await getPricePaidByPostcodeAndStreet(postcode, street);
 
     const mappedData = ppdData.map((item) => {
       // Clean address: number, street, city, postcode only

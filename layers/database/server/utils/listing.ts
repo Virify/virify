@@ -52,6 +52,10 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
           avatar: true,
         },
       },
+      ListingPriceHistory: {
+        orderBy: { createdAt: 'desc' as const },
+        select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+      },
     },
   });
 }
@@ -86,6 +90,10 @@ export async function getListingByIdForEdit(id: number, userId: number): Promise
           createdAt: true,
           avatar: true,
         },
+      },
+      ListingPriceHistory: {
+        orderBy: { createdAt: 'desc' as const },
+        select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
       },
     },
   });
@@ -147,6 +155,10 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
           createdAt: true,
           avatar: true,
         },
+      },
+      ListingPriceHistory: {
+        orderBy: { createdAt: 'desc' as const },
+        select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
       },
     },
   });
@@ -317,6 +329,10 @@ const fullListingInclude = {
       createdAt: true,
       avatar: true,
     },
+  },
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
   },
 };
 

@@ -209,10 +209,8 @@ const draftData = getStepData(8)
 const state = reactive<Step8FormState>(createInitialStep8Values(draftData))
 
 // Get listing type from Step 1 data and tenure from Step 3 (if sale)
-const step1Data = getStepData(1) as Step1FormData | undefined
-const step3Data = getStepData(3) as { saleListing?: { tenureType?: string } } | undefined
-const listingType = computed(() => step1Data?.selectedType ?? 'sale')
-const tenureType = computed(() => step3Data?.saleListing?.tenureType)
+const listingType = computed(() => (getStepData(1) as Step1FormData | undefined)?.selectedType ?? 'sale')
+const tenureType = computed(() => (getStepData(3) as { saleListing?: { tenureType?: string } } | undefined)?.saleListing?.tenureType)
 
 // Check if service charges should be shown (rental or leasehold)
 const showServiceCharges = computed(() => {

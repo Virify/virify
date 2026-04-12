@@ -6,6 +6,7 @@
  */
 import * as z from "zod";
 import { invalidateAggregatesCache } from "~~/layers/database/server/utils/cache";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
 const viewSchema = z.object({
   listingId: z.union([z.string(), z.number()]),

@@ -15,6 +15,7 @@ export type DraftListingForCard = DraftListingWithFullPayload & {
   isDraft: true;
   draftId: number;
   publishedAt: null;
+  ListingPriceHistory?: PriceHistoryEntry[];
 };
 
 export const useDraftListings = createSharedComposable(() => {

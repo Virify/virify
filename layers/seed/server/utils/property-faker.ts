@@ -1,7 +1,6 @@
 // imports require .ts extension to run seed
 import { faker } from "@faker-js/faker";
 import { AccessibilityFeature, BathroomFeature, BedSizeType, BedroomFeature, BoilerType, BroadbandType, BuildingFeature, ConnectedUtilities, ConstructionType, EPCRating, HeatingType, HotWaterSource, KitchenFeature, LandFeature, OtherRoomType, OutdoorSpaceFeature, ParkingFeature, ReceptionType, RenewableEnergy, RoomFeature, SecurityFeature, StorageFeature, UtilityFeature, type Address, type Prisma } from "../../../database/server/database/prisma/generated/client";
-import { roundFloat } from "../../../../shared/utils/numbers";
 import { typeToClassificationMap } from "./property-type-map";
 import type { PropertyWithAddress } from "../../../../shared/types/property";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
@@ -708,8 +707,8 @@ export const generateRunningCosts = (): Prisma.RunningCostsCreateWithoutProperty
   return {
     description: faker.word.words(15),
     councilTaxBand: faker.helpers.arrayElement(["A", "B", "C", "D", "E", "F", "G"]),
-    serviceCharges: roundFloat(faker.number.float({ min: 50, max: 300 }), 2),
-    groundRent: roundFloat(faker.number.float({ min: 0, max: 500 }), 2),
+    serviceCharges: Math.round(faker.number.float({ min: 50, max: 300 })),
+    groundRent: Math.round(faker.number.float({ min: 0, max: 500 })),
   };
 };
 
@@ -867,7 +866,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
   const propertyWithFeatures = await prisma.property.create({
     data: {
       description: faker.word.words(20),
-      value: roundFloat(faker.number.float({ min: 100000, max: 1000000 }), 2),
+      value: Math.round(faker.number.float({ min: 100000, max: 1000000 })),
       totalFloors,
       size: faker.number.int({ min: 50, max: 500 }),
       yearBuilt: faker.date.past().getFullYear().toString(),

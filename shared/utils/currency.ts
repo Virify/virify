@@ -19,6 +19,7 @@ export function numberToCurrency(value: number, isFloor = false): string {
     style: "currency",
     currency: "GBP",
     minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(value);
 }
 

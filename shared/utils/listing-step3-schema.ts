@@ -31,3 +31,25 @@ export const step3Schema = z.object({
 export type Step3FormData = z.infer<typeof step3Schema>
 export type SalePriceData = z.infer<typeof salePriceSchema>
 export type RentalPriceData = z.infer<typeof rentalPriceSchema>
+
+/**
+ * Creates a step 3 schema with price change constraints for editing a published listing.
+ *
+ * Rules:
+ * - Increases: no limit (any increase is allowed)
+ * - Reductions: minimum reduction is 2% (sale) or 5% (rental).
+ *   You CANNOT reduce by less than the minimum — but you CAN reduce by more.
+ */
+export function createStep3SchemaWithLimit(originalPrice: number, isRental: boolean) {
+  const minReductionPct = isRental ? 0.05 : 0.02
+  const label = isRental ? '5' : '2'
+  const maxReducedPrice = Math.floor(originalPrice * (1 - minReductionPct))
+  return step3Schema.extend({
+    price: z.coerce.number({ message: 'Price is required' })
+      .positive('Price must be greater than 0')
+      .refine(
+        (price) => price >= originalPrice || (originalPrice - price) / originalPrice >= minReductionPct,
+        { message: `To reduce the price, you must reduce by at least ${label}% (£${maxReducedPrice.toLocaleString()} or lower)` },
+      ),
+  })
+}

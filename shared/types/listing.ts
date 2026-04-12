@@ -79,6 +79,16 @@ export type ListingWithFullProperty = Prisma.ListingGetPayload<{
         avatar: true,
       },
     },
+    ListingPriceHistory: {
+      orderBy: { createdAt: 'desc'},
+      select: {
+        id: true,
+        oldPrice: true,
+        newPrice: true,
+        changePercent: true,
+        createdAt: true,
+      },
+    },
   },
 }>;
 
@@ -139,6 +149,10 @@ export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilitySta
 export const listingMinimalFields = {
   id: true,
   price: true,
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+  },
   rentalListing: { select: { id: true } },
   saleListing: { select: { id: true } },
   property: {
@@ -177,6 +191,10 @@ export const listingMinimalFields = {
 export const listingConversationCardFields = {
   id: true,
   price: true,
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+  },
   rentalListing: { select: { id: true } },
   saleListing: { select: { id: true } },
   property: {
@@ -216,6 +234,10 @@ export const listingCardFields = {
   publishedAt: true,
   rentalListing: true,
   saleListing: true,
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+  },
   property: {
     select: {
       media: {

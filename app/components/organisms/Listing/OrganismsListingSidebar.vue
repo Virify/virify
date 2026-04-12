@@ -12,6 +12,7 @@
 
 
       {{ price }}
+      <AtomsPriceHistoryPopover v-if="priceHistory?.length" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
     </h2>
 
     <p role="presentation" class="o-listing-sidebar__address | body-md font-bold">
@@ -62,6 +63,8 @@ interface Props {
   hasLand?: boolean
   available?: string
   isDraft?: boolean
+  priceHistory?: PriceHistoryEntry[]
+  currentPriceNumber?: number
 }
 
 const props = defineProps<Props>();

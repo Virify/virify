@@ -8,10 +8,21 @@
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
           {{ convertEnumToString(available!) }}
         </AtomsPill>
+        <AtomsPriceReducedBadge
+          :price-history="priceHistory"
+          :current-price="currentPriceNumber"
+        />
       </div>
 
 
-      <span class="o-listing-overview__price">{{ price }}</span>
+      <span class="o-listing-overview__price">
+        {{ price }}
+        <AtomsPriceHistoryPopover
+          v-if="priceHistory?.length && currentPriceNumber"
+          :price-history="priceHistory"
+          :current-price="currentPriceNumber"
+        />
+      </span>
     </h2>
 
     <p role="presentation" class="o-listing-overview__address | body-md">
@@ -38,6 +49,8 @@ interface Props {
   price?: string
   address?: string
   priceType?: string
+  priceHistory?: PriceHistoryEntry[]
+  currentPriceNumber?: number
   propertyType?: string
   propertySize?: number
   bedrooms?: number

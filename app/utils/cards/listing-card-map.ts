@@ -6,7 +6,7 @@
  *          which should potentially replace this function in the future
  */
 export function mapToCardProps(result: ListingCardData) {
-  const { id, price, rentalListing, saleListing, updatedAt, createdAt, property, user } = result;
+  const { id, price, rentalListing, saleListing, updatedAt, createdAt, property, user, ListingPriceHistory } = result;
   const { numberBedrooms, numberBathrooms, numberReceptions, type, classification, address, media, outdoorSpace, energyAndUtilities } = property;
 
   const saleOrRent: "buy" | "rent" = rentalListing ? "rent" : "buy";
@@ -45,6 +45,8 @@ export function mapToCardProps(result: ListingCardData) {
     price: numberToCurrency(Math.floor(price)),
     rentFrequency: rentalListing ? convertEnumToString(rentalListing.rentFrequency) : undefined,
     priceLabel: saleListing ? convertEnumToString(saleListing.priceType) : undefined,
+    currentPriceNumber: price,
+    priceHistory: ListingPriceHistory ?? [],
     overview,
     overviewAddress,
     dateChanged,
