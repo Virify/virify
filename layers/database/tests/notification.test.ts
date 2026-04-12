@@ -31,6 +31,9 @@ vi.mock("../server/utils/prisma-client", () => ({
   },
 }));
 
+const mockStorage = { removeItem: vi.fn().mockResolvedValue(undefined) };
+vi.stubGlobal("useStorage", vi.fn().mockReturnValue(mockStorage));
+
 // ──────────────────────────────────────────────────────────────────────────────
 // Fixtures
 // ──────────────────────────────────────────────────────────────────────────────

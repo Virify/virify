@@ -209,6 +209,9 @@ export default defineNuxtPlugin(() => {
           senderAvatar: notification.senderAvatar ?? undefined,
         });
 
+        // Always refresh notification counts so header + sidebar badges update in real-time
+        fetchNotificationCounts().catch((e) => console.error("Failed to fetch notification counts on notification_new:", e));
+
         // For viewing notifications: refresh the shared viewings ref and aggregates
         // so sidebar badges and the viewings page update without a hard refresh
         if (isViewingNotification) {

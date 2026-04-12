@@ -85,6 +85,7 @@ import { useIntersectionObserver } from '@vueuse/core'
 
 const emit = defineEmits<{
   (e: 'back'): void
+  (e: 'select'): void
 }>()
 
 const {
@@ -111,6 +112,9 @@ async function handleSelect(notification: UserNotification) {
   if (!notification.isRead) {
     markAsRead({ notificationId: notification.id })
   }
+
+  // Close the popover first so it doesn't block the modal on mobile
+  emit('select')
 
   if ((notification.type as string)?.startsWith('VIEWING_')) {
     const tab = notification.type === 'VIEWING_REQUEST' ? 'requested'

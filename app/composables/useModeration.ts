@@ -33,12 +33,31 @@ export function useModeration() {
   /**
    * Fast synchronous profanity check using the bad-words library.
    * Runs before any API call to catch obvious cases without a round-trip.
+   *
+   * `isProfane` uses word-boundary matching so it misses bad words embedded
+   * in compound strings like "MrDickTickle" or "ass_hat_123".
+   * We also split on non-alpha chars and CamelCase boundaries so every
+   * sub-token is checked individually.
    */
   function checkProfanity(text: string): { safe: boolean; reason?: string } {
     if (!text || text.trim().length === 0) return { safe: true }
 
     if (profanityFilter.isProfane(text)) {
       return { safe: false, reason: 'Your search contains inappropriate content. Please try a different search.' }
+    }
+
+    // Split compound strings: non-alpha separators + CamelCase boundaries
+    const tokens = text
+      .replace(/([a-z])([A-Z])/g, '$1 $2') // camelCase → camel Case
+      .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2') // ABCDef → ABC Def
+      .split(/[^a-zA-Z]+/)
+      .map(t => t.trim())
+      .filter(Boolean)
+
+    for (const token of tokens) {
+      if (token.length > 1 && profanityFilter.isProfane(token)) {
+        return { safe: false, reason: 'Your search contains inappropriate content. Please try a different search.' }
+      }
     }
 
     return { safe: true }
