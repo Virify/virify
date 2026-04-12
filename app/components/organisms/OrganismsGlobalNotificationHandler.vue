@@ -1,5 +1,5 @@
 <template>
-  <LazyOrganismsDashboardEnquiryModal 
+  <OrganismsDashboardEnquiryModal 
     v-if="user" 
     v-model:open="isModalOpen"
     :conversation="modalConversation" 
