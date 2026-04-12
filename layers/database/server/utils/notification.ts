@@ -49,8 +49,11 @@ export async function createNotification(data: CreateNotificationData) {
 
   // Bust the counts cache for this user so the next GET /api/notifications/counts
   // returns fresh data and badges update immediately.
-  const storage = useStorage('cache');
-  storage.removeItem(`notif-counts:user:${data.userId}`).catch(() => {});
+  // useStorage is only available in the Nitro runtime (not seed scripts), so guard it.
+  if (typeof useStorage !== 'undefined') {
+    const storage = useStorage('cache');
+    storage.removeItem(`notif-counts:user:${data.userId}`).catch(() => {});
+  }
 
   return notification;
 }
