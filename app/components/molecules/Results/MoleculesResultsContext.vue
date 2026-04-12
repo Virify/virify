@@ -205,11 +205,9 @@ const radiusText = computed(() => {
     outline: none;
   }
 
-  &__button:hover,
-  &__button:focus {
-    &__tag {
-      border-color: var(--primary-500);
-    }
+  &__button:hover &__tag,
+  &__button:focus &__tag {
+    border-color: var(--primary-500);
   }
 }
 </style>
