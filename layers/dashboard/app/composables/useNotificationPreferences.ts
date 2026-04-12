@@ -75,6 +75,17 @@ export const useNotificationPreferences = createSharedComposable(() => {
             color: 'warning',
             icon: 'i-lucide-bell-off',
           });
+        } else {
+          // Auto-save so the preference persists — user accepted the browser dialog
+          // but may not have clicked the form "Save Changes" button
+          try {
+            await useRequestFetch()("/api/user/notifications", {
+              method: "PATCH",
+              body: { ...state, receiveDesktopNotifications: true },
+            });
+          } catch {
+            // Fail silently — the toggle is already on, they can still manually save
+          }
         }
       },
     );

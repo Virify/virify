@@ -116,6 +116,7 @@ const toast = useToast();
 const { user, fetch } = useUserSession();
 const form = ref<Form<Schema>>();
 const checkingUsername = ref(false);
+const { checkProfanity } = useModeration();
 
 async function checkUsernameAvailability() {
   const username = state.username?.trim();
@@ -164,6 +165,25 @@ const schema = computed(() => {
 });
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
+  // Check name fields for profanity before submitting
+  const fieldsToCheck = [
+    { name: 'firstName', value: event.data.firstName },
+    { name: 'lastName', value: event.data.lastName },
+    { name: 'username', value: event.data.username },
+  ].filter((f): f is { name: string; value: string } => !!f.value?.trim())
+
+  const failed = fieldsToCheck
+    .map(f => ({ name: f.name, ...checkProfanity(f.value) }))
+    .filter(r => !r.safe)
+
+  if (failed.length > 0) {
+    form.value?.setErrors(failed.map(r => ({
+      name: r.name,
+      message: 'This field contains inappropriate language. Please choose something else.',
+    })))
+    return
+  }
+
   try {
     const response = await useRequestFetch()<Schema>("/api/user/profile", {
       method: "POST",
