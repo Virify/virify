@@ -1,28 +1,28 @@
 <template>
   <div class="m-results-context">
-    <h2 class="m-results-context__title | title-md">
+    <h2 v-if="count" class="m-results-context__title | title-md">
       {{ count }} {{ count === 1 ? 'property' : 'properties' }} found
     </h2>
 
     <ul class="m-results-context__list">
-      <li>
+      <li v-if="locationName || radiusText">
         <button type="button" class="m-results-context__button" aria-label="Expand location"
           @click.prevent="openLocation">
           <AtomsIcon icon="explore/map" width="16" height="16" />
 
-          <span class="m-results-context__tag">
+          <span v-if="locationName" class="m-results-context__tag">
             {{ locationName }},
           </span>
 
-          <span class="m-results-context__tag">
+          <span v-if="radiusText" class="m-results-context__tag">
             {{ radiusText }}
           </span>
         </button>
       </li>
 
-      <li>
-        <button v-if="visibleSearchTerms.length" type="button" class="m-results-context__button"
-          aria-label="Expand filters" @click.prevent="openFilters">
+      <li v-if="visibleSearchTerms.length">
+        <button type="button" class="m-results-context__button" aria-label="Expand filters"
+          @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
           <span class="m-results-context__tag" v-for="term in visibleSearchTerms" :key="term">
