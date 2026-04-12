@@ -203,6 +203,7 @@ const radiusText = computed(() => {
 
   &__button:focus {
     outline: none;
+    border-color: var(--blue-500);
   }
 
   &__button:hover &__tag,
