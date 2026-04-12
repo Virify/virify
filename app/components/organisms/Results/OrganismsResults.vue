@@ -45,16 +45,6 @@ defineEmits<{
 }>()
 
 /**
- * Check if we have search info to display
- */
-const hasSearchInfo = computed(() => {
-  const hasTerms = isPopulatedArray(props.queryAnalysis?.usedTerms)
-  const hasLocation = !!props.location
-  const hasRadius = props.radius > 0
-  return hasTerms || hasLocation || hasRadius || props.results.length > 0
-})
-
-/**
  *  Pagination
  */
 const RESULTS_PER_PAGE = 24;
