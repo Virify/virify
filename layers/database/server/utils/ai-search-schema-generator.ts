@@ -156,6 +156,17 @@ export async function getPrismaSchemaPrompt(): Promise<string> {
     ═══════════════════════════════════════════════════════════════════════════════
 
     - PRICE QUERIES: "£300k", "under £500k" → { "price": { "lte": 500000 } }
+    - PRICE RANGE (hyphen): "290k-310k", "£290,000-£310,000" → { "price": { "gte": 290000, "lte": 310000 } }
+    - PRICE RANGE (verbal): "between 290k and 310k", "290k to 310k", "from £290k to £310k" → { "price": { "gte": 290000, "lte": 310000 } }
+
+    PRICE IS ALWAYS TOP-LEVEL — NEVER INSIDE property OR saleListing/rentalListing:
+      WRONG (causes Prisma error "Unknown argument price"):
+        { "property": { "is": { "price": { "gte": 290000, "lte": 310000 } } } }
+        { "saleListing": { "is": { "price": { "lte": 500000 } } } }
+      CORRECT:
+        { "price": { "gte": 290000, "lte": 310000 }, "property": { "is": { "numberBedrooms": 2 } } }
+        { "price": { "lte": 500000 }, "saleListing": { "isNot": null } }
+
     - BEDROOM/BATHROOM: "3 beds" → "property": { "is": { "numberBedrooms": 3 } }
     - PROPERTY TYPE: "House" → "property": { "is": { "type": { "name": "House" } } }
     - CLASSIFICATION: "Detached" → "property": { "is": { "classification": { "name": "Detached" } } }

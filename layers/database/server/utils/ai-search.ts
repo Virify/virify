@@ -34,20 +34,24 @@ export async function constructPrismaWhereClause(listingType: ListingType | stri
   // Apply listing type relation filters when provided and not 'all'
   if (typeValue && typeValue !== "all") {
     if (typeValue === "sale") {
-      // If AI already provided saleListing conditions, wrap them under `is`
       if (whereClause.saleListing) {
-        if (!whereClause.saleListing.is) {
-          whereClause.saleListing = { is: whereClause.saleListing };
+        // AI returned saleListing conditions — only wrap with `is` if they are actual field
+        // conditions (e.g. { priceType: "FIXED" }). If the AI already returned a relation
+        // operator like { isNot: null } or { is: { ... } }, leave it untouched: wrapping
+        // { isNot: null } as { is: { isNot: null } } is invalid Prisma syntax.
+        const sl = whereClause.saleListing;
+        if (!sl.is && !sl.isNot) {
+          whereClause.saleListing = { is: sl };
         }
       } else {
         // Otherwise require that a SaleListing relation exists
         whereClause.saleListing = { isNot: null };
       }
     } else if (typeValue === "rent") {
-      // If AI already provided rentalListing conditions, wrap them under `is`
       if (whereClause.rentalListing) {
-        if (!whereClause.rentalListing.is) {
-          whereClause.rentalListing = { is: whereClause.rentalListing };
+        const rl = whereClause.rentalListing;
+        if (!rl.is && !rl.isNot) {
+          whereClause.rentalListing = { is: rl };
         }
       } else {
         // Otherwise require that a RentalListing relation exists
@@ -136,6 +140,37 @@ function parseAiCompletion(aiResponse: string): any {
 }
 
 /**
+ * Fields that belong on the Listing model (top-level) but which the AI sometimes
+ * incorrectly places inside property: { is: { ... } }.
+ */
+const LISTING_LEVEL_FIELDS = ["price", "listingTier", "moveInDate", "userId", "propertyId"];
+
+/**
+ * Rescues any Listing-model fields that the AI mistakenly nested inside
+ * property: { is: { ... } } and hoists them back to the top level.
+ * e.g. { property: { is: { price: { gte: 290000 } } } } →
+ *      { price: { gte: 290000 }, property: { is: {} } }
+ */
+function sanitizeWhereClause(whereClause: any): any {
+  if (whereClause.property?.is && typeof whereClause.property.is === "object") {
+    for (const field of LISTING_LEVEL_FIELDS) {
+      if (whereClause.property.is[field] !== undefined) {
+        // Only promote if not already set at top level
+        if (whereClause[field] === undefined) {
+          whereClause[field] = whereClause.property.is[field];
+        }
+        delete whereClause.property.is[field];
+      }
+    }
+    // Drop the property.is wrapper entirely if nothing remains inside it
+    if (Object.keys(whereClause.property.is).length === 0) {
+      delete whereClause.property;
+    }
+  }
+  return whereClause;
+}
+
+/**
  * Normalizes the parsed AI response to extract the where clause and query analysis,
  * and ensures the 'published' flag is set.
  * @param parsedResponse The parsed object from the AI's response.
@@ -151,6 +186,9 @@ function normalizeWhereClause(parsedResponse: any): aiSearchResult {
   } else {
     whereClause = parsedResponse;
   }
+
+  // Rescue any Listing-level fields the AI placed inside property.is
+  whereClause = sanitizeWhereClause(whereClause);
 
   // Always ensure published is true and archived is false (match traditional search behaviour)
   if (!whereClause.published) {
