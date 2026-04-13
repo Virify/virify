@@ -2,10 +2,9 @@
   <form class="o-traditional-search-form | flow flow-4xl" @submit.prevent="postFormData">
     <OrganismsTraditionalSearchContract :sale-includes-options :rent-includes-options v-model:is-sale="formData.isSale"
       v-model:min-price="formData.minPrice" v-model:max-price="formData.maxPrice" v-model:price="formData.price"
-      v-model:sale-includes="formData.saleIncludes" v-model:rent-includes="formData.rentIncludes"
-      id="traditional-search-form-price" />
+      v-model:sale-includes="formData.saleIncludes" v-model:rent-includes="formData.rentIncludes" :id="priceId" />
 
-    <section class="o-traditional-search-form__property-type" id="tradition-search-form-type">
+    <section class="o-traditional-search-form__property-type" :id="propertyTypeId">
       <h3 class="o-traditional-search-form__title | title-xs">
         Property type
       </h3>
@@ -14,8 +13,7 @@
         class="o-traditional-search-form__property-type-grid" />
     </section>
 
-
-    <section class="o-traditional-search-form__room-count" id="tradition-search-form-rooms">
+    <section class="o-traditional-search-form__room-count" :id="roomCountId">
       <h3 class="o-traditional-search-form__title | title-xs">
         Room counts
       </h3>
@@ -28,7 +26,25 @@
       </div>
     </section>
 
-    <section id="tradition-search-form-features">
+    <section class="o-traditional-search-form__property-size" :id="sizeId">
+      <h3 class="o-traditional-search-form__title | title-xs">
+        Size
+      </h3>
+
+      <div class="o-traditional-search-form__property-size-grid">
+
+        <OrganismsTraditionalSearchTextInput label="min size" name="minSize" type="number" v-model="formData.minSize"
+          :input-attributes="sizesInputAttributes" />
+
+        <OrganismsTraditionalSearchTextInput label="Max size" name="maxSize" type="number" v-model="formData.maxSize"
+          :input-attributes="sizesInputAttributes" />
+
+        <OrganismsTraditionalSearchSelectInput label="Unit" name="sizeUnit" v-model="formData.sizeUnit"
+          :options="sizes" />
+      </div>
+    </section>
+
+    <section :id="featuresId">
       <h3 class="o-traditional-search-form__title | title-xs">
         Additional features
       </h3>
@@ -49,7 +65,7 @@
       </p>
     </AtomsCollapsibleTip>
 
-    <OrganismsTraditionalSearchToolbar class="o-traditional-search-form__toolbar" />
+    <OrganismsTraditionalSearchToolbar :links="jumpLinks" class="o-traditional-search-form__toolbar" />
   </form>
 </template>
 
@@ -63,6 +79,8 @@ onBeforeMount(() => {
 /**
  *  Data
  */
+type PropertySizeUnits = 'sqmtr' | 'sqft'
+
 interface RoomCount {
   key: number
   value: string
@@ -134,6 +152,61 @@ const additionalFeatures = [
   { key: 'pets', label: 'Pet-friendly' },
 ]
 
+const sizes = [
+  { value: 'sqmtr', key: 'Square metre' },
+  { value: 'sqft', key: 'Square feet' },
+]
+
+const sizesInputAttributes = {
+  min: 0,
+  step: 1
+}
+
+/**
+ *  Jumplinks
+ */
+const jumpLinks: JumpLink[] = [
+  {
+    order: 1,
+    icon: 'jumplinks/price',
+    title: 'Price',
+    id: 'traditional-search-form-price'
+  },
+  {
+    order: 2,
+    icon: 'jumplinks/property-type',
+    title: 'Property',
+    id: 'tradition-search-form-type'
+  },
+  {
+    order: 3,
+    icon: 'jumplinks/room-count',
+    title: 'Rooms',
+    id: 'tradition-search-form-rooms'
+  },
+  {
+    order: 4,
+    icon: 'jumplinks/size',
+    title: 'Size',
+    id: 'tradition-search-size'
+  },
+  {
+    order: 5,
+    icon: 'jumplinks/additional-features',
+    title: 'Features',
+    id: 'tradition-search-form-features'
+  },
+]
+
+// Get list of IDs
+const [
+  priceId,
+  propertyTypeId,
+  roomCountId,
+  sizeId,
+  featuresId
+] = jumpLinks.map(({ id }) => id as string)
+
 /**
  *  Form data
  */
@@ -152,6 +225,9 @@ const formData = useState('search-contract-type', () => reactive({
   maxBeds: <number>getDefaultSelected(bedroomMax),
   minBathrooms: <number>getDefaultSelected(bathroomMin),
   maxBathrooms: <number>getDefaultSelected(bathroomMax),
+  minSize: <number | null>0,
+  maxSize: <number | null>null,
+  sizeUnit: <PropertySizeUnits>'sqmtr',
   propertyTypes: reactive<{ [key: string]: string[] }>({}),
   additionalFeatures: reactive<{ [key: string]: boolean }>({}),
 }))
@@ -183,6 +259,16 @@ function postFormData() {
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-32);
+  }
+
+  &__property-size-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 14ch;
+    gap: var(--size-12);
+
+    @include mq.tablet {
+      grid-template-columns: auto auto 1fr;
+    }
   }
 
   &__additional-features {

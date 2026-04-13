@@ -1,40 +1,23 @@
 <template>
   <div class="o-traditional-search-toolbar | gradient-box">
-    <MoleculesJumpLinks :links />
+
+    <LazyMoleculesJumpLinks hydrate-on-visible class="o-traditional-search-toolbar__jumplinks" :links />
+
 
     <button type="submit" class="o-traditional-search-toolbar__button | button button-secondary">
       Search
+
+      <AtomsIcon icon="arrow-right" />
     </button>
   </div>
 </template>
 
-<script setup>
-const links = [
-  {
-    order: 1,
-    icon: 'jumplinks/price',
-    title: 'Price',
-    id: 'traditional-search-form-price'
-  },
-  {
-    order: 2,
-    icon: 'jumplinks/property-type',
-    title: 'Property',
-    id: 'tradition-search-form-type'
-  },
-  {
-    order: 3,
-    icon: 'jumplinks/room-count',
-    title: 'Rooms',
-    id: 'tradition-search-form-rooms'
-  },
-  {
-    order: 4,
-    icon: 'jumplinks/additional-features',
-    title: 'Features',
-    id: 'tradition-search-form-features'
-  },
-]
+<script setup lang="ts">
+interface Props {
+  links: JumpLink[]
+}
+
+defineProps<Props>()
 
 </script>
 
@@ -42,7 +25,7 @@ const links = [
 @use "#styles/_utils/media" as mq;
 
 .o-traditional-search-toolbar {
-  --toolbar-padding: var(--size-14);
+  --toolbar-padding: var(--size-12);
   --toolbar-offset: calc(0px - var(--toolbar-padding));
 
   display: flex;
@@ -68,6 +51,10 @@ const links = [
     @include mq.mobile-only {
       padding: var(--size-12) var(--size-18);
     }
+
+    .a-icon {
+      display: none;
+    }
   }
 
   &__button,
@@ -75,6 +62,29 @@ const links = [
   .m-jump-links__indicator {
     border-radius: var(--size-12);
     box-sizing: border-box;
+  }
+
+  /**
+   *  Hide jump links for really tall screens
+   */
+  @media (min-height: 980px) {
+    &__jumplinks {
+      display: none;
+    }
+
+    &__button {
+      display: flex;
+      align-items: center;
+      gap: var(--size-10);
+      margin-left: auto;
+      padding: var(--size-12) var(24);
+
+      .a-icon {
+        display: block;
+        width: var(--size-20);
+        height: var(--size-20);
+      }
+    }
   }
 }
 </style>
