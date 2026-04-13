@@ -8,33 +8,12 @@
   </div>
 </template>
 
-<script setup>
-const links = [
-  {
-    order: 1,
-    icon: 'jumplinks/price',
-    title: 'Price',
-    id: 'traditional-search-form-price'
-  },
-  {
-    order: 2,
-    icon: 'jumplinks/property-type',
-    title: 'Property',
-    id: 'tradition-search-form-type'
-  },
-  {
-    order: 3,
-    icon: 'jumplinks/room-count',
-    title: 'Rooms',
-    id: 'tradition-search-form-rooms'
-  },
-  {
-    order: 4,
-    icon: 'jumplinks/additional-features',
-    title: 'Features',
-    id: 'tradition-search-form-features'
-  },
-]
+<script setup lang="ts">
+interface Props {
+  links: JumpLink[]
+}
+
+defineProps<Props>()
 
 </script>
 
@@ -42,7 +21,7 @@ const links = [
 @use "#styles/_utils/media" as mq;
 
 .o-traditional-search-toolbar {
-  --toolbar-padding: var(--size-14);
+  --toolbar-padding: var(--size-12);
   --toolbar-offset: calc(0px - var(--toolbar-padding));
 
   display: flex;
