@@ -1,9 +1,13 @@
 <template>
   <div class="o-traditional-search-toolbar | gradient-box">
-    <MoleculesJumpLinks :links />
+
+    <LazyMoleculesJumpLinks hydrate-on-visible class="o-traditional-search-toolbar__jumplinks" :links />
+
 
     <button type="submit" class="o-traditional-search-toolbar__button | button button-secondary">
       Search
+
+      <AtomsIcon icon="arrow-right" />
     </button>
   </div>
 </template>
@@ -47,6 +51,10 @@ defineProps<Props>()
     @include mq.mobile-only {
       padding: var(--size-12) var(--size-18);
     }
+
+    .a-icon {
+      display: none;
+    }
   }
 
   &__button,
@@ -54,6 +62,29 @@ defineProps<Props>()
   .m-jump-links__indicator {
     border-radius: var(--size-12);
     box-sizing: border-box;
+  }
+
+  /**
+   *  Hide jump links for really tall screens
+   */
+  @media (min-height: 980px) {
+    &__jumplinks {
+      display: none;
+    }
+
+    &__button {
+      display: flex;
+      align-items: center;
+      gap: var(--size-10);
+      margin-left: auto;
+      padding: var(--size-12) var(24);
+
+      .a-icon {
+        display: block;
+        width: var(--size-20);
+        height: var(--size-20);
+      }
+    }
   }
 }
 </style>
