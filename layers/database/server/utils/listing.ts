@@ -416,6 +416,11 @@ export async function fetchTraditionalSearchListings(
       saleFilter.availabilityStatus = 'AVAILABLE'
     }
 
+    // Chain free only
+    if (params.saleIncludes['chain-free']) {
+      saleFilter.chain = true
+    }
+
     // Freehold only
     if (params.saleIncludes['freehold-only']) {
       saleFilter.tenureType = 'FREEHOLD'
@@ -481,11 +486,6 @@ export async function fetchTraditionalSearchListings(
     if (conditions.length > 0) {
       propertyFilters.OR = conditions
     }
-  }
-
-  // Chain free (sale only)
-  if (params.isSale && params.saleIncludes['chain-free']) {
-    propertyFilters.chainFree = true
   }
 
   // Additional features

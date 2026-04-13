@@ -33,7 +33,6 @@ export interface SearchResult {
     numberOtherRooms?: number | null
     size?: number | null
     yearBuilt?: string | null
-    chainFree?: boolean
     vacant?: boolean
     constructionType?: string | null
     floorLevel?: number | null

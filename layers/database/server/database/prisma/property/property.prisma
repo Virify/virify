@@ -4,7 +4,6 @@ model Property {
   value                    Float?
   size                     Float?
   yearBuilt                String?
-  chainFree                Boolean                @default(false)
   vacant                   Boolean                @default(false)
   constructionType         ConstructionType?
   floorLevel               Int?
