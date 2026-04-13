@@ -25,8 +25,8 @@ export function buildQueryAnalysisFromFormData(data: TraditionalSearchData): Que
   }
 
   // Bathrooms  
-  if (data.maxBathrooms < 6) {
-    usedTerms.push(`0-${data.maxBathrooms} Bathrooms`)
+  if (data.minBathrooms > 0 || data.maxBathrooms < 6) {
+    usedTerms.push(`${data.minBathrooms}-${data.maxBathrooms} Bathrooms`)
   }
 
   // Property types
@@ -120,7 +120,19 @@ function formatNumber(num: number): string {
 }
 
 function formatFeatureName(key: string): string {
-  return key
+  const labels: Record<string, string> = {
+    'sold-stc': 'Sold STC',
+    'chain-free': 'Chain Free',
+    'freehold-only': 'Freehold Only',
+    'let-agreed': 'Let Agreed',
+    'short-term-lets': 'Short-term Lets',
+    'long-term-lets': 'Long-term Lets',
+    'off-street-parking': 'Off-street Parking',
+    'disabled-access': 'Disability Access',
+    'ev-charging': 'EV Charging',
+    'full-fibre': 'Full Fibre Broadband',
+  }
+  return labels[key] ?? key
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')

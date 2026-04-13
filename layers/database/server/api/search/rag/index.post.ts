@@ -23,16 +23,6 @@ const ragSearchSchema = z.object({
   sortBy: z.enum(['relevance', 'price-asc', 'price-desc', 'date-desc', 'date-asc']).optional().default('relevance'),
 });
 
-function buildOrderBy(sortBy: string): import('~~/layers/database/server/database/prisma/generated/client').Prisma.ListingOrderByWithRelationInput | undefined {
-  switch (sortBy) {
-    case 'price-asc': return { price: 'asc' }
-    case 'price-desc': return { price: 'desc' }
-    case 'date-desc': return { publishedAt: 'desc' }
-    case 'date-asc': return { publishedAt: 'asc' }
-    default: return undefined
-  }
-}
-
 export default defineEventHandler(async (event) => {
   try {
     checkAiConfiguration();
@@ -74,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
     // Fetch listings with or without pagination
     const shouldPaginate = page && limit;
-    const orderBy = buildOrderBy(sortBy)
+    const orderBy = buildListingOrderBy(sortBy)
     const listings = shouldPaginate
       ? await fetchPaginatedListingsForCard(whereClause, page, limit, orderBy)
       : await fetchListingsForCard(whereClause, orderBy);
