@@ -32,6 +32,15 @@
       </h3>
 
       <div class="o-traditional-search-form__property-size-grid">
+
+        <OrganismsTraditionalSearchTextInput label="min size" name="minSize" type="number" v-model="formData.minSize"
+          :input-attributes="sizesInputAttributes" />
+
+        <OrganismsTraditionalSearchTextInput label="Max size" name="maxSize" type="number" v-model="formData.maxSize"
+          :input-attributes="sizesInputAttributes" />
+
+        <OrganismsTraditionalSearchSelectInput label="Unit" name="sizeUnit" v-model="formData.sizeUnit"
+          :options="sizes" />
       </div>
     </section>
 
@@ -143,6 +152,16 @@ const additionalFeatures = [
   { key: 'pets', label: 'Pet-friendly' },
 ]
 
+const sizes = [
+  { value: 'sqmtr', key: 'Square metre' },
+  { value: 'sqft', key: 'Square feet' },
+]
+
+const sizesInputAttributes = {
+  min: 0,
+  step: 1
+}
+
 /**
  *  Jumplinks
  */
@@ -206,8 +225,8 @@ const formData = useState('search-contract-type', () => reactive({
   maxBeds: <number>getDefaultSelected(bedroomMax),
   minBathrooms: <number>getDefaultSelected(bathroomMin),
   maxBathrooms: <number>getDefaultSelected(bathroomMax),
-  minSize: 0,
-  maxSize: 0,
+  minSize: <number | null>0,
+  maxSize: <number | null>null,
   sizeUnit: <PropertySizeUnits>'sqmtr',
   propertyTypes: reactive<{ [key: string]: string[] }>({}),
   additionalFeatures: reactive<{ [key: string]: boolean }>({}),
@@ -240,6 +259,16 @@ function postFormData() {
     display: flex;
     flex-wrap: wrap;
     gap: var(--size-32);
+  }
+
+  &__property-size-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 14ch;
+    gap: var(--size-12);
+
+    @include mq.tablet {
+      grid-template-columns: auto auto 1fr;
+    }
   }
 
   &__additional-features {
