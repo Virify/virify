@@ -76,7 +76,7 @@ onMounted(() => {
       resizeIndicator()
     })
   }, {
-    rootMargin: '-100px'
+    rootMargin: '-150px'
   })
 
   /**
