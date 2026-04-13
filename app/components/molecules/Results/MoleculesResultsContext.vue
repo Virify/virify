@@ -20,17 +20,13 @@
         </button>
       </li>
 
-      <li v-if="visibleSearchTerms.length">
+      <li v-if="searchTermsFormatted.length">
         <button type="button" class="m-results-context__button" aria-label="Expand filters"
           @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
-          <span class="m-results-context__tag" v-for="term in visibleSearchTerms" :key="term">
+          <span class="m-results-context__tag" v-for="term in searchTermsFormatted" :key="term">
             {{ term }}
-          </span>
-
-          <span v-if="overflowSearchTerms" class="m-results-context__overflow">
-            and {{ overflowSearchTerms }} more
           </span>
         </button>
       </li>
@@ -84,30 +80,6 @@ const searchTermsFormatted = computed(() => {
   return usedTerms.filter(isString).map(term => {
     return term.charAt(0).toUpperCase() + term.slice(1)
   })
-})
-
-const visibleSearchTerms = computed(() => {
-  const usedTerms = searchTermsFormatted.value
-
-  // If less than 4 used terms exist, return as-is
-  if (usedTerms.length < 4) {
-    return searchTermsFormatted.value
-  }
-
-  // Else only return the first 2
-  return usedTerms.slice(0, 2)
-})
-
-const overflowSearchTerms = computed(() => {
-  const usedTerms = searchTermsFormatted.value
-
-  // If less than 4 used terms exist, no overflow
-  if (usedTerms.length < 4) {
-    return 0
-  }
-
-  // Else overflow is total length minus 2
-  return usedTerms.length - 2
 })
 
 /**
