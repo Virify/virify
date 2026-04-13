@@ -139,13 +139,14 @@ const radiusText = computed(() => {
     font-size: var(--font-xs);
     line-height: var(--lineheight-sm);
     font-weight: var(--font-semisemibold);
-    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
+    border: 1px solid light-dark(var(--blue-700), var(--blue-300));
     border-radius: var(--border-radius-lg);
     padding: var(--results-context-gap);
     cursor: pointer;
 
     @include mq.tablet {
       font-size: var(--font-sm);
+      border-radius: var(--border-radius-xl);
     }
 
     .a-icon {
@@ -163,8 +164,12 @@ const radiusText = computed(() => {
     border: 1px solid var(--primary-background-200);
     background: var(--primary-background-100);
     padding: var(--size-4) var(--size-10);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius-md);
     transition: border-color var(--animation-fast) var(--ease-in-out);
+
+    @include mq.tablet {
+      border-radius: var(--border-radius-lg);
+    }
   }
 
   &__overflow {
