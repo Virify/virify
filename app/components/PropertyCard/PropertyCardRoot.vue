@@ -47,10 +47,13 @@
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price">
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
+        <PropertyCardPill v-if="rentFrequency" :content="rentFrequency" variant="orange" />
 
         <span class="property-card-root__price-amount | title-md">
-          {{ price }}            <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
-          <sub v-if="rentFrequency" class="property-card-root__price-frequency">{{ rentFrequency }}</sub>
+          {{ price }}
+
+          <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!"
+            :current-price="currentPriceNumber!" />
         </span>
       </h2>
 
@@ -343,13 +346,6 @@ const imageCarouselArray = computed(() => {
     @include small-card {
       font-size: var(--title-sm);
     }
-  }
-
-  &__price-frequency {
-    position: unset;
-    bottom: unset;
-    font-size: var(--font-xs);
-    vertical-align: baseline;
   }
 
   &__overview {
