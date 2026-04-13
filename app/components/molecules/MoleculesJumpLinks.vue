@@ -21,13 +21,6 @@
 <script setup lang="ts">
 import { useResizeObserver, watchImmediate } from '@vueuse/core';
 
-interface JumpLink {
-  order?: number,
-  icon?: null,
-  title: string
-  id: string
-}
-
 interface Props {
   links: JumpLink[]
 }
