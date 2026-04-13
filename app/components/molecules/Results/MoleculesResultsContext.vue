@@ -180,7 +180,7 @@ const radiusText = computed(() => {
 
   &__button:focus {
     outline: none;
-    border-color: var(--blue-500);
+    border-color: light-dark(var(--blue-600), var(--blue-400));
   }
 
   &__button:hover &__tag,
