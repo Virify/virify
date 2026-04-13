@@ -650,7 +650,7 @@ export async function generateWhereClauseFromQuery(query: string): Promise<aiSea
   checkAiConfiguration();
 
   const storage = useStorage("cache");
-  const cacheKey = `ai-search:v14:${query.toLowerCase().replace(/\s+/g, " ").trim()}`;
+  const cacheKey = `ai-search:${query.toLowerCase().replace(/\s+/g, " ").trim()}`;
 
   const cached = await storage.getItem<aiSearchResult>(cacheKey);
   if (cached) return cached;
