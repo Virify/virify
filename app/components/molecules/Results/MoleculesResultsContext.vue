@@ -1,36 +1,32 @@
 <template>
   <div class="m-results-context">
-    <h2 class="m-results-context__title | title-md">
+    <h2 v-if="count" class="m-results-context__title | title-md">
       {{ count }} {{ count === 1 ? 'property' : 'properties' }} found
     </h2>
 
     <ul class="m-results-context__list">
-      <li>
+      <li v-if="locationName || radiusText">
         <button type="button" class="m-results-context__button" aria-label="Expand location"
           @click.prevent="openLocation">
           <AtomsIcon icon="explore/map" width="16" height="16" />
 
-          <span class="m-results-context__tag">
+          <span v-if="locationName" class="m-results-context__tag">
             {{ locationName }},
           </span>
 
-          <span class="m-results-context__tag">
+          <span v-if="radiusText" class="m-results-context__tag">
             {{ radiusText }}
           </span>
         </button>
       </li>
 
-      <li>
-        <button v-if="visibleSearchTerms.length" type="button" class="m-results-context__button"
-          aria-label="Expand filters" @click.prevent="openFilters">
+      <li v-if="searchTermsFormatted.length">
+        <button type="button" class="m-results-context__button" aria-label="Expand filters"
+          @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
-          <span class="m-results-context__tag" v-for="term in visibleSearchTerms" :key="term">
+          <span class="m-results-context__tag" v-for="term in searchTermsFormatted" :key="term">
             {{ term }}
-          </span>
-
-          <span v-if="overflowSearchTerms" class="m-results-context__overflow">
-            and {{ overflowSearchTerms }} more
           </span>
         </button>
       </li>
@@ -84,30 +80,6 @@ const searchTermsFormatted = computed(() => {
   return usedTerms.filter(isString).map(term => {
     return term.charAt(0).toUpperCase() + term.slice(1)
   })
-})
-
-const visibleSearchTerms = computed(() => {
-  const usedTerms = searchTermsFormatted.value
-
-  // If less than 4 used terms exist, return as-is
-  if (usedTerms.length < 4) {
-    return searchTermsFormatted.value
-  }
-
-  // Else only return the first 2
-  return usedTerms.slice(0, 2)
-})
-
-const overflowSearchTerms = computed(() => {
-  const usedTerms = searchTermsFormatted.value
-
-  // If less than 4 used terms exist, no overflow
-  if (usedTerms.length < 4) {
-    return 0
-  }
-
-  // Else overflow is total length minus 2
-  return usedTerms.length - 2
 })
 
 /**

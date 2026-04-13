@@ -9,8 +9,8 @@
     </template>
 
     <template v-else>
-      <MoleculesResultsContext v-if="hasSearchInfo" :count="results.length" :query-analysis="queryAnalysis"
-        :location="location" :radius="radius" @open-popover="$emit('open-popover', $event)" />
+      <MoleculesResultsContext v-if="results.length" :count="results.length" :query-analysis :location :radius
+        @open-popover="$emit('open-popover', $event)" />
 
       <div class="o-results__grid">
         <PropertyCardRoot v-for="result of paginatedResults" :key="result.listingId" v-bind="result" />
