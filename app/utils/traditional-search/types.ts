@@ -19,5 +19,8 @@ export interface TraditionalSearchData {
   rentIncludes: TraditionalSearchDataOptions
   saleIncludes: TraditionalSearchDataOptions
   additionalFeatures: TraditionalSearchDataOptions
+  minSize?: number | null
+  maxSize?: number | null
+  sizeUnit?: 'sqmtr' | 'sqft'
 }
 

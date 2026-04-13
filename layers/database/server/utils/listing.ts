@@ -364,17 +364,18 @@ export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, pa
 /**
  * Fetches card-only listing data (lean select, no room details).
  */
-export async function fetchListingsForCard(where: Prisma.ListingWhereInput): Promise<ListingCardType[]> {
+export async function fetchListingsForCard(where: Prisma.ListingWhereInput, orderBy?: Prisma.ListingOrderByWithRelationInput): Promise<ListingCardType[]> {
   return await prisma.listing.findMany({
     where,
     select: listingCardFields,
+    ...(orderBy ? { orderBy } : {}),
   });
 }
 
 /**
  * Fetches paginated card-only listing data.
  */
-export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20): Promise<ListingCardType[]> {
+export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20, orderBy?: Prisma.ListingOrderByWithRelationInput): Promise<ListingCardType[]> {
   const skip = (page - 1) * limit;
 
   return await prisma.listing.findMany({
@@ -382,5 +383,6 @@ export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereIn
     select: listingCardFields,
     skip,
     take: limit,
+    ...(orderBy ? { orderBy } : {}),
   });
 }

@@ -28,7 +28,18 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Model
  */
-const inputValue = defineModel()
+const model = defineModel<number | string | null>()
+
+const inputValue = computed({
+  get: () => model.value ?? '',
+  set: (val) => {
+    if (props.type === 'number') {
+      model.value = (val === '' || val === null) ? null : Number(val)
+    } else {
+      model.value = val
+    }
+  }
+})
 
 </script>
 

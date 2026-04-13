@@ -8,6 +8,7 @@
       <template #left v-if="showGrid">
         <OrganismsResults v-if="isLoading || results.length" :results :is-loading="isLoading"
           :query-analysis="searchState?.queryAnalysis" :location="searchState?.location" :radius="searchState?.radius"
+          :sort-by="sortBy"
           @open-popover="handleOpenPopover" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
@@ -39,6 +40,7 @@ const {
   fetchResults,
   setViewMode,
   setSortOrder,
+  sortSelectOpen,
 } = useSearchState()
 
 /**
@@ -99,7 +101,12 @@ const dockRef = ref<{ showPopover: (type: 'location' | 'filters') => void } | nu
 /**
  * Handle opening the dock popover
  */
-function handleOpenPopover(type: 'location' | 'filters') {
+function handleOpenPopover(type: 'location' | 'filters' | 'sort') {
+  if (type === 'sort') {
+    sortSelectOpen.value = true
+    return
+  }
+
   dockRef.value?.showPopover(type)
 }
 
@@ -141,6 +148,7 @@ const viewMode = computed(() => asObject(searchState.value).viewMode)
 
 watch(sortBy, (newValue) => {
   setSortOrder(newValue as SortOrder)
+  fetchResults()
 })
 
 watch(viewMode, (layout) => {

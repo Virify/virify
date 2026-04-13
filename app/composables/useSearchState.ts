@@ -18,6 +18,7 @@ let instance: ReturnType<typeof createSearchState> | null = null;
 function createSearchState() {
   const searchState = ref<SearchState>({ ...defaultState });
   const isLoading = ref(false);
+  const sortSelectOpen = ref(false);
 
   /**
    *  Run a callback, if it's valid
@@ -221,7 +222,8 @@ function createSearchState() {
           body: {
             ...asObject(body),
             location,
-            radius
+            radius,
+            sortBy: searchState.value.sortBy
           } as unknown as BodyInit
         })
 
@@ -253,7 +255,8 @@ function createSearchState() {
           body: {
             ...formData,
             location,
-            radius
+            radius,
+            sortBy: searchState.value.sortBy
           }
         })
 
@@ -289,6 +292,7 @@ function createSearchState() {
 
   return {
     searchState,
+    sortSelectOpen,
     setSortOrder,
     setViewMode,
     setSearchType,

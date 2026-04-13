@@ -62,7 +62,21 @@ const traditionalSearchSchema = z.object({
     Specialty: z.array(z.enum(['Retirement Home', 'New Build Home'])).default([]),
     'Student Accommodation': z.array(z.enum(['Flat', 'House', 'House-share'])).default([]),
   }).optional(),
+  sortBy: z.enum(['relevance', 'price-asc', 'price-desc', 'date-desc', 'date-asc']).optional().default('relevance'),
+  minSize: z.number().min(0).nullable().optional(),
+  maxSize: z.number().min(0).nullable().optional(),
+  sizeUnit: z.enum(['sqmtr', 'sqft']).optional().default('sqmtr'),
 });
+
+function buildOrderBy(sortBy: string): import('~~/layers/database/server/database/prisma/generated/client').Prisma.ListingOrderByWithRelationInput | undefined {
+  switch (sortBy) {
+    case 'price-asc': return { price: 'asc' }
+    case 'price-desc': return { price: 'desc' }
+    case 'date-desc': return { publishedAt: 'desc' }
+    case 'date-asc': return { publishedAt: 'asc' }
+    default: return undefined
+  }
+}
 
 export default defineEventHandler(async (event) => {
   
@@ -183,13 +197,29 @@ export default defineEventHandler(async (event) => {
       propertyFilters.accessibilityFeatures = { isNot: null };
     }
 
+    // Apply property size filter (DB stores size in sqmtr; convert if user selected sqft)
+    const SQFT_TO_SQMTR = 0.092903
+    const minSizeSqmtr = body.minSize != null
+      ? (body.sizeUnit === 'sqft' ? body.minSize * SQFT_TO_SQMTR : body.minSize)
+      : undefined
+    const maxSizeSqmtr = body.maxSize != null
+      ? (body.sizeUnit === 'sqft' ? body.maxSize * SQFT_TO_SQMTR : body.maxSize)
+      : undefined
+    if (minSizeSqmtr !== undefined || maxSizeSqmtr !== undefined) {
+      propertyFilters.size = {
+        ...(minSizeSqmtr !== undefined ? { gte: minSizeSqmtr } : {}),
+        ...(maxSizeSqmtr !== undefined ? { lte: maxSizeSqmtr } : {}),
+      }
+    }
+
     // Apply property filters if any exist
     if (Object.keys(propertyFilters).length > 0) {
       whereClause.property = { is: propertyFilters };
     }
 
     // Fetch lean card data for listings
-    const listings = await fetchListingsForCard(whereClause);
+    const orderBy = buildOrderBy(body.sortBy)
+    const listings = await fetchListingsForCard(whereClause, orderBy);
 
     return listings;
 

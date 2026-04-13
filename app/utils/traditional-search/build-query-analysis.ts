@@ -47,6 +47,18 @@ export function buildQueryAnalysisFromFormData(data: TraditionalSearchData): Que
   
   usedTerms.push(...activeFeatures)
 
+  // Size
+  const { minSize, maxSize, sizeUnit } = data
+  const unit = sizeUnit === 'sqft' ? 'sqft' : 'sqmtr'
+
+  if (minSize && maxSize) {
+    usedTerms.push(`${minSize}-${maxSize} ${unit}`)
+  } else if (minSize) {
+    usedTerms.push(`${minSize}+ ${unit}`)
+  } else if (maxSize) {
+    usedTerms.push(`Up to ${maxSize} ${unit}`)
+  }
+
   // Sale includes
   if (data.isSale) {
     const saleFeatures = Object.entries(data.saleIncludes || {})

@@ -33,7 +33,7 @@
 
       <div class="o-traditional-search-form__property-size-grid">
 
-        <OrganismsTraditionalSearchTextInput label="min size" name="minSize" type="number" v-model="formData.minSize"
+        <OrganismsTraditionalSearchTextInput label="Min size" name="minSize" type="number" v-model="formData.minSize"
           :input-attributes="sizesInputAttributes" />
 
         <OrganismsTraditionalSearchTextInput label="Max size" name="maxSize" type="number" v-model="formData.maxSize"
@@ -225,7 +225,7 @@ const formData = useState('search-contract-type', () => reactive({
   maxBeds: <number>getDefaultSelected(bedroomMax),
   minBathrooms: <number>getDefaultSelected(bathroomMin),
   maxBathrooms: <number>getDefaultSelected(bathroomMax),
-  minSize: <number | null>0,
+  minSize: <number | null>null,
   maxSize: <number | null>null,
   sizeUnit: <PropertySizeUnits>'sqmtr',
   propertyTypes: reactive<{ [key: string]: string[] }>({}),
