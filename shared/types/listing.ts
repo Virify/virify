@@ -282,6 +282,7 @@ export const listingCardFields = {
           petFriendly: true,
         },
       },
+      size: true,
       numberBedrooms: true,
       numberBathrooms: true,
       numberReceptions: true,

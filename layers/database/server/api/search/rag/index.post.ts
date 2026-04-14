@@ -19,14 +19,15 @@ const ragSearchSchema = z.object({
   }).passthrough().optional(),
   radius: z.coerce.number().optional().default(40),
   page: z.coerce.number().min(1).optional(),
-  limit: z.coerce.number().min(1).max(100).optional()
+  limit: z.coerce.number().min(1).max(100).optional(),
+  sortBy: z.enum(['relevance', 'price-asc', 'price-desc', 'date-desc', 'date-asc']).optional().default('relevance'),
 });
 
 export default defineEventHandler(async (event) => {
   try {
     checkAiConfiguration();
 
-    const { listingType, query, location, radius, page, limit } = await readValidatedBody(event, ragSearchSchema.parse);
+    const { listingType, query, location, radius, page, limit, sortBy } = await readValidatedBody(event, ragSearchSchema.parse);
 
     // Extract location data from the full location object
     const lat = location?.geometry?.coordinates?.[1];
@@ -63,9 +64,10 @@ export default defineEventHandler(async (event) => {
 
     // Fetch listings with or without pagination
     const shouldPaginate = page && limit;
+    const orderBy = buildListingOrderBy(sortBy)
     const listings = shouldPaginate
-      ? await fetchPaginatedListingsForCard(whereClause, page, limit)
-      : await fetchListingsForCard(whereClause);
+      ? await fetchPaginatedListingsForCard(whereClause, page, limit, orderBy)
+      : await fetchListingsForCard(whereClause, orderBy);
 
     const resultsWithListingType = listings.map((listing) => ({
       ...listing,

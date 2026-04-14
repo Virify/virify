@@ -33,7 +33,7 @@
 
       <div class="o-traditional-search-form__property-size-grid">
 
-        <OrganismsTraditionalSearchTextInput label="min size" name="minSize" type="number" v-model="formData.minSize"
+        <OrganismsTraditionalSearchTextInput label="Min size" name="minSize" type="number" v-model="formData.minSize"
           :input-attributes="sizesInputAttributes" />
 
         <OrganismsTraditionalSearchTextInput label="Max size" name="maxSize" type="number" v-model="formData.maxSize"
@@ -50,8 +50,8 @@
       </h3>
 
       <ul class="o-traditional-search-form__additional-features">
-        <li v-for="{ key, label } of additionalFeatures">
-          <AtomsCheckbox v-model="formData.additionalFeatures[key]" :label :name="key" />
+        <li v-for="{ key, label, icon } of additionalFeatures">
+          <AtomsCheckbox v-model="formData.additionalFeatures[key]" :label :name="key" :icon />
         </li>
       </ul>
     </section>
@@ -89,9 +89,8 @@ interface RoomCount {
 
 const saleIncludesOptions = [
   { key: 'sold-stc', label: 'Include sold STC' },
-  { key: 'shared-ownership', label: 'Include shared ownership' },
-  { key: 'retirement', label: 'Include retirement properties' },
-  { key: 'cash-only', label: 'Include cash-only properties' },
+  { key: 'chain-free', label: 'Chain free only' },
+  { key: 'freehold-only', label: 'Freehold only' },
 ]
 
 const rentIncludesOptions = [
@@ -145,11 +144,13 @@ const bathroomMax: RoomCount[] = [
 ]
 
 const additionalFeatures = [
-  { key: 'garage', label: 'Garage' },
-  { key: 'off-street-parking', label: 'Off-street parking' },
-  { key: 'disabled-access', label: 'Disability access' },
-  { key: 'garden', label: 'Garden' },
-  { key: 'pets', label: 'Pet-friendly' },
+  { key: 'garage', label: 'Garage', icon: 'i-lucide-warehouse' },
+  { key: 'off-street-parking', label: 'Off-street parking', icon: 'i-lucide-square-parking' },
+  { key: 'disabled-access', label: 'Disability access', icon: 'i-lucide-accessibility' },
+  { key: 'garden', label: 'Garden', icon: 'i-lucide-tree-deciduous' },
+  { key: 'pets', label: 'Pet-friendly', icon: 'i-lucide-dog' },
+  { key: 'ev-charging', label: 'EV charging', icon: 'i-lucide-bolt' },
+  { key: 'full-fibre', label: 'Full fibre broadband', icon: 'i-lucide-wifi' },
 ]
 
 const sizes = [
@@ -225,7 +226,7 @@ const formData = useState('search-contract-type', () => reactive({
   maxBeds: <number>getDefaultSelected(bedroomMax),
   minBathrooms: <number>getDefaultSelected(bathroomMin),
   maxBathrooms: <number>getDefaultSelected(bathroomMax),
-  minSize: <number | null>0,
+  minSize: <number | null>null,
   maxSize: <number | null>null,
   sizeUnit: <PropertySizeUnits>'sqmtr',
   propertyTypes: reactive<{ [key: string]: string[] }>({}),

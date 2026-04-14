@@ -869,7 +869,7 @@ export const generateProperty = async (address: Prisma.AddressCreateWithoutPrope
       totalFloors,
       size: faker.number.int({ min: 50, max: 500 }),
       yearBuilt: faker.date.past().getFullYear().toString(),
-      chainFree: faker.datatype.boolean(),
+
       vacant: faker.datatype.boolean(),
       constructionType: faker.helpers.arrayElement(Object.values(ConstructionType)),
       floorLevel: undefined,

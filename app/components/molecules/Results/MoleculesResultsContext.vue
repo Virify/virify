@@ -5,13 +5,13 @@
     </h2>
 
     <ul class="m-results-context__list">
-      <li v-if="locationName || radiusText">
+      <li v-if="location || radiusText">
         <button type="button" class="m-results-context__button" aria-label="Expand location"
           @click.prevent="openLocation">
           <AtomsIcon icon="explore/map" width="16" height="16" />
 
-          <span v-if="locationName" class="m-results-context__tag">
-            {{ locationName }},
+          <span v-if="location" class="m-results-context__tag">
+            {{ location }},
           </span>
 
           <span v-if="radiusText" class="m-results-context__tag">
@@ -20,12 +20,23 @@
         </button>
       </li>
 
-      <li v-if="searchTermsFormatted.length">
+      <li v-if="sortLabel">
+        <button type="button" class="m-results-context__button" aria-label="Change sort order"
+          @click.prevent="openSort">
+          <AtomsIcon icon="search/sort" width="16" height="16" />
+
+          <span class="m-results-context__tag">
+            {{ sortLabel }}
+          </span>
+        </button>
+      </li>
+
+      <li v-if="terms.length">
         <button type="button" class="m-results-context__button" aria-label="Expand filters"
           @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
-          <span class="m-results-context__tag" v-for="term in searchTermsFormatted" :key="term">
+          <span class="m-results-context__tag" v-for="term in terms" :key="term">
             {{ term }}
           </span>
         </button>
@@ -37,21 +48,24 @@
 <script setup lang="ts">
 interface Props {
   count?: number
-  queryAnalysis?: QueryAnalysis | null
-  location?: GeocodingFeature | null
-  radius?: number
+  sortBy?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   count: 0,
-  queryAnalysis: null,
-  location: null,
-  radius: 0
+  sortBy: 'relevance'
 })
 
 const emit = defineEmits<{
-  'open-popover': [type: 'location' | 'filters']
+  'open-popover': [type: 'location' | 'filters' | 'sort']
 }>()
+
+/**
+ * Open sort in the dock
+ */
+function openSort() {
+  emit('open-popover', 'sort')
+}
 
 /**
  * Open filters in the dock
@@ -70,33 +84,22 @@ function openLocation() {
 /**
  * Search terms from query analysis - capitalized
  */
-const searchTermsFormatted = computed(() => {
-  const { usedTerms } = asObject(props.queryAnalysis)
-
-  // If no search terms exist, return nothing
-  if (!Array.isArray(usedTerms)) return []
-
-  // Format the list
-  return usedTerms.filter(isString).map(term => {
-    return term.charAt(0).toUpperCase() + term.slice(1)
-  })
-})
-
-/**
- * Location name for display
- */
-const locationName = computed(() => {
-  if (!props.location) return ''
-  return props.location.place_name_en || props.location.place_name || ''
-})
+const { location, radius, terms } = useActiveSearchTerms()
 
 /**
  * Radius text for display
  */
 const radiusText = computed(() => {
-  if (props.radius == null) return ''
-  if (props.radius === 0) return 'This location only'
-  return `Within ${props.radius} Miles`
+  if (!radius && radius !== 0) return ''
+  if (radius === 0) return 'This location only'
+  return `Within ${radius} Miles`
+})
+
+/**
+ * Sort label for display
+ */
+const sortLabel = computed(() => {
+  return selectOptionSortOrder.find(o => o.value === (props.sortBy || 'relevance'))?.key ?? 'Relevance'
 })
 
 </script>
