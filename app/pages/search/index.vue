@@ -7,7 +7,6 @@
     }">
       <template #left v-if="showGrid">
         <OrganismsResults v-if="isLoading || results.length" :results :is-loading="isLoading"
-          :query-analysis="searchState?.queryAnalysis" :location="searchState?.location" :radius="searchState?.radius"
           :sort-by="sortBy"
           @open-popover="handleOpenPopover" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />

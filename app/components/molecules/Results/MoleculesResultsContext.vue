@@ -48,17 +48,11 @@
 <script setup lang="ts">
 interface Props {
   count?: number
-  queryAnalysis?: QueryAnalysis | null
-  location?: GeocodingFeature | null
-  radius?: number
   sortBy?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   count: 0,
-  queryAnalysis: null,
-  location: null,
-  radius: 0,
   sortBy: 'relevance'
 })
 

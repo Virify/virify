@@ -9,7 +9,7 @@
     </template>
 
     <template v-else>
-      <MoleculesResultsContext v-if="results.length" :count="results.length" :query-analysis :location :radius :sort-by
+      <MoleculesResultsContext v-if="results.length" :count="results.length" :sort-by
         @open-popover="$emit('open-popover', $event)" />
 
       <div class="o-results__grid">
@@ -28,17 +28,11 @@
 interface Props {
   isLoading?: boolean
   results: ListingCardData[]
-  queryAnalysis?: QueryAnalysis | null
-  location?: GeocodingFeature | null
-  radius?: number
   sortBy?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
-  queryAnalysis: null,
-  location: null,
-  radius: 0,
   sortBy: 'relevance'
 })
 

@@ -64,8 +64,8 @@ const traditionalSearchSchema = z.object({
     'Student Accommodation': z.array(z.enum(['Flat', 'House', 'House-share'])).default([]),
   }).optional(),
   sortBy: z.enum(['relevance', 'price-asc', 'price-desc', 'date-desc', 'date-asc']).optional().default('relevance'),
-  minSize: z.number().min(0).nullable().optional(),
-  maxSize: z.number().min(0).nullable().optional(),
+  minSize: z.preprocess(v => (v === '' || v == null) ? null : Number(v), z.number().min(0).nullable().optional()),
+  maxSize: z.preprocess(v => (v === '' || v == null) ? null : Number(v), z.number().min(0).nullable().optional()),
   sizeUnit: z.enum(['sqmtr', 'sqft']).optional().default('sqmtr'),
 });
 
