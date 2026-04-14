@@ -335,6 +335,15 @@ export const useCreateListingSteps = createSharedComposable(() => {
           color: 'info',
           duration: 2000
         })
+      } else {
+        const stepTitle = steps.value.find(s => s.id === stepNumber)?.title || `Step ${stepNumber}`
+        toast.add({
+          title: `${stepTitle} saved`,
+          icon: 'i-lucide-check-circle-2',
+          description: 'Your progress has been saved',
+          color: 'success',
+          duration: 2000
+        })
       }
       return true
     }

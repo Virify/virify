@@ -68,7 +68,9 @@ moveInDateBefore: ISO date string (YYYY-MM-DD). Property available ON OR BEFORE 
 moveInDateAfter: ISO date string (YYYY-MM-DD). Property available FROM this date. Use for "available from September", "available after the summer". Compute from today's date.
 verificationLevel: "UNVERIFIED" | "BASIC" | "VERIFIED" | "FULLY_VERIFIED". "verified" → VERIFIED. "fully verified" → FULLY_VERIFIED.
 yearBuiltAfter / yearBuiltBefore: 4-digit year (number). "built after 2000" → yearBuiltAfter:2000. "Victorian" → yearBuiltBefore:1910. "Edwardian" → yearBuiltAfter:1901, yearBuiltBefore:1910. "1970s" → yearBuiltAfter:1970, yearBuiltBefore:1979. "new build" → use classificationNames instead.
-totalFloorsMax: Max floors in the building. "low-rise" → totalFloorsMax:4. "no high-rise" → totalFloorsMax:6.
+FLOOR NUMBERING: 0 = Ground Floor, 1 = First Floor, 2 = Second Floor, etc. A "2 storey" or "2 floor" house has totalFloors=2 (ground + first).
+floorLevel: Floor a room is on. "ground floor flat" → floorLevel:0. "first floor flat" → floorLevel:1. "second floor flat" → floorLevel:2.
+totalFloorsMax: Max number of floors in the building (count, not index). "2 storey" / "2 floor" → totalFloorsMax:2. "single storey" / "bungalow" → totalFloorsMax:1. "low-rise" → totalFloorsMax:4. "no high-rise" → totalFloorsMax:6.
 numberKitchensMin: Min number of kitchens. "2 kitchens" → numberKitchensMin:2.
 numberOtherRoomsMin: Min number of other rooms (offices, studies, etc).
 depositMax: Max security deposit in pounds (rental only). "deposit under £2,000" → depositMax:2000.
@@ -131,12 +133,12 @@ export const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         sizeMin: { type: "number" },
         yearBuiltAfter: { type: "number", description: "4-digit year" },
         yearBuiltBefore: { type: "number", description: "4-digit year" },
-        totalFloorsMax: { type: "number" },
+        totalFloorsMax: { type: "number", description: "Max number of floors in the building (count, not index). '2 storey'/'2 floor' → 2. 'single storey'/'bungalow' → 1. 'low-rise' → 4." },
         numberKitchensMin: { type: "number" },
         numberOtherRoomsMin: { type: "number" },
         vacant: { type: "boolean" },
         constructionType: { type: "string", enum: ["STANDARD", "NON_STANDARD"] },
-        floorLevel: { type: "number" },
+        floorLevel: { type: "number", description: "Floor level using 0-based convention: 0=Ground Floor, 1=First Floor, 2=Second Floor, etc. 'ground floor flat' → 0. 'first floor flat' → 1." },
         propertyTypeName: { type: "string" },
         classificationNames: { type: "array", items: { type: "string" } },
         parkingFeatures: { type: "array", items: { type: "string", enum: ["GARAGE", "DRIVEWAY", "PERMIT_PARKING", "ON_STREET", "NO_PARKING", "CARPORT", "ALLOCATED_PARKING", "EV_CHARGING"] } },

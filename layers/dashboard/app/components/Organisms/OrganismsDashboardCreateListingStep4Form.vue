@@ -110,7 +110,7 @@ function addBedroom() {
     name: '',
     roomNumber: newIndex + 1,
     description: null,
-    floor: 1,
+    floor: 0,
     bed: [],
     features: [],
     size: null,
@@ -148,7 +148,7 @@ function addBathroom() {
     name: '',
     roomNumber: newIndex + 1,
     description: null,
-    floor: 1,
+    floor: 0,
     features: [],
     size: null,
   })

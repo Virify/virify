@@ -6,6 +6,7 @@
     :is-valid="isFormValid"
     api-endpoint="/api/listings/update/steps/nine/"
     :get-submission-data="getSubmissionData"
+    :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
@@ -302,6 +303,15 @@ onUnmounted(() => {
 
 function getSubmissionData() {
   return { property: { media: formatMediaForSubmission(state.property.media) } }
+}
+
+function getFieldsToModerate() {
+  return state.property.media
+    .filter(img => img.description)
+    .map(img => ({
+      name: `media.${img.cloudflareId}.description`,
+      value: img.description ?? '',
+    }))
 }
 
 function onStepCompleted() {
