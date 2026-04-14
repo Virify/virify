@@ -28,7 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
 /**
  *  Model
  */
-const inputValue = defineModel()
+const inputValue = defineModel<number | string | null>()
 
 </script>
 

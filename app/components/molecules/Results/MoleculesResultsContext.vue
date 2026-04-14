@@ -20,6 +20,17 @@
         </button>
       </li>
 
+      <li v-if="sortLabel">
+        <button type="button" class="m-results-context__button" aria-label="Change sort order"
+          @click.prevent="openSort">
+          <AtomsIcon icon="search/sort" width="16" height="16" />
+
+          <span class="m-results-context__tag">
+            {{ sortLabel }}
+          </span>
+        </button>
+      </li>
+
       <li v-if="terms.length">
         <button type="button" class="m-results-context__button" aria-label="Expand filters"
           @click.prevent="openFilters">
@@ -37,15 +48,24 @@
 <script setup lang="ts">
 interface Props {
   count?: number
+  sortBy?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  count: 0
+  count: 0,
+  sortBy: 'relevance'
 })
 
 const emit = defineEmits<{
-  'open-popover': [type: 'location' | 'filters']
+  'open-popover': [type: 'location' | 'filters' | 'sort']
 }>()
+
+/**
+ * Open sort in the dock
+ */
+function openSort() {
+  emit('open-popover', 'sort')
+}
 
 /**
  * Open filters in the dock
@@ -73,6 +93,13 @@ const radiusText = computed(() => {
   if (!radius && radius !== 0) return ''
   if (radius === 0) return 'This location only'
   return `Within ${radius} Miles`
+})
+
+/**
+ * Sort label for display
+ */
+const sortLabel = computed(() => {
+  return selectOptionSortOrder.find(o => o.value === (props.sortBy || 'relevance'))?.key ?? 'Relevance'
 })
 
 </script>

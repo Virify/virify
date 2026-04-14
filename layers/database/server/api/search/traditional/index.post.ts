@@ -1,8 +1,8 @@
 import * as z from 'zod';
-import type { Prisma } from '~~/layers/database/server/database/prisma/generated/client';
 
 const traditionalSearchSchema = z.object({
   isSale: z.boolean().default(true),
+  minBathrooms: z.number().min(0).default(0),
   maxBathrooms: z.number().min(0).default(6),
   minBedrooms: z.number().min(0).default(0),
   maxBeds: z.number().min(0).default(9),
@@ -36,17 +36,18 @@ const traditionalSearchSchema = z.object({
   bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
   rentIncludes: z.object({
     'let-agreed': z.boolean().default(false),
-    'bills-included': z.boolean().default(false),
-    furnished: z.boolean().default(false),
+    'short-term-lets': z.boolean().default(false),
+    'long-term-lets': z.boolean().default(false),
   }),
   saleIncludes: z.object({
-    'cash-only': z.boolean().default(false),
-    'retirement': z.boolean().default(false),
-    'shared-ownership': z.boolean().default(false),
     'sold-stc': z.boolean().default(false),
+    'chain-free': z.boolean().default(false),
+    'freehold-only': z.boolean().default(false),
   }),
   additionalFeatures: z.object({
     'disabled-access': z.boolean().default(false),
+    'ev-charging': z.boolean().default(false),
+    'full-fibre': z.boolean().default(false),
     garage: z.boolean().default(false),
     garden: z.boolean().default(false),
     'off-street-parking': z.boolean().default(false),
@@ -62,136 +63,45 @@ const traditionalSearchSchema = z.object({
     Specialty: z.array(z.enum(['Retirement Home', 'New Build Home'])).default([]),
     'Student Accommodation': z.array(z.enum(['Flat', 'House', 'House-share'])).default([]),
   }).optional(),
+  sortBy: z.enum(['relevance', 'price-asc', 'price-desc', 'date-desc', 'date-asc']).optional().default('relevance'),
+  minSize: z.preprocess(v => (v === '' || v == null) ? null : Number(v), z.number().min(0).nullable().optional()),
+  maxSize: z.preprocess(v => (v === '' || v == null) ? null : Number(v), z.number().min(0).nullable().optional()),
+  sizeUnit: z.enum(['sqmtr', 'sqft']).optional().default('sqmtr'),
 });
 
 export default defineEventHandler(async (event) => {
-  
   try {
     const body = await readValidatedBody(event, traditionalSearchSchema.parse);
 
-    // Extract location data from the full location object
     const lat = body.location?.geometry?.coordinates?.[1];
     const lon = body.location?.geometry?.coordinates?.[0];
     const boundaryPolygon = body.location?.boundaryPolygon;
     const bbox = body.location?.bbox;
 
-    // Handle location filtering first to get property IDs
     let locationPropertyIds: number[] | null = null;
-    let locationContext: any = null;
-    
+
     if (lat && lon) {
-      const locationResult = await handleLocationFilter(
-        lat,
-        lon,
-        body.radius,
-        bbox,
-        boundaryPolygon
-      );
-      locationPropertyIds = locationResult.propertyIds;
-      locationContext = locationResult.locationContext;
+      const { propertyIds } = await handleLocationFilter(lat, lon, body.radius, bbox, boundaryPolygon);
+      locationPropertyIds = propertyIds;
     }
 
-    // Build the where clause
-    const whereClause: Prisma.ListingWhereInput = {
-      published: true,
-      archived: false,
-    };
-
-    // Listing type (sale or rent)
-    if (body.isSale) {
-      whereClause.saleListing = { isNot: null };
-    } else {
-      whereClause.rentalListing = { isNot: null };
+    const params: TraditionalSearchParams = {
+      isSale: body.isSale,
+      price: body.price,
+      minBedrooms: body.minBedrooms,
+      minBathrooms: body.minBathrooms,
+      maxBathrooms: body.maxBathrooms,
+      additionalFeatures: body.additionalFeatures,
+      propertyTypes: body.propertyTypes,
+      minSize: body.minSize,
+      maxSize: body.maxSize,
+      sizeUnit: body.sizeUnit,
+      saleIncludes: body.saleIncludes,
+      rentIncludes: body.rentIncludes,
     }
 
-    // Price range
-    if (body.price && body.price.length === 2) {
-      whereClause.price = {
-        gte: body.price[0],
-        lte: body.price[1],
-      };
-    }
-
-    // Property filters (nested in property relation)
-    const propertyFilters: Prisma.PropertyWhereInput = {};
-
-    // Location filter - restrict to property IDs within location
-    if (locationPropertyIds !== null) {
-      propertyFilters.id = { in: locationPropertyIds };
-    }
-
-    // Bedrooms
-    if (body.minBedrooms > 0) {
-      propertyFilters.numberBedrooms = {
-        gte: body.minBedrooms,
-      };
-    }
-
-    // Bathrooms
-    if (body.maxBathrooms > 0) {
-      propertyFilters.numberBathrooms = {
-        lte: body.maxBathrooms,
-      };
-    }
-
-    // Property types and classifications
-    // Only apply filter if propertyTypes exists and has at least one type with subtypes selected
-    if (body.propertyTypes) {
-      const typeClassificationConditions: Prisma.PropertyWhereInput[] = [];
-
-      for (const [typeName, subtypes] of Object.entries(body.propertyTypes)) {
-        if (subtypes.length > 0) {
-          // Each type can have multiple subtypes selected
-          typeClassificationConditions.push({
-            type: { name: typeName },
-            classification: {
-              name: { in: subtypes }
-            }
-          });
-        }
-      }
-
-      // Only apply the filter if we have at least one condition
-      // If no conditions (all arrays empty), don't filter by type - return all properties
-      if (typeClassificationConditions.length > 0) {
-        propertyFilters.OR = typeClassificationConditions;
-      }
-    }
-
-    // Additional features
-    if (body.additionalFeatures.garden) {
-      propertyFilters.outdoorSpace = {
-        is: {
-          garden: { some: {} }
-        }
-      };
-    }
-
-    if (body.additionalFeatures.garage || body.additionalFeatures['off-street-parking']) {
-      propertyFilters.parking = { isNot: null };
-    }
-
-    if (body.additionalFeatures.pets) {
-      propertyFilters.additionalFeatures = {
-        is: { petFriendly: true }
-      };
-    }
-
-    if (body.additionalFeatures['disabled-access']) {
-    console.log('Final WHERE clause:', JSON.stringify(whereClause, null, 2));
-
-      propertyFilters.accessibilityFeatures = { isNot: null };
-    }
-
-    // Apply property filters if any exist
-    if (Object.keys(propertyFilters).length > 0) {
-      whereClause.property = { is: propertyFilters };
-    }
-
-    // Fetch lean card data for listings
-    const listings = await fetchListingsForCard(whereClause);
-
-    return listings;
+    const orderBy = buildListingOrderBy(body.sortBy);
+    return fetchTraditionalSearchListings(params, locationPropertyIds, orderBy);
 
   } catch (error) {
     console.error('Traditional search error:', error);

@@ -52,7 +52,6 @@ class Property {
   +value : Float?
   +size : Float?
   +yearBuilt : String?
-  +chainFree : Boolean
   +vacant : Boolean
   +constructionType : String?
   +floorLevel : Int?

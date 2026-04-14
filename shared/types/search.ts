@@ -33,7 +33,6 @@ export interface SearchResult {
     numberOtherRooms?: number | null
     size?: number | null
     yearBuilt?: string | null
-    chainFree?: boolean
     vacant?: boolean
     constructionType?: string | null
     floorLevel?: number | null
@@ -73,6 +72,37 @@ export interface SearchResult {
     energyAndUtilities?: any
     securityFeatures?: any
     storageFeatures?: any
+  }
+}
+
+export interface TraditionalSearchParams {
+  isSale: boolean
+  price: [number, number]
+  minBedrooms: number
+  minBathrooms: number
+  maxBathrooms: number
+  additionalFeatures: {
+    garden: boolean
+    garage: boolean
+    'off-street-parking': boolean
+    pets: boolean
+    'disabled-access': boolean
+    'ev-charging': boolean
+    'full-fibre': boolean
+  }
+  propertyTypes?: Record<string, string[]>
+  minSize?: number | null
+  maxSize?: number | null
+  sizeUnit?: 'sqmtr' | 'sqft'
+  saleIncludes: {
+    'sold-stc': boolean
+    'chain-free': boolean
+    'freehold-only': boolean
+  }
+  rentIncludes: {
+    'let-agreed': boolean
+    'short-term-lets': boolean
+    'long-term-lets': boolean
   }
 }
 
