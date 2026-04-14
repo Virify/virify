@@ -26,7 +26,7 @@
     <OrganismsDashboardBedroomForm
       :bedrooms="state.property.bedroomFeatures"
       @add="addBedroom"
-      @edit="openBedroomEditor"
+      @edit="bedroomEditor.open"
       @remove="removeBedroom"
     />
 
@@ -34,30 +34,30 @@
     <OrganismsDashboardBathroomForm
       :bathrooms="state.property.bathroomFeatures"
       @add="addBathroom"
-      @edit="openBathroomEditor"
+      @edit="bathroomEditor.open"
       @remove="removeBathroom"
     />
 
     <!-- Bedroom Editor Slideover -->
     <OrganismsDashboardBedroomSlideForm
-      v-model:open="bedroomEditorOpen"
-      :bedroom="editingBedroom"
-      :bedroom-index="editingBedroomIndex ?? 0"
+      v-model:open="bedroomEditor.isOpen.value"
+      :bedroom="bedroomEditor.editingItem.value"
+      :bedroom-index="bedroomEditor.editingIndex.value ?? 0"
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleBedroomDone"
-      @cancel="handleBedroomCancel"
+      @cancel="bedroomEditor.cancel"
     />
 
     <!-- Bathroom Editor Slideover -->
     <OrganismsDashboardBathroomSlideForm
-      v-model:open="bathroomEditorOpen"
-      :bathroom="editingBathroom"
-      :bathroom-index="editingBathroomIndex ?? 0"
+      v-model:open="bathroomEditor.isOpen.value"
+      :bathroom="bathroomEditor.editingItem.value"
+      :bathroom-index="bathroomEditor.editingIndex.value ?? 0"
       :floor-options="floorOptions"
       :is-saving="isSaving"
       @done="handleBathroomDone"
-      @cancel="handleBathroomCancel"
+      @cancel="bathroomEditor.cancel"
     />
   </OrganismsDashboardCreateListingStepWrapper>
 </template>
@@ -80,25 +80,8 @@ const state = reactive<Step4FormData>(
 )
 
 // Slideover state
-const bedroomEditorOpen = ref(false)
-const bathroomEditorOpen = ref(false)
-const editingBedroomIndex = ref<number | null>(null)
-const editingBathroomIndex = ref<number | null>(null)
-const isAddingNewBedroom = ref(false)
-const isAddingNewBathroom = ref(false)
-
-// Computed refs for currently editing rooms
-const editingBedroom = computed((): BedroomData | null => 
-  editingBedroomIndex.value !== null 
-    ? state.property.bedroomFeatures[editingBedroomIndex.value] ?? null
-    : null
-)
-
-const editingBathroom = computed((): BathroomData | null => 
-  editingBathroomIndex.value !== null 
-    ? state.property.bathroomFeatures[editingBathroomIndex.value] ?? null
-    : null
-)
+const bedroomEditor = useRoomEditor(state.property.bedroomFeatures)
+const bathroomEditor = useRoomEditor(state.property.bathroomFeatures)
 
 // Form validation
 const isFormValid = computed(() => step4Validation.isStep4Valid(state))
@@ -115,8 +98,8 @@ function addBedroom() {
     features: [],
     size: null,
   })
-  isAddingNewBedroom.value = true
-  openBedroomEditor(newIndex)
+  bedroomEditor.isAddingNew.value = true
+  bedroomEditor.open(newIndex)
 }
 
 async function removeBedroom(index: number) {
@@ -125,20 +108,6 @@ async function removeBedroom(index: number) {
     b.roomNumber = i + 1
   })
   await saveRoomProgress('Bedroom removed')
-}
-
-function openBedroomEditor(index: number) {
-  // Only reset if not called from addBedroom (which sets it to true)
-  if (!isAddingNewBedroom.value) {
-    isAddingNewBedroom.value = false
-  }
-  editingBedroomIndex.value = index
-  bedroomEditorOpen.value = true
-}
-
-function closeBedroomEditor() {
-  editingBedroomIndex.value = null
-  isAddingNewBedroom.value = false
 }
 
 // Bathroom methods
@@ -152,8 +121,8 @@ function addBathroom() {
     features: [],
     size: null,
   })
-  isAddingNewBathroom.value = true
-  openBathroomEditor(newIndex)
+  bathroomEditor.isAddingNew.value = true
+  bathroomEditor.open(newIndex)
 }
 
 async function removeBathroom(index: number) {
@@ -162,20 +131,6 @@ async function removeBathroom(index: number) {
     b.roomNumber = i + 1
   })
   await saveRoomProgress('Bathroom removed')
-}
-
-function openBathroomEditor(index: number) {
-  // Only reset if not called from addBathroom (which sets it to true)
-  if (!isAddingNewBathroom.value) {
-    isAddingNewBathroom.value = false
-  }
-  editingBathroomIndex.value = index
-  bathroomEditorOpen.value = true
-}
-
-function closeBathroomEditor() {
-  editingBathroomIndex.value = null
-  isAddingNewBathroom.value = false
 }
 
 async function saveRoomProgress(successMessage?: string) {
@@ -189,40 +144,16 @@ async function saveRoomProgress(successMessage?: string) {
 
 // Handle bedroom done - save and close
 async function handleBedroomDone() {
-  const isNew = isAddingNewBedroom.value
-  isAddingNewBedroom.value = false
+  const isNew = bedroomEditor.isAddingNew.value
+  bedroomEditor.close()
   await saveRoomProgress(isNew ? 'Bedroom added' : 'Bedroom updated')
-  closeBedroomEditor()
-}
-
-// Handle bedroom cancel - remove if new
-function handleBedroomCancel() {
-  if (isAddingNewBedroom.value && editingBedroomIndex.value !== null) {
-    state.property.bedroomFeatures.splice(editingBedroomIndex.value, 1)
-    state.property.bedroomFeatures.forEach((b, i) => {
-      b.roomNumber = i + 1
-    })
-  }
-  closeBedroomEditor()
 }
 
 // Handle bathroom done - save and close
 async function handleBathroomDone() {
-  const isNew = isAddingNewBathroom.value
-  isAddingNewBathroom.value = false
+  const isNew = bathroomEditor.isAddingNew.value
+  bathroomEditor.close()
   await saveRoomProgress(isNew ? 'Bathroom added' : 'Bathroom updated')
-  closeBathroomEditor()
-}
-
-// Handle bathroom cancel - remove if new
-function handleBathroomCancel() {
-  if (isAddingNewBathroom.value && editingBathroomIndex.value !== null) {
-    state.property.bathroomFeatures.splice(editingBathroomIndex.value, 1)
-    state.property.bathroomFeatures.forEach((b, i) => {
-      b.roomNumber = i + 1
-    })
-  }
-  closeBathroomEditor()
 }
 
 // Get submission data
