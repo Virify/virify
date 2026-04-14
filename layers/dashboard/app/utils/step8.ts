@@ -9,6 +9,7 @@ import {
   HotWaterSource,
   RenewableEnergy,
   ConnectedUtilities,
+  CouncilTaxBand,
 } from '~~/layers/database/server/database/prisma/generated/enums'
 
 // ============================================================================
@@ -92,13 +93,7 @@ export const connectedUtilitiesOptions = Object.values(ConnectedUtilities).map((
 // Council Tax Band Options
 // ============================================================================
 
-export const councilTaxBandOptions = [
-  { value: 'A', label: 'Band A' },
-  { value: 'B', label: 'Band B' },
-  { value: 'C', label: 'Band C' },
-  { value: 'D', label: 'Band D' },
-  { value: 'E', label: 'Band E' },
-  { value: 'F', label: 'Band F' },
-  { value: 'G', label: 'Band G' },
-  { value: 'H', label: 'Band H' },
-]
+export const councilTaxBandOptions = Object.values(CouncilTaxBand).map((band) => ({
+  value: band,
+  label: `Band ${band}`,
+}))
