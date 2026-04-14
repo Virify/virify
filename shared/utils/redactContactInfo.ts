@@ -47,6 +47,10 @@ export function redactDeep<T>(value: T): T {
     return value.map(redactDeep) as unknown as T;
   }
 
+  if (value instanceof Date) {
+    return value;
+  }
+
   if (value !== null && typeof value === 'object') {
     const result: Record<string, unknown> = {};
     for (const [key, val] of Object.entries(value as Record<string, unknown>)) {

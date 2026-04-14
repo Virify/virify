@@ -53,6 +53,14 @@ export const propertySchema = z.object({
 // Step 2 form schema
 export const step2Schema = z.object({
   property: propertySchema,
+  moveInDate: z.preprocess(
+    (val) => {
+      if (val === null || val === undefined || val === '') return null
+      const d = val instanceof Date ? val : new Date(val as string)
+      return isNaN(d.getTime()) ? null : d
+    },
+    z.date().nullable().optional()
+  ),
 })
 
 export type Step2FormData = z.infer<typeof step2Schema>

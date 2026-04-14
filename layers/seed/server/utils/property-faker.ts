@@ -51,7 +51,6 @@ export const generateAdditionalFeatures = (): Prisma.AdditionalFeaturesCreateWit
   return {
     description: faker.word.words(10),
     petFriendly: faker.datatype.boolean(),
-    moveInDate: faker.date.future(),
     features: selectRandomEnumValues(Object.values(BuildingFeature), 0.4),
   };
 };

@@ -1,6 +1,5 @@
 import { createSharedComposable } from "@vueuse/core"
 import type { DraftListing } from '~~/layers/database/server/database/prisma/generated/client'
-import type { DraftListingWithFullPayload } from '~~/shared/types/draft'
 import { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
 import { redactDeep } from '~~/shared/utils/redactContactInfo'
 
@@ -20,14 +19,14 @@ import { redactDeep } from '~~/shared/utils/redactContactInfo'
  * 3. `saveStep()` is called:
  *    a. If no draft exists → POST `/api/draft-listings/create/` with tier
  *    b. Draft created → `draftListingId` is set
- *    c. PATCH to step-specific endpoint (e.g. `/api/draft-listings/update/steps/one/`)
+ *    c. PATCH to step-specific endpoint (e.g. `/api/listings/update/steps/one/`)
  *    d. Step data saved locally and step marked complete
  * 4. Subsequent steps use the existing `draftListingId`
  * 
  * ## API Endpoints Used
  * - POST `/api/draft-listings/create/` - Create new draft (returns DraftListing)
- * - PATCH `/api/draft-listings/update/steps/one/` - Update step 1 data
- * - PATCH `/api/draft-listings/update/steps/two/` - Update step 2 data (etc.)
+ * - PATCH `/api/listings/update/steps/one/` - Update step 1 data (works for both draft and live listings)
+ * - PATCH `/api/listings/update/steps/two/` - Update step 2 data (etc.)
  * - GET `/api/draft-listings/[id]/` - Load existing draft for editing
  * 
  * ## Usage
@@ -40,7 +39,7 @@ import { redactDeep } from '~~/shared/utils/redactContactInfo'
  * } = useCreateListingSteps()
  * 
  * // Save step data (creates draft if needed, then updates step)
- * await saveStep(1, '/api/draft-listings/update/steps/one/', stepData, advance)
+ * await saveStep(1, '/api/listings/update/steps/one/', stepData, advance)
  * ```
  */
 
@@ -251,8 +250,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
   }
 
   // Populate local step data from draft listing response
-  const populateStepDataFromDraft = (draft: DraftListingWithFullPayload) => {
-    const loadedSteps = populateAllStepsFromDraft(draft)
+  const populateStepDataFromDraft = (listing: EditableListing) => {
+    const loadedSteps = populateAllSteps(listing)
     Object.entries(loadedSteps).forEach(([stepNum, data]) => {
       stepData.value[Number(stepNum)] = data
     })

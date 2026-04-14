@@ -4,7 +4,7 @@
     :schema="step5Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/five/"
+    api-endpoint="/api/listings/update/steps/five/"
     :get-submission-data="getSubmissionData"
     @completed="onStepCompleted"
     @saved="onStepSaved"
@@ -242,7 +242,7 @@ function closeOtherRoomEditor() {
 async function saveRoomProgress() {
   await saveRoomData(
     5,
-    '/api/draft-listings/update/steps/five/',
+    '/api/listings/update/steps/five/',
     getSubmissionData()
   )
 }

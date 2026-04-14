@@ -44,6 +44,14 @@ interface SearchParameters {
   rentFrequency?: "WEEKLY" | "MONTHLY";
   rentalAvailabilityStatus?: "AVAILABLE" | "LET_AGREED" | "LET";
   depositMax?: number;
+  holdingDepositMax?: number;
+
+  // Move-in date
+  moveInDateBefore?: string; // ISO date — available on or before
+  moveInDateAfter?: string;  // ISO date — available from
+
+  // Listing
+  verificationLevel?: "UNVERIFIED" | "BASIC" | "VERIFIED" | "FULLY_VERIFIED";
 
   // Property
   numberBedroomsExact?: number;
@@ -53,7 +61,13 @@ interface SearchParameters {
   numberBathroomsExact?: number;
   numberBathroomsMin?: number;
   numberReceptionsMin?: number;
+  numberKitchensMin?: number;
+  numberOtherRoomsMin?: number;
   sizeMin?: number;
+  yearBuiltAfter?: number;
+  yearBuiltBefore?: number;
+  totalFloorsMax?: number;
+  chainFree?: boolean;
   vacant?: boolean;
   constructionType?: "STANDARD" | "NON_STANDARD";
   floorLevel?: number;
@@ -67,12 +81,16 @@ interface SearchParameters {
   hasGarden?: boolean;
   gardenFacing?: "NORTH" | "EAST" | "SOUTH" | "WEST";
   gardenPositions?: ("FRONT" | "REAR" | "SIDE")[];
+  gardenSizeMin?: number;
+  outdoorAreaMin?: number;
   outdoorSpaceFeatures?: string[];
   landFeatures?: string[];
+  landSeparateParcel?: boolean;
 
   // Energy & utilities
   epcRatings?: string[];
   primaryHeatingTypes?: string[];
+  secondaryHeatingTypes?: string[];
   boilerType?: string;
   hotWaterSource?: string;
   renewables?: string[];
@@ -91,6 +109,7 @@ interface SearchParameters {
 
   // Rooms
   bedroomFeatures?: string[];
+  bedSizes?: string[];
   bathroomFeatures?: string[];
   kitchenFeatures?: string[];
   receptionTypes?: string[];
@@ -172,6 +191,21 @@ amenityType + amenitySubtype mappings:
 PRICE: "k" = ×1000, "m" = ×1000000. "under £400k" → priceMax:400000. "between £200k-£400k" → priceMin:200000, priceMax:400000.
 BEDROOMS: "3+" or "at least 3" → numberBedroomsMin:3. "exactly 3" → numberBedroomsExact:3. "2 or 3" → numberBedroomsMin:2, numberBedroomsMax:3. "fewer than 3" → numberBedroomsLt:3.
 chain: false means "chain free" / "no chain". ⚠ "chain free" or "no chain" → chain:false (NOT chain:true).
+chainFree: true when user says "chain free" or "no chain" — same as chain:false but at property level.
+moveInDateBefore: ISO date string (YYYY-MM-DD). Property available ON OR BEFORE this date. Use for "move in next month", "available by June", "available within 3 months", "available soon". Compute from today's date. "next month" → last day of next month. "within 3 months" → today + 3 months.
+moveInDateAfter: ISO date string (YYYY-MM-DD). Property available FROM this date. Use for "available from September", "available after the summer". Compute from today's date.
+verificationLevel: "UNVERIFIED" | "BASIC" | "VERIFIED" | "FULLY_VERIFIED". "verified" → VERIFIED. "fully verified" → FULLY_VERIFIED.
+yearBuiltAfter / yearBuiltBefore: 4-digit year (number). "built after 2000" → yearBuiltAfter:2000. "Victorian" → yearBuiltBefore:1910. "Edwardian" → yearBuiltAfter:1901, yearBuiltBefore:1910. "1970s" → yearBuiltAfter:1970, yearBuiltBefore:1979. "new build" → use classificationNames instead.
+totalFloorsMax: Max floors in the building. "low-rise" → totalFloorsMax:4. "no high-rise" → totalFloorsMax:6.
+numberKitchensMin: Min number of kitchens. "2 kitchens" → numberKitchensMin:2.
+numberOtherRoomsMin: Min number of other rooms (offices, studies, etc).
+depositMax: Max security deposit in pounds (rental only). "deposit under £2,000" → depositMax:2000.
+holdingDepositMax: Max holding deposit in pounds (rental only). "holding deposit under £500" → holdingDepositMax:500.
+secondaryHeatingTypes: Same enum as primaryHeatingTypes. "log burner" → secondaryHeatingTypes:["OTHER"]. "electric backup" → secondaryHeatingTypes:["ELECTRIC"].
+bedSizes: "BED_SINGLE" | "BED_DOUBLE" | "QUEEN" | "KING" | "SUPER_KING". "king size bed" → bedSizes:["KING"]. "double bed" → bedSizes:["DOUBLE"].
+gardenSizeMin: Min garden size in m². "large garden" → gardenSizeMin:50. "50m² garden" → gardenSizeMin:50.
+outdoorAreaMin: Min total outdoor area in m² across all outdoor spaces.
+landSeparateParcel: true when land is on a separate title from the main property. "separate parcel of land" → landSeparateParcel:true.
 
 usedTerms: Short human-readable labels for every filter you set. One label per distinct concept. Examples: "For sale", "3+ bedrooms", "Under £400,000", "Detached house", "South-facing garden", "Chain free", "Furnished", "Pet friendly", "EPC C or better", "Near a school".
 ignoredTerms: Parts of the query you could not map to any filter. Return [] if nothing was ignored.`;
@@ -203,6 +237,7 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         rentFrequency: { type: "string", enum: ["WEEKLY", "MONTHLY"] },
         rentalAvailabilityStatus: { type: "string", enum: ["AVAILABLE", "LET_AGREED", "LET"] },
         depositMax: { type: "number" },
+        holdingDepositMax: { type: "number" },
         numberBedroomsExact: { type: "number" },
         numberBedroomsMin: { type: "number" },
         numberBedroomsMax: { type: "number" },
@@ -211,6 +246,12 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         numberBathroomsMin: { type: "number" },
         numberReceptionsMin: { type: "number" },
         sizeMin: { type: "number" },
+        yearBuiltAfter: { type: "number", description: "4-digit year" },
+        yearBuiltBefore: { type: "number", description: "4-digit year" },
+        totalFloorsMax: { type: "number" },
+        numberKitchensMin: { type: "number" },
+        numberOtherRoomsMin: { type: "number" },
+        chainFree: { type: "boolean" },
         vacant: { type: "boolean" },
         constructionType: { type: "string", enum: ["STANDARD", "NON_STANDARD"] },
         floorLevel: { type: "number" },
@@ -220,10 +261,14 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         hasGarden: { type: "boolean" },
         gardenFacing: { type: "string", enum: ["NORTH", "EAST", "SOUTH", "WEST"] },
         gardenPositions: { type: "array", items: { type: "string", enum: ["FRONT", "REAR", "SIDE"] } },
+        gardenSizeMin: { type: "number", description: "Min garden size in m²" },
+        outdoorAreaMin: { type: "number", description: "Min total outdoor area in m²" },
+        landSeparateParcel: { type: "boolean" },
         outdoorSpaceFeatures: { type: "array", items: { type: "string", enum: ["SUN_TERRACE", "TERRACE", "BALCONY", "PATIO", "SEPARATE_PARCEL", "SHED", "SUMMER_HOUSE", "GARDEN_OFFICE", "POOL"] } },
         landFeatures: { type: "array", items: { type: "string", enum: ["WOODLAND", "PADDOCK", "STABLES", "TENNIS_COURT", "ORCHARD", "POND", "OUTBUILDING"] } },
         epcRatings: { type: "array", items: { type: "string", enum: ["A", "B", "C", "D", "E", "F", "G"] } },
         primaryHeatingTypes: { type: "array", items: { type: "string", enum: ["GAS_CENTRAL", "ELECTRIC", "OIL", "UNDERFLOOR", "BIOMASS", "HEAT_PUMP", "DISTRICT", "STORAGE_HEATERS", "LPG", "PASSIVE", "SOLAR_THERMAL", "OTHER"] } },
+        secondaryHeatingTypes: { type: "array", items: { type: "string", enum: ["GAS_CENTRAL", "ELECTRIC", "OIL", "UNDERFLOOR", "BIOMASS", "HEAT_PUMP", "DISTRICT", "STORAGE_HEATERS", "LPG", "PASSIVE", "SOLAR_THERMAL", "OTHER"] } },
         boilerType: { type: "string", enum: ["COMBI", "SYSTEM", "CONVENTIONAL", "BACK_BOILER"] },
         hotWaterSource: { type: "string", enum: ["BOILER", "IMMERSION_HEATER", "SOLAR_THERMAL", "HEAT_PUMP", "OTHER"] },
         renewables: { type: "array", items: { type: "string", enum: ["SOLAR_PV", "BATTERY_STORAGE", "SMART_METER", "EV_CHARGING"] } },
@@ -238,6 +283,7 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         petFriendly: { type: "boolean" },
         buildingFeatures: { type: "array", items: { type: "string", enum: ["POOL", "INTERNET", "CONCIERGE", "SHOP", "GYM"] } },
         bedroomFeatures: { type: "array", items: { type: "string", enum: ["EN_SUITE", "BUILT_IN_STORAGE", "WALK_IN_WARDROBE", "BAY_WINDOW", "BALCONY", "HAS_VIEW", "PATIO_DOORS", "BUILT_IN_DESK"] } },
+        bedSizes: { type: "array", items: { type: "string", enum: ["SINGLE", "DOUBLE", "QUEEN", "KING", "SUPER_KING"] } },
         bathroomFeatures: { type: "array", items: { type: "string", enum: ["TOILET", "EN_SUITE", "BATHTUB", "WALK_IN_SHOWER"] } },
         kitchenFeatures: { type: "array", items: { type: "string", enum: ["MODERN", "OPEN_PLAN", "WHITE_GOODS", "BREAKFAST_BAR", "ISLAND", "UTILITY_ACCESS", "PANTRY"] } },
         receptionTypes: { type: "array", items: { type: "string", enum: ["LIVING_ROOM", "FAMILY_ROOM", "DINING_ROOM", "GAMES_ROOM", "HOME_CINEMA"] } },
@@ -250,6 +296,9 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         councilTaxBand: { type: "string" },
         serviceChargesMax: { type: "number" },
         groundRentMax: { type: "number" },
+        moveInDateBefore: { type: "string", description: "ISO date (YYYY-MM-DD) — include listings available on or before this date" },
+        moveInDateAfter: { type: "string", description: "ISO date (YYYY-MM-DD) — include listings available from this date" },
+        verificationLevel: { type: "string", enum: ["UNVERIFIED", "BASIC", "VERIFIED", "FULLY_VERIFIED"] },
         usedTerms: { type: "array", items: { type: "string" } },
         ignoredTerms: { type: "array", items: { type: "string" } },
       },
@@ -263,10 +312,12 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
 // GPT fills flat SearchParameters; never sees Prisma operators.
 // ---------------------------------------------------------------------------
 async function extractSearchParameters(query: string): Promise<SearchParameters> {
+  const today = new Date().toISOString().split('T')[0];
+  const systemWithDate = `Today's date is ${today}. Use this when computing relative dates (e.g. "next month", "in 3 months").\n\n${SYSTEM_PROMPT}`;
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: systemWithDate },
       { role: "user", content: query },
     ],
     tools: [SEARCH_TOOL],
@@ -360,6 +411,14 @@ function buildWhereClause(rawParams: SearchParameters): any {
   }
 
   if (params.listingTier) where.listingTier = params.listingTier;
+  if (params.verificationLevel) where.verificationLevel = params.verificationLevel;
+
+  // Move-in date
+  if (params.moveInDateBefore !== undefined || params.moveInDateAfter !== undefined) {
+    where.moveInDate = {};
+    if (params.moveInDateBefore) where.moveInDate.lte = new Date(params.moveInDateBefore);
+    if (params.moveInDateAfter) where.moveInDate.gte = new Date(params.moveInDateAfter);
+  }
 
   // Sale listing
   const saleFields: any = {};
@@ -381,6 +440,7 @@ function buildWhereClause(rawParams: SearchParameters): any {
   if (params.rentFrequency) rentalFields.rentFrequency = params.rentFrequency;
   if (params.rentalAvailabilityStatus) rentalFields.availabilityStatus = params.rentalAvailabilityStatus;
   if (params.depositMax !== undefined) rentalFields.deposit = { lte: params.depositMax };
+  if (params.holdingDepositMax !== undefined) rentalFields.holdingDeposit = { lte: params.holdingDepositMax };
 
   if (params.listingType === "RENT" || Object.keys(rentalFields).length > 0) {
     where.rentalListing = Object.keys(rentalFields).length > 0 ? { is: rentalFields } : { isNot: null };
@@ -407,10 +467,20 @@ function buildWhereClause(rawParams: SearchParameters): any {
   }
 
   if (params.numberReceptionsMin !== undefined) property.numberReceptions = { gte: params.numberReceptionsMin };
+  if (params.numberKitchensMin !== undefined) property.numberKitchens = { gte: params.numberKitchensMin };
+  if (params.numberOtherRoomsMin !== undefined) property.numberOtherRooms = { gte: params.numberOtherRoomsMin };
   if (params.sizeMin !== undefined) property.size = { gte: params.sizeMin };
+  if (params.chainFree !== undefined) property.chainFree = params.chainFree;
   if (params.vacant !== undefined) property.vacant = params.vacant;
   if (params.constructionType) property.constructionType = params.constructionType;
   if (params.floorLevel !== undefined) property.floorLevel = params.floorLevel;
+  if (params.totalFloorsMax !== undefined) property.totalFloors = { lte: params.totalFloorsMax };
+  // yearBuilt is stored as a String in Prisma — filter with string comparison
+  if (params.yearBuiltAfter !== undefined || params.yearBuiltBefore !== undefined) {
+    property.yearBuilt = {};
+    if (params.yearBuiltAfter !== undefined) property.yearBuilt.gte = String(params.yearBuiltAfter);
+    if (params.yearBuiltBefore !== undefined) property.yearBuilt.lte = String(params.yearBuiltBefore);
+  }
 
   // Type & classification
   if (params.propertyTypeName) {
@@ -456,6 +526,15 @@ function buildWhereClause(rawParams: SearchParameters): any {
   if (params.landFeatures?.length) {
     outdoorIs.land = { some: { features: params.landFeatures.length === 1 ? { has: params.landFeatures[0] } : { hasSome: params.landFeatures } } };
   }
+  if (params.landSeparateParcel !== undefined) {
+    outdoorIs.land = { some: { ...(outdoorIs.land?.some ?? {}), separateParcel: params.landSeparateParcel } };
+  }
+  if (params.gardenSizeMin !== undefined) {
+    outdoorIs.garden = { some: { ...(outdoorIs.garden?.some ?? {}), size: { gte: params.gardenSizeMin } } };
+  }
+  if (params.outdoorAreaMin !== undefined) {
+    outdoorIs.totalArea = { gte: params.outdoorAreaMin };
+  }
   if (Object.keys(outdoorIs).length > 0) property.outdoorSpace = { is: outdoorIs };
 
   // Energy & utilities
@@ -465,6 +544,11 @@ function buildWhereClause(rawParams: SearchParameters): any {
     energyIs.primaryHeatingType = params.primaryHeatingTypes.length === 1
       ? { has: params.primaryHeatingTypes[0] }
       : { hasSome: params.primaryHeatingTypes };
+  }
+  if (params.secondaryHeatingTypes?.length) {
+    energyIs.secondaryHeatingType = params.secondaryHeatingTypes.length === 1
+      ? { has: params.secondaryHeatingTypes[0] }
+      : { hasSome: params.secondaryHeatingTypes };
   }
   if (params.boilerType) energyIs.boilerType = params.boilerType;
   if (params.hotWaterSource) energyIs.hotWaterSource = params.hotWaterSource;
@@ -514,9 +598,18 @@ function buildWhereClause(rawParams: SearchParameters): any {
   }
   if (Object.keys(additionalIs).length > 0) property.additionalFeatures = { is: additionalIs };
 
-  // Bedroom features
+  // Bedroom features & bed sizes
   if (params.bedroomFeatures?.length) {
     property.bedroomFeatures = { some: { features: params.bedroomFeatures.length === 1 ? { has: params.bedroomFeatures[0] } : { hasSome: params.bedroomFeatures } } };
+  }
+  if (params.bedSizes?.length) {
+    property.bedroomFeatures = {
+      ...property.bedroomFeatures,
+      some: {
+        ...(property.bedroomFeatures?.some ?? {}),
+        bed: params.bedSizes.length === 1 ? { has: params.bedSizes[0] } : { hasSome: params.bedSizes },
+      },
+    };
   }
 
   // Bathroom features

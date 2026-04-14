@@ -4,7 +4,7 @@
     :schema="step9Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/nine/"
+    api-endpoint="/api/listings/update/steps/nine/"
     :get-submission-data="getSubmissionData"
     @completed="onStepCompleted"
     @saved="onStepSaved"
@@ -271,7 +271,7 @@ const autoSaveMediaOrder = useDebounceFn(async () => {
   if (!draftListingId.value) return
   
   try {
-    await useRequestFetch()('/api/draft-listings/update/steps/nine/', {
+    await useRequestFetch()('/api/listings/update/steps/nine/', {
       method: 'PATCH',
       body: {
         draftId: draftListingId.value,

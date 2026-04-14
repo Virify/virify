@@ -218,6 +218,21 @@ const queriesNocrash: string[] = [
   "Period terrace with character, 3 beds, fireplaces, garden, under £400k",
   "Modern flat, 2 beds, concierge, EV charging, great commuter links, under £350k",
 
+  // --- NEW FILTERS ---
+  "Show me only verified property listings for sale",
+  "Fully verified listings only, 3 bed house",
+  "Flat to rent with a holding deposit under £500",
+  "House for sale with underfloor heating as a secondary heating source",
+  "House for sale with all king size beds",
+  "House for sale with a garden over 100 square metres",
+  "Property with at least 500 square metres of total outdoor space",
+  "House for sale with a separate parcel of land",
+  "House for sale built after 2000",
+  "House for sale built between 1950 and 1980",
+  "2 bed flat in a low-rise block, no more than 4 floors",
+  "Farmhouse for sale with at least 2 kitchens",
+  "Large house with 3 or more other rooms beyond the main rooms",
+
   // --- EDGE CASES ---
   "Property for sale with absolutely no filters at all",
   "House for rent with absolutely no filters at all",

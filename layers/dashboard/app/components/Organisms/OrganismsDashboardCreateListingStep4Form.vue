@@ -4,7 +4,7 @@
     :schema="step4Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/four/"
+    api-endpoint="/api/listings/update/steps/four/"
     :get-submission-data="getSubmissionData"
     @completed="onStepCompleted"
     @saved="onStepSaved"
@@ -182,7 +182,7 @@ async function saveRoomProgress() {
   console.log('Saving Step 4 data:', data)
   const result = await saveRoomData(
     4,
-    '/api/draft-listings/update/steps/four/',
+    '/api/listings/update/steps/four/',
     data
   )
   console.log('Save Step 4 result:', result)
