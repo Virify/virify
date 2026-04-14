@@ -193,6 +193,7 @@ function createSearchState() {
 
   const toast = useToast()
   const { trackSearch } = useAnalyticsTracking()
+  const { setActiveLocation, setActiveRadius, setActiveTerms } = useActiveSearchTerms()
 
   async function fetchResults(
     locationData = mostRecentLocation,
@@ -232,6 +233,7 @@ function createSearchState() {
 
         if (queryAnalysis) {
           setQueryAnalysis(queryAnalysis)
+          setActiveTerms(queryAnalysis?.usedTerms)
         }
 
         setResults(results as unknown[])
@@ -264,8 +266,12 @@ function createSearchState() {
 
         const queryAnalysis = buildQueryAnalysisFromFormData(formData)
         setQueryAnalysis(queryAnalysis)
+        setActiveTerms(queryAnalysis?.usedTerms)
         setResults(response as unknown[])
       }
+
+      setActiveLocation(location)
+      setActiveRadius(radius)
 
       await navigateTo('/search')
 
