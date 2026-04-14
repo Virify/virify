@@ -439,13 +439,14 @@ export const useCreateListingSteps = createSharedComposable(() => {
   }
 
   /**
-   * Silent save for room data (bedrooms/bathrooms) - no toast notifications
-   * Used when saving individual rooms in Step 4 slideovers
+   * Save room data and optionally show a success toast.
+   * Used when saving individual rooms in Step 4/5 slideovers
    */
   const saveRoomData = async (
     stepNumber: number,
     apiEndpoint: string,
-    stepFormData: Record<string, any>
+    stepFormData: Record<string, any>,
+    successMessage?: string
   ): Promise<boolean> => {
     if (isSaving.value) return false
     
@@ -490,7 +491,16 @@ export const useCreateListingSteps = createSharedComposable(() => {
       // Save to local state
       saveStepData(stepNumber, stepFormData)
       lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData))
-      
+
+      if (successMessage) {
+        toast.add({
+          title: successMessage,
+          icon: 'i-lucide-check-circle-2',
+          color: 'success',
+          duration: 2000,
+        })
+      }
+
       return true
     } catch (error: any) {
       console.error(`Failed to save room data:`, error)

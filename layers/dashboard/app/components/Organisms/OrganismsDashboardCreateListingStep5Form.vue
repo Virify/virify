@@ -146,11 +146,12 @@ function addKitchen() {
   openKitchenEditor(newIndex)
 }
 
-function removeKitchen(index: number) {
+async function removeKitchen(index: number) {
   state.property.kitchenFeatures.splice(index, 1)
   state.property.kitchenFeatures.forEach((k, i) => {
     k.roomNumber = i + 1
   })
+  await saveRoomProgress('Kitchen removed')
 }
 
 function openKitchenEditor(index: number) {
@@ -182,11 +183,12 @@ function addReception() {
   openReceptionEditor(newIndex)
 }
 
-function removeReception(index: number) {
+async function removeReception(index: number) {
   state.property.reception.splice(index, 1)
   state.property.reception.forEach((r, i) => {
     r.roomNumber = i + 1
   })
+  await saveRoomProgress('Reception room removed')
 }
 
 function openReceptionEditor(index: number) {
@@ -218,11 +220,12 @@ function addOtherRoom() {
   openOtherRoomEditor(newIndex)
 }
 
-function removeOtherRoom(index: number) {
+async function removeOtherRoom(index: number) {
   state.property.otherRoom.splice(index, 1)
   state.property.otherRoom.forEach((o, i) => {
     o.roomNumber = i + 1
   })
+  await saveRoomProgress('Room removed')
 }
 
 function openOtherRoomEditor(index: number) {
@@ -238,19 +241,20 @@ function closeOtherRoomEditor() {
   isAddingNewOtherRoom.value = false
 }
 
-// Save room data silently (no toast)
-async function saveRoomProgress() {
+async function saveRoomProgress(successMessage?: string) {
   await saveRoomData(
     5,
     '/api/listings/update/steps/five/',
-    getSubmissionData()
+    getSubmissionData(),
+    successMessage
   )
 }
 
 // Handle kitchen done - save and close
 async function handleKitchenDone() {
+  const isNew = isAddingNewKitchen.value
   isAddingNewKitchen.value = false
-  await saveRoomProgress()
+  await saveRoomProgress(isNew ? 'Kitchen added' : 'Kitchen updated')
   closeKitchenEditor()
 }
 
@@ -267,8 +271,9 @@ function handleKitchenCancel() {
 
 // Handle reception done - save and close
 async function handleReceptionDone() {
+  const isNew = isAddingNewReception.value
   isAddingNewReception.value = false
-  await saveRoomProgress()
+  await saveRoomProgress(isNew ? 'Reception room added' : 'Reception room updated')
   closeReceptionEditor()
 }
 
@@ -285,8 +290,9 @@ function handleReceptionCancel() {
 
 // Handle other room done - save and close
 async function handleOtherRoomDone() {
+  const isNew = isAddingNewOtherRoom.value
   isAddingNewOtherRoom.value = false
-  await saveRoomProgress()
+  await saveRoomProgress(isNew ? 'Room added' : 'Room updated')
   closeOtherRoomEditor()
 }
 

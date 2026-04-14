@@ -53,7 +53,7 @@ const props = defineProps<Props>();
 // Computed properties for sale details formatting
 const formattedChain = computed(() => {
   if (props.listing?.saleListing?.chain === null || props.listing?.saleListing?.chain === undefined) return '';
-  return props.listing.saleListing.chain ? 'Chain Free' : 'Chain Dependent';
+  return props.listing.saleListing.chain ? 'Chain Dependent' : 'Chain Free';
 });
 
 const formattedTenure = computed(() => {

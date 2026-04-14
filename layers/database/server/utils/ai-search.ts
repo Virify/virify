@@ -137,6 +137,8 @@ interface SearchParameters {
 // ---------------------------------------------------------------------------
 const SYSTEM_PROMPT = `You are a property search assistant. Extract search parameters from the user's query by calling set_search_parameters.
 
+⚠ REQUIRED: You MUST always populate usedTerms with a short human-readable label for EVERY filter you set. One label per distinct concept. Examples: "For sale", "3+ bedrooms", "Under £400,000", "Detached house", "South-facing garden", "Chain free", "Furnished", "Pet friendly", "EPC C or better", "Near a school", "Cardiff", "Leasehold", "New build", "Garage", "Garden", "2 bathrooms". If you set ANY parameter, you MUST add a corresponding usedTerm. Never return an empty usedTerms array if any filters were set.
+
 ENUM VALUES — use exactly as shown:
 listingType: "SALE" (for sale/to buy) | "RENT" (to rent/to let)
 propertyTypeName: "House" | "Flat" | "Bungalow" | "Land" | "Commercial" | "Garage" | "Room" | "Houseboat" | "Park Home" | "Studio"
@@ -299,9 +301,10 @@ const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         moveInDateBefore: { type: "string", description: "ISO date (YYYY-MM-DD) — include listings available on or before this date" },
         moveInDateAfter: { type: "string", description: "ISO date (YYYY-MM-DD) — include listings available from this date" },
         verificationLevel: { type: "string", enum: ["UNVERIFIED", "BASIC", "VERIFIED", "FULLY_VERIFIED"] },
-        usedTerms: { type: "array", items: { type: "string" } },
-        ignoredTerms: { type: "array", items: { type: "string" } },
+        usedTerms: { type: "array", items: { type: "string" }, description: "REQUIRED. Short human-readable label for every filter you set. One label per distinct concept. Examples: For sale, 3+ bedrooms, Under £400000, Detached house, Chain free, South-facing garden, Pet friendly, EPC C or better, Near a school. Must not be empty if any parameters were set." },
+        ignoredTerms: { type: "array", items: { type: "string" }, description: "Parts of the query you could not map to any filter. Return [] if nothing was ignored." },
       },
+      required: ["usedTerms"],
       additionalProperties: false,
     },
   },

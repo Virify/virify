@@ -56,9 +56,9 @@ export function useActiveSearchTerms() {
   }
 
   return readonly({
-    location: state.value.location,
-    radius: state.value.radius,
-    terms: state.value.terms,
+    location: computed(() => state.value.location),
+    radius: computed(() => state.value.radius),
+    terms: computed(() => state.value.terms),
     setActiveLocation,
     setActiveRadius,
     setActiveTerms

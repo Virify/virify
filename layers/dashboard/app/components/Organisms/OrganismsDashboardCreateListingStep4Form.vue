@@ -119,11 +119,12 @@ function addBedroom() {
   openBedroomEditor(newIndex)
 }
 
-function removeBedroom(index: number) {
+async function removeBedroom(index: number) {
   state.property.bedroomFeatures.splice(index, 1)
   state.property.bedroomFeatures.forEach((b, i) => {
     b.roomNumber = i + 1
   })
+  await saveRoomProgress('Bedroom removed')
 }
 
 function openBedroomEditor(index: number) {
@@ -155,11 +156,12 @@ function addBathroom() {
   openBathroomEditor(newIndex)
 }
 
-function removeBathroom(index: number) {
+async function removeBathroom(index: number) {
   state.property.bathroomFeatures.splice(index, 1)
   state.property.bathroomFeatures.forEach((b, i) => {
     b.roomNumber = i + 1
   })
+  await saveRoomProgress('Bathroom removed')
 }
 
 function openBathroomEditor(index: number) {
@@ -176,22 +178,20 @@ function closeBathroomEditor() {
   isAddingNewBathroom.value = false
 }
 
-// Save room data silently (no toast)
-async function saveRoomProgress() {
-  const data = getSubmissionData()
-  console.log('Saving Step 4 data:', data)
-  const result = await saveRoomData(
+async function saveRoomProgress(successMessage?: string) {
+  await saveRoomData(
     4,
     '/api/listings/update/steps/four/',
-    data
+    getSubmissionData(),
+    successMessage
   )
-  console.log('Save Step 4 result:', result)
 }
 
 // Handle bedroom done - save and close
 async function handleBedroomDone() {
+  const isNew = isAddingNewBedroom.value
   isAddingNewBedroom.value = false
-  await saveRoomProgress()
+  await saveRoomProgress(isNew ? 'Bedroom added' : 'Bedroom updated')
   closeBedroomEditor()
 }
 
@@ -208,8 +208,9 @@ function handleBedroomCancel() {
 
 // Handle bathroom done - save and close
 async function handleBathroomDone() {
+  const isNew = isAddingNewBathroom.value
   isAddingNewBathroom.value = false
-  await saveRoomProgress()
+  await saveRoomProgress(isNew ? 'Bathroom added' : 'Bathroom updated')
   closeBathroomEditor()
 }
 
