@@ -116,10 +116,11 @@ function buildBedroomsFilter(p: SearchParameters): any {
 /** Returns a `numberBathrooms` scalar or range filter, or `undefined` if no bathroom count is set. */
 function buildBathroomsFilter(p: SearchParameters): any {
   if (p.numberBathroomsExact !== undefined) return p.numberBathroomsExact;
-  if (p.numberBathroomsMin !== undefined || p.numberBathroomsMax !== undefined) {
+  if (p.numberBathroomsMin !== undefined || p.numberBathroomsMax !== undefined || p.numberBathroomsLt !== undefined) {
     const f: any = {};
     if (p.numberBathroomsMin !== undefined) f.gte = p.numberBathroomsMin;
     if (p.numberBathroomsMax !== undefined) f.lte = p.numberBathroomsMax;
+    if (p.numberBathroomsLt !== undefined) f.lt = p.numberBathroomsLt;
     return f;
   }
   return undefined;
@@ -315,12 +316,13 @@ function buildReceptionFilter(p: SearchParameters): any {
   return { some: recFilter };
 }
 
-/** Returns an `otherRoom.some` filter for requested room types and/or features, or `undefined`. */
+/** Returns an `otherRoom.some` filter for requested room types, features, and/or min size, or `undefined`. */
 function buildOtherRoomFilter(p: SearchParameters): any {
-  if (!p.otherRoomTypes?.length && !p.otherRoomFeatures?.length) return undefined;
+  if (!p.otherRoomTypes?.length && !p.otherRoomFeatures?.length && p.otherRoomSizeMin === undefined) return undefined;
   const otherFilter: any = {};
   if (p.otherRoomTypes?.length) otherFilter.type = p.otherRoomTypes.length === 1 ? p.otherRoomTypes[0] : { in: p.otherRoomTypes };
   if (p.otherRoomFeatures?.length) otherFilter.features = p.otherRoomFeatures.length === 1 ? { has: p.otherRoomFeatures[0] } : { hasSome: p.otherRoomFeatures };
+  if (p.otherRoomSizeMin !== undefined) otherFilter.size = { gte: p.otherRoomSizeMin };
   return { some: otherFilter };
 }
 
@@ -361,7 +363,9 @@ function buildExcludedUtilitiesFilter(p: SearchParameters): any {
   const notConditions = p.connectedUtilitiesExclude.map((u) => ({
     property: { is: { energyAndUtilities: { is: { connectedUtilities: { has: u } } } } },
   }));
-  return notConditions.length === 1 ? notConditions[0] : { AND: notConditions };
+  // Array form: where.NOT = [cond1, cond2] = NOT cond1 AND NOT cond2 (correct)
+  // NOT: { AND: [...] } would be a NAND — wrong for exclusions
+  return notConditions.length === 1 ? notConditions[0] : notConditions;
 }
 
 // ── Main export ──────────────────────────────────────────────────────────────
@@ -399,9 +403,12 @@ export function buildWhereClause(rawParams: SearchParameters): any {
   const bathrooms = buildBathroomsFilter(params);
   if (bathrooms !== undefined) property.numberBathrooms = bathrooms;
 
-  if (params.numberReceptionsMin !== undefined) property.numberReceptions = { gte: params.numberReceptionsMin };
-  if (params.numberKitchensMin !== undefined) property.numberKitchens = { gte: params.numberKitchensMin };
-  if (params.numberOtherRoomsMin !== undefined) property.numberOtherRooms = { gte: params.numberOtherRoomsMin };
+  if (params.numberReceptionsExact !== undefined) property.numberReceptions = params.numberReceptionsExact;
+  else if (params.numberReceptionsMin !== undefined) property.numberReceptions = { gte: params.numberReceptionsMin };
+  if (params.numberKitchensExact !== undefined) property.numberKitchens = params.numberKitchensExact;
+  else if (params.numberKitchensMin !== undefined) property.numberKitchens = { gte: params.numberKitchensMin };
+  if (params.numberOtherRoomsExact !== undefined) property.numberOtherRooms = params.numberOtherRoomsExact;
+  else if (params.numberOtherRoomsMin !== undefined) property.numberOtherRooms = { gte: params.numberOtherRoomsMin };
   if (params.sizeMin !== undefined) property.size = { gte: params.sizeMin };
   if (params.vacant !== undefined) property.vacant = params.vacant;
   if (params.constructionType) property.constructionType = filterScalar(params.constructionType, "constructionType") ?? undefined;
@@ -470,6 +477,11 @@ export function buildWhereClause(rawParams: SearchParameters): any {
   if (utility) property.utility = utility;
 
   if (Object.keys(property).length > 0) where.property = { is: property };
+
+  // Seller username filter — Listing.user.username
+  if (params.sellerUsername) {
+    where.user = { is: { username: params.sellerUsername } };
+  }
 
   // Excluded utilities — NOT wrapper at top level
   const notFilter = buildExcludedUtilitiesFilter(params);

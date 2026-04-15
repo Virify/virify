@@ -87,8 +87,12 @@ export interface SearchParameters {
   numberBathroomsExact?: number;
   numberBathroomsMin?: number;
   numberBathroomsMax?: number;
+  numberBathroomsLt?: number;
+  numberReceptionsExact?: number;
   numberReceptionsMin?: number;
+  numberKitchensExact?: number;
   numberKitchensMin?: number;
+  numberOtherRoomsExact?: number;
   numberOtherRoomsMin?: number;
   sizeMin?: number;
   yearBuiltAfter?: number;
@@ -151,6 +155,7 @@ export interface SearchParameters {
   receptionSizeMin?: number;
   otherRoomTypes?: OtherRoomType[];
   otherRoomFeatures?: RoomFeature[];
+  otherRoomSizeMin?: number;
   utilityFeatures?: UtilityFeature[];
 
   // Amenity (single nearest amenity — most queries only ask for one)
@@ -162,6 +167,9 @@ export interface SearchParameters {
   councilTaxBand?: CouncilTaxBand;
   serviceChargesMax?: number;
   groundRentMax?: number;
+
+  // Seller
+  sellerUsername?: string;
 
   // Query analysis
   usedTerms?: string[];

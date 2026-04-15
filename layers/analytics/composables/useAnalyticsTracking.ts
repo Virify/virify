@@ -246,6 +246,8 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     radius: number;
     resultCount: number;
     filters?: Record<string, unknown>;
+    usedTerms?: string[];
+    ignoredTerms?: string[];
   }) => {
     if (!import.meta.client) return;
     
@@ -266,6 +268,8 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       radius: params.radius,
       resultCount: params.resultCount,
       filters: params.filters,
+      usedTerms: params.usedTerms,
+      ignoredTerms: params.ignoredTerms,
     };
     
     sendBeaconEvent('/api/analytics/search', payload);

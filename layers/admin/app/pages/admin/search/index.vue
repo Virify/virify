@@ -90,6 +90,16 @@
             <UTable :data="data.unmetDemand.lowResults" :columns="lowResultColumns" />
           </div>
         </div>
+
+        <!-- Feature Gaps -->
+        <h2 class="title-xs mb-0! flex items-center gap-2">
+          Feature Gaps
+          <UIcon name="i-lucide-puzzle" class="text-secondary" />
+        </h2>
+        <p class="body-sm text-muted">Search terms users included that the AI couldn't map to a filter — what people want that the platform doesn't yet support.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <UTable :data="data.featureGaps" :columns="featureGapColumns" />
+        </div>
       </template>
     </template>
   </UDashboardPanel>
@@ -132,15 +142,22 @@ const locationColumns = [
 ];
 
 const zeroResultColumns = [
+  { accessorKey: "query", header: "Search" },
   { accessorKey: "location", header: "Location" },
   { accessorKey: "listingType", header: "Type" },
   { accessorKey: "searchCount", header: "Searches" },
 ];
 
 const lowResultColumns = [
+  { accessorKey: "query", header: "Search" },
   { accessorKey: "location", header: "Location" },
   { accessorKey: "listingType", header: "Type" },
   { accessorKey: "searchCount", header: "Searches" },
   { accessorKey: "avgResults", header: "Avg Results" },
+];
+
+const featureGapColumns = [
+  { accessorKey: "term", header: "Ignored Term" },
+  { accessorKey: "count", header: "Occurrences" },
 ];
 </script>

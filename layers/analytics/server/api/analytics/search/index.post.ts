@@ -13,6 +13,8 @@ const trackSearchSchema = z.object({
     lat: z.number(),
     lon: z.number(),
   }),
+  usedTerms: z.array(z.string()).optional().default([]),
+  ignoredTerms: z.array(z.string()).optional().default([]),
 });
 
 /**
@@ -29,10 +31,12 @@ export default defineEventHandler(async (event) => {
     const { user } = await getUserSession(event);
 
     // Reconstruct the GeocodingFeature shape expected by the trackSearch utility
-    const { location, ...rest } = data;
+    const { location, usedTerms, ignoredTerms, ...rest } = data;
     await trackSearch({
       ...rest,
       userId: user?.id,
+      usedTerms,
+      ignoredTerms,
       location: {
         id: location.id,
         place_name_en: location.placeName,

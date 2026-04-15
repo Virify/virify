@@ -94,7 +94,7 @@ export const VALID_SCALAR: Record<string, Set<string>> = {
 };
 
 /** Returns `val` only if it is a member of the allowed set for `key`; otherwise `undefined`. */
-export function filterScalar(val: string | undefined, key: keyof typeof VALID_SCALAR): string | undefined {
+export function filterScalar<T extends string>(val: T | undefined, key: keyof typeof VALID_SCALAR): T | undefined {
   if (!val) return undefined;
   return VALID_SCALAR[key].has(val) ? val : undefined;
 }
@@ -103,10 +103,10 @@ export function filterScalar(val: string | undefined, key: keyof typeof VALID_SC
  * Filters `arr` to only values present in the allowed set for `key`.
  * Also normalises a scalar string to a single-element array (GPT occasionally returns one).
  */
-export function filterEnum(arr: string[] | string | undefined, key: keyof typeof VALID): string[] | undefined {
+export function filterEnum<T extends string>(arr: T[] | string | undefined, key: keyof typeof VALID): T[] | undefined {
   if (!arr) return undefined;
   // GPT occasionally returns a scalar string instead of an array — normalise it
-  const normalised = Array.isArray(arr) ? arr : [arr];
+  const normalised: T[] = Array.isArray(arr) ? arr : [arr as T];
   if (!normalised.length) return undefined;
   const filtered = normalised.filter((v) => VALID[key].has(v));
   return filtered.length ? filtered : undefined;

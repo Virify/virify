@@ -88,6 +88,8 @@ export interface TrackingSearchPayload extends TrackingBasePayload {
   radius: number;
   resultCount: number;
   filters?: Record<string, unknown>;
+  usedTerms?: string[];
+  ignoredTerms?: string[];
 }
 
 /**
