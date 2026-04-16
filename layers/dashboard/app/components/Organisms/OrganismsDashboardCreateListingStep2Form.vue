@@ -116,8 +116,8 @@
       </UFormField>
     </div>
 
-    <!-- Row 3: Move-in Date (optional) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+    <!-- Row 3: Move-in Date (rental only, optional) -->
+    <div v-if="listingType === 'rent'" class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
       <UFormField label="Move-in Date" name="moveInDate" description="Earliest date the property is available" hint="optional">
         <UInput
           v-model="moveInDateInput"
@@ -144,6 +144,8 @@
 
 <script setup lang="ts">
 const { getStepData, propertyTypes } = useCreateListingSteps()
+
+const listingType = computed(() => (getStepData(1) as Step1FormData | undefined)?.selectedType ?? 'sale')
 
 // Default empty address state (matches AddressParsed interface)
 const emptyAddress: AddressParsed = {

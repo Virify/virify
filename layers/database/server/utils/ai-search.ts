@@ -54,7 +54,10 @@ async function extractSearchParameters(query: string): Promise<SearchParameters>
  * Constructs the Prisma WHERE clause from the query and location filters.
  */
 export async function constructPrismaWhereClause(listingType: ListingType | string | undefined, query: string, propertyIds: number[] | null) {
-  const { whereClause, queryAnalysis } = await generateWhereClauseFromQuery(query);
+  const cached = await generateWhereClauseFromQuery(query);
+  // Deep-clone so that mutations below (adding propertyIds, wrapping listing type relations)
+  // never corrupt the in-memory cache reference when Redis is not in use.
+  const { whereClause, queryAnalysis } = JSON.parse(JSON.stringify(cached)) as typeof cached;
 
   let typeValue: string | undefined;
   if (typeof listingType === "string") {
@@ -116,7 +119,7 @@ export async function constructPrismaWhereClause(listingType: ListingType | stri
 /**
  * Generate a Prisma WHERE clause from a natural language query using OpenAI function calling.
  * GPT extracts flat SearchParameters; buildWhereClause() handles all nesting deterministically.
- * Results are cached for 24h. Cache key versioned — bump when SearchParameters changes.
+ * Results are cached for 24h. Cache key is versioned — bump CACHE_VERSION when SearchParameters changes.
  */
 export async function generateWhereClauseFromQuery(query: string): Promise<aiSearchResult> {
   checkAiConfiguration();
@@ -125,7 +128,9 @@ export async function generateWhereClauseFromQuery(query: string): Promise<aiSea
   const cacheKey = `ai-search:${query.toLowerCase().replace(/\s+/g, " ").trim()}`;
 
   const cached = await storage.getItem<aiSearchResult>(cacheKey);
-  if (cached) return cached;
+  // Validate shape before trusting the cached value — a malformed entry (missing whereClause)
+  // would cause a Prisma error on every subsequent request for that query until the TTL expires.
+  if (cached && cached.whereClause && typeof cached.whereClause === "object") return cached;
 
   let result: aiSearchResult;
   try {

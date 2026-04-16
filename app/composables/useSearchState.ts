@@ -220,6 +220,7 @@ function createSearchState() {
       if (isAI) {
         const response = await $fetch('/api/search/rag', {
           method: 'POST',
+          timeout: 60000,
           body: {
             ...asObject(body),
             location,
