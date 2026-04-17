@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 const { getStepData, saveRoomData, isSaving } = useCreateListingSteps()
+const toast = useToast()
 
 // Get totalFloors from Step 2 data
 const step2Data = getStepData(2) as { property?: { totalFloors?: number } } | undefined
@@ -103,6 +104,16 @@ function addBedroom() {
 }
 
 async function removeBedroom(index: number) {
+  if (state.property.bedroomFeatures.length <= 1) {
+    toast.add({
+      title: 'Cannot remove bedroom',
+      description: 'A listing must have at least one bedroom.',
+      color: 'error',
+      icon: 'i-lucide-circle-x',
+      duration: 3000,
+    })
+    return
+  }
   state.property.bedroomFeatures.splice(index, 1)
   state.property.bedroomFeatures.forEach((b, i) => {
     b.roomNumber = i + 1

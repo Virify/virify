@@ -53,6 +53,10 @@ accessibilityFeatures: "WHEELCHAIR_FRIENDLY" | "STEP_FREE_ACCESS" | "WIDE_DOORWA
 petFriendly: true when pets are allowed, false when explicitly not allowed. "pets allowed" → petFriendly:true. "dog friendly" → petFriendly:true. "no pets" → petFriendly:false.
 buildingFeatures: "POOL" | "INTERNET" | "CONCIERGE" | "SHOP" | "GYM"
 bedroomFeatures: "EN_SUITE" | "BUILT_IN_STORAGE" | "WALK_IN_WARDROBE" | "BAY_WINDOW" | "BALCONY" | "HAS_VIEW" | "PATIO_DOORS" | "BUILT_IN_DESK"
+  ⚠ Room feature assignment rules:
+  - When a feature is explicitly tied to a bedroom → bedroomFeatures ONLY. "cottage with a bedroom with a bay window" → bedroomFeatures:["BAY_WINDOW"]. "en-suite bedroom" → bedroomFeatures:["EN_SUITE"].
+  - When a feature is explicitly tied to a reception/living room → receptionFeatures ONLY. "living room with bay windows" → receptionFeatures:["BAY_WINDOW"].
+  - When NO specific room is mentioned and the feature can appear in multiple room types → set it in ALL applicable arrays. "house with bay windows" → bedroomFeatures:["BAY_WINDOW"], receptionFeatures:["BAY_WINDOW"]. "property with a view" → bedroomFeatures:["HAS_VIEW"], receptionFeatures:["HAS_VIEW"]. This makes the search return properties that have the feature anywhere, which matches user intent.
 bathroomFeatures: "TOILET" | "EN_SUITE" | "BATHTUB" | "WALK_IN_SHOWER"
 kitchenFeatures: "MODERN" | "OPEN_PLAN" | "WHITE_GOODS" | "BREAKFAST_BAR" | "ISLAND" | "UTILITY_ACCESS" | "PANTRY"
 receptionTypes: "LIVING_ROOM" | "FAMILY_ROOM" | "DINING_ROOM" | "GAMES_ROOM" | "HOME_CINEMA". ALWAYS set when the user mentions specific named rooms — even if they sound like a generic description. "with a living room" → receptionTypes:["LIVING_ROOM"]. "living room and dining room" / "with a living room and a dining room" → receptionTypes:["LIVING_ROOM","DINING_ROOM"]. "family room" → receptionTypes:["FAMILY_ROOM"]. "home cinema" → receptionTypes:["HOME_CINEMA"].
@@ -202,7 +206,7 @@ export const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         accessibilityFeatures: { type: "array", items: { type: "string", enum: ["WHEELCHAIR_FRIENDLY", "STEP_FREE_ACCESS", "WIDE_DOORWAYS", "WET_ROOM", "HANDRAILS", "ELEVATOR", "STAIRS", "ACCESSIBLE_PARKING"] } },
         petFriendly: { type: "boolean" },
         buildingFeatures: { type: "array", items: { type: "string", enum: ["POOL", "INTERNET", "CONCIERGE", "SHOP", "GYM"] } },
-        bedroomFeatures: { type: "array", items: { type: "string", enum: ["EN_SUITE", "BUILT_IN_STORAGE", "WALK_IN_WARDROBE", "BAY_WINDOW", "BALCONY", "HAS_VIEW", "PATIO_DOORS", "BUILT_IN_DESK"] } },
+        bedroomFeatures: { type: "array", items: { type: "string", enum: ["EN_SUITE", "BUILT_IN_STORAGE", "WALK_IN_WARDROBE", "BAY_WINDOW", "BALCONY", "HAS_VIEW", "PATIO_DOORS", "BUILT_IN_DESK"] }, description: "Features tied to a bedroom. Also set this when the user mentions the feature without specifying a room — pair it with receptionFeatures/otherRoomFeatures so the search spans all room types." },
         bedSizes: { type: "array", items: { type: "string", enum: ["SINGLE", "DOUBLE", "QUEEN", "KING", "SUPER_KING"] } },
         bedroomSizeMin: { type: "number", description: "Min size of a single bedroom in m²" },
         bathroomFeatures: { type: "array", items: { type: "string", enum: ["TOILET", "EN_SUITE", "BATHTUB", "WALK_IN_SHOWER"] } },

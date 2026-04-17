@@ -50,7 +50,7 @@
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-44 sm:max-w-52">
-          <UFormField label="Chain Status" name="chain" required eagerValidation>
+          <UFormField label="Chain Status" name="chain" description="Chain status of the property" eagerValidation>
             <USelect
               v-model="state.saleListing!.chain"
               :items="chainItems"
