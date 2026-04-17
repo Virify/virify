@@ -1,6 +1,4 @@
 
-import type { ListingSearch, ListingSearchOptional, ListingWithFullProperty, ListingCardType, SummaryCardData } from "~~/shared/types/listing";
-import { listingCardFields } from "~~/shared/types/listing";
 import { ListingTier, Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus, type Listing } from "../database/prisma/generated/client";
 import { prisma } from "./prisma-client";
 
@@ -52,6 +50,10 @@ export async function getFullListingById(id: number): Promise<ListingWithFullPro
           avatar: true,
         },
       },
+      ListingPriceHistory: {
+        orderBy: { createdAt: 'desc' as const },
+        select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+      },
     },
   });
 }
@@ -86,6 +88,10 @@ export async function getListingByIdForEdit(id: number, userId: number): Promise
           createdAt: true,
           avatar: true,
         },
+      },
+      ListingPriceHistory: {
+        orderBy: { createdAt: 'desc' as const },
+        select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
       },
     },
   });
@@ -147,6 +153,10 @@ export async function getAllListingsByPropertyIds(propertyIds: number[]): Promis
           createdAt: true,
           avatar: true,
         },
+      },
+      ListingPriceHistory: {
+        orderBy: { createdAt: 'desc' as const },
+        select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
       },
     },
   });
@@ -318,6 +328,10 @@ const fullListingInclude = {
       avatar: true,
     },
   },
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+  },
 };
 
 /**
@@ -348,17 +362,18 @@ export async function fetchPaginatedListings(where: Prisma.ListingWhereInput, pa
 /**
  * Fetches card-only listing data (lean select, no room details).
  */
-export async function fetchListingsForCard(where: Prisma.ListingWhereInput): Promise<ListingCardType[]> {
+export async function fetchListingsForCard(where: Prisma.ListingWhereInput, orderBy?: Prisma.ListingOrderByWithRelationInput): Promise<ListingCardType[]> {
   return await prisma.listing.findMany({
     where,
     select: listingCardFields,
+    ...(orderBy ? { orderBy } : {}),
   });
 }
 
 /**
  * Fetches paginated card-only listing data.
  */
-export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20): Promise<ListingCardType[]> {
+export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereInput, page: number = 1, limit: number = 20, orderBy?: Prisma.ListingOrderByWithRelationInput): Promise<ListingCardType[]> {
   const skip = (page - 1) * limit;
 
   return await prisma.listing.findMany({
@@ -366,5 +381,159 @@ export async function fetchPaginatedListingsForCard(where: Prisma.ListingWhereIn
     select: listingCardFields,
     skip,
     take: limit,
+    ...(orderBy ? { orderBy } : {}),
   });
+}
+
+// ---------------------------------------------------------------------------
+// Traditional (form-based) search
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetches card listings for a traditional search.
+ * Builds the WHERE clause from form params and executes the query.
+ *
+ * @param params             Validated form parameters
+ * @param locationPropertyIds Property IDs pre-filtered by location (null = no location filter)
+ * @param orderBy            Optional Prisma order-by clause
+ */
+export async function fetchTraditionalSearchListings(
+  params: TraditionalSearchParams,
+  locationPropertyIds: number[] | null,
+  orderBy?: Prisma.ListingOrderByWithRelationInput
+): Promise<ListingCardType[]> {
+  const where: Prisma.ListingWhereInput = {
+    published: true,
+    archived: false,
+  }
+
+  // Listing type + sale/rent-specific includes
+  if (params.isSale) {
+    const saleFilter: Prisma.SaleListingWhereInput = {}
+
+    // By default only show available; sold-stc ON = include all statuses
+    if (!params.saleIncludes['sold-stc']) {
+      saleFilter.availabilityStatus = 'AVAILABLE'
+    }
+
+    // Chain free only
+    if (params.saleIncludes['chain-free']) {
+      saleFilter.chain = true
+    }
+
+    // Freehold only
+    if (params.saleIncludes['freehold-only']) {
+      saleFilter.tenureType = 'FREEHOLD'
+    }
+
+    where.saleListing = { is: saleFilter }
+  } else {
+    const rentFilter: Prisma.RentalListingWhereInput = {}
+
+    // By default only show available; let-agreed ON = include all statuses
+    if (!params.rentIncludes['let-agreed']) {
+      rentFilter.availabilityStatus = 'AVAILABLE'
+    }
+
+    // Rental length — only filter if at least one is selected
+    const rentalLengths: string[] = []
+    if (params.rentIncludes['short-term-lets']) rentalLengths.push('SHORT_TERM')
+    if (params.rentIncludes['long-term-lets']) rentalLengths.push('LONG_TERM')
+    if (rentalLengths.length > 0) {
+      rentFilter.rentalLength = { in: rentalLengths as ('SHORT_TERM' | 'LONG_TERM')[] }
+    }
+
+    where.rentalListing = { is: rentFilter }
+  }
+
+  // Price range
+  const [minPrice, maxPrice] = params.price
+  if (minPrice > 0 || maxPrice > 0) {
+    where.price = { gte: minPrice, lte: maxPrice }
+  }
+
+  // Property-level filters
+  const propertyFilters: Prisma.PropertyWhereInput = {}
+
+  if (locationPropertyIds !== null) {
+    propertyFilters.id = { in: locationPropertyIds }
+  }
+
+  if (params.minBedrooms > 0) {
+    propertyFilters.numberBedrooms = { gte: params.minBedrooms }
+  }
+
+  if (params.minBathrooms > 0 || params.maxBathrooms > 0) {
+    propertyFilters.numberBathrooms = {
+      ...(params.minBathrooms > 0 ? { gte: params.minBathrooms } : {}),
+      ...(params.maxBathrooms > 0 ? { lte: params.maxBathrooms } : {}),
+    }
+  }
+
+  // Property types + classifications
+  if (params.propertyTypes) {
+    const conditions: Prisma.PropertyWhereInput[] = []
+
+    for (const [typeName, subtypes] of Object.entries(params.propertyTypes)) {
+      if (subtypes.length > 0) {
+        conditions.push({
+          type: { name: typeName },
+          classification: { name: { in: subtypes } },
+        })
+      }
+    }
+
+    if (conditions.length > 0) {
+      propertyFilters.OR = conditions
+    }
+  }
+
+  // Additional features
+  if (params.additionalFeatures.garden) {
+    propertyFilters.outdoorSpace = { is: { garden: { some: {} } } }
+  }
+
+  // Build parking feature requirements — garage, off-street, and EV charging can combine
+  const requiredParkingFeatures: ('GARAGE' | 'DRIVEWAY' | 'PERMIT_PARKING' | 'ON_STREET' | 'NO_PARKING' | 'CARPORT' | 'ALLOCATED_PARKING' | 'EV_CHARGING')[] = []
+  if (params.additionalFeatures.garage) requiredParkingFeatures.push('GARAGE')
+  if (params.additionalFeatures['ev-charging']) requiredParkingFeatures.push('EV_CHARGING')
+
+  if (requiredParkingFeatures.length > 0) {
+    propertyFilters.parking = { is: { features: { hasEvery: requiredParkingFeatures } } }
+  } else if (params.additionalFeatures['off-street-parking']) {
+    propertyFilters.parking = { is: { features: { hasSome: ['DRIVEWAY', 'CARPORT', 'ALLOCATED_PARKING'] } } }
+  }
+
+  if (params.additionalFeatures['full-fibre']) {
+    propertyFilters.energyAndUtilities = { is: { fullFibreAvailable: true } }
+  }
+
+  if (params.additionalFeatures.pets) {
+    propertyFilters.additionalFeatures = { is: { petFriendly: true } }
+  }
+
+  if (params.additionalFeatures['disabled-access']) {
+    propertyFilters.accessibilityFeatures = { isNot: null }
+  }
+
+  // Size filter (DB stores sqmtr; convert if user chose sqft)
+  const SQFT_TO_SQMTR = 0.092903
+  const toSqmtr = (v: number) => params.sizeUnit === 'sqft' ? v * SQFT_TO_SQMTR : v
+
+  if (params.minSize != null || params.maxSize != null) {
+    propertyFilters.size = {
+      ...(params.minSize != null ? { gte: toSqmtr(params.minSize) } : {}),
+      ...(params.maxSize != null ? { lte: toSqmtr(params.maxSize) } : {}),
+    }
+  }
+
+  if (Object.keys(propertyFilters).length > 0) {
+    where.property = { is: propertyFilters }
+  }
+
+  return prisma.listing.findMany({
+    where,
+    select: listingCardFields,
+    ...(orderBy ? { orderBy } : {}),
+  })
 }

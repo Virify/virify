@@ -30,9 +30,10 @@ describe("numberToCurrency", () => {
     expect(numberToCurrency(1234.99, true)).toBe("£1,234");
   });
 
-  it("does not floor by default (preserves decimal portion via Intl)", () => {
-    // Intl with minimumFractionDigits: 0 keeps the .5 decimal
-    expect(numberToCurrency(1234.5)).toBe("£1,234.5");
+  it("rounds decimals to nearest whole number (no pence)", () => {
+    // maximumFractionDigits: 0 — all prices are whole pounds
+    expect(numberToCurrency(1234.5)).toBe("£1,235");
+    expect(numberToCurrency(1234.4)).toBe("£1,234");
   });
 
   it("formats negative numbers", () => {

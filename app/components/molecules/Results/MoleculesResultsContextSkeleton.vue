@@ -12,6 +12,8 @@
 </template>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
+
 .m-results-context-skeleton {
   --results-context-gap: var(--size-4);
   --results-context-spacing: var(--size-8);
@@ -21,7 +23,7 @@
   &__title {
     border-radius: var(--border-radius-lg);
     height: var(--size-36);
-    margin: 0 0 var(--size-10);
+    margin: 0 0 var(--size-12);
     width: 24ch;
   }
 
@@ -36,11 +38,15 @@
     display: flex;
     align-items: center;
     gap: var(--results-context-gap);
-    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
+    border: 1px solid light-dark(var(--blue-700), var(--blue-300));
     border-radius: var(--border-radius-lg);
     padding: var(--results-context-gap);
     width: min(100%, 30ch);
     box-sizing: border-box;
+
+    @include mq.tablet {
+      border-radius: var(--border-radius-xl);
+    }
 
     &:last-child {
       width: min(100%, 40ch);
@@ -60,6 +66,10 @@
     height: var(--size-32);
     border-radius: var(--border-radius-md);
     flex-shrink: 1;
+
+    @include mq.tablet {
+      border-radius: var(--border-radius-lg);
+    }
   }
 }
 </style>

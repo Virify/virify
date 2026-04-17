@@ -5,13 +5,13 @@
     </h2>
 
     <ul class="m-results-context__list">
-      <li v-if="locationName || radiusText">
+      <li v-if="location || radiusText">
         <button type="button" class="m-results-context__button" aria-label="Expand location"
           @click.prevent="openLocation">
           <AtomsIcon icon="explore/map" width="16" height="16" />
 
-          <span v-if="locationName" class="m-results-context__tag">
-            {{ locationName }},
+          <span v-if="location" class="m-results-context__tag">
+            {{ location }},
           </span>
 
           <span v-if="radiusText" class="m-results-context__tag">
@@ -20,17 +20,24 @@
         </button>
       </li>
 
-      <li v-if="visibleSearchTerms.length">
+      <li v-if="sortLabel">
+        <button type="button" class="m-results-context__button" aria-label="Change sort order"
+          @click.prevent="openSort">
+          <AtomsIcon icon="search/sort" width="16" height="16" />
+
+          <span class="m-results-context__tag">
+            {{ sortLabel }}
+          </span>
+        </button>
+      </li>
+
+      <li v-if="terms.length">
         <button type="button" class="m-results-context__button" aria-label="Expand filters"
           @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
-          <span class="m-results-context__tag" v-for="term in visibleSearchTerms" :key="term">
+          <span class="m-results-context__tag" v-for="term in terms" :key="term">
             {{ term }}
-          </span>
-
-          <span v-if="overflowSearchTerms" class="m-results-context__overflow">
-            and {{ overflowSearchTerms }} more
           </span>
         </button>
       </li>
@@ -41,21 +48,24 @@
 <script setup lang="ts">
 interface Props {
   count?: number
-  queryAnalysis?: QueryAnalysis | null
-  location?: GeocodingFeature | null
-  radius?: number
+  sortBy?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   count: 0,
-  queryAnalysis: null,
-  location: null,
-  radius: 0
+  sortBy: 'relevance'
 })
 
 const emit = defineEmits<{
-  'open-popover': [type: 'location' | 'filters']
+  'open-popover': [type: 'location' | 'filters' | 'sort']
 }>()
+
+/**
+ * Open sort in the dock
+ */
+function openSort() {
+  emit('open-popover', 'sort')
+}
 
 /**
  * Open filters in the dock
@@ -74,57 +84,22 @@ function openLocation() {
 /**
  * Search terms from query analysis - capitalized
  */
-const searchTermsFormatted = computed(() => {
-  const { usedTerms } = asObject(props.queryAnalysis)
-
-  // If no search terms exist, return nothing
-  if (!Array.isArray(usedTerms)) return []
-
-  // Format the list
-  return usedTerms.filter(isString).map(term => {
-    return term.charAt(0).toUpperCase() + term.slice(1)
-  })
-})
-
-const visibleSearchTerms = computed(() => {
-  const usedTerms = searchTermsFormatted.value
-
-  // If less than 4 used terms exist, return as-is
-  if (usedTerms.length < 4) {
-    return searchTermsFormatted.value
-  }
-
-  // Else only return the first 2
-  return usedTerms.slice(0, 2)
-})
-
-const overflowSearchTerms = computed(() => {
-  const usedTerms = searchTermsFormatted.value
-
-  // If less than 4 used terms exist, no overflow
-  if (usedTerms.length < 4) {
-    return 0
-  }
-
-  // Else overflow is total length minus 2
-  return usedTerms.length - 2
-})
-
-/**
- * Location name for display
- */
-const locationName = computed(() => {
-  if (!props.location) return ''
-  return props.location.place_name_en || props.location.place_name || ''
-})
+const { location, radius, terms } = useActiveSearchTerms()
 
 /**
  * Radius text for display
  */
 const radiusText = computed(() => {
-  if (props.radius == null) return ''
-  if (props.radius === 0) return 'This location only'
-  return `Within ${props.radius} Miles`
+  if (!radius && radius !== 0) return ''
+  if (radius === 0) return 'This location only'
+  return `Within ${radius} Miles`
+})
+
+/**
+ * Sort label for display
+ */
+const sortLabel = computed(() => {
+  return selectOptionSortOrder.find(o => o.value === (props.sortBy || 'relevance'))?.key ?? 'Relevance'
 })
 
 </script>
@@ -167,13 +142,14 @@ const radiusText = computed(() => {
     font-size: var(--font-xs);
     line-height: var(--lineheight-sm);
     font-weight: var(--font-semisemibold);
-    border: 1px solid light-dark(var(--blue-600), var(--blue-400));
+    border: 1px solid light-dark(var(--blue-700), var(--blue-300));
     border-radius: var(--border-radius-lg);
     padding: var(--results-context-gap);
     cursor: pointer;
 
     @include mq.tablet {
       font-size: var(--font-sm);
+      border-radius: var(--border-radius-xl);
     }
 
     .a-icon {
@@ -191,8 +167,12 @@ const radiusText = computed(() => {
     border: 1px solid var(--primary-background-200);
     background: var(--primary-background-100);
     padding: var(--size-4) var(--size-10);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius-md);
     transition: border-color var(--animation-fast) var(--ease-in-out);
+
+    @include mq.tablet {
+      border-radius: var(--border-radius-lg);
+    }
   }
 
   &__overflow {
@@ -203,7 +183,7 @@ const radiusText = computed(() => {
 
   &__button:focus {
     outline: none;
-    border-color: var(--blue-500);
+    border-color: light-dark(var(--blue-600), var(--blue-400));
   }
 
   &__button:hover &__tag,

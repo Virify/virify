@@ -79,9 +79,12 @@ function viewingTabForType(type: string): string {
 }
 
 // Route based on notification type
-function handleNotificationSelect(notification: UserNotification) {
-  // Close slideover first so whatever opens renders above it
+async function handleNotificationSelect(notification: UserNotification) {
+  // Close slideover first so it doesn't block the modal on mobile
   isOpen.value = false;
+
+  // Wait for the slideover close animation to finish before opening anything else
+  await nextTick();
 
   if ((notification.type as string)?.startsWith('VIEWING_')) {
     markAsRead({ notificationId: notification.id });

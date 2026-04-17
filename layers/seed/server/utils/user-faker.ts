@@ -189,7 +189,7 @@ async function seedConversations(userIds: number[]): Promise<void> {
     const conversationsToCreate = [];
 
     for (const listing of batch) {
-      const numEnquiries = faker.number.int({ min: 2, max: 5 });
+      const numEnquiries = faker.number.int({ min: 0, max: 2 });
       const eligibleUsers = userIds.filter(id => id !== listing.userId);
 
       if (eligibleUsers.length === 0) continue;
@@ -232,7 +232,7 @@ async function seedConversations(userIds: number[]): Promise<void> {
       const messagesToCreate = [];
 
       for (const conversation of createdConversations) {
-        const messageCount = faker.number.int({ min: 3, max: 8 });
+        const messageCount = faker.number.int({ min: 1, max: 3 });
 
         for (let i = 0; i < messageCount; i++) {
           const isFromUser = faker.datatype.boolean();
@@ -261,12 +261,12 @@ async function seedConversations(userIds: number[]): Promise<void> {
     }
   }
 
-  // Admin enquiries: stress test amount (approx 600 total)
+  // Admin enquiries: realistic amount
   console.log("👤 Creating admin enquiries...");
   
-  // Admin sends 200 enquiries to other users' listings
+  // Admin sends 20 enquiries to other users' listings
   const nonAdminListings = listings.filter(l => l.userId !== ADMIN_ID);
-  const adminSentListings = faker.helpers.arrayElements(nonAdminListings, Math.min(200, nonAdminListings.length));
+  const adminSentListings = faker.helpers.arrayElements(nonAdminListings, Math.min(20, nonAdminListings.length));
 
   console.log(`  Creating ${adminSentListings.length} sent enquiries from admin...`);
   for (const listing of adminSentListings) {
@@ -278,7 +278,7 @@ async function seedConversations(userIds: number[]): Promise<void> {
       },
     });
 
-    const messageCount = faker.number.int({ min: 3, max: 8 });
+    const messageCount = faker.number.int({ min: 1, max: 3 });
     const messages = [];
 
     for (let i = 0; i < messageCount; i++) {
@@ -303,12 +303,12 @@ async function seedConversations(userIds: number[]): Promise<void> {
     totalMessages += messages.length;
   }
 
-  // Admin receives 400+ enquiries on their listings
+  // Admin receives enquiries on their listings
   const adminListings = listings.filter(l => l.userId === ADMIN_ID);
-  console.log(`  Creating 400+ received enquiries to admin's ${adminListings.length} listings...`);
+  console.log(`  Creating received enquiries to admin's ${adminListings.length} listings...`);
   
   let adminReceivedCount = 0;
-  const targetReceived = 400;
+  const targetReceived = 30;
   
   // Distribute enquiries across admin's listings
   while (adminReceivedCount < targetReceived && adminListings.length > 0) {
@@ -348,7 +348,7 @@ async function seedConversations(userIds: number[]): Promise<void> {
         }
       });
 
-      const messageCount = faker.number.int({ min: 3, max: 8 });
+      const messageCount = faker.number.int({ min: 1, max: 3 });
       const messages = [];
 
       for (let i = 0; i < messageCount; i++) {
@@ -438,8 +438,8 @@ export async function seedFakeUserFavouritesOnAdminListings(userIds: number[]): 
 
   // Each fake user has a chance to add some admin listings to favourites/notes
   for (const userId of fakeUsers) {
-    // Each user favourites 0-5 admin listings
-    const numFavourites = faker.number.int({ min: 0, max: 5 });
+    // Each user favourites 0-2 admin listings
+    const numFavourites = faker.number.int({ min: 0, max: 2 });
     if (numFavourites > 0) {
       const selectedFavourites = faker.helpers.arrayElements(
         adminListings,
@@ -466,8 +466,8 @@ export async function seedFakeUserFavouritesOnAdminListings(userIds: number[]): 
       }
     }
 
-    // Each user adds notes to 0-5 admin listings (different from favourites)
-    const numNotes = faker.number.int({ min: 0, max: 5 });
+    // Each user adds notes to 0-2 admin listings (different from favourites)
+    const numNotes = faker.number.int({ min: 0, max: 2 });
     if (numNotes > 0) {
       const selectedNotes = faker.helpers.arrayElements(
         adminListings,

@@ -36,17 +36,24 @@
           variant="solid"
           class="absolute top-2 right-2 z-1 text-xs"
         />
+        <AtomsPriceReducedBadge
+          :price-history="priceHistory"
+          :current-price="currentPriceNumber"
+          class="absolute top-2 left-2 z-1 text-xs"
+        />
       </ClientOnly>
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price">
         <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
+        <PropertyCardPill v-if="rentFrequency" :content="rentFrequency" variant="orange" />
 
         <span class="property-card-root__price-amount | title-md">
           {{ price }}
 
-          <sub v-if="rentFrequency" class="property-card-root__price-frequency">{{ rentFrequency }}</sub>
+          <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!"
+            :current-price="currentPriceNumber!" />
         </span>
       </h2>
 
@@ -124,6 +131,8 @@ interface Props {
   price?: string
   priceLabel?: string
   rentFrequency?: string
+  priceHistory?: PriceHistoryEntry[]
+  currentPriceNumber?: number
   overview?: string
   overviewAddress?: string
   dateChanged?: string
@@ -161,6 +170,8 @@ const viewingLabel = computed(() => {
 const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
 )
+
+const hasPriceHistory = computed(() => !!props.priceHistory?.length)
 
 /**
  *  Conditionally show as links
@@ -335,13 +346,6 @@ const imageCarouselArray = computed(() => {
     @include small-card {
       font-size: var(--title-sm);
     }
-  }
-
-  &__price-frequency {
-    position: unset;
-    bottom: unset;
-    font-size: var(--font-xs);
-    vertical-align: baseline;
   }
 
   &__overview {

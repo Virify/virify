@@ -27,7 +27,7 @@ export interface CreateNotificationData {
  * This should be called when a new message or conversation is created
  */
 export async function createNotification(data: CreateNotificationData) {
-  return await prisma.userNotification.create({
+  const notification = await prisma.userNotification.create({
     data: {
       userId: data.userId,
       type: data.type,
@@ -46,6 +46,16 @@ export async function createNotification(data: CreateNotificationData) {
       listingIsRental: data.listingIsRental,
     },
   });
+
+  // Bust the counts cache for this user so the next GET /api/notifications/counts
+  // returns fresh data and badges update immediately.
+  // useStorage is only available in the Nitro runtime (not seed scripts), so guard it.
+  if (typeof useStorage !== 'undefined') {
+    const storage = useStorage('cache');
+    storage.removeItem(`notif-counts:user:${data.userId}`).catch(() => {});
+  }
+
+  return notification;
 }
 
 /**

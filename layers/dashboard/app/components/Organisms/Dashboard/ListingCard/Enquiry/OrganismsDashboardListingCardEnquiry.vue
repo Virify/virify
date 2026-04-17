@@ -13,8 +13,13 @@
     </div>
     <div class="min-w-0 flex-1">
       <div class="flex items-center justify-between gap-2 mb-0">
-        <p class="text-base font-bold text-secondary leading-none">
+        <p class="text-base font-bold text-secondary leading-none flex items-center gap-1">
           {{ formatCurrency((listing.price)) }}
+          <AtomsPriceHistoryPopover
+            v-if="listing.ListingPriceHistory?.length"
+            :price-history="listing.ListingPriceHistory"
+            :current-price="listing.price"
+          />
         </p>
         <div class="flex items-center gap-1.5">
           <UBadge :label="listing.rentalListing ? 'To Rent' : 'For Sale'" color="secondary" variant="soft" size="md" />

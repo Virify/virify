@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="searchState.sortBy">
+  <SelectRoot v-model="searchState.sortBy" v-model:open="sortSelectOpen">
     <SelectTrigger class="o-dock-inputs-sort__button" v-bind="$attrs">
       <AtomsIcon icon="search/sort" />
       <SelectValue class="o-dock-inputs-sort__button-value | body-sm" placeholder="Select sort order" />
@@ -45,7 +45,7 @@ import {
 /**
  *  Sort order state
  */
-const { searchState } = useSearchState()
+const { searchState, sortSelectOpen } = useSearchState()
 
 </script>
 

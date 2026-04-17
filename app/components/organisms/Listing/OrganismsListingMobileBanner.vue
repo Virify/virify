@@ -23,7 +23,7 @@
           <h2 v-if="price"
             class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
             {{ price }}
-
+            <AtomsPriceHistoryPopover v-if="priceHistory?.length" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
 
             <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
               {{ convertEnumToString(priceType!) }}
@@ -69,6 +69,7 @@
           <div class="o-listing-mobile-banner__overview" role="presentation">
             <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
               {{ price }}
+              <AtomsPriceHistoryPopover v-if="priceHistory?.length" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
 
               <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
                 {{ convertEnumToString(priceType!) }}
@@ -121,6 +122,8 @@ interface Props {
   }
   available?: string
   isDraft?: boolean
+  priceHistory?: PriceHistoryEntry[]
+  currentPriceNumber?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {

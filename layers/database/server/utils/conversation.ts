@@ -521,6 +521,10 @@ const conversationListingMinimalSelect = {
   id: true,
   userId: true,
   price: true,
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, createdAt: true },
+  },
   rentalListing: { select: { id: true, availabilityStatus: true } },
   saleListing: { select: { id: true, availabilityStatus: true } },
   property: {
@@ -560,6 +564,10 @@ const conversationListingCardSelect = {
   id: true,
   userId: true,
   price: true,
+  ListingPriceHistory: {
+    orderBy: { createdAt: 'desc' as const },
+    select: { id: true, oldPrice: true, newPrice: true, createdAt: true },
+  },
   rentalListing: { select: { id: true, availabilityStatus: true } },
   saleListing: { select: { id: true, availabilityStatus: true } },
   property: {

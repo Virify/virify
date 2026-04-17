@@ -56,3 +56,9 @@
     }
   }
 }
+
+.gradient-box-inline {
+  display: block;
+  border: 1.5px solid light-dark(#{fn.faded-color(8%)}, #{fn.faded-color(17%)});
+  border-radius: var(--border-radius-2xl);
+}

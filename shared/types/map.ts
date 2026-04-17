@@ -1,8 +1,16 @@
-import type { Map as MaptilerMap, Marker } from "@maptiler/sdk";
+import type { GeoJSONFeature, Map as MaptilerMap, Marker } from "@maptiler/sdk";
 import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/client";
 /**
  * Map marker type for use with MapTiler maps
  */
+export type PriceHistoryEntry = {
+  id: number;
+  oldPrice: number;
+  newPrice: number;
+  changePercent?: number;
+  createdAt: Date | string;
+};
+
 export type MapMarker = {
   id: string | number | null;
   lat: number;
@@ -12,6 +20,7 @@ export type MapMarker = {
   bathrooms: number | null;
   receptions: number | null;
   price: number | null;
+  priceHistory?: PriceHistoryEntry[] | null;
   propertyType?: string | null;
   classification?: string | null;
   priceType?: string | null;

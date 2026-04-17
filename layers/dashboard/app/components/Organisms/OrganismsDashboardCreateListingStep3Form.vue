@@ -1,7 +1,7 @@
 <template>
   <OrganismsDashboardCreateListingStepWrapper
     :step-number="3"
-    :schema="step3Schema"
+    :schema="activeSchema"
     :state="state"
     :is-valid="isFormValid"
     api-endpoint="/api/draft-listings/update/steps/three/"
@@ -30,9 +30,11 @@
             v-model.number="state.price"
             type="number"
             :min="1"
+            step="1"
             placeholder="e.g. 350000"
             color="secondary"
             class="w-full"
+            @keydown="(e: KeyboardEvent) => (e.key === '.' || e.key === ',') && e.preventDefault()"
           >
             <template #leading>
               <span class="text-muted">£</span>
@@ -54,8 +56,16 @@
 
       <!-- Price preview -->
       <div class="basis-full">
-        <p class="text-sm text-muted">
+        <p v-if="isEditingLive && originalPrice" class="text-sm text-muted mb-1">
+          Current price: <strong class="text-foreground">{{ formatPrice(originalPrice) }}</strong>
+        </p>
+        <p v-if="state.price" class="text-sm text-muted">
           Your listing will show: <strong class="text-foreground">{{ formattedSalePrice }}</strong>
+        </p>
+        <p v-if="isEditingLive && originalPrice && maxReducedPrice" class="text-sm text-muted mt-1 flex items-center gap-1">
+          <UIcon name="i-lucide-info" class="w-4 h-4 shrink-0" />
+          Increases are unlimited. To reduce, you must reduce by at least 2%
+          (£{{ maxReducedPrice.toLocaleString() }} or lower).
         </p>
       </div>
     </div>
@@ -68,9 +78,11 @@
             v-model.number="state.price"
             type="number"
             :min="1"
+            step="1"
             placeholder="e.g. 1500"
             color="secondary"
             class="w-full"
+            @keydown="(e: KeyboardEvent) => (e.key === '.' || e.key === ',') && e.preventDefault()"
           >
             <template #leading>
               <span class="text-muted">£</span>
@@ -96,9 +108,11 @@
             v-model.number="state.rentalListing!.deposit"
             type="number"
             :min="0"
+            step="1"
             placeholder="e.g. 1500"
             color="secondary"
             class="w-full"
+            @keydown="(e: KeyboardEvent) => (e.key === '.' || e.key === ',') && e.preventDefault()"
           >
             <template #leading>
               <span class="text-muted">£</span>
@@ -113,6 +127,7 @@
             v-model.number="state.rentalListing!.holdingDeposit"
             type="number"
             :min="0"
+            step="1"
             color="secondary"
             placeholder="e.g. 300"
             class="w-full"
@@ -126,27 +141,93 @@
 
       <!-- Price preview -->
       <div class="basis-full">
-        <p class="text-sm text-muted">
+        <p v-if="isEditingLive && originalPrice" class="text-sm text-muted mb-1">
+          Current price: <strong class="text-foreground">{{ formatPrice(originalPrice) }}</strong>
+        </p>
+        <p v-if="state.price" class="text-sm text-muted">
           Your listing will show: <strong class="text-foreground">{{ formattedRentalPrice }}</strong>
         </p>
+        <p v-if="isEditingLive && originalPrice && maxReducedPrice" class="text-sm text-muted mt-1 flex items-center gap-1">
+          <UIcon name="i-lucide-info" class="w-4 h-4 shrink-0" />
+          Increases are unlimited. To reduce, you must reduce by at least 5%
+          (£{{ maxReducedPrice.toLocaleString() }} or lower).
+        </p>
       </div>
+    </div>
+
+    <!-- PPD: recent sold prices — sale listings only -->
+    <div v-if="listingType === 'sale' && ppdSummary" class="basis-full mt-2">
+      <div class="flex items-center gap-2 mb-3">
+        <UIcon name="i-lucide-landmark" class="w-4 h-4 text-muted shrink-0" />
+        <p class="text-sm font-medium text-foreground">
+          Sold prices near {{ postcode }}
+        </p>
+        <UBadge color="secondary" variant="subtle" size="md">{{ ppdSummary.recentCount }} sales &mdash; {{ ppdSummary.period }}</UBadge>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="rounded-lg border border-default bg-elevated/50 p-3 text-center">
+          <p class="text-xs text-muted mb-0.5">Average</p>
+          <p class="text-sm font-bold text-foreground">{{ formatPrice(ppdSummary.avg) }}</p>
+        </div>
+        <div class="rounded-lg border border-default bg-elevated/50 p-3 text-center">
+          <p class="text-xs text-muted mb-0.5">Lowest</p>
+          <p class="text-sm font-bold text-foreground">{{ formatPrice(ppdSummary.min) }}</p>
+        </div>
+        <div class="rounded-lg border border-default bg-elevated/50 p-3 text-center">
+          <p class="text-xs text-muted mb-0.5">Highest</p>
+          <p class="text-sm font-bold text-foreground">{{ formatPrice(ppdSummary.max) }}</p>
+        </div>
+      </div>
+
+      <UTable
+        :data="ppdSummary.lastSales"
+        :columns="ppdColumns"
+        size="sm"
+        class="w-full"
+      />
     </div>
   </OrganismsDashboardCreateListingStepWrapper>
 </template>
 
 <script setup lang="ts">
 // step3Schema is auto-imported from shared/utils/
-const { getStepData } = useCreateListingSteps()
+const { getStepData, editingListingId } = useCreateListingSteps()
 
-// Get listing type from Step 1 data
-const step1Data = getStepData(1) as Step1FormData | undefined
-const listingType = computed(() => step1Data?.selectedType ?? 'sale')
+// Get listing type from Step 1 data — read inside computed so it stays reactive
+const listingType = computed(() => (getStepData(1) as Step1FormData | undefined)?.selectedType ?? 'sale')
+
+// Price change limits when editing a published listing
+const isEditingLive = computed(() => editingListingId.value !== null)
+const savedData = getStepData(3) as { price?: number | null } | undefined
+const originalPrice = computed(() => isEditingLive.value ? (savedData?.price ?? null) : null)
+const minReductionPct = computed(() => listingType.value === 'rent' ? 0.05 : 0.02)
+const maxReducedPrice = computed(() =>
+  originalPrice.value ? Math.floor(originalPrice.value * (1 - minReductionPct.value)) : null
+)
+
+// PPD: street context via composable
+const postcode = computed(() =>
+  (getStepData(2) as { property?: { address?: { postcode?: string | null } } } | undefined)?.property?.address?.postcode ?? null
+)
+const street = computed(() =>
+  (getStepData(2) as { property?: { address?: { street?: string | null } } } | undefined)?.property?.address?.street ?? null
+)
+console.log('[Step3Form] step2 data:', getStepData(2), '— postcode:', postcode.value, '— street:', street.value)
+const { summary: ppdSummary, loading: ppdLoading } = usePpdStreetData(postcode, street)
+
+// Use constrained schema when editing a live listing to show inline Zod errors before submit
+const activeSchema = computed(() =>
+  isEditingLive.value && originalPrice.value
+    ? createStep3SchemaWithLimit(originalPrice.value, listingType.value === 'rent')
+    : step3Schema
+)
 
 // Alert description based on listing type
 const alertDescription = computed(() => {
   return listingType.value === 'sale'
-    ? 'Set your asking price and how you\'d like it displayed to potential buyers.'
-    : 'Set your rental price, frequency, and any deposit requirements.'
+    ? 'Set your asking price and how you\'d like it displayed to potential buyers. If you reduce or increase the price of a published listing, this will be visible to users via listing price history.'
+    : 'Set your rental price, frequency, and any deposit requirements. If you reduce or increase the price of a published listing, this will be visible to users via listing price history.'
 })
 
 // State type matching API schema
@@ -163,10 +244,10 @@ interface Step3State {
 }
 
 // Form state - initialize based on listing type
-const savedData = getStepData(3) as Step3State | undefined
+const savedStep3 = getStepData(3) as Step3State | undefined
 const state = reactive<Step3State>(
-  savedData && Object.keys(savedData).length > 0 
-    ? { ...savedData }
+  savedStep3 && Object.keys(savedStep3).length > 0 
+    ? { ...savedStep3 }
     : listingType.value === 'sale'
       ? {
           price: null,
@@ -211,6 +292,17 @@ const priceTypeItems = [
 const rentFrequencyItems = [
   { value: 'MONTHLY', label: 'Per Month' },
   { value: 'WEEKLY', label: 'Per Week' },
+]
+
+// PPD table columns
+const ppdColumns = [
+  { accessorKey: 'formattedDate', header: 'Date' },
+  { accessorKey: 'full_address', header: 'Address' },
+  {
+    accessorKey: 'price',
+    header: 'Price',
+    cell: ({ row }: { row: { original: { price: number } } }) => formatPrice(row.original.price),
+  },
 ]
 
 // Price formatting

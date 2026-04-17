@@ -21,13 +21,6 @@
 <script setup lang="ts">
 import { useResizeObserver, watchImmediate } from '@vueuse/core';
 
-interface JumpLink {
-  order?: number,
-  icon?: null,
-  title: string
-  id: string
-}
-
 interface Props {
   links: JumpLink[]
 }
@@ -83,7 +76,7 @@ onMounted(() => {
       resizeIndicator()
     })
   }, {
-    rootMargin: '-100px'
+    rootMargin: '-150px'
   })
 
   /**
@@ -204,8 +197,30 @@ useResizeObserver($root, resizeIndicator)
     white-space: nowrap;
     font-weight: var(--font-semibold);
     padding: var(--size-12) var(--size-20);
-    gap: var(--size-10);
+    gap: var(--size-8);
     line-height: var(--lineheight-xs);
+
+    @container jumplinks (width < 560px) {
+      padding: var(--size-10) var(--size-16);
+    }
+
+    @container jumplinks (width < 520px) {
+      padding: var(--size-10) var(--size-14) var(--size-4);
+      flex-direction: column;
+      gap: 0;
+    }
+
+    @container jumplinks (width < 420px) {
+      padding: var(--size-8) var(--size-10) var(--size-2);
+    }
+
+    @container jumplinks (width < 260px) {
+      padding: var(--size-6) var(--size-8) var(--size-2);
+    }
+
+    @container jumplinks (width < 240px) {
+      padding: var(--size-6) var(--size-6) var(--size-2);
+    }
 
     &:hover {
       background: fn.faded-color(10%);
@@ -220,25 +235,11 @@ useResizeObserver($root, resizeIndicator)
       color: light-dark(var(--primary-200), var(--monochrome-900));
     }
 
-    @container jumplinks (width < 520px) {
-      padding: var(--size-10) var(--size-14) var(--size-4);
-      flex-direction: column;
-      gap: 0;
-    }
-
-    @container jumplinks (width < 420px) {
-      padding: var(--size-8) var(--size-10) var(--size-2);
-    }
-
-    @container jumplinks (width < 250px) {
-      padding: var(--size-6) var(--size-8) var(--size-2);
-    }
-
     .a-icon {
-      width: var(--size-20);
-      height: var(--size-20);
+      width: var(--size-18);
+      height: var(--size-18);
 
-      @container jumplinks (width < 420px) {
+      @container jumplinks (width < 520px) {
         width: var(--size-24);
         height: var(--size-24);
       }
@@ -246,11 +247,11 @@ useResizeObserver($root, resizeIndicator)
   }
 
   &__link-text {
-    font-size: var(--font-sm);
+    font-size: var(--font-xs);
 
     @container jumplinks (width < 520px) {
       display: block;
-      font-size: var(--font-2xs);
+      font-size: var(--font-3xs);
       overflow: hidden;
       text-overflow: ellipsis;
     }

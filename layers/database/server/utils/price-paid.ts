@@ -22,6 +22,20 @@ export async function getPricePaidByAddress(postcode: string, street: string, ci
 }
 
 /**
+ * Get all price paid data for a postcode, optionally narrowed to a street.
+ * Used for street-level market context in the listing editor.
+ */
+export async function getPricePaidByPostcodeAndStreet(postcode: string, street?: string | null): Promise<PricePaidSale[]> {
+  return await ppdPrisma.pricePaid.findMany({
+    where: {
+      postcode: postcode.toUpperCase(),
+      ...(street ? { street: street.toUpperCase() } : {}),
+    },
+    orderBy: { transfer_date: "desc" },
+  });
+}
+
+/**
  * Calculate market context for a property
  *
  * This function provides analytics to help understand how a property's sale price compares to the local market.

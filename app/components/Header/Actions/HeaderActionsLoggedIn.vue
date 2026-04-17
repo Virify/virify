@@ -10,6 +10,11 @@
           size="lg"
           :as="{ img: 'img' }"
         />
+        <span
+          v-if="notificationsTotal > 0"
+          class="header-actions-logged-in__unread-badge"
+          aria-label="Unread notifications"
+        />
       </span>
     </PopoverTrigger>
 
@@ -55,6 +60,7 @@
         <HeaderActionsNotificationsPanel
           v-else-if="activePanel === 'notifications'"
           @back="activePanel = 'main'"
+          @select="popoverOpen = false"
         />
       </PopoverContent>
     </PopoverPortal>
@@ -90,8 +96,8 @@ onMounted(() => {
   fetchNotificationCounts();
 })
 
-const notificationsTotal = computed(() => {
-  const { total = 0 } = asObject(notificationCounts.value)
+const notificationsTotal = computed<number>(() => {
+  const { total = 0 } = asObject(notificationCounts.value) as { total?: number }
 
   return total
 })
@@ -166,6 +172,7 @@ async function logOut() {
   }
 
   &__profile-image {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -181,6 +188,18 @@ async function logOut() {
       width: var(--size-24);
       height: var(--size-24);
     }
+  }
+
+  &__unread-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    border-radius: var(--border-radius-pill);
+    background: var(--error);
+    border: 2px solid var(--background-100);
+    pointer-events: none;
   }
 
   &__popover {

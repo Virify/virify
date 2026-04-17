@@ -148,6 +148,7 @@ export function formatMarker(listing: any): any {
     receptions: listing.property?.numberReceptions ?? null,
     otherRooms: listing.property?.numberOtherRooms ?? null,
     price: listing.price ?? null,
+    priceHistory: listing.ListingPriceHistory ?? null,
     propertyType: listing.property?.type?.name ?? null,
     classification: listing.property?.classification?.name ?? null,
     priceType: listing.saleListing?.priceType ?? listing.rentalListing?.rentFrequency ?? null,

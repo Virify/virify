@@ -19,7 +19,8 @@ let instance: ReturnType<typeof createSearchState> | null = null;
 
 function createSearchState() {
   const searchState = ref<SearchState>({ ...defaultState });
-  const isLoading = shallowRef(true);
+  const isLoading = shallowRef(false);
+  const sortSelectOpen = shallowRef(false);
 
   /**
    *  Run a callback, if it's valid
@@ -280,6 +281,7 @@ function createSearchState() {
    */
   const toast = useToast()
   const { trackSearch } = useAnalyticsTracking()
+  const { setActiveLocation, setActiveRadius, setActiveTerms } = useActiveSearchTerms()
 
   async function fetchResults(
     locationData = mostRecentLocation,
@@ -309,7 +311,8 @@ function createSearchState() {
           body: {
             ...asObject(body),
             location,
-            radius
+            radius,
+            sortBy: searchState.value.sortBy
           } as unknown as BodyInit
         })
 
@@ -318,6 +321,7 @@ function createSearchState() {
 
         if (queryAnalysis) {
           setQueryAnalysis(queryAnalysis)
+          setActiveTerms(queryAnalysis?.usedTerms)
         }
 
         setResults(results as unknown[])
@@ -341,7 +345,8 @@ function createSearchState() {
           body: {
             ...formData,
             location,
-            radius
+            radius,
+            sortBy: searchState.value.sortBy
           }
         })
 
@@ -349,8 +354,19 @@ function createSearchState() {
 
         const queryAnalysis = buildQueryAnalysisFromFormData(formData)
         setQueryAnalysis(queryAnalysis)
+        setActiveTerms(queryAnalysis?.usedTerms)
         setResults(response as unknown[])
       }
+
+      setActiveLocation(location)
+      setActiveRadius(radius)
+
+      await navigateTo('/search')
+
+      window.scrollTo({
+        top: 0,
+        behavior: "instant"
+      })
     }
     catch (error) {
       console.error('Search error:', error)
@@ -369,6 +385,7 @@ function createSearchState() {
 
   return {
     searchState,
+    sortSelectOpen,
     setSortOrder,
     setViewMode,
     setSearchType,

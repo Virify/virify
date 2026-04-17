@@ -9,6 +9,7 @@
     <input type="checkbox" :name :value :checked v-model="isChecked" class="| visually-hidden" />
     <AtomsIcon icon="tick-solid" aria-hidden class="a-checkbox-icon" />
     <span class="a-checkbox-text">
+      <UIcon v-if="icon" :name="icon" aria-hidden class="a-checkbox-feature-icon" />
       {{ label }}
     </span>
   </label>
@@ -20,6 +21,7 @@ interface Props {
   name?: string
   value?: string | number
   checked?: boolean
+  icon?: string
 }
 
 defineProps<Props>()
@@ -81,6 +83,16 @@ const isChecked = defineModel<boolean>({
     &:hover {
       background: #{ fn.faded-color(10%) };
     }
+  }
+
+  &-feature-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: var(--size-16);
+    height: var(--size-16);
+    margin-right: var(--size-4);
+    margin-top: -2px;
+    opacity: 0.7;
   }
 
   &:has(input:checked) &-icon {

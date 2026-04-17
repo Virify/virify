@@ -9,14 +9,23 @@
       body: 'w-full flex flex-col flex-1',
     }">
     <!-- Image with placeholder for drafts without images -->
-    <AtomsCloudFlareImage v-if="hasImage" :src="getMainImage(listing?.property)!" alt="Listing image" variant="gallery"
-      :placeholder="true" class="w-full h-54 object-cover rounded-lg aspect-4/3" />
-    <div v-else
-      class="w-full h-54 bg-elevated/50 rounded-lg aspect-4/3 flex items-center justify-center border border-dashed border-accented/30">
-      <div class="flex flex-col items-center gap-2 text-muted-foreground">
-        <UIcon name="i-lucide-image-off" class="w-8 h-8" />
-        <span class="body-xs">No images yet</span>
+    <div class="relative">
+      <AtomsCloudFlareImage v-if="hasImage" :src="getMainImage(listing?.property)!" alt="Listing image" variant="gallery"
+        :placeholder="true" class="w-full h-54 object-cover rounded-lg aspect-4/3" />
+      <div v-else
+        class="w-full h-54 bg-elevated/50 rounded-lg aspect-4/3 flex items-center justify-center border border-dashed border-accented/30">
+        <div class="flex flex-col items-center gap-2 text-muted-foreground">
+          <UIcon name="i-lucide-image-off" class="w-8 h-8" />
+          <span class="body-xs">No images yet</span>
+        </div>
       </div>
+      <!-- price reduced badge -->
+      <AtomsPriceReducedBadge
+        v-if="!listing.isDraft"
+        :price-history="listing.ListingPriceHistory"
+        :current-price="listing.price ?? undefined"
+        class="absolute top-2 left-2 z-1 text-xs"
+      />
     </div>
 
     <template #header>
@@ -25,12 +34,17 @@
           <p class="body-md m-0">
             <span v-if="hasPrice" class="font-bold body-md">{{ formatCurrency(listing.price!) }}</span>
             <span v-else class="font-medium body-md text-muted-foreground italic">No price set</span>
+            <AtomsPriceHistoryPopover
+              v-if="hasPrice && listing.ListingPriceHistory?.length"
+              :price-history="listing.ListingPriceHistory"
+              :current-price="listing.price!"
+            />
             <span v-if="priceType && hasPrice" class="text-muted-foreground"> / {{ priceType }}</span>
           </p>
           <UBadge v-if="listing.isDraft" size="md" color="error" variant="subtle">Draft</UBadge>
           <UBadge v-else-if="listing.archived" size="md" color="secondary" variant="subtle">Archived</UBadge>
           <UBadge v-if="hasListingType" size="md" color="secondary" variant="subtle">{{ listing.rentalListing ?
-            'ForRent' : 'For Sale' }}</UBadge>
+            'For Rent' : 'For Sale' }}</UBadge>
           <UBadge v-if="tierBadge" size="md" color="secondary" variant="outline">{{ tierBadge }}</UBadge>
         </div>
       </div>
