@@ -63,13 +63,18 @@ const emit = defineEmits<{
   completed: []
 }>()
 
-const { saveStep, isSaving, previousStep } = useCreateListingSteps()
+const { saveStep, isSaving, previousStep, getStepData } = useCreateListingSteps()
 const closeModal = inject<() => void>('closeModal')
 const toast = useToast()
 const { moderateFields, isModerating } = useModerateFields()
 
 // Ref to the UForm so we can call setErrors() for moderation failures
 const formRef = ref<{ setErrors: (errors: FormError[]) => void } | null>(null)
+
+// Resolve a dot-path field name (e.g. "property.description") against an object
+function getNestedValue(obj: Record<string, any>, path: string): unknown {
+  return path.split('.').reduce((acc, key) => acc?.[key], obj)
+}
 
 // Cancel handler
 function onCancel() {
@@ -102,10 +107,17 @@ async function handleSaveProgress() {
 async function handleSave(advance: boolean) {
   if (!props.isValid || isSaving.value) return
 
-  // Run moderation on any text fields the step has declared
+  // Only moderate fields whose values have changed since the last save
   if (props.getFieldsToModerate) {
-    const passed = await moderateFields(props.getFieldsToModerate(), formRef)
-    if (!passed) return
+    const lastSaved = getStepData(props.stepNumber) as Record<string, any>
+    const changedFields = props.getFieldsToModerate().filter((f) => {
+      const savedValue = getNestedValue(lastSaved, f.name)
+      return (f.value ?? '') !== (savedValue ?? '')
+    })
+    if (changedFields.length > 0) {
+      const passed = await moderateFields(changedFields, formRef)
+      if (!passed) return
+    }
   }
 
   const result = await saveStep(

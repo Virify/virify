@@ -4,7 +4,7 @@
     :schema="step7Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/seven/"
+    api-endpoint="/api/listings/update/steps/seven/"
     :get-submission-data="getSubmissionData"
     @completed="onStepCompleted"
     @saved="onStepSaved"

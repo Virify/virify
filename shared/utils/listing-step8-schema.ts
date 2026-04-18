@@ -6,6 +6,7 @@ import {
   HotWaterSource,
   RenewableEnergy,
   ConnectedUtilities,
+  CouncilTaxBand,
 } from '~~/layers/database/server/database/prisma/generated/enums'
 
 /**
@@ -20,6 +21,7 @@ const boilerTypeValues = Object.values(BoilerType) as [string, ...string[]]
 const hotWaterSourceValues = Object.values(HotWaterSource) as [string, ...string[]]
 const renewableEnergyValues = Object.values(RenewableEnergy) as [string, ...string[]]
 const connectedUtilitiesValues = Object.values(ConnectedUtilities) as [string, ...string[]]
+const councilTaxBandValues = Object.values(CouncilTaxBand) as [string, ...string[]]
 
 // Energy and Utilities schema
 export const energyAndUtilitiesSchema = z.object({
@@ -37,7 +39,7 @@ export const energyAndUtilitiesSchema = z.object({
 // Running Costs schema
 export const runningCostsSchema = z.object({
   description: z.string().max(5000, 'Description must be 5000 characters or less').nullable().optional(),
-  councilTaxBand: z.string({ message: 'Council tax band is required' }),
+  councilTaxBand: z.enum(councilTaxBandValues, { message: 'Council tax band is required' }),
   serviceCharges: z.coerce.number().min(0, 'Service charges must be 0 or greater').nullable().optional(),
   groundRent: z.coerce.number().min(0, 'Ground rent must be 0 or greater').nullable().optional(),
 })
@@ -105,7 +107,7 @@ export function createInitialStep8Values(draftData?: any): Step8FormState {
       },
       runningCosts: {
         description: runningCosts?.description ?? null,
-        councilTaxBand: runningCosts?.councilTaxBand ?? 'A',
+        councilTaxBand: runningCosts?.councilTaxBand ?? CouncilTaxBand.A,
         serviceCharges: runningCosts?.serviceCharges ?? null,
         groundRent: runningCosts?.groundRent ?? null,
       },

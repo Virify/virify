@@ -8,7 +8,7 @@ export interface TierFeatures {
 // Features for each tier
 export const tierFeatures: TierFeatures[] = [
   {
-    tier: "basic",
+    tier: "BASIC",
     features: [
       "Direct communication (in‑app chat & verified identity)",
       "Up to 10 active listings",
@@ -26,7 +26,7 @@ export const tierFeatures: TierFeatures[] = [
     ],
   },
   {
-    tier: "featured",
+    tier: "FEATURED",
     features: [
       "Direct communication (in‑app chat & verified identity)",
       "Up to 10 active listings",
@@ -46,7 +46,7 @@ export const tierFeatures: TierFeatures[] = [
     ],
   },
   {
-    tier: "premium",
+    tier: "PREMIUM",
     features: [
       "Direct communication (in‑app chat & verified identity)",
       "Up to 10 active listings",
@@ -72,7 +72,7 @@ export const tierFeatures: TierFeatures[] = [
  * @param tier - The tier to get features for
  * @returns Array of features for the tier
  */
-export function getTierFeatures(tier: "premium" | "featured" | "basic"): string[] {
+export function getTierFeatures(tier: "PREMIUM" | "FEATURED" | "BASIC"): string[] {
   const tierData = tierFeatures.find((t) => t.tier === tier);
   return tierData?.features || [];
 }
@@ -108,6 +108,6 @@ export function getMaxImagesForTier(tier: "PREMIUM" | "FEATURED" | "BASIC" | nul
       return 20;
     case "basic":
     default:
-      return 5;
+      return 8;
   }
 }

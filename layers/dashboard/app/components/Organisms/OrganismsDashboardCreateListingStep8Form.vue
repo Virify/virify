@@ -4,7 +4,7 @@
     :schema="step8Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/eight/"
+    api-endpoint="/api/listings/update/steps/eight/"
     :get-submission-data="getSubmissionData"
     :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"

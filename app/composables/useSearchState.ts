@@ -220,6 +220,7 @@ function createSearchState() {
       if (isAI) {
         const response = await $fetch('/api/search/rag', {
           method: 'POST',
+          timeout: 60000,
           body: {
             ...asObject(body),
             location,
@@ -243,6 +244,8 @@ function createSearchState() {
           location: location as GeocodingFeature,
           radius: radius as number,
           resultCount: results?.length ?? 0,
+          usedTerms: queryAnalysis?.usedTerms ?? [],
+          ignoredTerms: queryAnalysis?.ignoredTerms ?? [],
         })
       }
 
@@ -268,6 +271,16 @@ function createSearchState() {
         setQueryAnalysis(queryAnalysis)
         setActiveTerms(queryAnalysis?.usedTerms)
         setResults(response as unknown[])
+
+        trackSearch({
+          listingType: formData.isSale ? 'sale' : 'rent',
+          query: buildQueryFromTraditionalFormData(formData),
+          location: location as GeocodingFeature,
+          radius: radius as number,
+          resultCount: (response as unknown[])?.length ?? 0,
+          usedTerms: queryAnalysis?.usedTerms ?? [],
+          ignoredTerms: [],
+        })
       }
 
       setActiveLocation(location)

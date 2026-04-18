@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { invalidateListingCache } from "~~/layers/database/server/utils/cache";
 
 /**
  * Schema for media assignment to rooms
@@ -20,7 +19,7 @@ const mediaAssignmentSchema = z.object({
 });
 
 const stepTenSchema = z.object({
-  listingId: z.number().int().positive(),
+  draftId: z.number().int().positive(),
   media: z.array(mediaAssignmentSchema),
 });
 
@@ -33,11 +32,11 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
   
   try {
-    const { listingId, media } = await readValidatedBody(event, stepTenSchema.parse);
+    const { draftId, media } = await readValidatedBody(event, stepTenSchema.parse);
 
     // Verify draft ownership
-    const existingDraft = await prisma.listing.findUnique({
-      where: { id: listingId, userId: user.id },
+    const existingDraft = await prisma.draftListing.findUnique({
+      where: { id: draftId, userId: user.id },
       include: {
         property: {
           include: {
@@ -82,8 +81,8 @@ export default defineEventHandler(async (event) => {
     }));
 
     // Update draft with new media
-    const result = await prisma.listing.update({
-      where: { id: listingId, userId: user.id },
+    const result = await prisma.draftListing.update({
+      where: { id: draftId, userId: user.id },
       data: {
         property: {
           update: {
@@ -149,9 +148,7 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    // Invalidate cache after update
-    await invalidateListingCache(listingId);
-
+    await invalidateDraftListingsCache(user.id as number);
     return result;
   } catch (error) {
     console.error('Step ten update error:', error);

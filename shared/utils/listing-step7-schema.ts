@@ -56,7 +56,6 @@ export const utilitySchema = z.object({
 export const additionalFeaturesSchema = z.object({
   description: z.string().max(500, 'Description must be 500 characters or less').nullable().optional(),
   petFriendly: z.boolean().default(true),
-  moveInDate: z.coerce.date().nullable().optional(),
   features: z.array(z.enum(buildingFeatureValues)).optional().default([]),
 })
 
@@ -132,12 +131,10 @@ export function createInitialStep7Values(draftData?: any): Step7FormData {
       additionalFeatures: property?.additionalFeatures ? {
         description: property.additionalFeatures.description ?? null,
         petFriendly: property.additionalFeatures.petFriendly ?? true,
-        moveInDate: property.additionalFeatures.moveInDate ?? null,
         features: property.additionalFeatures.features ?? [],
       } : {
         description: null,
         petFriendly: true,
-        moveInDate: null,
         features: [],
       },
     }

@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
-  loadStep1FromDraft,
-  loadStep2FromDraft,
-  loadStep3FromDraft,
-} from "../app/utils/draft-listing-loader";
+  loadStep1,
+  loadStep2,
+  loadStep3,
+} from "../app/utils/listing-loader";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Minimal draft fixture builder
@@ -26,15 +26,15 @@ function makeDraft(overrides: Record<string, any> = {}): any {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// loadStep1FromDraft
+// loadStep1
 // ──────────────────────────────────────────────────────────────────────────────
 
-describe("loadStep1FromDraft", () => {
+describe("loadStep1", () => {
   it("returns selectedType 'sale' when draft has a saleListing", () => {
     const draft = makeDraft({
       saleListing: { tenureType: "FREEHOLD", chain: false, sharedOwnership: false, availabilityStatus: "AVAILABLE" },
     });
-    const result = loadStep1FromDraft(draft);
+    const result = loadStep1(draft);
     expect(result?.selectedType).toBe("sale");
     expect(result?.saleListing?.tenureType).toBe("FREEHOLD");
     expect(result?.rentalListing).toBeNull();
@@ -49,7 +49,7 @@ describe("loadStep1FromDraft", () => {
         availabilityStatus: "AVAILABLE",
       },
     });
-    const result = loadStep1FromDraft(draft);
+    const result = loadStep1(draft);
     expect(result?.selectedType).toBe("rent");
     expect(result?.rentalListing?.furnishedStatus).toBe("FURNISHED");
     expect(result?.saleListing).toBeNull();
@@ -57,26 +57,26 @@ describe("loadStep1FromDraft", () => {
 
   it("returns null when draft has neither sale nor rental listing", () => {
     const draft = makeDraft();
-    expect(loadStep1FromDraft(draft)).toBeNull();
+    expect(loadStep1(draft)).toBeNull();
   });
 
   it("defaults chain to false when null", () => {
     const draft = makeDraft({
       saleListing: { tenureType: "LEASEHOLD", chain: null, sharedOwnership: null, availabilityStatus: null },
     });
-    const result = loadStep1FromDraft(draft);
+    const result = loadStep1(draft);
     expect(result?.saleListing?.chain).toBe(false);
     expect(result?.saleListing?.availabilityStatus).toBe("AVAILABLE");
   });
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
-// loadStep2FromDraft
+// loadStep2
 // ──────────────────────────────────────────────────────────────────────────────
 
-describe("loadStep2FromDraft", () => {
+describe("loadStep2", () => {
   it("returns null when draft has no property", () => {
-    expect(loadStep2FromDraft(makeDraft())).toBeNull();
+    expect(loadStep2(makeDraft())).toBeNull();
   });
 
   it("extracts property data when present", () => {
@@ -102,7 +102,7 @@ describe("loadStep2FromDraft", () => {
         numberOtherRooms: null,
       },
     });
-    const result = loadStep2FromDraft(draft);
+    const result = loadStep2(draft);
     expect(result?.property.description).toBe("A lovely flat.");
     expect(result?.property.type).toBe(1);
     expect(result?.property.totalFloors).toBe(2);
@@ -131,7 +131,7 @@ describe("loadStep2FromDraft", () => {
         numberOtherRooms: null,
       },
     });
-    const result = loadStep2FromDraft(draft);
+    const result = loadStep2(draft);
     expect(result?.property.address.street).toBeNull();
   });
 
@@ -145,18 +145,18 @@ describe("loadStep2FromDraft", () => {
         numberKitchens: null, numberReceptions: null, numberOtherRooms: null,
       },
     });
-    const result = loadStep2FromDraft(draft);
+    const result = loadStep2(draft);
     expect(result?.property.totalFloors).toBe(1);
   });
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
-// loadStep3FromDraft
+// loadStep3
 // ──────────────────────────────────────────────────────────────────────────────
 
-describe("loadStep3FromDraft", () => {
+describe("loadStep3", () => {
   it("returns null when price is null", () => {
-    expect(loadStep3FromDraft(makeDraft({ price: null }))).toBeNull();
+    expect(loadStep3(makeDraft({ price: null }))).toBeNull();
   });
 
   it("returns price data when price is set", () => {
@@ -164,7 +164,7 @@ describe("loadStep3FromDraft", () => {
       price: 300000,
       saleListing: { priceType: "OFFERS_OVER" },
     });
-    const result = loadStep3FromDraft(draft);
+    const result = loadStep3(draft);
     expect(result?.price).toBe(300000);
     expect(result?.saleListing?.priceType).toBe("OFFERS_OVER");
     expect(result?.rentalListing).toBeNull();
@@ -175,7 +175,7 @@ describe("loadStep3FromDraft", () => {
       price: 1500,
       rentalListing: { rentFrequency: "MONTHLY", deposit: 1500, holdingDeposit: 500 },
     });
-    const result = loadStep3FromDraft(draft);
+    const result = loadStep3(draft);
     expect(result?.rentalListing?.rentFrequency).toBe("MONTHLY");
     expect(result?.rentalListing?.deposit).toBe(1500);
   });

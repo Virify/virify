@@ -41,10 +41,10 @@ describe("getFloorOptions", () => {
   it("labels first floor as Ground Floor", () => {
     const options = getFloorOptions(3);
     expect(options[0].label).toBe("Ground Floor");
-    expect(options[0].value).toBe(1);
+    expect(options[0].value).toBe(0);
   });
 
-  it("labels subsequent floors as Floor N-1", () => {
+  it("labels subsequent floors as Floor N", () => {
     const options = getFloorOptions(3);
     expect(options[1].label).toBe("Floor 1");
     expect(options[2].label).toBe("Floor 2");

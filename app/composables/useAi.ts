@@ -63,6 +63,8 @@ export default function useAi() {
       location: locationForTracking,
       radius,
       resultCount: response.results?.length ?? 0,
+      usedTerms: response.queryAnalysis?.usedTerms ?? [],
+      ignoredTerms: response.queryAnalysis?.ignoredTerms ?? [],
     });
 
     if (response.queryAnalysis) {

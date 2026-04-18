@@ -16,7 +16,7 @@ export const bedroomSchema = z.object({
   name: z.string().min(1, 'Bedroom name is required').max(100, 'Bedroom name must be 100 characters or less'),
   roomNumber: z.coerce.number().int().min(1),
   description: z.string().max(500).nullable().optional(),
-  floor: z.coerce.number().int().min(1, 'Floor is required'),
+  floor: z.coerce.number().int().min(0, 'Floor is required'),
   bed: z.array(z.enum(bedSizeValues)).default([]),
   features: z.array(z.enum(bedroomFeatureValues)).optional().default([]),
   size: z.coerce.number().min(0).nullable().optional(),
@@ -27,7 +27,7 @@ export const bathroomSchema = z.object({
   name: z.string().min(1, 'Bathroom name is required').max(100, 'Bathroom name must be 100 characters or less'),
   roomNumber: z.coerce.number().int().min(1),
   description: z.string().max(500).nullable().optional(),
-  floor: z.coerce.number().int().min(1, 'Floor is required'),
+  floor: z.coerce.number().int().min(0, 'Floor is required'),
   features: z.array(z.enum(bathroomFeatureValues)).optional().default([]),
   size: z.coerce.number().min(0).nullable().optional(),
 })
@@ -35,8 +35,8 @@ export const bathroomSchema = z.object({
 // Property schema for Step 4
 export const step4PropertySchema = z.object({
   totalFloors: z.coerce.number().int().min(1),
-  bedroomFeatures: z.array(bedroomSchema).default([]),
-  numberBedrooms: z.coerce.number().int().min(0).default(0),
+  bedroomFeatures: z.array(bedroomSchema).min(1, 'At least one bedroom is required').default([]),
+  numberBedrooms: z.coerce.number().int().min(1, 'At least one bedroom is required').default(0),
   bathroomFeatures: z.array(bathroomSchema).default([]),
   numberBathrooms: z.coerce.number().int().min(0).default(0),
 })
@@ -93,7 +93,7 @@ export const step4Validation = {
     return Boolean(
       bedroom?.name &&
       bedroom?.roomNumber &&
-      bedroom?.floor &&
+      bedroom?.floor !== undefined && bedroom?.floor !== null &&
       bedroom?.bed?.length > 0
     )
   },
@@ -105,7 +105,7 @@ export const step4Validation = {
     return Boolean(
       bathroom?.name &&
       bathroom?.roomNumber &&
-      bathroom?.floor
+      bathroom?.floor !== undefined && bathroom?.floor !== null
     )
   },
 
@@ -130,7 +130,9 @@ export const step4Validation = {
    */
   isStep4Valid: (data: Step4FormData): boolean => {
     if (!data?.property) return false // No data yet — must add at least 1 bedroom
-    return step4Validation.areBedroomsValid(data.property.bedroomFeatures || []) &&
-           step4Validation.areBathroomsValid(data.property.bathroomFeatures || [])
+    const { bedroomFeatures, numberBedrooms, bathroomFeatures } = data.property
+    return numberBedrooms >= 1 &&
+           step4Validation.areBedroomsValid(bedroomFeatures || []) &&
+           step4Validation.areBathroomsValid(bathroomFeatures || [])
   },
 }

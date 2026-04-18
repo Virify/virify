@@ -24,6 +24,7 @@ export default defineEventHandler(async (event) => {
     listingTypeSplit,
     radiusHistogram,
     avgResultCount,
+    ignoredTermsRaw,
   ] = await Promise.all([
     prisma.trackSearch.aggregate({ _sum: { count: true } }),
 
@@ -55,7 +56,7 @@ export default defineEventHandler(async (event) => {
 
     // Unmet demand: zero-result searches
     prisma.trackSearch.groupBy({
-      by: ["locationPlaceName", "listingType"],
+      by: ["locationPlaceName", "listingType", "query"],
       where: { resultCount: 0 },
       _sum: { count: true },
       orderBy: { _sum: { count: "desc" } },
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
 
     // Low result searches (1–4 results)
     prisma.trackSearch.groupBy({
-      by: ["locationPlaceName", "listingType"],
+      by: ["locationPlaceName", "listingType", "query"],
       where: { resultCount: { gt: 0, lt: 5 } },
       _sum: { count: true },
       _avg: { resultCount: true },
@@ -82,6 +83,17 @@ export default defineEventHandler(async (event) => {
     prisma.trackSearch.findMany({ select: { radius: true, count: true } }),
 
     prisma.trackSearch.aggregate({ _avg: { resultCount: true } }),
+
+    // Feature gaps: ignored terms (things GPT couldn't map to a filter)
+    // Raw query to unnest the Postgres array and count occurrences
+    prisma.$queryRaw<{ term: string; count: bigint }[]>`
+      SELECT unnest("ignoredTerms") AS term, COUNT(*) AS count
+      FROM "public"."TrackSearch"
+      WHERE array_length("ignoredTerms", 1) > 0
+      GROUP BY term
+      ORDER BY count DESC
+      LIMIT 30
+    `,
   ]);
 
   // Geographic demand: get lat/lon for top locations
@@ -116,11 +128,13 @@ export default defineEventHandler(async (event) => {
       zeroResults: zeroResultSearches.map((r) => ({
         location: r.locationPlaceName,
         listingType: r.listingType,
+        query: r.query,
         searchCount: r._sum.count ?? 0,
       })),
       lowResults: lowResultSearches.map((r) => ({
         location: r.locationPlaceName,
         listingType: r.listingType,
+        query: r.query,
         searchCount: r._sum.count ?? 0,
         avgResults: r._avg.resultCount ? Math.round(r._avg.resultCount * 10) / 10 : null,
       })),
@@ -137,5 +151,9 @@ export default defineEventHandler(async (event) => {
     avgResultCount: avgResultCount._avg.resultCount
       ? Math.round(avgResultCount._avg.resultCount * 10) / 10
       : null,
+    featureGaps: ignoredTermsRaw.map((r) => ({
+      term: r.term,
+      count: Number(r.count),
+    })),
   };
 });

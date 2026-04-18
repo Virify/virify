@@ -218,6 +218,30 @@ const queriesNocrash: string[] = [
   "Period terrace with character, 3 beds, fireplaces, garden, under £400k",
   "Modern flat, 2 beds, concierge, EV charging, great commuter links, under £350k",
 
+  // --- NEW FILTERS ---
+  "Show me only verified property listings for sale",
+  "Fully verified listings only, 3 bed house",
+  "Flat to rent with a holding deposit under £500",
+  "House for sale with underfloor heating as a secondary heating source",
+  "House for sale with all king size beds",
+  "3 bed house with king size and double beds for sale",
+  "House for sale with single beds only",
+  "House for sale with super king bed in the master bedroom",
+  "3 bed house with a living room and a dining room for sale",
+  "House for sale with both a family room and a games room",
+  "House for sale with a log burner as secondary heating",
+  "Flat to rent available from September",
+  "2 bed flat available within the next 3 months, to rent",
+  "Flat to rent available by the end of next month",
+  "House for sale with a garden over 100 square metres",
+  "Property with at least 500 square metres of total outdoor space",
+  "House for sale with a separate parcel of land",
+  "House for sale built after 2000",
+  "House for sale built between 1950 and 1980",
+  "2 bed flat in a low-rise block, no more than 4 floors",
+  "Farmhouse for sale with at least 2 kitchens",
+  "Large house with 3 or more other rooms beyond the main rooms",
+
   // --- EDGE CASES ---
   "Property for sale with absolutely no filters at all",
   "House for rent with absolutely no filters at all",
@@ -229,6 +253,15 @@ const queriesNocrash: string[] = [
   "Flat with genuinely every accessibility feature possible",
   "Planet-friendly eco home with literally every green feature",
   "10 or more bedrooms — need more space than any normal family",
+
+  // --- RECENTLY ADDED FIELDS ---
+  "At most 2 bathrooms, 3 bed house for sale",
+  "House for sale with a master bedroom at least 15 square metres",
+  "Home office with a view, 4 beds",
+  "House with a south facing yard",
+  "Property with at least an acre of land",
+  "House near a walking trail or footpath",
+  "Council tax band D, 3 bed house for sale",
 ];
 
 // Queries that verify the AI put each field in the correct nesting location.
@@ -609,6 +642,204 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     expectInClause: (c: any) => {
       expect(c.property?.is?.type, "type must be in property.is.type").toBeDefined();
       expect(c.property?.is?.classification?.type, "type must not be nested inside classification").toBeUndefined();
+    },
+  },
+
+  // BED SIZES — must be inside property.is.bedroomFeatures.some.bed (has / hasSome)
+  {
+    query: "House for sale with a king size bed",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const bed = c.property?.is?.bedroomFeatures?.some?.bed;
+      expect(bed, "bed must be in property.is.bedroomFeatures.some.bed").toBeDefined();
+      expect(bed?.has, "single bed size must use has: KING").toBe("KING");
+      expect(c.bedSizes, "bedSizes must not be at root level").toBeUndefined();
+    },
+  },
+  {
+    query: "House for sale with all double beds",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const bed = c.property?.is?.bedroomFeatures?.some?.bed;
+      expect(bed, "bed must be in property.is.bedroomFeatures.some.bed").toBeDefined();
+      // single value → has, multiple → hasSome
+      const hasDouble = bed?.has === "DOUBLE" || bed?.hasSome?.includes("DOUBLE");
+      expect(hasDouble, "DOUBLE must appear in bed filter").toBe(true);
+    },
+  },
+
+  // SECONDARY HEATING — must be inside property.is.energyAndUtilities.is.secondaryHeatingType
+  {
+    query: "House for sale with a log burner as secondary heating",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const secondary = c.property?.is?.energyAndUtilities?.is?.secondaryHeatingType;
+      expect(secondary, "secondaryHeatingType must be in property.is.energyAndUtilities.is").toBeDefined();
+      expect(c.secondaryHeatingType, "secondaryHeatingType must not be at root level").toBeUndefined();
+    },
+  },
+
+  // RECEPTION TYPES — multi-value must use { in: [...] }, not silently drop values
+  {
+    query: "3 bed house for sale with a living room and a dining room",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const rec = c.property?.is?.reception?.some;
+      expect(rec, "reception must be in property.is.reception.some").toBeDefined();
+      // If only 1 type returned it can be a scalar; if 2 types it must be { in: [...] }
+      if (rec?.type?.in) {
+        expect(rec.type.in, "multi-type reception must include LIVING_ROOM and DINING_ROOM").toEqual(
+          expect.arrayContaining(["LIVING_ROOM", "DINING_ROOM"])
+        );
+      }
+    },
+  },
+
+  // HOLDING DEPOSIT — must be inside rentalListing.is.holdingDeposit.lte
+  {
+    query: "Flat to rent with holding deposit under £500",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const lte = c.rentalListing?.is?.holdingDeposit?.lte;
+      expect(lte, "holdingDeposit.lte must be inside rentalListing.is").toBeLessThanOrEqual(500);
+      expect(c.holdingDeposit, "holdingDeposit must not be at root level").toBeUndefined();
+    },
+  },
+
+  // VERIFICATION LEVEL — must be at root level on the Listing
+  {
+    query: "Verified listings only for sale",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      expect(c.verificationLevel, "verificationLevel must be at root level").toBe("VERIFIED");
+      expect(c.property?.is?.verificationLevel, "verificationLevel must not be inside property.is").toBeUndefined();
+    },
+  },
+
+  // MOVE-IN DATE — must be at root level as moveInDate.lte / moveInDate.gte
+  {
+    query: "Flat to rent available within the next 3 months",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      expect(c.moveInDate?.lte, "moveInDate.lte must be at root level for availability deadline").toBeDefined();
+      expect(c.property?.is?.moveInDate, "moveInDate must not be inside property.is").toBeUndefined();
+    },
+  },
+  {
+    query: "House to rent available from September",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      expect(c.moveInDate?.gte, "moveInDate.gte must be at root level for available from date").toBeDefined();
+      expect(c.property?.is?.moveInDate, "moveInDate must not be inside property.is").toBeUndefined();
+    },
+  },
+
+  // COUNCIL TAX BAND — must be inside property.is.runningCosts.is
+  {
+    query: "Council tax band D, 3 bed house for sale",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const band = c.property?.is?.runningCosts?.is?.councilTaxBand;
+      expect(band, "councilTaxBand must be in property.is.runningCosts.is").toBe("D");
+      expect(c.councilTaxBand, "councilTaxBand must not be at root level").toBeUndefined();
+    },
+  },
+
+  // BATHROOMS MAX — must use property.is.numberBathrooms.lte
+  {
+    query: "House for sale with at most 2 bathrooms",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      expect(c.property?.is?.numberBathrooms?.lte, "numberBathrooms.lte must be ≤ 2").toBeLessThanOrEqual(2);
+    },
+  },
+
+  // BEDROOM SIZE — must use property.is.bedroomFeatures.some.size.gte
+  {
+    query: "House for sale with a master bedroom at least 15 square metres",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const size = c.property?.is?.bedroomFeatures?.some?.size?.gte;
+      expect(size, "bedroomFeatures.some.size.gte must be set for bedroom size filter").toBeDefined();
+      expect(size, "size must be ≥ 15").toBeGreaterThanOrEqual(15);
+    },
+  },
+
+  // KITCHEN SIZE — must use property.is.kitchenFeatures.some.size.gte
+  {
+    query: "House for sale with a kitchen bigger than 20 square metres",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const size = c.property?.is?.kitchenFeatures?.some?.size?.gte;
+      expect(size, "kitchenFeatures.some.size.gte must be set for kitchen size filter").toBeDefined();
+    },
+  },
+
+  // RECEPTION SIZE — must use property.is.reception.some.size.gte
+  {
+    query: "House for sale with a living room larger than 25 square metres",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const size = c.property?.is?.reception?.some?.size?.gte;
+      expect(size, "reception.some.size.gte must be set for reception size filter").toBeDefined();
+    },
+  },
+
+  // YARD — must be inside property.is.outdoorSpace.is.yard.some
+  {
+    query: "House for sale with a south facing yard",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const yard = c.property?.is?.outdoorSpace?.is?.yard?.some;
+      expect(yard, "yard must be in property.is.outdoorSpace.is.yard.some").toBeDefined();
+      expect(yard?.facing, "facing must be SOUTH").toBe("SOUTH");
+      expect(c.yard, "yard must not be at root level").toBeUndefined();
+    },
+  },
+
+  // LAND SIZE — must be inside property.is.outdoorSpace.is.land.some.size.gte
+  {
+    query: "Property with at least 2000 square metres of land",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const size = c.property?.is?.outdoorSpace?.is?.land?.some?.size?.gte;
+      expect(size, "land.some.size.gte must be in property.is.outdoorSpace.is.land.some").toBeDefined();
+      expect(size, "size must be ≥ 2000").toBeGreaterThanOrEqual(2000);
+    },
+  },
+
+  // OTHER ROOM FEATURES — must use property.is.otherRoom.some.features
+  {
+    query: "House for sale with a home office that has a built in desk",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const room = c.property?.is?.otherRoom?.some;
+      expect(room, "otherRoom must be in property.is.otherRoom.some").toBeDefined();
+      expect(c.otherRoom, "otherRoom must not be at root level").toBeUndefined();
+    },
+  },
+
+  // AMENITY TRAIL — must map to GREEN_SPACE + TRAIL
+  {
+    query: "House for sale near a walking trail",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const amenity = c.property?.is?.amenities?.some;
+      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
+      expect(amenity?.type, "amenity type must be GREEN_SPACE for trail").toBe("GREEN_SPACE");
+      expect(amenity?.subtype, "amenity subtype must be TRAIL").toBe("TRAIL");
+    },
+  },
+
+  // AMENITY DISTANCE MAX — must use property.is.amenities.some.distanceM.lte
+  {
+    query: "House for sale within 500 metres of a train station",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expectInClause: (c: any) => {
+      const amenity = c.property?.is?.amenities?.some;
+      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
+      expect(amenity?.distanceM?.lte, "distanceM.lte must be set for amenity distance filter").toBeDefined();
+      expect(amenity?.distanceM?.lte, "distanceM.lte must be ≤ 500").toBeLessThanOrEqual(500);
     },
   },
 ];
