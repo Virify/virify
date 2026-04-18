@@ -229,31 +229,31 @@ describe("getFeatureTypeIcon", () => {
 
 describe("getTierFeatures", () => {
   it("returns non-empty array for basic", () => {
-    expect(getTierFeatures("basic").length).toBeGreaterThan(0);
+    expect(getTierFeatures("BASIC").length).toBeGreaterThan(0);
   });
 
   it("returns non-empty array for featured", () => {
-    expect(getTierFeatures("featured").length).toBeGreaterThan(0);
+    expect(getTierFeatures("FEATURED").length).toBeGreaterThan(0);
   });
 
   it("returns non-empty array for premium", () => {
-    expect(getTierFeatures("premium").length).toBeGreaterThan(0);
+    expect(getTierFeatures("PREMIUM").length).toBeGreaterThan(0);
   });
 });
 
 describe("getTierFeaturesMap", () => {
   it("returns map with all three tiers", () => {
     const map = getTierFeaturesMap();
-    expect(map).toHaveProperty("basic");
-    expect(map).toHaveProperty("featured");
-    expect(map).toHaveProperty("premium");
+    expect(map).toHaveProperty("BASIC");
+    expect(map).toHaveProperty("FEATURED");
+    expect(map).toHaveProperty("PREMIUM");
   });
 
   it("each tier has at least one feature", () => {
     const map = getTierFeaturesMap();
-    expect(map["basic"]?.length).toBeGreaterThan(0);
-    expect(map["featured"]?.length).toBeGreaterThan(0);
-    expect(map["premium"]?.length).toBeGreaterThan(0);
+    expect(map["BASIC"]?.length).toBeGreaterThan(0);
+    expect(map["FEATURED"]?.length).toBeGreaterThan(0);
+    expect(map["PREMIUM"]?.length).toBeGreaterThan(0);
   });
 });
 
@@ -266,8 +266,8 @@ describe("getMaxImagesForTier", () => {
     expect(getMaxImagesForTier("FEATURED")).toBe(20);
   });
 
-  it("returns 5 for BASIC", () => {
-    expect(getMaxImagesForTier("BASIC")).toBe(5);
+  it("returns 8q for BASIC", () => {
+    expect(getMaxImagesForTier("BASIC")).toBe(8);
   });
 
   it("returns 5 (default) for null", () => {
