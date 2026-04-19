@@ -80,7 +80,7 @@ export default defineEventHandler(async (event) => {
 
     const historyObject = {
       type: 'ai',
-      body: query, queryAnalysis,
+      body: { query, queryAnalysis },
       location,
       radius
     }
@@ -99,7 +99,7 @@ export default defineEventHandler(async (event) => {
       currentPage: page,
       totalResults: totalCount,
       hash: searchKey,
-      hashString: JSON.stringify({ historyObject })
+      hashString: JSON.stringify(historyObject)
     };
   } catch (error: any) {
     console.error("Error performing RAG search:", error);
