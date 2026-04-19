@@ -56,6 +56,7 @@ exec-db:
 
 start:
 		${COMPOSE_SERVICE} start
+		@make exec
 
 stop:
 		${COMPOSE_SERVICE} stop
