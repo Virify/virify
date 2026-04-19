@@ -13,6 +13,8 @@ model TrackSearch {
   resultCount       Int         @default(0)
   count             Int         @default(0)
   userIds           Int[]       @default([])
+  usedTerms         String[]    @default([]) // human-readable labels for active filters (analytics: what people search for)
+  ignoredTerms      String[]    @default([]) // terms GPT couldn't map to a filter (analytics: feature gaps)
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 

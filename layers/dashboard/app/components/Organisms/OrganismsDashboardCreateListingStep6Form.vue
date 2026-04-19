@@ -4,7 +4,7 @@
     :schema="step6Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/six/"
+    api-endpoint="/api/listings/update/steps/six/"
     :get-submission-data="getSubmissionData"
     :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
@@ -322,7 +322,7 @@ const handleLandCancel = () => {
 // Save room progress when adding/removing/updating items
 const saveRoomProgress = async () => {
   const data = getSubmissionData()
-  const result = await saveRoomData(6, '/api/draft-listings/update/steps/six/', data)
+  const result = await saveRoomData(6, '/api/listings/update/steps/six/', data)
   console.log('Step 6 save result:', result)
 }
 

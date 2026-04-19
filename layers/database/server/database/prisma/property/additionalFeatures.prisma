@@ -2,7 +2,6 @@ model AdditionalFeatures {
   id          Int               @id @default(autoincrement())
   description String?
   petFriendly Boolean           @default(true)
-  moveInDate  DateTime?
   features    BuildingFeature[]
   propertyId  Int               @unique
   createdAt   DateTime          @default(now())

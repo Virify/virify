@@ -7,6 +7,8 @@ export interface TrackSearchParams {
   radius: number;
   resultCount: number;
   userId?: number;
+  usedTerms?: string[];
+  ignoredTerms?: string[];
 }
 
 /**
@@ -562,7 +564,7 @@ export async function getViewedListingsPaginated(
  * @returns The created or updated track record
  */
 export async function trackSearch(params: TrackSearchParams): Promise<TrackSearch> {
-  const { listingType, query, location, radius, resultCount, userId } = params;
+  const { listingType, query, location, radius, resultCount, userId, usedTerms = [], ignoredTerms = [] } = params;
 
   const listingTypeUpper = listingType.toLocaleUpperCase();
   const locationId = location.id || "";
@@ -597,6 +599,8 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
         resultCount, // Update with latest result count
         locationId, // Update locationId in case it was missing
         userIds,
+        usedTerms,
+        ignoredTerms,
       },
     });
   }
@@ -615,6 +619,8 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
       resultCount,
       count: 1,
       userIds: userId ? [userId] : [],
+      usedTerms,
+      ignoredTerms,
     },
   });
 }

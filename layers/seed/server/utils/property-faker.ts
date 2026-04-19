@@ -5,7 +5,7 @@ import { typeToClassificationMap } from "./property-type-map";
 import type { PropertyWithAddress } from "../../../../shared/types/property";
 import { updateLocationByAddressIdForSeed, getLocationByAddressIdForSeed } from "./location-for-seed";
 import { getRequiredImages, getRandomAdditionalImages, getAllImagesByRoom } from "./images-to-seed";
-import { ListingTier } from "../../../database/server/database/prisma/generated/enums";
+import { CouncilTaxBand, ListingTier } from "../../../database/server/database/prisma/generated/enums";
 
 /**
  * Result of generating a property, includes the tier used for image limiting
@@ -51,7 +51,6 @@ export const generateAdditionalFeatures = (): Prisma.AdditionalFeaturesCreateWit
   return {
     description: faker.word.words(10),
     petFriendly: faker.datatype.boolean(),
-    moveInDate: faker.date.future(),
     features: selectRandomEnumValues(Object.values(BuildingFeature), 0.4),
   };
 };
@@ -706,7 +705,7 @@ export const generateEnergyAndUtilities = (): Prisma.EnergyAndUtilitiesCreateWit
 export const generateRunningCosts = (): Prisma.RunningCostsCreateWithoutPropertyInput => {
   return {
     description: faker.word.words(15),
-    councilTaxBand: faker.helpers.arrayElement(["A", "B", "C", "D", "E", "F", "G"]),
+    councilTaxBand: faker.helpers.arrayElement(Object.values(CouncilTaxBand)),
     serviceCharges: Math.round(faker.number.float({ min: 50, max: 300 })),
     groundRent: Math.round(faker.number.float({ min: 0, max: 500 })),
   };

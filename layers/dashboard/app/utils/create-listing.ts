@@ -46,11 +46,11 @@ export const sizeUnitItems: SelectOption[] = [
 /** Generate floor options based on total floors */
 export function getFloorOptions(totalFloors: number): FloorOption[] {
   const options: FloorOption[] = []
-  for (let i = 1; i <= totalFloors; i++) {
-    if (i === 1) {
+  for (let i = 0; i < totalFloors; i++) {
+    if (i === 0) {
       options.push({ value: i, label: 'Ground Floor' })
     } else {
-      options.push({ value: i, label: `Floor ${i - 1}` })
+      options.push({ value: i, label: `Floor ${i}` })
     }
   }
   return options

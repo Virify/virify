@@ -16,8 +16,8 @@ export const listingTypeItems: SelectOption[] = [
 
 /** Boolean yes/no options for chain status */
 export const chainItems: SelectOption[] = [
-  { value: true, label: 'No' },
-  { value: false, label: 'Yes' },
+  { value: true, label: 'Has Chain' },
+  { value: false, label: 'Chain Free' },
 ]
 
 /** Boolean yes/no options for bills included */

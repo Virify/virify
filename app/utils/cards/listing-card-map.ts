@@ -18,7 +18,7 @@ export function mapToCardProps(result: ListingCardData) {
   if (saleListing) {
     const tenure = getTenureType(saleListing.tenureType);
     if (tenure) labels.push(tenure);
-    if (saleListing.chain) labels.push("Chain free");
+    if (!saleListing.chain) labels.push("Chain free");
   } else if (rentalListing) {
     const furnished = convertEnumToString((rentalListing as any).furnishedStatus);
     if (furnished) labels.push(furnished);

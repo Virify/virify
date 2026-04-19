@@ -4,8 +4,9 @@
     :schema="step9Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/nine/"
+    api-endpoint="/api/listings/update/steps/nine/"
     :get-submission-data="getSubmissionData"
+    :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
     @saved="onStepSaved"
   >
@@ -271,7 +272,7 @@ const autoSaveMediaOrder = useDebounceFn(async () => {
   if (!draftListingId.value) return
   
   try {
-    await useRequestFetch()('/api/draft-listings/update/steps/nine/', {
+    await useRequestFetch()('/api/listings/update/steps/nine/', {
       method: 'PATCH',
       body: {
         draftId: draftListingId.value,
@@ -302,6 +303,15 @@ onUnmounted(() => {
 
 function getSubmissionData() {
   return { property: { media: formatMediaForSubmission(state.property.media) } }
+}
+
+function getFieldsToModerate() {
+  return state.property.media
+    .filter(img => img.description)
+    .map(img => ({
+      name: `media.${img.cloudflareId}.description`,
+      value: img.description ?? '',
+    }))
 }
 
 function onStepCompleted() {

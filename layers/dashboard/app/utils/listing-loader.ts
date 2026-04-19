@@ -1,42 +1,43 @@
-import type { DraftListingWithFullPayload } from '~~/shared/types/draft'
+
 
 /**
- * Utility functions to load step data from draft listings
- * Each function extracts and formats data for a specific step in the listing creation flow
+ * Utility functions to load step form data from a listing payload.
+ * Used for both new draft creation and editing live listings.
+ * Each function extracts and formats data for a specific step in the listing flow.
  */
 
-export function loadStep1FromDraft(draft: DraftListingWithFullPayload) {
-  if (draft.saleListing) {
+export function loadStep1(listing: EditableListing) {
+  if (listing.saleListing) {
     return {
       selectedType: 'sale' as const,
       saleListing: {
-        tenureType: draft.saleListing.tenureType,
-        chain: draft.saleListing.chain ?? false,
-        sharedOwnership: draft.saleListing.sharedOwnership ?? false,
-        availabilityStatus: draft.saleListing.availabilityStatus ?? 'AVAILABLE',
+        tenureType: listing.saleListing.tenureType,
+        chain: listing.saleListing.chain ?? false,
+        sharedOwnership: listing.saleListing.sharedOwnership ?? false,
+        availabilityStatus: listing.saleListing.availabilityStatus ?? 'AVAILABLE',
       },
       rentalListing: null
     }
-  } else if (draft.rentalListing) {
+  } else if (listing.rentalListing) {
     return {
       selectedType: 'rent' as const,
       saleListing: null,
       rentalListing: {
-        furnishedStatus: draft.rentalListing.furnishedStatus,
-        isBillsIncluded: draft.rentalListing.isBillsIncluded ?? false,
-        rentalLength: draft.rentalListing.rentalLength,
-        availabilityStatus: draft.rentalListing.availabilityStatus ?? 'AVAILABLE',
+        furnishedStatus: listing.rentalListing.furnishedStatus,
+        isBillsIncluded: listing.rentalListing.isBillsIncluded ?? false,
+        rentalLength: listing.rentalListing.rentalLength,
+        availabilityStatus: listing.rentalListing.availabilityStatus ?? 'AVAILABLE',
       }
     }
   }
   return null
 }
 
-export function loadStep2FromDraft(draft: DraftListingWithFullPayload) {
-  if (draft.property) {
+export function loadStep2(listing: EditableListing) {
+  if (listing.property) {
     return {
       property: {
-        address: draft.property.address ? { ...draft.property.address } : {
+        address: listing.property.address ? { ...listing.property.address } : {
           number: null,
           flat: null,
           name: null,
@@ -51,42 +52,43 @@ export function loadStep2FromDraft(draft: DraftListingWithFullPayload) {
           lat: null,
           lon: null,
         },
-        type: draft.property.type?.id ?? null,
-        classification: draft.property.classification?.id ?? null,
-        description: draft.property.description ?? '',
-        totalFloors: draft.property.totalFloors ?? 1,
-        constructionType: draft.property.constructionType ?? null,
-        size: draft.property.size ?? null,
-        yearBuilt: draft.property.yearBuilt ?? null,
-      }
+        type: listing.property.type?.id ?? null,
+        classification: listing.property.classification?.id ?? null,
+        description: listing.property.description ?? '',
+        totalFloors: listing.property.totalFloors ?? 1,
+        constructionType: listing.property.constructionType ?? null,
+        size: listing.property.size ?? null,
+        yearBuilt: listing.property.yearBuilt ?? null,
+      },
+      moveInDate: listing.moveInDate ?? null,
     }
   }
   return null
 }
 
-export function loadStep3FromDraft(draft: DraftListingWithFullPayload) {
-  if (draft.price !== null && draft.price !== undefined) {
+export function loadStep3(listing: EditableListing) {
+  if (listing.price !== null && listing.price !== undefined) {
     return {
-      price: draft.price,
-      saleListing: draft.saleListing ? {
-        priceType: draft.saleListing.priceType ?? undefined,
+      price: listing.price,
+      saleListing: listing.saleListing ? {
+        priceType: listing.saleListing.priceType ?? undefined,
       } : null,
-      rentalListing: draft.rentalListing ? {
-        rentFrequency: draft.rentalListing.rentFrequency ?? undefined,
-        deposit: draft.rentalListing.deposit ?? null,
-        holdingDeposit: draft.rentalListing.holdingDeposit ?? null,
+      rentalListing: listing.rentalListing ? {
+        rentFrequency: listing.rentalListing.rentFrequency ?? undefined,
+        deposit: listing.rentalListing.deposit ?? null,
+        holdingDeposit: listing.rentalListing.holdingDeposit ?? null,
       } : null,
     }
   }
   return null
 }
 
-export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
-  if (draft.property?.bedroomFeatures || draft.property?.bathroomFeatures) {
+export function loadStep4(listing: EditableListing) {
+  if (listing.property?.bedroomFeatures || listing.property?.bathroomFeatures) {
     return {
       property: {
-        totalFloors: draft.property.totalFloors ?? 1,
-        bedroomFeatures: draft.property.bedroomFeatures?.map(b => ({
+        totalFloors: listing.property.totalFloors ?? 1,
+        bedroomFeatures: listing.property.bedroomFeatures?.map(b => ({
           id: b.id,
           name: b.name ?? '',
           roomNumber: b.roomNumber ?? 1,
@@ -96,8 +98,8 @@ export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
           features: b.features ?? [],
           size: b.size ?? null,
         })) ?? [],
-        numberBedrooms: draft.property.numberBedrooms ?? draft.property.bedroomFeatures?.length ?? 0,
-        bathroomFeatures: draft.property.bathroomFeatures?.map(b => ({
+        numberBedrooms: listing.property.numberBedrooms ?? listing.property.bedroomFeatures?.length ?? 0,
+        bathroomFeatures: listing.property.bathroomFeatures?.map(b => ({
           id: b.id,
           name: b.name ?? '',
           roomNumber: b.roomNumber ?? 1,
@@ -106,19 +108,19 @@ export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
           features: b.features ?? [],
           size: b.size ?? null,
         })) ?? [],
-        numberBathrooms: draft.property.numberBathrooms ?? draft.property.bathroomFeatures?.length ?? 0,
+        numberBathrooms: listing.property.numberBathrooms ?? listing.property.bathroomFeatures?.length ?? 0,
       }
     }
   }
   return null
 }
 
-export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
-  if (draft.property?.kitchenFeatures || draft.property?.reception || draft.property?.otherRoom) {
+export function loadStep5(listing: EditableListing) {
+  if (listing.property?.kitchenFeatures || listing.property?.reception || listing.property?.otherRoom) {
     return {
       property: {
-        totalFloors: draft.property.totalFloors ?? 1,
-        kitchenFeatures: draft.property.kitchenFeatures?.map(k => ({
+        totalFloors: listing.property.totalFloors ?? 1,
+        kitchenFeatures: listing.property.kitchenFeatures?.map(k => ({
           id: k.id,
           name: k.name ?? '',
           roomNumber: k.roomNumber ?? 1,
@@ -127,8 +129,8 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
           features: k.features ?? [],
           size: k.size ?? null,
         })) ?? [],
-        numberKitchens: draft.property.numberKitchens ?? draft.property.kitchenFeatures?.length ?? 0,
-        reception: draft.property.reception?.map(r => ({
+        numberKitchens: listing.property.numberKitchens ?? listing.property.kitchenFeatures?.length ?? 0,
+        reception: listing.property.reception?.map(r => ({
           id: r.id,
           name: r.name ?? '',
           roomNumber: r.roomNumber ?? 1,
@@ -138,8 +140,8 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
           features: r.features ?? [],
           size: r.size ?? null,
         })) ?? [],
-        numberReceptions: draft.property.numberReceptions ?? draft.property.reception?.length ?? 0,
-        otherRoom: draft.property.otherRoom?.map(o => ({
+        numberReceptions: listing.property.numberReceptions ?? listing.property.reception?.length ?? 0,
+        otherRoom: listing.property.otherRoom?.map(o => ({
           id: o.id,
           name: o.name ?? '',
           roomNumber: o.roomNumber ?? 1,
@@ -149,15 +151,15 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
           features: o.features ?? [],
           size: o.size ?? null,
         })) ?? [],
-        numberOtherRooms: draft.property.numberOtherRooms ?? draft.property.otherRoom?.length ?? 0,
+        numberOtherRooms: listing.property.numberOtherRooms ?? listing.property.otherRoom?.length ?? 0,
       }
     }
   }
   return null
 }
 
-export function loadStep6FromDraft(draft: DraftListingWithFullPayload) {
-  const outdoorSpace = draft.property?.outdoorSpace
+export function loadStep6(listing: EditableListing) {
+  const outdoorSpace = listing.property?.outdoorSpace
   if (outdoorSpace) {
     return {
       property: {
@@ -197,8 +199,8 @@ export function loadStep6FromDraft(draft: DraftListingWithFullPayload) {
   return null
 }
 
-export function loadStep7FromDraft(draft: DraftListingWithFullPayload) {
-  const property = draft.property
+export function loadStep7(listing: EditableListing) {
+  const property = listing.property
   if (property?.parking || property?.accessibilityFeatures || property?.securityFeatures || 
       property?.storageFeatures || property?.utility || property?.additionalFeatures) {
     return {
@@ -235,8 +237,8 @@ export function loadStep7FromDraft(draft: DraftListingWithFullPayload) {
   return null
 }
 
-export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
-  const property = draft.property
+export function loadStep8(listing: EditableListing) {
+  const property = listing.property
   if (property?.energyAndUtilities || property?.runningCosts) {
     return {
       property: {
@@ -278,8 +280,8 @@ export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
   return null
 }
 
-export function loadStep9FromDraft(draft: DraftListingWithFullPayload) {
-  const property = draft.property
+export function loadStep9(listing: EditableListing) {
+  const property = listing.property
   const existingMedia = property?.media || []
 
   // Map existing media to our format
@@ -317,34 +319,34 @@ export function loadStep9FromDraft(draft: DraftListingWithFullPayload) {
  * Populate all step data from a draft listing
  * Returns a record of step data indexed by step number
  */
-export function populateAllStepsFromDraft(draft: DraftListingWithFullPayload): Record<number, any> {
+export function populateAllSteps(listing: EditableListing): Record<number, any> {
   const stepData: Record<number, any> = {}
   
-  const step1Data = loadStep1FromDraft(draft)
+  const step1Data = loadStep1(listing)
   if (step1Data) stepData[1] = step1Data
   
-  const step2Data = loadStep2FromDraft(draft)
+  const step2Data = loadStep2(listing)
   if (step2Data) stepData[2] = step2Data
   
-  const step3Data = loadStep3FromDraft(draft)
+  const step3Data = loadStep3(listing)
   if (step3Data) stepData[3] = step3Data
   
-  const step4Data = loadStep4FromDraft(draft)
+  const step4Data = loadStep4(listing)
   if (step4Data) stepData[4] = step4Data
   
-  const step5Data = loadStep5FromDraft(draft)
+  const step5Data = loadStep5(listing)
   if (step5Data) stepData[5] = step5Data
   
-  const step6Data = loadStep6FromDraft(draft)
+  const step6Data = loadStep6(listing)
   if (step6Data) stepData[6] = step6Data
   
-  const step7Data = loadStep7FromDraft(draft)
+  const step7Data = loadStep7(listing)
   if (step7Data) stepData[7] = step7Data
   
-  const step8Data = loadStep8FromDraft(draft)
+  const step8Data = loadStep8(listing)
   if (step8Data) stepData[8] = step8Data
   
-  const step9Data = loadStep9FromDraft(draft)
+  const step9Data = loadStep9(listing)
   if (step9Data) stepData[9] = step9Data
   
   return stepData

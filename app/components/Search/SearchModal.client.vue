@@ -169,7 +169,13 @@ function resetAnimation() {
  *  Perform the navigation, then hide and reset the dock
  */
 async function animateFormToDock() {
-  await runAnimation()
+  // Animation may be cancelled by the browser (tab switch, reduced motion, layout shift, etc.).
+  // Always navigate regardless — if we don't, setSearchPending(true) is never cleared.
+  try {
+    await runAnimation()
+  } catch {
+    // Intentionally swallowed — animation failure must not block navigation
+  }
   await navigateTo('/search')
 
   window.scrollTo({

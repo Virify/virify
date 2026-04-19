@@ -4,7 +4,7 @@
     :schema="step1Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/one/"
+    api-endpoint="/api/listings/update/steps/one/"
     :get-submission-data="getSubmissionData"
     @completed="onStepCompleted"
     @saved="onStepSaved"
@@ -50,7 +50,7 @@
         </div>
 
         <div class="basis-full sm:basis-0 sm:flex-1 sm:min-w-44 sm:max-w-52">
-          <UFormField label="Chain Status" name="chain" description="Part of a chain?" required eagerValidation>
+          <UFormField label="Chain Status" name="chain" description="Chain status of the property" eagerValidation>
             <USelect
               v-model="state.saleListing!.chain"
               :items="chainItems"

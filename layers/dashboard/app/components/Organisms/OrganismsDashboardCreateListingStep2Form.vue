@@ -4,7 +4,7 @@
     :schema="step2Schema"
     :state="state"
     :is-valid="isFormValid"
-    api-endpoint="/api/draft-listings/update/steps/two/"
+    api-endpoint="/api/listings/update/steps/two/"
     :get-submission-data="getSubmissionData"
     :get-fields-to-moderate="getFieldsToModerate"
     @completed="onStepCompleted"
@@ -104,7 +104,7 @@
 
       <UFormField label="Year Built" name="property.yearBuilt" description="Year the property was built" hint="optional">
         <UInput 
-          v-model="state.property.yearBuilt" 
+          v-model="(state.property.yearBuilt as number | undefined)" 
           type="number"
           :min="1500"
           size="lg"
@@ -116,7 +116,20 @@
       </UFormField>
     </div>
 
-    <!-- Row 3: Description (full width) -->
+    <!-- Row 3: Move-in Date (rental only, optional) -->
+    <div v-if="listingType === 'rent'" class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+      <UFormField label="Move-in Date" name="moveInDate" description="Earliest date the property is available" hint="optional">
+        <UInput
+          v-model="moveInDateInput"
+          type="date"
+          color="secondary"
+          size="lg"
+          class="w-full"
+        />
+      </UFormField>
+    </div>
+
+    <!-- Row 4: Description (full width) -->
     <UFormField label="Property Description" name="property.description" description="Add a compelling description of your property (min 10 characters)" required eagerValidation>
       <UTextarea 
         v-model="state.property.description" 
@@ -131,6 +144,8 @@
 
 <script setup lang="ts">
 const { getStepData, propertyTypes } = useCreateListingSteps()
+
+const listingType = computed(() => (getStepData(1) as Step1FormData | undefined)?.selectedType ?? 'sale')
 
 // Default empty address state (matches AddressParsed interface)
 const emptyAddress: AddressParsed = {
@@ -169,6 +184,19 @@ const state = reactive<Step2FormData>({
   property: savedData?.property 
     ? { ...defaultProperty, ...savedData.property, address: { ...emptyAddress, ...savedData.property.address } }
     : defaultProperty,
+  moveInDate: savedData?.moveInDate ?? null,
+})
+
+// Move-in date as an ISO date string for the date input (YYYY-MM-DD)
+const moveInDateInput = computed({
+  get() {
+    if (!state.moveInDate) return ''
+    const d = state.moveInDate instanceof Date ? state.moveInDate : new Date(state.moveInDate)
+    return isNaN(d.getTime()) ? '' : d.toISOString().substring(0, 10)
+  },
+  set(val: string) {
+    state.moveInDate = val ? new Date(val) : null
+  },
 })
 
 // Size conversion (UI only - stored in meters)
@@ -266,6 +294,7 @@ function getSubmissionData() {
   return {
     // Store user's preferred size unit so we can restore it when editing
     sizeUnit: sizeUnit.value,
+    moveInDate: state.moveInDate ?? null,
     property: {
       address: state.property.address,
       type: state.property.type,

@@ -418,7 +418,7 @@ export async function fetchTraditionalSearchListings(
 
     // Chain free only
     if (params.saleIncludes['chain-free']) {
-      saleFilter.chain = true
+      saleFilter.chain = false
     }
 
     // Freehold only
