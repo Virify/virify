@@ -183,54 +183,74 @@ function createSearchState() {
    *  @TODO this should probably be done as part of the actual fetch 
    *        request in the `fetchResults` function
    */
-  async function mockSaveHash(key: string, value: string) {
+  async function saveHistoryState(key: string, value: string) {
     if (!import.meta.client) return
 
     return new Promise((resolve) => {
       setTimeout(() => {
-        window.localStorage.setItem(key, value)
+        console.log('History state posted!', {
+          [key]: value
+        })
+
         resolve(true)
       }, 500)
     })
   }
 
-  async function mockParseHash(key?: string | string[]) {
+  async function fetchHistoryState(key?: string | string[]) {
     if (!import.meta.client || !isString(key)) return
 
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        const savedSearch = window.localStorage.getItem(key as string)
-
-        if (!isString(savedSearch)) return
-
-        try {
-          const { location, query } = asObject(JSON.parse(savedSearch))
-
-          // Set most recent search
-          mostRecentLocation = location
-          mostRecentQuery = query
-
-          // Save location
-          setLocation(location?.location)
-          setLocationRadius(location?.radius)
-
-          // @TODO save query, etc.
-
-          await fetchResults()
-        }
-        catch {
-          console.error('Unable to parse saved query')
-        }
-
-        resolve(true)
-      }, 500)
+    const historyState = await $fetch('/api/search/history', {
+      params: {
+        hash: key as string
+      }
     })
+
+    if (!isNonEmptyObject(historyState)) return
+
+    try {
+      const { type, location, radius, body } = asObject(historyState)
+
+      // Set most recent search
+      mostRecentLocation = { location, radius }
+      mostRecentQuery = { type, body }
+
+      // Save location
+      setLocation(location)
+      setLocationRadius(radius)
+      setSearchType(type)
+
+      // Save AI state
+      if (type === 'ai') {
+        const { query, queryAnalysis } = asObject(body)
+
+        setQuery(query)
+        setQueryAnalysis(queryAnalysis)
+        setActiveTerms(queryAnalysis?.usedTerms)
+      }
+
+      // Else save traditional state
+      else if (type === 'traditional') {
+        const queryAnalysis = buildQueryAnalysisFromFormData(body)
+
+        setQueryAnalysis(queryAnalysis)
+        setActiveTerms(queryAnalysis?.usedTerms)
+      }
+      else {
+        return
+      }
+
+      await fetchResults()
+    }
+    catch {
+      console.error('Unable to parse saved query')
+    }
   }
 
   async function fetchHash(hash?: string | string[]) {
     isLoading.value = true
 
-    await mockParseHash(hash)
+    await fetchHistoryState(hash)
 
     isLoading.value = false
   }
@@ -249,7 +269,7 @@ function createSearchState() {
      *  sanitise this data (this should be done serverside, as otherwise
      *  someone could just ignore it anyway)
      */
-    mockSaveHash(hashKey, stringValue)
+    saveHistoryState(hashKey, stringValue)
     navigateTo('/search/' + hashKey)
   }
 
