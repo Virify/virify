@@ -340,7 +340,7 @@ function createSearchState() {
       else {
         const formData = asObject(body) as unknown as TraditionalSearchData
 
-        const response = await $fetch('/api/search/traditional', {
+        const { results } = await $fetch('/api/search/traditional', {
           method: 'POST',
           body: {
             ...formData,
@@ -350,12 +350,12 @@ function createSearchState() {
           }
         })
 
-        if (!response) throw new Error('')
+        if (!results) throw new Error('No responses array returned')
 
         const queryAnalysis = buildQueryAnalysisFromFormData(formData)
         setQueryAnalysis(queryAnalysis)
         setActiveTerms(queryAnalysis?.usedTerms)
-        setResults(response as unknown[])
+        setResults(results as unknown[])
       }
 
       setActiveLocation(location)

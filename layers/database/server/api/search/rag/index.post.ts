@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { hash } from 'ohash'
 
 // Schema for validating the request body
 const ragSearchSchema = z.object({
@@ -42,8 +43,8 @@ export default defineEventHandler(async (event) => {
     // Derive the effective listing type from what the AI put in the where clause
     const effectiveListingType: 'sale' | 'rent' | 'all' =
       whereClause.saleListing ? 'sale'
-      : whereClause.rentalListing ? 'rent'
-      : 'all';
+        : whereClause.rentalListing ? 'rent'
+          : 'all';
 
     // If propertyIds is an empty array, no properties were found, so we can return early.
     if (Array.isArray(propertyIds) && propertyIds.length === 0) {
@@ -76,6 +77,10 @@ export default defineEventHandler(async (event) => {
 
     const totalCount = resultsWithListingType.length;
 
+
+    const historyObject = { query, queryAnalysis, location, radius }
+    const searchKey = hash({ historyObject })
+
     return {
       results: resultsWithListingType,
       query,
@@ -87,6 +92,8 @@ export default defineEventHandler(async (event) => {
       searchType: "rag_sql",
       currentPage: page,
       totalResults: totalCount,
+      hash: searchKey,
+      hashString: JSON.stringify({ historyObject })
     };
   } catch (error: any) {
     console.error("Error performing RAG search:", error);

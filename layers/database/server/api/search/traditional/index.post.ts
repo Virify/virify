@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { hash } from 'ohash'
 
 const traditionalSearchSchema = z.object({
   isSale: z.boolean().default(true),
@@ -73,6 +74,8 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readValidatedBody(event, traditionalSearchSchema.parse);
 
+    const { location, radius, ...rest } = asObject(body)
+
     const lat = body.location?.geometry?.coordinates?.[1];
     const lon = body.location?.geometry?.coordinates?.[0];
     const boundaryPolygon = body.location?.boundaryPolygon;
@@ -101,7 +104,15 @@ export default defineEventHandler(async (event) => {
     }
 
     const orderBy = buildListingOrderBy(body.sortBy);
-    return fetchTraditionalSearchListings(params, locationPropertyIds, orderBy);
+    const results = await fetchTraditionalSearchListings(params, locationPropertyIds, orderBy);
+
+    const historyObject = { location, radius, formData: rest }
+
+    return {
+      results,
+      hash: hash(historyObject),
+      hashString: JSON.stringify(historyObject)
+    }
 
   } catch (error) {
     console.error('Traditional search error:', error);
