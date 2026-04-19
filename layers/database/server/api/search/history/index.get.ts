@@ -9,13 +9,13 @@ export default defineEventHandler(async (event) => {
   const { hash } = await getValidatedQuery(event, historySchema.parse)
 
   try {
-    const historyState = mockDb[hash]
+    const historyState = (mockDb as Record<string, string>)[hash]
 
-    return historyState ? JSON.parse(historyState) : null
+    return historyState ? JSON.parse(historyState) : {}
   }
   catch (err) {
     console.error({ error: (err as Error)?.message || 'Unknown error' })
 
-    return null
+    return {}
   }
 })
