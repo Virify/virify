@@ -11,11 +11,11 @@ export default defineEventHandler(async (event) => {
   try {
     const historyState = mockDb[hash]
 
-    return historyState ? JSON.parse(historyState) : {}
+    return historyState ? JSON.parse(historyState) : null
   }
   catch (err) {
     console.error({ error: (err as Error)?.message || 'Unknown error' })
 
-    return {}
+    return null
   }
 })
