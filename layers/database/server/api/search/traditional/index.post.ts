@@ -74,8 +74,6 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readValidatedBody(event, traditionalSearchSchema.parse);
 
-    const { location, radius, ...rest } = asObject(body)
-
     const lat = body.location?.geometry?.coordinates?.[1];
     const lon = body.location?.geometry?.coordinates?.[0];
     const boundaryPolygon = body.location?.boundaryPolygon;
@@ -106,7 +104,15 @@ export default defineEventHandler(async (event) => {
     const orderBy = buildListingOrderBy(body.sortBy);
     const results = await fetchTraditionalSearchListings(params, locationPropertyIds, orderBy);
 
-    const historyObject = { location, radius, formData: rest }
+
+    const { location, radius, ...bodyRest } = asObject(body)
+
+    const historyObject = {
+      type: 'traditional',
+      body: bodyRest,
+      location,
+      radius
+    }
 
     return {
       results,

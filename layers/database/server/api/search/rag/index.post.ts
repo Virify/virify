@@ -78,7 +78,13 @@ export default defineEventHandler(async (event) => {
     const totalCount = resultsWithListingType.length;
 
 
-    const historyObject = { query, queryAnalysis, location, radius }
+    const historyObject = {
+      type: 'ai',
+      body: query, queryAnalysis,
+      location,
+      radius
+    }
+
     const searchKey = hash({ historyObject })
 
     return {
