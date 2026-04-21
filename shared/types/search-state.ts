@@ -72,9 +72,6 @@ export interface SearchState {
   /** Preserved location context for search refinement */
   locationContext: any
 
-  /** User's preferred view mode for results display */
-  viewMode: 'grid' | 'map' | 'split'
-
   /** Map viewport state for preserving zoom, center, and bounds */
   mapViewport?: MapViewportState
 
@@ -101,7 +98,6 @@ export const defaultSearchState: SearchState = {
   totalResults: 0,
   whereClause: null,
   locationContext: null,
-  viewMode: 'grid',
   mapViewport: undefined,
   traditionalSearchForm: null
 }

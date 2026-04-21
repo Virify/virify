@@ -37,7 +37,6 @@ const {
   isLoading,
   searchState,
   fetchResults,
-  setViewMode,
   setSortOrder,
   sortSelectOpen,
 } = useSearchState()
@@ -112,18 +111,18 @@ function handleOpenPopover(type: 'location' | 'filters' | 'sort') {
 /**
  *  Update layout
  */
-function updateViewMode(viewMode: string) {
-  setViewMode(viewMode === 'left' ? 'map' : 'grid')
+const { currentView, setCurrentView } = useResultsViewMode()
+
+function updateViewMode(newView: string) {
+  setCurrentView(newView === 'left' ? 'map' : 'grid')
 }
 
 const showGrid = computed(() => {
-  const { viewMode } = asObject(searchState.value)
-  return viewMode === 'grid' || viewMode === 'split'
+  return currentView.value === 'grid' || currentView.value === 'split'
 })
 
 const showMap = computed(() => {
-  const { viewMode } = asObject(searchState.value)
-  return viewMode === 'map' || viewMode === 'split'
+  return currentView.value === 'map' || currentView.value === 'split'
 })
 
 // Track if the map has ever been shown to avoid re-initializing it
@@ -143,14 +142,13 @@ const resultsAreCurrentForLocation = computed(() => {
 const location = computed(() => asObject(searchState.value).location)
 const radius = computed(() => asObject(searchState.value).radius)
 const sortBy = computed(() => asObject(searchState.value).sortBy)
-const viewMode = computed(() => asObject(searchState.value).viewMode)
 
 watch(sortBy, (newValue) => {
   setSortOrder(newValue as SortOrder)
   fetchResults()
 })
 
-watch(viewMode, (layout) => {
+watch(currentView, (layout) => {
   if (layout !== 'map') return
   window.scrollTo({ top: 0, behavior: 'instant' })
 })

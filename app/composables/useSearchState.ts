@@ -135,22 +135,6 @@ function createSearchState() {
   }
 
   /**
-   *  Update state layout
-   */
-  function setViewMode(value: ResultLayout, callback?: () => void) {
-    const validValues: ResultLayout[] = ['grid', 'split', 'map']
-
-    // Check value is valid
-    if (!validValues.includes(value)) return
-
-    // Update state
-    updateState({ viewMode: value })
-
-    // Run optional callback
-    _runCallback(callback)
-  }
-
-  /**
    *  Manage state directly
    */
   function setResults(value: any[], callback?: () => void) {
@@ -313,7 +297,6 @@ function createSearchState() {
     searchState,
     sortSelectOpen,
     setSortOrder,
-    setViewMode,
     setSearchType,
     setListingType,
     setLocation,

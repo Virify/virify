@@ -6,8 +6,8 @@
 
     <label ref="$labels" v-for="{ key, value, icon } of options" :key
       class="o-dock-inputs-layout__label | font-semibold">
-      <input type="radio" class="| visually-hidden" :value="key" v-model="searchState.viewMode" name="results-layout"
-        :aria-label="value" @change="setUpdateViewMode" />
+      <input type="radio" class="| visually-hidden" :value="key" v-model="currentView" name="results-layout"
+        :aria-label="value" />
 
       <AtomsIcon :icon />
 
@@ -20,13 +20,13 @@
 
 <script setup lang="ts">
 import { useMounted, useResizeObserver, watchImmediate } from '@vueuse/core'
-import type { ResultLayout } from '#imports'
+import type { ViewModeKey } from '#imports'
 
 /**
  *  Options
  */
 type ResultLayouts = {
-  key: ResultLayout,
+  key: ViewModeKey
   value: string
   icon: string
 }[]
@@ -46,21 +46,27 @@ const options = computed(() => {
 })
 
 /**
- *  Layout state
- */
-const { searchState, setViewMode } = useSearchState()
-
-const viewMode = computed(() => {
-  const { viewMode } = asObject(searchState.value)
-
-  return viewMode
-})
-
-/**
  *  Loading state
  */
 const isMounted = useMounted()
 
+/**
+ *  Layout state
+ */
+const { currentView, setCurrentView } = useResultsViewMode()
+
+/**
+ *  If split view on small screen, set to default (grid)
+ */
+watch(options, (newValue) => {
+  const isSmallScreen = newValue.length === 2
+
+  if (!isSmallScreen || currentView.value !== 'split') {
+    return
+  }
+
+  setCurrentView('grid')
+})
 /**
  *  Update highlight position
  */
@@ -149,24 +155,10 @@ async function updateSelection(isResize?: boolean) {
 
   // Update highlight position
   updateHighlightPosition(isResize)
-
-  // Save new view mode
-  setViewMode(viewMode.value)
 }
 
-watchImmediate(viewMode, () => updateSelection(false))
+watchImmediate(currentView, () => updateSelection(false))
 useResizeObserver($wrapper, () => updateSelection(true))
-
-/**
- *  Update layout in state
- */
-watch(options, (newValue) => {
-  if (newValue.length !== 2 || viewMode.value !== 'split') {
-    return
-  }
-
-  setViewMode('grid')
-})
 
 </script>
 
