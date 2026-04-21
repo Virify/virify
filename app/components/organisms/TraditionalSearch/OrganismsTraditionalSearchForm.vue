@@ -87,6 +87,24 @@ interface RoomCount {
   selected?: boolean
 }
 
+export interface FormState {
+  isSale: boolean
+  minPrice: number
+  maxPrice: number
+  price: [number, number]
+  saleIncludes: { [key: string]: boolean }
+  rentIncludes: { [key: string]: boolean }
+  minBeds?: number
+  maxBeds?: number
+  minBathrooms?: number
+  maxBathrooms?: number
+  minSize: number | null
+  maxSize: number | null
+  sizeUnit: PropertySizeUnits
+  propertyTypes: { [key: string]: string[] }
+  additionalFeatures: { [key: string]: boolean }
+}
+
 const saleIncludesOptions = [
   { key: 'sold-stc', label: 'Include sold STC' },
   { key: 'chain-free', label: 'Chain free only' },
@@ -215,22 +233,22 @@ function getDefaultSelected(arr: RoomCount[]) {
   return arr.find(({ selected }) => selected)?.key
 }
 
-const formData = useState('search-contract-type', () => reactive({
+const formData = useState<FormState>('search-contract-type', () => reactive({
   isSale: true,
   minPrice: 0,
   maxPrice: 0,
-  price: <[number, number]>[0, 0],
-  saleIncludes: reactive<{ [key: string]: boolean }>({}),
-  rentIncludes: reactive<{ [key: string]: boolean }>({}),
-  minBeds: <number>getDefaultSelected(bedroomMin),
-  maxBeds: <number>getDefaultSelected(bedroomMax),
-  minBathrooms: <number>getDefaultSelected(bathroomMin),
-  maxBathrooms: <number>getDefaultSelected(bathroomMax),
-  minSize: <number | null>null,
-  maxSize: <number | null>null,
-  sizeUnit: <PropertySizeUnits>'sqmtr',
-  propertyTypes: reactive<{ [key: string]: string[] }>({}),
-  additionalFeatures: reactive<{ [key: string]: boolean }>({}),
+  price: [0, 0],
+  saleIncludes: {},
+  rentIncludes: {},
+  minBeds: getDefaultSelected(bedroomMin),
+  maxBeds: getDefaultSelected(bedroomMax),
+  minBathrooms: getDefaultSelected(bathroomMin),
+  maxBathrooms: getDefaultSelected(bathroomMax),
+  minSize: null,
+  maxSize: null,
+  sizeUnit: 'sqmtr',
+  propertyTypes: {},
+  additionalFeatures: {},
 }))
 
 /**
