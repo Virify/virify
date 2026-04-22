@@ -17,6 +17,7 @@
         <nuxt-link v-if="isViewAll" :to="href" @keydown.escape.stop="selectParent"
           class="header-desktop-mega-menu__sub-link-title | title-sm">
           {{ currentTitle }}
+          <AtomsIcon icon="arrow-right" />
         </nuxt-link>
 
         <nuxt-link v-else :to="href" @keydown.escape.stop="selectParent"
@@ -133,9 +134,11 @@ function selectParent() {
 </script>
 
 <style lang="scss">
+$box-shadow: 0 30px 50px -20px light-dark(rgba(#000, 0.15), rgba(#000, 0.5));
+
 .header-desktop-mega-menu {
   display: grid;
-  height: min(calc(100vh - var(--header-height) - var(--size-28)), 28ch);
+  height: min(calc(100vh - var(--header-height) - var(--size-28)), 30ch);
   grid-template-columns: 1fr 1.5fr 20ch;
   grid-gap: var(--size-28);
   align-items: stretch;
@@ -149,6 +152,7 @@ function selectParent() {
     background: var(--primary-400);
     font-weight: var(--font-bold);
     transition: background-color var(--animation-fast);
+    box-shadow: $box-shadow;
 
     &:hover {
       color: var(--monochrome-900);
@@ -177,7 +181,10 @@ function selectParent() {
   }
 
   &__headers {
-    padding: var(--size-20) 0;
+    list-style: none;
+    margin: 0;
+    padding: var(--size-20);
+    padding-right: var(--size-10);
   }
 
   &__sub-links,
@@ -185,11 +192,6 @@ function selectParent() {
     height: 100%;
     overflow: auto;
     overscroll-behavior: contain;
-  }
-
-  &__headers {
-    list-style: none;
-    margin: 0;
   }
 
   &__header {
@@ -226,13 +228,26 @@ function selectParent() {
     list-style: none;
     margin: 0;
     background: var(--background-100);
+    box-shadow: $box-shadow;
   }
 
   &__sub-link-title {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-8);
     line-height: var(--lineheight-sm);
-    margin: 0 0 var(--size-12);
+    padding: 0 0 var(--size-16);
+    margin: 0 0 var(--size-24);
     color: var(--primary-400);
+    border-bottom: 1px solid var(--background-400);
+
+    .a-icon {
+      display: block;
+      width: var(--size-24);
+      height: var(--size-24);
+      flex-shrink: 0;
+    }
   }
 
   &__sub-link {
