@@ -58,7 +58,6 @@ export function useMyComposable() { ... }
 - `useListingEdit()` - Draft & live listing state (with type guards `isDraftListing()`, `isLiveListing()`)
 - `useDashboardRecentItems()` - Recent favourites/notes (data loading for dashboard)
 - `useAnalytics()` - User interaction tracking (also orchestrates recent items refresh)
-- `useNavigation()` - Global nav state with dropdown/mobile menu control
 - Dialog composables: `useDialog()` for modal state, `useGlobalEnquiryModal()` for conversations
 
 ## Project-Specific Conventions
