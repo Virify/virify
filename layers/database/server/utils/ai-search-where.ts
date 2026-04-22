@@ -35,6 +35,10 @@ function sanitiseParams(raw: SearchParameters): SearchParameters {
     yardPositions: filterEnum(raw.yardPositions, "yardPositions"),
     utilityFeatures: filterEnum(raw.utilityFeatures, "utilityFeatures"),
     epcRatings: filterEnum(raw.epcRatings, "epcRatings"),
+    tenureTypes: filterEnum(raw.tenureTypes, "tenureTypes"),
+    saleAvailabilityStatuses: filterEnum(raw.saleAvailabilityStatuses, "saleAvailabilityStatuses"),
+    furnishedStatuses: filterEnum(raw.furnishedStatuses, "furnishedStatuses"),
+    rentalAvailabilityStatuses: filterEnum(raw.rentalAvailabilityStatuses, "rentalAvailabilityStatuses"),
     councilTaxBand: filterScalar(raw.councilTaxBand, "councilTaxBand"),
   };
 }
@@ -65,12 +69,12 @@ function buildMoveInDateFilter(p: SearchParameters): any {
  */
 function buildSaleListingFilter(p: SearchParameters): any {
   const saleFields: any = {};
-  if (p.tenureType) saleFields.tenureType = filterScalar(p.tenureType, "tenureType") ?? undefined;
+  if (p.tenureTypes?.length) saleFields.tenureType = p.tenureTypes.length === 1 ? p.tenureTypes[0] : { in: p.tenureTypes };
   if (p.chain !== undefined) saleFields.chain = p.chain;
   if (p.sharedOwnership !== undefined) saleFields.sharedOwnership = p.sharedOwnership;
   // chainFree is removed from Property — chain false on SaleListing is the canonical mapping
   if (p.priceType) saleFields.priceType = filterScalar(p.priceType, "priceType") ?? undefined;
-  if (p.saleAvailabilityStatus) saleFields.availabilityStatus = filterScalar(p.saleAvailabilityStatus, "saleAvailabilityStatus") ?? undefined;
+  if (p.saleAvailabilityStatuses?.length) saleFields.availabilityStatus = p.saleAvailabilityStatuses.length === 1 ? p.saleAvailabilityStatuses[0] : { in: p.saleAvailabilityStatuses };
 
   if (p.listingType === "SALE" || Object.keys(saleFields).length > 0) {
     return Object.keys(saleFields).length > 0 ? { is: saleFields } : { isNot: null };
@@ -84,11 +88,11 @@ function buildSaleListingFilter(p: SearchParameters): any {
  */
 function buildRentalListingFilter(p: SearchParameters): any {
   const rentalFields: any = {};
-  if (p.furnishedStatus) rentalFields.furnishedStatus = filterScalar(p.furnishedStatus, "furnishedStatus") ?? undefined;
+  if (p.furnishedStatuses?.length) rentalFields.furnishedStatus = p.furnishedStatuses.length === 1 ? p.furnishedStatuses[0] : { in: p.furnishedStatuses };
   if (p.isBillsIncluded !== undefined) rentalFields.isBillsIncluded = p.isBillsIncluded;
   if (p.rentalLength) rentalFields.rentalLength = filterScalar(p.rentalLength, "rentalLength") ?? undefined;
   if (p.rentFrequency) rentalFields.rentFrequency = filterScalar(p.rentFrequency, "rentFrequency") ?? undefined;
-  if (p.rentalAvailabilityStatus) rentalFields.availabilityStatus = filterScalar(p.rentalAvailabilityStatus, "rentalAvailabilityStatus") ?? undefined;
+  if (p.rentalAvailabilityStatuses?.length) rentalFields.availabilityStatus = p.rentalAvailabilityStatuses.length === 1 ? p.rentalAvailabilityStatuses[0] : { in: p.rentalAvailabilityStatuses };
   if (p.depositMax !== undefined) rentalFields.deposit = { lte: p.depositMax };
   if (p.holdingDepositMax !== undefined) rentalFields.holdingDeposit = { lte: p.holdingDepositMax };
 

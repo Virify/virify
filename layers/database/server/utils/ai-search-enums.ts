@@ -69,6 +69,10 @@ export const VALID: Record<string, Set<string>> = {
   otherRoomTypes: new Set(Object.values(OtherRoomType)),
   utilityFeatures: new Set(Object.values(UtilityFeature)),
   epcRatings: new Set(Object.values(EPCRating)),
+  tenureTypes: new Set(Object.values(TenureType)),
+  saleAvailabilityStatuses: new Set(Object.values(SaleAvailabilityStatus)),
+  furnishedStatuses: new Set(Object.values(FurnishedStatus)),
+  rentalAvailabilityStatuses: new Set(Object.values(RentalAvailabilityStatus)),
 };
 
 /** Allowed values for every scalar enum parameter. Used by `filterScalar`. */
@@ -77,13 +81,9 @@ export const VALID_SCALAR: Record<string, Set<string>> = {
   boilerType: new Set(Object.values(BoilerType)),
   broadbandType: new Set(Object.values(BroadbandType)),
   constructionType: new Set(Object.values(ConstructionType)),
-  tenureType: new Set(Object.values(TenureType)),
   priceType: new Set(Object.values(SalePriceType)),
-  saleAvailabilityStatus: new Set(Object.values(SaleAvailabilityStatus)),
-  furnishedStatus: new Set(Object.values(FurnishedStatus)),
   rentalLength: new Set(Object.values(RentalLengthType)),
   rentFrequency: new Set(Object.values(RentalPriceType)),
-  rentalAvailabilityStatus: new Set(Object.values(RentalAvailabilityStatus)),
   verificationLevel: new Set(Object.values(VerificationLevel)),
   listingTier: new Set(Object.values(ListingTier)),
   gardenFacing: new Set(Object.values(GardenFacing)),
