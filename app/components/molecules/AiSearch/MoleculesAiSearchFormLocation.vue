@@ -38,14 +38,15 @@ import { onClickOutside } from "@vueuse/core";
 const emit = defineEmits(['location-selected'])
 
 /**
- *  Set autocomplete value
+ *  Set autocomplete value. Set as useState rather than shallowRef so
+ *  that the model syncs across all inputs (e.g. modal and dock)
  */
 const locationQuery = useState<string>('location-name', () => '')
 
 /**
  *  Store a local copy of locationQuery - this prevents the
  *  autocomplete watcher firing multiple times if the component
- *  appears multiple times on the page
+ *  appears multiple times on the page (e.g. modal and dock)
  */
 const locationQueryLocal = shallowRef('')
 
