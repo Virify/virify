@@ -75,8 +75,6 @@ import {
   PopoverTrigger
 } from 'reka-ui'
 
-
-
 /**
  *  Panel switching
  */
@@ -207,9 +205,14 @@ async function logOut() {
     background: var(--background-100);
     width: min(calc(100vw - var(--size-32)), 24ch);
     transition: width var(--animation-fast);
+    transform-origin: 100% 0;
+
+    @media (prefers-reduced-motion: no-preference) {
+      animation: fadeInDropdown var(--animation-fast) var(--ease-in-out);
+    }
 
     &--wide {
-      width: min(calc(100vw - var(--size-32)), 320px);
+      width: min(calc(100vw - var(--size-32)), 360px);
     }
   }
 
@@ -269,6 +272,13 @@ async function logOut() {
     &--active {
       background: var(--error);
     }
+  }
+}
+
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    scale: 0.9;
   }
 }
 </style>

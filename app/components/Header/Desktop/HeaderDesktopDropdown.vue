@@ -120,6 +120,8 @@ watch(useRoute(), () => {
 
 <style lang="scss">
 .header-desktop-dropdown {
+  anchor-name: --dropdown-root;
+
   position: relative;
 
   &__toggle {
@@ -148,7 +150,7 @@ watch(useRoute(), () => {
 
   &__menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + var(--size-10));
     left: calc(0px - var(--size-12));
     width: fit-content;
     background: var(--background-200);
@@ -156,20 +158,44 @@ watch(useRoute(), () => {
     margin: 0;
     list-style: none;
     border-radius: var(--border-radius-2xl);
-    border-top-right-radius: 0;
-    border-top-left-radius: 0;
-    box-shadow: 0 20px 60px -20px light-dark(rgba(#000, 0.07), rgba(#000, 0.5));
+    border: 1px solid var(--background-400);
+    box-shadow: 0 20px 60px -20px light-dark(rgba(#000, 0.15), rgba(#000, 0.5));
     min-width: 24ch;
+    transform-origin: 50% 0;
+
+    @media (prefers-reduced-motion: no-preference) {
+      animation: fadeInDropdown var(--animation-fast) var(--ease-in-out);
+    }
+
+    @supports (position-anchor: --dropdown-root) {
+      position-anchor: --dropdown-root;
+      position: fixed;
+      top: var(--header-height);
+      left: calc(anchor(left) - var(--size-12));
+    }
 
     &--mega-menu {
       position: fixed;
       top: var(--header-height);
       left: 50%;
       transform: translate(-50%);
-      padding: 0 var(--size-28) var(--size-28);
+      padding: var(--size-28);
       width: min(calc(100vw - var(--container-padding)), 88ch);
       box-sizing: border-box;
+      transform-origin: 0 0;
+
+      @supports (position-anchor: --dropdown-root) {
+        position-anchor: --dropdown-root;
+        left: 50%;
+      }
     }
+  }
+}
+
+@keyframes fadeInDropdown {
+  from {
+    opacity: 0;
+    scale: 0.9;
   }
 }
 </style>
