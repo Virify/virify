@@ -1,5 +1,10 @@
-export type SortOrder = 'date-desc' | 'date-asc' | 'price-asc' | 'price-desc' | 'relevance'
-export type ResultLayout = 'map' | 'grid' | 'split'
+export type SortOrder =
+  | "date-desc"
+  | "date-asc"
+  | "price-asc"
+  | "price-desc"
+  | "relevance";
+export type ResultLayout = "map" | "grid" | "split";
 
 /**
  * URL-based search state management
@@ -24,45 +29,45 @@ function createSearchState() {
    *  Run a callback, if it's valid
    */
   function _runCallback(fn: unknown) {
-    if (!isFunction(fn)) return
+    if (!isFunction(fn)) return;
 
-    fn()
+    fn();
   }
 
   /**
    *  Toggle whether a search is pending
    */
   function setSearchPending(value: boolean = false) {
-    isLoading.value = value
+    isLoading.value = value;
   }
 
   /**
    * Update search type (traditional vs AI)
    */
-  function setSearchType(value: 'traditional' | 'ai', callback?: () => void) {
+  function setSearchType(value: "traditional" | "ai", callback?: () => void) {
     // Check value is valid
-    if (value !== 'traditional' && value !== 'ai') return
+    if (value !== "traditional" && value !== "ai") return;
 
     // Update state
-    updateState({ searchType: value })
+    updateState({ searchType: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
    * Update listing type filter
    */
   function setListingType(value: string, callback?: () => void) {
-    if (value !== 'all' && value !== 'sale' && value !== 'rent') return
+    if (value !== "all" && value !== "sale" && value !== "rent") return;
     // Check value is valid
-    if (!isString(value)) return
+    if (!isString(value)) return;
 
     // Update state
-    updateState({ listingType: value })
+    updateState({ listingType: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
@@ -70,10 +75,10 @@ function createSearchState() {
    */
   function setLocation(value: GeocodingFeature, callback?: () => void) {
     // Update state - don't clear results, they'll be cleared when search starts
-    updateState({ location: value })
+    updateState({ location: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
@@ -81,13 +86,13 @@ function createSearchState() {
    */
   function setQuery(value: string, callback?: () => void) {
     // Check either value is valid
-    if (!isString(value)) return
+    if (!isString(value)) return;
 
     // Update state
-    updateState({ query: value })
+    updateState({ query: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
@@ -95,13 +100,13 @@ function createSearchState() {
    */
   function setQueryAnalysis(value: QueryAnalysis, callback?: () => void) {
     // Check either value is valid
-    if (!isObject(value)) return
+    if (!isObject(value)) return;
 
     // Update state
-    updateState({ queryAnalysis: value })
+    updateState({ queryAnalysis: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
@@ -109,29 +114,35 @@ function createSearchState() {
    */
   function setLocationRadius(value: number, callback?: () => void) {
     // Check value is valid
-    if (!Number.isInteger(value)) return
+    if (!Number.isInteger(value)) return;
 
     // Update state
-    updateState({ radius: value })
+    updateState({ radius: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
    *  Update state sort order
    */
   function setSortOrder(value: SortOrder, callback?: () => void) {
-    const validValues: SortOrder[] = ['date-desc', 'date-asc', 'price-asc', 'price-desc', 'relevance']
+    const validValues: SortOrder[] = [
+      "date-desc",
+      "date-asc",
+      "price-asc",
+      "price-desc",
+      "relevance",
+    ];
 
     // Check value is valid
-    if (!validValues.includes(value)) return
+    if (!validValues.includes(value)) return;
 
     // Update state
-    updateState({ sortBy: value })
+    updateState({ sortBy: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
@@ -139,13 +150,13 @@ function createSearchState() {
    */
   function setResults(value: any[], callback?: () => void) {
     // Check value is valid
-    if (!Array.isArray(value)) return
+    if (!Array.isArray(value)) return;
 
     // Update state
-    updateState({ results: value })
+    updateState({ results: value });
 
     // Run optional callback
-    _runCallback(callback)
+    _runCallback(callback);
   }
 
   /**
@@ -163,65 +174,71 @@ function createSearchState() {
    *  Fetch results
    */
   interface RecentSearch {
-    type: 'ai' | 'traditional'
-    body: unknown
+    type: "ai" | "traditional";
+    body: unknown;
   }
 
   interface RecentLocation {
-    location?: unknown
-    radius?: number
+    location?: unknown;
+    radius?: number;
   }
 
-  let mostRecentLocation: RecentLocation = {}
-  let mostRecentQuery: RecentSearch | null = null
+  let mostRecentLocation: RecentLocation = {};
+  let mostRecentQuery: RecentSearch | null = null;
 
-  const toast = useToast()
-  const { trackSearch } = useAnalyticsTracking()
-  const { setActiveLocation, setActiveRadius, setActiveTerms } = useActiveSearchTerms()
+  const toast = useToast();
+  const { trackSearch } = useAnalyticsTracking();
+  const { setActiveLocation, setActiveRadius, setActiveTerms } =
+    useActiveSearchTerms();
 
   async function fetchResults(
     locationData = mostRecentLocation,
-    queryData = mostRecentQuery
+    queryData = mostRecentQuery,
   ) {
-    const { location, radius } = asObject(locationData)
+    const { location, radius } = asObject(locationData);
 
     if (!location || !queryData) {
-      return
+      return;
     }
 
-    const { type, body } = asObject(queryData)
+    const { type, body } = asObject(queryData);
 
-    const isAI = type === 'ai'
-    const validatedType = isAI ? 'ai' : 'traditional'
+    const isAI = type === "ai";
+    const validatedType = isAI ? "ai" : "traditional";
 
     try {
-      setSearchPending(true)
-      setSearchType(validatedType)
+      setSearchPending(true);
+      setSearchType(validatedType);
 
       /**
        *  Perform AI search
        */
       if (isAI) {
-        const response = await $fetch('/api/search/rag', {
-          method: 'POST',
+        const response = await $fetch<AISearchResponse>("/api/search", {
+          method: "POST",
           timeout: 60000,
           body: {
             ...asObject(body),
             location,
             radius,
-            sortBy: searchState.value.sortBy
-          } as unknown as BodyInit
-        })
+            sortBy: searchState.value.sortBy,
+            type: "ai",
+          } as unknown as BodyInit,
+        });
 
-        const { queryAnalysis, results = [], effectiveListingType } = asObject(response)
-        const { listingType, query } = asObject(body)
+        const {
+          queryAnalysis,
+          results = [],
+          effectiveListingType,
+        } = asObject(response);
+        const { listingType, query } = asObject(body);
 
         if (queryAnalysis) {
-          setQueryAnalysis(queryAnalysis)
-          setActiveTerms(queryAnalysis?.usedTerms)
+          setQueryAnalysis(queryAnalysis);
+          setActiveTerms(queryAnalysis?.usedTerms);
         }
 
-        setResults(results as unknown[])
+        setResults(results as unknown[]);
         trackSearch({
           listingType: effectiveListingType ?? listingType,
           query: query as string,
@@ -230,66 +247,64 @@ function createSearchState() {
           resultCount: results?.length ?? 0,
           usedTerms: queryAnalysis?.usedTerms ?? [],
           ignoredTerms: queryAnalysis?.ignoredTerms ?? [],
-        })
-      }
+        });
+      } else {
+        /**
+         *  Perform traditional search
+         */
+        const formData = asObject(body) as unknown as TraditionalSearchData;
 
-      /**
-       *  Perform traditional search
-       */
-      else {
-        const formData = asObject(body) as unknown as TraditionalSearchData
-
-        const response = await $fetch('/api/search/traditional', {
-          method: 'POST',
+        const response = await $fetch("/api/search", {
+          method: "POST",
           body: {
             ...formData,
             location,
             radius,
-            sortBy: searchState.value.sortBy
-          }
-        })
+            sortBy: searchState.value.sortBy,
+            type: "traditional",
+          },
+        });
 
-        if (!response) throw new Error('')
+        if (!response) throw new Error("");
 
-        const queryAnalysis = buildQueryAnalysisFromFormData(formData)
-        setQueryAnalysis(queryAnalysis)
-        setActiveTerms(queryAnalysis?.usedTerms)
-        setResults(response as unknown[])
+        const queryAnalysis = buildQueryAnalysisFromFormData(formData);
+        setQueryAnalysis(queryAnalysis);
+        setActiveTerms(queryAnalysis?.usedTerms);
+        setResults(response as unknown[]);
 
         trackSearch({
-          listingType: formData.isSale ? 'sale' : 'rent',
+          listingType: formData.isSale ? "sale" : "rent",
           query: buildQueryFromTraditionalFormData(formData),
           location: location as GeocodingFeature,
           radius: radius as number,
           resultCount: (response as unknown[])?.length ?? 0,
           usedTerms: queryAnalysis?.usedTerms ?? [],
           ignoredTerms: [],
-        })
+        });
       }
 
-      setActiveLocation(location)
-      setActiveRadius(radius)
+      setActiveLocation(location);
+      setActiveRadius(radius);
 
-      await navigateTo('/search')
+      await navigateTo("/search");
 
       window.scrollTo({
         top: 0,
-        behavior: "instant"
-      })
-    }
-    catch (error) {
-      console.error('Search error:', error)
+        behavior: "instant",
+      });
+    } catch (error) {
+      console.error("Search error:", error);
 
       toast.add({
-        title: 'Error',
-        description: 'Search failed. Please try again.',
-        color: 'error',
-        icon: 'i-lucide-search-x'
-      })
+        title: "Error",
+        description: "Search failed. Please try again.",
+        color: "error",
+        icon: "i-lucide-search-x",
+      });
     } finally {
-      setSearchPending(false)
-      mostRecentQuery = queryData
-      mostRecentLocation = locationData
+      setSearchPending(false);
+      mostRecentQuery = queryData;
+      mostRecentLocation = locationData;
     }
   }
 
