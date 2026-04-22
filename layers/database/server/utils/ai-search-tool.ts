@@ -7,7 +7,7 @@ import type OpenAI from "openai";
 /** System prompt sent on every AI search request. Instructs GPT to populate `SearchParameters` via function calling. */
 export const SYSTEM_PROMPT = `You are a property search assistant. Extract search parameters from the user's query by calling set_search_parameters.
 
-⚠ REQUIRED: You MUST always populate usedTerms with a short human-readable label for EVERY filter you set. One label per distinct concept. Examples: "For sale", "3+ bedrooms", "Under £400,000", "Detached house", "South-facing garden", "Chain free", "Furnished", "Pet friendly", "EPC C or better", "Near a school", "Cardiff", "Leasehold", "New build", "Garage", "Garden", "2 bathrooms". If you set ANY parameter, you MUST add a corresponding usedTerm. Never return an empty usedTerms array if any filters were set.
+⚠ REQUIRED: You MUST always populate usedTerms with a short human-readable label for EVERY filter you set. One label per distinct concept. Examples: "For sale", "To rent", "House", "Flat", "Cottage", "Bungalow", "Land", "Farm", "Student accommodation", "3+ bedrooms", "Under £400,000", "Detached house", "Semi-detached house", "Terraced house", "South-facing garden", "Chain free", "Furnished", "Pet friendly", "EPC C or better", "Near a school", "Cardiff", "Leasehold", "New build", "Garage", "Garden", "2 bathrooms". If you set propertyTypeName, you MUST add the property type as a usedTerm (e.g. "House", "Flat", "Cottage"). If you set ANY parameter, you MUST add a corresponding usedTerm. Never return an empty usedTerms array if any filters were set.
 
 ENUM VALUES — use exactly as shown:
 listingType: "SALE" (for sale/to buy) | "RENT" (to rent/to let)
@@ -19,14 +19,14 @@ classificationNames — use ONLY these values, matched to the propertyTypeName:
   Farms → "Non-working" | "Working" | "Small Holding"
   Specialty → "Retirement Home" | "New Build Home"
   Student Accommodation → "Flat" | "House" | "House-share"
-Examples: "detached house" → propertyTypeName:"House", classificationNames:["Detached"]. "retirement property" → propertyTypeName:"Specialty", classificationNames:["Retirement Home"]. "new build" → propertyTypeName:"Specialty", classificationNames:["New Build Home"]. "farm" → propertyTypeName:"Farms". "student let" → propertyTypeName:"Student Accommodation". "maisonette" → propertyTypeName:"Flat", classificationNames:["Maisonette"]. "penthouse" → propertyTypeName:"Flat", classificationNames:["Penthouse"]. "high rise flat" → propertyTypeName:"Flat", classificationNames:["High-rise"].
-tenureType: "FREEHOLD" | "LEASEHOLD" | "COMMONHOLD"
+Examples: "house" → propertyTypeName:"House". "houses" → propertyTypeName:"House". "house for sale" → propertyTypeName:"House", listingType:"SALE". "houses for sale" → propertyTypeName:"House", listingType:"SALE". "house to rent" → propertyTypeName:"House", listingType:"RENT". "flat" → propertyTypeName:"Flat". "flats" → propertyTypeName:"Flat". "flat for sale" → propertyTypeName:"Flat", listingType:"SALE". "cottage" → propertyTypeName:"Cottage". "cottages" → propertyTypeName:"Cottage". "bungalow" → propertyTypeName:"Bungalow". "bungalows" → propertyTypeName:"Bungalow". "land for sale" → propertyTypeName:"Land", listingType:"SALE". "detached house" → propertyTypeName:"House", classificationNames:["Detached"]. "semi detached house" → propertyTypeName:"House", classificationNames:["Semi-detached"]. "terraced house" → propertyTypeName:"House", classificationNames:["Terraced"]. "end of terrace" → propertyTypeName:"House", classificationNames:["End of Terrace"]. "retirement property" → propertyTypeName:"Specialty", classificationNames:["Retirement Home"]. "new build" → propertyTypeName:"Specialty", classificationNames:["New Build Home"]. "farm" → propertyTypeName:"Farms". "student let" → propertyTypeName:"Student Accommodation". "maisonette" → propertyTypeName:"Flat", classificationNames:["Maisonette"]. "penthouse" → propertyTypeName:"Flat", classificationNames:["Penthouse"]. "high rise flat" → propertyTypeName:"Flat", classificationNames:["High-rise"].
+tenureTypes: array of "FREEHOLD" | "LEASEHOLD" | "COMMONHOLD". "freehold" → ["FREEHOLD"]. "freehold or commonhold" → ["FREEHOLD","COMMONHOLD"]. "no leasehold" / "not leasehold" → ["FREEHOLD","COMMONHOLD"]. "leasehold" → ["LEASEHOLD"]. "commonhold" → ["COMMONHOLD"].
 priceType: "FIXED" | "OFFERS_OVER" | "GUIDE_PRICE"
-saleAvailabilityStatus: "AVAILABLE" | "UNDER_OFFER" | "SOLD"
-furnishedStatus: "FURNISHED" | "UNFURNISHED" | "PART_FURNISHED"
+saleAvailabilityStatuses: array of "AVAILABLE" | "UNDER_OFFER" | "SOLD". "available" → ["AVAILABLE"]. "available or under offer" → ["AVAILABLE","UNDER_OFFER"].
+furnishedStatuses: array of "FURNISHED" | "UNFURNISHED" | "PART_FURNISHED". "furnished" → ["FURNISHED"]. "furnished or part furnished" → ["FURNISHED","PART_FURNISHED"]. "unfurnished" → ["UNFURNISHED"].
 rentalLength: "SHORT_TERM" | "LONG_TERM"
 rentFrequency: "WEEKLY" | "MONTHLY"  (payment frequency — "weekly rent" → WEEKLY, "monthly rent" → MONTHLY)
-rentalAvailabilityStatus: "AVAILABLE" | "LET_AGREED" | "LET"
+rentalAvailabilityStatuses: array of "AVAILABLE" | "LET_AGREED" | "LET". "available" → ["AVAILABLE"]. "available or let agreed" → ["AVAILABLE","LET_AGREED"].
 isBillsIncluded: true when bills/utilities are included in the rent. "bills included" → isBillsIncluded:true. "all bills included" → isBillsIncluded:true.
 epcRatings: ordered A→G. "C or better" = ["A","B","C"]. "D or worse" = ["D","E","F","G"]. "B or better" = ["A","B"].
 primaryHeatingTypes: "GAS_CENTRAL" | "ELECTRIC" | "OIL" | "UNDERFLOOR" | "BIOMASS" | "HEAT_PUMP" | "DISTRICT" | "STORAGE_HEATERS" | "LPG" | "PASSIVE" | "SOLAR_THERMAL" | "OTHER"
@@ -141,16 +141,16 @@ export const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         priceMin: { type: "number" },
         priceMax: { type: "number" },
         listingTier: { type: "string", enum: ["BASIC", "PREMIUM", "FEATURED"] },
-        tenureType: { type: "string", enum: ["FREEHOLD", "LEASEHOLD", "COMMONHOLD"] },
+        tenureTypes: { type: "array", items: { type: "string", enum: ["FREEHOLD", "LEASEHOLD", "COMMONHOLD"] } },
         chain: { type: "boolean", description: "false = chain free / no chain. true = chain present. 'chain free' always means false." },
         sharedOwnership: { type: "boolean" },
         priceType: { type: "string", enum: ["FIXED", "OFFERS_OVER", "GUIDE_PRICE"] },
-        saleAvailabilityStatus: { type: "string", enum: ["AVAILABLE", "UNDER_OFFER", "SOLD"] },
-        furnishedStatus: { type: "string", enum: ["FURNISHED", "UNFURNISHED", "PART_FURNISHED"] },
+        saleAvailabilityStatuses: { type: "array", items: { type: "string", enum: ["AVAILABLE", "UNDER_OFFER", "SOLD"] } },
+        furnishedStatuses: { type: "array", items: { type: "string", enum: ["FURNISHED", "UNFURNISHED", "PART_FURNISHED"] } },
         isBillsIncluded: { type: "boolean" },
         rentalLength: { type: "string", enum: ["SHORT_TERM", "LONG_TERM"] },
         rentFrequency: { type: "string", enum: ["WEEKLY", "MONTHLY"] },
-        rentalAvailabilityStatus: { type: "string", enum: ["AVAILABLE", "LET_AGREED", "LET"] },
+        rentalAvailabilityStatuses: { type: "array", items: { type: "string", enum: ["AVAILABLE", "LET_AGREED", "LET"] } },
         depositMax: { type: "number" },
         holdingDepositMax: { type: "number" },
         numberBedroomsExact: { type: "number" },

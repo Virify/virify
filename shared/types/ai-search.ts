@@ -57,18 +57,18 @@ export interface SearchParameters {
   listingTier?: ListingTier;
 
   // Sale listing
-  tenureType?: TenureType;
+  tenureTypes?: TenureType[];
   chain?: boolean;
   sharedOwnership?: boolean;
   priceType?: SalePriceType;
-  saleAvailabilityStatus?: SaleAvailabilityStatus;
+  saleAvailabilityStatuses?: SaleAvailabilityStatus[];
 
   // Rental listing
-  furnishedStatus?: FurnishedStatus;
+  furnishedStatuses?: FurnishedStatus[];
   isBillsIncluded?: boolean;
   rentalLength?: RentalLengthType;
   rentFrequency?: RentalPriceType;
-  rentalAvailabilityStatus?: RentalAvailabilityStatus;
+  rentalAvailabilityStatuses?: RentalAvailabilityStatus[];
   depositMax?: number;
   holdingDepositMax?: number;
 
