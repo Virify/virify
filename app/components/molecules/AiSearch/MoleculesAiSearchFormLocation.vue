@@ -5,8 +5,8 @@
         <legend class="| visually-hidden">Location</legend>
 
         <input ref="$searchInput" type="text" class="m-ai-search-form-location__input | body-md"
-          placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
-          @input="updateAutocompleteValue" @focus="showPopover" />
+          placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery" @focus="showPopover"
+          @input="updateLoctionQuery" />
 
         <AtomsSelect name="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
@@ -16,7 +16,7 @@
       <client-only>
         <Transition name="m-ai-search-form-location">
           <div role="presentation" class="m-ai-search-form-location__popover" v-show="popoverExpanded">
-            <MoleculesAutocompletePopover :search-value="autocompleteValue"
+            <MoleculesAutocompletePopover :search-value="locationQueryLocal"
               @location-selected="handleLocationSelected" />
           </div>
         </Transition>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { onClickOutside, useDebounceFn } from "@vueuse/core";
+import { onClickOutside } from "@vueuse/core";
 
 /**
  *  Emits
@@ -40,44 +40,25 @@ const emit = defineEmits(['location-selected'])
 /**
  *  Set autocomplete value
  */
-const autocompleteValue = ref('')
-
-const getAutocomplete = useDebounceFn((value: string) => {
-  autocompleteValue.value = value
-}, 200)
-
-function updateAutocompleteValue({ target }: Event) {
-  const { value } = asObject(target)
-
-  showPopover()
-  getAutocomplete(value as string)
-}
+const locationQuery = useState<string>('location-name', () => '')
 
 /**
- *  Global and input state
+ *  Store a local copy of locationQuery - this prevents the
+ *  autocomplete watcher firing multiple times if the component
+ *  appears multiple times on the page
  */
-const { searchState } = useSearchState()
+const locationQueryLocal = shallowRef('')
 
-// Local input value - synced with global state but editable
-const locationQueryLocal = ref('')
+function updateLoctionQuery({ target }: InputEvent) {
+  locationQueryLocal.value = (target as HTMLInputElement)?.value
 
-// Sync from global state when location changes
-watch(() => searchState.value?.location, (location) => {
-  if (location) {
-    locationQueryLocal.value = location.place_name_en || location.place_name || ''
-  }
-}, { immediate: true })
-
-// Expose as locationQuery for template
-const locationQuery = computed({
-  get: () => locationQueryLocal.value,
-  set: (value: string) => { locationQueryLocal.value = value }
-})
+  showPopover()
+}
 
 /**
  *  Handle autocomplete events
  */
-const { setLocation, setLocationRadius } = useSearchState()
+const { searchState, setLocation, setLocationRadius } = useSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
 async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
@@ -87,11 +68,15 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
   const enhancedLocation = await enhanceWithBoundaryPolygon(locationUnref)
     .catch(() => locationUnref);
 
-  // Update input immediately with full location name
-  locationQueryLocal.value = enhancedLocation.place_name_en || enhancedLocation.place_name || ''
-
   // Update global state
-  setLocation(enhancedLocation, hidePopover)
+  setLocation(enhancedLocation)
+
+  // Save location, if it has changed
+  const locationString = getLocationAsString(enhancedLocation)
+
+  if (locationString && locationQuery.value !== locationString) {
+    locationQuery.value = locationString
+  }
 
   // Close popover
   hidePopover()
