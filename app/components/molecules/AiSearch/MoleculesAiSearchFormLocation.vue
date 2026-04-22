@@ -58,11 +58,12 @@ function updateLoctionQuery({ target }: InputEvent) {
 /**
  *  Handle autocomplete events
  */
+const { location, setLocation: setLocationNew } = useGlobalSearchState()
 const { searchState, setLocation, setLocationRadius } = useSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
-async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
-  const locationUnref = unref(location)
+async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeature>) {
+  const locationUnref = unref(selectedLocation)
 
   // Get enhanced location, falling back to normal location
   const enhancedLocation = await enhanceWithBoundaryPolygon(locationUnref)
@@ -70,12 +71,11 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
 
   // Update global state
   setLocation(enhancedLocation)
+  setLocationNew(enhancedLocation)
 
-  // Save location, if it has changed
-  const locationString = getLocationAsString(enhancedLocation)
-
-  if (locationString && locationQuery.value !== locationString) {
-    locationQuery.value = locationString
+  // Sync location with useState location
+  if (isString(location.value) && locationQuery.value !== location.value) {
+    locationQuery.value = location.value
   }
 
   // Close popover

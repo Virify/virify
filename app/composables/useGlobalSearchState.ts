@@ -112,8 +112,33 @@ const useGlobalSearchState = createSharedComposable(() => {
     })
   }
 
-  return readonly({
+  /**
+   *  Get location, radius in a human-readable format
+   */
+  const location = computed<string | null>(() => {
+    const { location } = asObject(state.value)
+    const { place_name_en, place_name } = asObject(location)
+
+    if (!isString(place_name_en || place_name)) {
+      return null
+    }
+
+    return (place_name_en || place_name) as string
+  })
+
+  /**
+   *  Get radius
+   */
+  const radius = computed<number>(() => {
+    const { radius } = asObject(state.value)
+
+    return Number(radius) || 0
+  })
+
+  return {
     state,
+    location,
+    radius,
     setType,
     setState,
     setLocation,
@@ -121,7 +146,7 @@ const useGlobalSearchState = createSharedComposable(() => {
     setFormData,
     setSortOrder,
     getFetchBody
-  })
+  }
 })
 
 
