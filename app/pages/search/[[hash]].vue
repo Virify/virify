@@ -39,6 +39,7 @@ const {
   setSortOrder,
   sortSelectOpen,
 } = useSearchState()
+const { state: newSearchState } = useGlobalSearchState()
 
 /**
  * Re-run search on page load if we have search metadata but no results
@@ -61,12 +62,8 @@ onMounted(async () => {
    *  The below code will all be probably deprecated, but leaving for
    *  now until new server side cache is working
    */
-  const {
-    results = [],
-    location,
-    radius,
-    searchType,
-  } = asObject(searchState.value)
+  const { location, radius } = asObject(newSearchState.value)
+  const { results = [], searchType } = asObject(searchState.value)
 
   // If we have results already, nothing to do
   if ((results as unknown[])?.length > 0) return
@@ -154,8 +151,8 @@ const resultsAreCurrentForLocation = computed(() => {
 /**
  *  Handle searches
  */
-const location = computed(() => asObject(searchState.value).location)
-const radius = computed(() => asObject(searchState.value).radius)
+const location = computed(() => asObject(newSearchState.value).location)
+const radius = computed(() => asObject(newSearchState.value).radius)
 const sortBy = computed(() => asObject(searchState.value).sortBy)
 
 watch(sortBy, (newValue) => {

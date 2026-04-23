@@ -25,7 +25,7 @@ function showModalFromElement() {
 /**
  *  Fetch filters
  */
-const { searchState } = useSearchState()
+const { state } = useGlobalSearchState()
 
 /**
  *  Disable filters button if no location is added - to avoid hydration
@@ -33,7 +33,7 @@ const { searchState } = useSearchState()
  *
  */
 const hasLocation = computed(() => {
-  const { location } = asObject(searchState.value)
+  const { location } = asObject(state.value)
 
   return import.meta.client && !!location
 })

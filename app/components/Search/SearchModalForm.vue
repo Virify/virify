@@ -45,6 +45,7 @@ function hideTraditionalFormLoader() {
  *  Fetch filters
  */
 const { setQuery, setListingType, searchState, updateState, setSearchPending } = useSearchState()
+const { state: newSearchState } = useGlobalSearchState()
 const toast = useToast()
 
 const initialQuery = computed(() => {
@@ -57,7 +58,7 @@ const initialQuery = computed(() => {
  *  Traditional search form handler
  */
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location } = asObject(searchState.value)
+  const { location } = asObject(newSearchState.value)
 
   if (!location) {
     return
@@ -95,7 +96,8 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
 async function aiSearchSubmit(query: string) {
   setListingType(props.listingType)
 
-  const { location, radius, listingType } = asObject(searchState.value)
+  const { location, radius } = asObject(newSearchState.value)
+  const { listingType } = asObject(searchState.value)
 
   if (!location) {
     return
@@ -134,7 +136,7 @@ function searchReset() {
  *
  */
 const hasLocation = computed(() => {
-  const { location } = asObject(searchState.value)
+  const { location } = asObject(newSearchState.value)
 
   return import.meta.client && !!location
 })

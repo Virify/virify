@@ -10,7 +10,7 @@
 
         <AtomsSelect name="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
-          v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
+          v-model="radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
 
       <client-only>
@@ -24,8 +24,8 @@
     </div>
 
     <AtomsSelect name="radius" aria-label="Location radius"
-      class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
-      v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
+      class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md" v-model="radius"
+      :options="selectOptionRadius" @change="handleRadiusSelected" />
   </form>
 </template>
 
@@ -59,8 +59,7 @@ function updateLoctionQuery({ target }: InputEvent) {
 /**
  *  Handle autocomplete events
  */
-const { location, setLocation: setLocationNew } = useGlobalSearchState()
-const { searchState, setLocation, setLocationRadius } = useSearchState()
+const { location, radius, setLocation, setRadius } = useGlobalSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
 async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeature>) {
@@ -72,7 +71,6 @@ async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeatur
 
   // Update global state
   setLocation(enhancedLocation)
-  setLocationNew(enhancedLocation)
 
   // Sync location with useState location
   if (isString(location.value) && locationQuery.value !== location.value) {
@@ -92,11 +90,9 @@ async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeatur
 /**
  *  Update radius via state when updated
  */
-async function handleRadiusSelected() {
-  const { radius } = asObject(searchState.value)
-
+async function handleRadiusSelected({ target }: InputEvent) {
   // Update radius for location
-  setLocationRadius(Number(radius) || 0)
+  setRadius((target as HTMLSelectElement)?.value)
 
   // Let DOM refresh before showing modal, so location popover is closed
   await nextTick()

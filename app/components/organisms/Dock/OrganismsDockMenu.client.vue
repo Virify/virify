@@ -23,7 +23,7 @@
       <span class="o-dock-menu__mobile-label | faded-text body-xs">Property</span>
 
       <OrganismsDockInputsFilters class="o-dock-menu__fix-height" :popovertarget="popoverId"
-        :is-expanded="currentlyOpen === 'filters'" @click.prevent="showFiltersDialog" :disabled="!hasLocation">
+        :is-expanded="currentlyOpen === 'filters'" @click.prevent="showFiltersDialog" :disabled="!location">
       </OrganismsDockInputsFilters>
     </li>
   </ul>
@@ -58,13 +58,7 @@ function showFiltersDialog() {
 /**
  *  Check if a location has been added
  */
-const { searchState } = useSearchState()
-
-const hasLocation = computed(() => {
-  const { location } = asObject(searchState.value)
-
-  return (location as Record<string, unknown>)?.place_name_en
-})
+const { location } = useGlobalSearchState()
 
 </script>
 

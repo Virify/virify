@@ -1,15 +1,12 @@
 <template>
   <div class="no-results">
     <!-- Search context pills -->
-    <MoleculesResultsContext 
-      :query-analysis="searchState?.queryAnalysis"
-      :location="searchState?.location"
-      :radius="searchState?.radius"
-    />
+    <MoleculesResultsContext :query-analysis="searchState?.queryAnalysis" :location :radius />
 
     <!-- Big header -->
     <h2 class="no-results__title | title-xl">No results found</h2>
-    <p class="no-results__subtitle | body-md">We couldn't find any properties matching your search. Try one of these instead:</p>
+    <p class="no-results__subtitle | body-md">We couldn't find any properties matching your search. Try one of these
+      instead:</p>
 
     <!-- Suggestion prompts -->
     <ul class="no-results__suggestions">
@@ -31,16 +28,15 @@ const props = defineProps<{
   lastSearchQuery: string;
 }>();
 
+const { location, radius } = useGlobalSearchState()
 const { searchState, setQuery } = useSearchState()
-
-const location = computed(() => searchState.value?.location)
 
 const { suggestedSearches: examplePrompts } = useAiSuggestedSearches();
 
 function searchWithPrompt(prompt: string) {
-  const loc = location.value
-  if (!loc) {
+  if (!location.value) {
     navigateTo('/')
+
     return
   }
 

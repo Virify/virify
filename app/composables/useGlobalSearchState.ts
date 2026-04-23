@@ -61,7 +61,7 @@ const useGlobalSearchState = createSharedComposable(() => {
   /**
    *  Update radius
    */
-  function setRadius(radius: number) {
+  function setRadius(radius: number | string) {
     state.value.radius = Number(radius) || 0
   }
 
