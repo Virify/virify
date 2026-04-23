@@ -6,20 +6,17 @@ model Listing {
   listingStartDate     DateTime?
   listingEndDate       DateTime?
   viewingOptions       String?
-  verificationLevel    VerificationLevel?
+  ownershipVerified    Boolean                @default(false)
   rentalListing        RentalListing?
   saleListing          SaleListing?
   userId               Int?
   propertyId           Int
-  estateAgentId        Int?
   publishedAt          DateTime?
   published            Boolean                @default(false)
   createdAt            DateTime               @default(now())
   updatedAt            DateTime               @updatedAt
   user                 User?                  @relation(fields: [userId], references: [id])
   property             Property?              @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  estateAgent          EstateAgent?           @relation(fields: [estateAgentId], references: [id])
-  agents               Agent[]                @relation("AgentToListing")
   HiddenListing        HiddenListing[]
   UserFavouriteListing UserFavouriteListing[]
   ListingView          ListingView[]
@@ -37,7 +34,6 @@ model Listing {
 
   @@index([userId])
   @@index([propertyId])
-  @@index([estateAgentId])
   @@index([price])
   @@index([publishedAt])
 }
@@ -46,11 +42,4 @@ enum ListingTier {
   BASIC
   PREMIUM
   FEATURED
-}
-
-enum VerificationLevel {
-  UNVERIFIED
-  BASIC
-  VERIFIED
-  FULLY_VERIFIED
 }

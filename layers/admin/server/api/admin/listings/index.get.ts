@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     totalDrafts,
     totalArchived,
     tierBreakdown,
-    verificationBreakdown,
+    ownershipBreakdown,
     priceReductionCount,
     priceReductionAvg,
     totalHidden,
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     }),
 
     prisma.listing.groupBy({
-      by: ["verificationLevel"],
+      by: ["ownershipVerified"],
       where: { published: true, archived: false },
       _count: { id: true },
     }),
@@ -64,8 +64,12 @@ export default defineEventHandler(async (event) => {
 
     // Sale breakdowns
     prisma.saleListing.groupBy({ by: ["tenureType"], _count: { id: true } }),
-    prisma.saleListing.count({ where: { chain: true, listingId: { not: null } } }),
-    prisma.saleListing.count({ where: { sharedOwnership: true, listingId: { not: null } } }),
+    prisma.saleListing.count({
+      where: { chain: true, listingId: { not: null } },
+    }),
+    prisma.saleListing.count({
+      where: { sharedOwnership: true, listingId: { not: null } },
+    }),
     prisma.saleListing.groupBy({
       by: ["availabilityStatus"],
       where: { listingId: { not: null } },
@@ -73,9 +77,17 @@ export default defineEventHandler(async (event) => {
     }),
 
     // Rental breakdowns
-    prisma.rentalListing.groupBy({ by: ["furnishedStatus"], _count: { id: true } }),
-    prisma.rentalListing.count({ where: { isBillsIncluded: true, listingId: { not: null } } }),
-    prisma.rentalListing.groupBy({ by: ["rentalLength"], _count: { id: true } }),
+    prisma.rentalListing.groupBy({
+      by: ["furnishedStatus"],
+      _count: { id: true },
+    }),
+    prisma.rentalListing.count({
+      where: { isBillsIncluded: true, listingId: { not: null } },
+    }),
+    prisma.rentalListing.groupBy({
+      by: ["rentalLength"],
+      _count: { id: true },
+    }),
     prisma.rentalListing.groupBy({
       by: ["availabilityStatus"],
       where: { listingId: { not: null } },
@@ -87,35 +99,59 @@ export default defineEventHandler(async (event) => {
   ]);
 
   // Draft funnel: split by steps completed
-  const abandonedDrafts = allDrafts.filter((d) => d.completedSteps.length === 0).length;
+  const abandonedDrafts = allDrafts.filter(
+    (d) => d.completedSteps.length === 0,
+  ).length;
   const inProgressDrafts = allDrafts.filter(
     (d) => d.completedSteps.length > 0 && d.completedSteps.length < 10,
   ).length;
-  const completedDrafts = allDrafts.filter((d) => d.completedSteps.length >= 10).length;
+  const completedDrafts = allDrafts.filter(
+    (d) => d.completedSteps.length >= 10,
+  ).length;
 
   // Average steps completed
   const avgStepsCompleted =
     allDrafts.length > 0
-      ? allDrafts.reduce((sum, d) => sum + d.completedSteps.length, 0) / allDrafts.length
+      ? allDrafts.reduce((sum, d) => sum + d.completedSteps.length, 0) /
+        allDrafts.length
       : 0;
 
   // Price bracket distribution for published listings
-  const [priceUnder100k, price100to250k, price250to500k, price500to1m, priceOver1m] =
-    await Promise.all([
-      prisma.listing.count({ where: { price: { lt: 100000 }, published: true, archived: false } }),
-      prisma.listing.count({
-        where: { price: { gte: 100000, lt: 250000 }, published: true, archived: false },
-      }),
-      prisma.listing.count({
-        where: { price: { gte: 250000, lt: 500000 }, published: true, archived: false },
-      }),
-      prisma.listing.count({
-        where: { price: { gte: 500000, lt: 1000000 }, published: true, archived: false },
-      }),
-      prisma.listing.count({
-        where: { price: { gte: 1000000 }, published: true, archived: false },
-      }),
-    ]);
+  const [
+    priceUnder100k,
+    price100to250k,
+    price250to500k,
+    price500to1m,
+    priceOver1m,
+  ] = await Promise.all([
+    prisma.listing.count({
+      where: { price: { lt: 100000 }, published: true, archived: false },
+    }),
+    prisma.listing.count({
+      where: {
+        price: { gte: 100000, lt: 250000 },
+        published: true,
+        archived: false,
+      },
+    }),
+    prisma.listing.count({
+      where: {
+        price: { gte: 250000, lt: 500000 },
+        published: true,
+        archived: false,
+      },
+    }),
+    prisma.listing.count({
+      where: {
+        price: { gte: 500000, lt: 1000000 },
+        published: true,
+        archived: false,
+      },
+    }),
+    prisma.listing.count({
+      where: { price: { gte: 1000000 }, published: true, archived: false },
+    }),
+  ]);
 
   return {
     funnel: {
@@ -127,9 +163,12 @@ export default defineEventHandler(async (event) => {
       completedDrafts,
       avgStepsCompleted: Math.round(avgStepsCompleted * 10) / 10,
     },
-    tierBreakdown: tierBreakdown.map((r) => ({ tier: r.listingTier, count: r._count.id })),
-    verificationBreakdown: verificationBreakdown.map((r) => ({
-      level: r.verificationLevel,
+    tierBreakdown: tierBreakdown.map((r) => ({
+      tier: r.listingTier,
+      count: r._count.id,
+    })),
+    ownershipBreakdown: ownershipBreakdown.map((r) => ({
+      verified: r.ownershipVerified,
       count: r._count.id,
     })),
     priceDistribution: [
@@ -146,7 +185,10 @@ export default defineEventHandler(async (event) => {
         : null,
     },
     saleBreakdown: {
-      tenureType: tenureBreakdown.map((r) => ({ type: r.tenureType, count: r._count.id })),
+      tenureType: tenureBreakdown.map((r) => ({
+        type: r.tenureType,
+        count: r._count.id,
+      })),
       chain: chainCount,
       sharedOwnership: sharedOwnershipCount,
       availability: saleAvailability.map((r) => ({
@@ -170,6 +212,9 @@ export default defineEventHandler(async (event) => {
       })),
     },
     hiddenListings: { total: totalHidden },
-    topFavourited: topFavourited.map((r) => ({ listingId: r.listingId, count: r._count.id })),
+    topFavourited: topFavourited.map((r) => ({
+      listingId: r.listingId,
+      count: r._count.id,
+    })),
   };
 });

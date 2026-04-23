@@ -18,7 +18,6 @@ model Address {
   // geolocation fields
   location    Unsupported("geometry")?
   properties  Property[]
-  estateAgent EstateAgent[]
   user        User[]
 
   @@unique([number, street, city, postcode, country])

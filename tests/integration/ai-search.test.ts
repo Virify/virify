@@ -219,8 +219,7 @@ const queriesNocrash: string[] = [
   "Modern flat, 2 beds, concierge, EV charging, great commuter links, under £350k",
 
   // --- NEW FILTERS ---
-  "Show me only verified property listings for sale",
-  "Fully verified listings only, 3 bed house",
+
   "Flat to rent with a holding deposit under £500",
   "House for sale with underfloor heating as a secondary heating source",
   "House for sale with all king size beds",
@@ -266,46 +265,64 @@ const queriesNocrash: string[] = [
 
 // Queries that verify the AI put each field in the correct nesting location.
 // A 200 response with 0 results would NOT catch these — we check generatedWhereClause directly.
-type ClauseCheck = { query: string; expectInClause: (clause: Record<string, unknown>) => void };
+type ClauseCheck = {
+  query: string;
+  expectInClause: (clause: Record<string, unknown>) => void;
+};
 const queriesWithClauseChecks: ClauseCheck[] = [
   // SALE LISTING FIELDS — must be inside saleListing: { is: { ... } }
   {
     query: "Freehold house for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.saleListing?.is?.tenureType, "tenureType must be in saleListing.is").toBe("FREEHOLD"),
+      expect(
+        c.saleListing?.is?.tenureType,
+        "tenureType must be in saleListing.is",
+      ).toBe("FREEHOLD"),
   },
   {
     query: "Leasehold flat for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.saleListing?.is?.tenureType, "tenureType must be in saleListing.is").toBe("LEASEHOLD"),
+      expect(
+        c.saleListing?.is?.tenureType,
+        "tenureType must be in saleListing.is",
+      ).toBe("LEASEHOLD"),
   },
   {
     query: "Chain free house for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.saleListing?.is?.chain, "chain must be in saleListing.is").toBe(false),
+      expect(c.saleListing?.is?.chain, "chain must be in saleListing.is").toBe(
+        false,
+      ),
   },
   {
     query: "Shared ownership flat for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.saleListing?.is?.sharedOwnership, "sharedOwnership must be in saleListing.is").toBe(true),
+      expect(
+        c.saleListing?.is?.sharedOwnership,
+        "sharedOwnership must be in saleListing.is",
+      ).toBe(true),
   },
   {
     query: "House for sale that is under offer",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.saleListing?.is?.availabilityStatus, "availabilityStatus must be in saleListing.is").toBe(
-        "UNDER_OFFER"
-      ),
+      expect(
+        c.saleListing?.is?.availabilityStatus,
+        "availabilityStatus must be in saleListing.is",
+      ).toBe("UNDER_OFFER"),
   },
   {
     query: "House for sale with a fixed price under £350,000",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.saleListing?.is?.priceType, "priceType must be in saleListing.is").toBe("FIXED");
+      expect(
+        c.saleListing?.is?.priceType,
+        "priceType must be in saleListing.is",
+      ).toBe("FIXED");
       const lte = c.price?.lte ?? c.saleListing?.is?.price?.lte;
       expect(lte, "price.lte must be ≤ 350000").toBeLessThanOrEqual(350000);
     },
@@ -314,7 +331,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "House for sale with offers over £200,000",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.saleListing?.is?.priceType, "priceType must be in saleListing.is").toBe("OFFERS_OVER"),
+      expect(
+        c.saleListing?.is?.priceType,
+        "priceType must be in saleListing.is",
+      ).toBe("OFFERS_OVER"),
   },
 
   // RENTAL LISTING FIELDS — must be inside rentalListing: { is: { ... } }
@@ -322,58 +342,83 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Furnished flat for rent",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.furnishedStatus, "furnishedStatus must be in rentalListing.is").toBe("FURNISHED"),
+      expect(
+        c.rentalListing?.is?.furnishedStatus,
+        "furnishedStatus must be in rentalListing.is",
+      ).toBe("FURNISHED"),
   },
   {
     query: "Unfurnished house for rent",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.furnishedStatus, "furnishedStatus must be in rentalListing.is").toBe("UNFURNISHED"),
+      expect(
+        c.rentalListing?.is?.furnishedStatus,
+        "furnishedStatus must be in rentalListing.is",
+      ).toBe("UNFURNISHED"),
   },
   {
     query: "Part furnished flat for rent",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.furnishedStatus, "furnishedStatus must be in rentalListing.is").toBe("PART_FURNISHED"),
+      expect(
+        c.rentalListing?.is?.furnishedStatus,
+        "furnishedStatus must be in rentalListing.is",
+      ).toBe("PART_FURNISHED"),
   },
   {
     query: "House for rent with bills included",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.isBillsIncluded, "isBillsIncluded must be in rentalListing.is").toBe(true),
+      expect(
+        c.rentalListing?.is?.isBillsIncluded,
+        "isBillsIncluded must be in rentalListing.is",
+      ).toBe(true),
   },
   {
     query: "House for rent available short term",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.rentalLength, "rentalLength must be in rentalListing.is").toBe("SHORT_TERM"),
+      expect(
+        c.rentalListing?.is?.rentalLength,
+        "rentalLength must be in rentalListing.is",
+      ).toBe("SHORT_TERM"),
   },
   {
     query: "House for rent available long term",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.rentalLength, "rentalLength must be in rentalListing.is").toBe("LONG_TERM"),
+      expect(
+        c.rentalListing?.is?.rentalLength,
+        "rentalLength must be in rentalListing.is",
+      ).toBe("LONG_TERM"),
   },
   {
     query: "House for rent paid weekly",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.rentFrequency, "rentFrequency must be in rentalListing.is").toBe("WEEKLY"),
+      expect(
+        c.rentalListing?.is?.rentFrequency,
+        "rentFrequency must be in rentalListing.is",
+      ).toBe("WEEKLY"),
   },
   {
     query: "House for rent with let agreed status",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) =>
-      expect(c.rentalListing?.is?.availabilityStatus, "availabilityStatus must be in rentalListing.is").toBe(
-        "LET_AGREED"
-      ),
+      expect(
+        c.rentalListing?.is?.availabilityStatus,
+        "availabilityStatus must be in rentalListing.is",
+      ).toBe("LET_AGREED"),
   },
   {
     query: "Flat for rent with deposit under £2,000",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const lte = c.rentalListing?.is?.deposit?.lte;
-      expect(lte, "deposit.lte must be inside rentalListing.is").toBeLessThanOrEqual(2000);
+      expect(
+        lte,
+        "deposit.lte must be inside rentalListing.is",
+      ).toBeLessThanOrEqual(2000);
     },
   },
 
@@ -382,8 +427,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "House for sale with an open plan kitchen",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.property?.is?.kitchen, "field must be kitchenFeatures, not kitchen").toBeUndefined();
-      expect(c.property?.is?.kitchenFeatures, "kitchenFeatures must exist inside property.is").toBeDefined();
+      expect(
+        c.property?.is?.kitchen,
+        "field must be kitchenFeatures, not kitchen",
+      ).toBeUndefined();
+      expect(
+        c.property?.is?.kitchenFeatures,
+        "kitchenFeatures must exist inside property.is",
+      ).toBeDefined();
     },
   },
 
@@ -392,8 +443,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "2 or 3 bedroom house for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.property?.is?.numberBedrooms?.gte, "numberBedrooms.gte must be 2").toBe(2);
-      expect(c.property?.is?.numberBedrooms?.lte, "numberBedrooms.lte must be 3").toBe(3);
+      expect(
+        c.property?.is?.numberBedrooms?.gte,
+        "numberBedrooms.gte must be 2",
+      ).toBe(2);
+      expect(
+        c.property?.is?.numberBedrooms?.lte,
+        "numberBedrooms.lte must be 3",
+      ).toBe(3);
     },
   },
   {
@@ -402,7 +459,7 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     expectInClause: (c: any) =>
       expect(
         c.property?.is?.numberBedrooms?.gte,
-        "numberBedrooms.gte must be ≥ 4"
+        "numberBedrooms.gte must be ≥ 4",
       ).toBeGreaterThanOrEqual(4),
   },
   {
@@ -411,7 +468,7 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     expectInClause: (c: any) =>
       expect(
         c.property?.is?.numberBedrooms?.lt,
-        "numberBedrooms.lt must be used for 'fewer than'"
+        "numberBedrooms.lt must be used for 'fewer than'",
       ).toBe(3),
   },
 
@@ -420,19 +477,40 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Houses for sale between £200,000 and £400,000",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.price?.gte, "price.gte must be at root level").toBeGreaterThanOrEqual(200000);
-      expect(c.price?.lte, "price.lte must be at root level").toBeLessThanOrEqual(400000);
-      expect(c.saleListing?.is?.price, "price must not be inside saleListing.is").toBeUndefined();
-      expect(c.property?.is?.price, "price must not be inside property.is").toBeUndefined();
+      expect(
+        c.price?.gte,
+        "price.gte must be at root level",
+      ).toBeGreaterThanOrEqual(200000);
+      expect(
+        c.price?.lte,
+        "price.lte must be at root level",
+      ).toBeLessThanOrEqual(400000);
+      expect(
+        c.saleListing?.is?.price,
+        "price must not be inside saleListing.is",
+      ).toBeUndefined();
+      expect(
+        c.property?.is?.price,
+        "price must not be inside property.is",
+      ).toBeUndefined();
     },
   },
   {
     query: "Flat to rent between £800 and £1,200 per month",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.price?.gte, "price.gte must be at root level").toBeGreaterThanOrEqual(800);
-      expect(c.price?.lte, "price.lte must be at root level").toBeLessThanOrEqual(1200);
-      expect(c.rentalListing?.is?.price, "price must not be inside rentalListing.is").toBeUndefined();
+      expect(
+        c.price?.gte,
+        "price.gte must be at root level",
+      ).toBeGreaterThanOrEqual(800);
+      expect(
+        c.price?.lte,
+        "price.lte must be at root level",
+      ).toBeLessThanOrEqual(1200);
+      expect(
+        c.rentalListing?.is?.price,
+        "price must not be inside rentalListing.is",
+      ).toBeUndefined();
     },
   },
 
@@ -443,7 +521,7 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     expectInClause: (c: any) => {
       expect(
         c.property?.is?.parking?.is?.features?.has,
-        "garage must be in property.is.parking.is.features.has"
+        "garage must be in property.is.parking.is.features.has",
       ).toBe("GARAGE");
       expect(c.parking, "parking must not be at root level").toBeUndefined();
     },
@@ -454,7 +532,7 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     expectInClause: (c: any) =>
       expect(
         c.property?.is?.parking?.is?.features?.has,
-        "driveway must be in property.is.parking.is.features.has"
+        "driveway must be in property.is.parking.is.features.has",
       ).toBe("DRIVEWAY"),
   },
 
@@ -464,10 +542,16 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
       expect(amenity?.type, "amenity type must be EDUCATION").toBe("EDUCATION");
       expect(amenity?.subtype, "amenity subtype must be SCHOOL").toBe("SCHOOL");
-      expect(c.amenities, "amenities must not be at root level").toBeUndefined();
+      expect(
+        c.amenities,
+        "amenities must not be at root level",
+      ).toBeUndefined();
     },
   },
   {
@@ -475,10 +559,18 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
       expect(amenity?.type, "amenity type must be TRANSPORT").toBe("TRANSPORT");
-      expect(amenity?.subtype, "amenity subtype must be TRAIN_STATION").toBe("TRAIN_STATION");
-      expect(c.amenities, "amenities must not be at root level").toBeUndefined();
+      expect(amenity?.subtype, "amenity subtype must be TRAIN_STATION").toBe(
+        "TRAIN_STATION",
+      );
+      expect(
+        c.amenities,
+        "amenities must not be at root level",
+      ).toBeUndefined();
     },
   },
   {
@@ -486,10 +578,18 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
       expect(amenity?.type, "amenity type must be TRANSPORT").toBe("TRANSPORT");
-      expect(amenity?.subtype, "amenity subtype must be MOTORWAY_ACCESS").toBe("MOTORWAY_ACCESS");
-      expect(c.amenities, "amenities must not be at root level").toBeUndefined();
+      expect(amenity?.subtype, "amenity subtype must be MOTORWAY_ACCESS").toBe(
+        "MOTORWAY_ACCESS",
+      );
+      expect(
+        c.amenities,
+        "amenities must not be at root level",
+      ).toBeUndefined();
     },
   },
   {
@@ -497,9 +597,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
       expect(amenity?.type, "amenity type must be TRANSPORT").toBe("TRANSPORT");
-      expect(amenity?.subtype, "amenity subtype must be BUS_STOP").toBe("BUS_STOP");
+      expect(amenity?.subtype, "amenity subtype must be BUS_STOP").toBe(
+        "BUS_STOP",
+      );
     },
   },
   {
@@ -507,8 +612,13 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
-      expect(amenity?.type, "amenity type must be GREEN_SPACE").toBe("GREEN_SPACE");
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
+      expect(amenity?.type, "amenity type must be GREEN_SPACE").toBe(
+        "GREEN_SPACE",
+      );
       expect(amenity?.subtype, "amenity subtype must be PARK").toBe("PARK");
     },
   },
@@ -517,9 +627,16 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
-      expect(amenity?.type, "amenity type must be HEALTHCARE").toBe("HEALTHCARE");
-      expect(amenity?.subtype, "amenity subtype must be HOSPITAL").toBe("HOSPITAL");
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
+      expect(amenity?.type, "amenity type must be HEALTHCARE").toBe(
+        "HEALTHCARE",
+      );
+      expect(amenity?.subtype, "amenity subtype must be HOSPITAL").toBe(
+        "HOSPITAL",
+      );
     },
   },
 
@@ -529,7 +646,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const garden = c.property?.is?.outdoorSpace?.is?.garden?.some;
-      expect(garden, "garden must be in property.is.outdoorSpace.is.garden.some").toBeDefined();
+      expect(
+        garden,
+        "garden must be in property.is.outdoorSpace.is.garden.some",
+      ).toBeDefined();
       expect(garden?.facing, "facing must be SOUTH").toBe("SOUTH");
       expect(c.garden, "garden must not be at root level").toBeUndefined();
     },
@@ -539,7 +659,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const garden = c.property?.is?.outdoorSpace?.is?.garden?.some;
-      expect(garden, "garden must be in property.is.outdoorSpace.is.garden.some").toBeDefined();
+      expect(
+        garden,
+        "garden must be in property.is.outdoorSpace.is.garden.some",
+      ).toBeDefined();
       expect(garden?.position, "position must be REAR").toBe("REAR");
     },
   },
@@ -550,11 +673,22 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const epc = c.property?.is?.energyAndUtilities?.is?.epcRating;
-      expect(epc, "epcRating must be in property.is.energyAndUtilities.is").toBeDefined();
-      expect(Array.isArray(epc?.in), "epcRating must use 'in' array — never gte/lte on enums").toBe(true);
-      expect(epc?.in, "C or better must include A, B, C").toEqual(expect.arrayContaining(["A", "B", "C"]));
+      expect(
+        epc,
+        "epcRating must be in property.is.energyAndUtilities.is",
+      ).toBeDefined();
+      expect(
+        Array.isArray(epc?.in),
+        "epcRating must use 'in' array — never gte/lte on enums",
+      ).toBe(true);
+      expect(epc?.in, "C or better must include A, B, C").toEqual(
+        expect.arrayContaining(["A", "B", "C"]),
+      );
       expect(epc?.in?.length, "C or better must have exactly 3 values").toBe(3);
-      expect(c.epcRating, "epcRating must not be at root level").toBeUndefined();
+      expect(
+        c.epcRating,
+        "epcRating must not be at root level",
+      ).toBeUndefined();
     },
   },
   {
@@ -562,9 +696,16 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const epc = c.property?.is?.energyAndUtilities?.is?.epcRating;
-      expect(epc, "epcRating must be in property.is.energyAndUtilities.is").toBeDefined();
-      expect(Array.isArray(epc?.in), "epcRating must use 'in' array").toBe(true);
-      expect(epc?.in, "D or worse must include D, E, F, G").toEqual(expect.arrayContaining(["D", "E", "F", "G"]));
+      expect(
+        epc,
+        "epcRating must be in property.is.energyAndUtilities.is",
+      ).toBeDefined();
+      expect(Array.isArray(epc?.in), "epcRating must use 'in' array").toBe(
+        true,
+      );
+      expect(epc?.in, "D or worse must include D, E, F, G").toEqual(
+        expect.arrayContaining(["D", "E", "F", "G"]),
+      );
       expect(epc?.in?.length, "D or worse must have exactly 4 values").toBe(4);
     },
   },
@@ -574,19 +715,35 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "House for sale with gas central heating",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      const heating = c.property?.is?.energyAndUtilities?.is?.primaryHeatingType;
-      expect(heating, "primaryHeatingType must be in property.is.energyAndUtilities.is").toBeDefined();
-      expect(heating?.has, "gas central heating must use has: GAS_CENTRAL").toBe("GAS_CENTRAL");
-      expect(c.primaryHeatingType, "primaryHeatingType must not be at root level").toBeUndefined();
+      const heating =
+        c.property?.is?.energyAndUtilities?.is?.primaryHeatingType;
+      expect(
+        heating,
+        "primaryHeatingType must be in property.is.energyAndUtilities.is",
+      ).toBeDefined();
+      expect(
+        heating?.has,
+        "gas central heating must use has: GAS_CENTRAL",
+      ).toBe("GAS_CENTRAL");
+      expect(
+        c.primaryHeatingType,
+        "primaryHeatingType must not be at root level",
+      ).toBeUndefined();
     },
   },
   {
     query: "House for sale with underfloor heating",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      const heating = c.property?.is?.energyAndUtilities?.is?.primaryHeatingType;
-      expect(heating, "primaryHeatingType must be in property.is.energyAndUtilities.is").toBeDefined();
-      expect(heating?.has, "underfloor heating must use has: UNDERFLOOR").toBe("UNDERFLOOR");
+      const heating =
+        c.property?.is?.energyAndUtilities?.is?.primaryHeatingType;
+      expect(
+        heating,
+        "primaryHeatingType must be in property.is.energyAndUtilities.is",
+      ).toBeDefined();
+      expect(heating?.has, "underfloor heating must use has: UNDERFLOOR").toBe(
+        "UNDERFLOOR",
+      );
     },
   },
 
@@ -595,9 +752,18 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Furnished 2 bedroom flat to rent",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.rentalListing?.is?.furnishedStatus, "furnishedStatus must be in rentalListing.is").toBe("FURNISHED");
-      expect(c.furnishedStatus, "furnishedStatus must not be at root level").toBeUndefined();
-      expect(c.property?.is?.furnishedStatus, "furnishedStatus must not be inside property.is").toBeUndefined();
+      expect(
+        c.rentalListing?.is?.furnishedStatus,
+        "furnishedStatus must be in rentalListing.is",
+      ).toBe("FURNISHED");
+      expect(
+        c.furnishedStatus,
+        "furnishedStatus must not be at root level",
+      ).toBeUndefined();
+      expect(
+        c.property?.is?.furnishedStatus,
+        "furnishedStatus must not be inside property.is",
+      ).toBeUndefined();
     },
   },
 
@@ -606,9 +772,18 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Flat to rent with bills included",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.rentalListing?.is?.isBillsIncluded, "isBillsIncluded must be in rentalListing.is").toBe(true);
-      expect(c.isBillsIncluded, "isBillsIncluded must not be at root level").toBeUndefined();
-      expect(c.property?.is?.isBillsIncluded, "isBillsIncluded must not be inside property.is").toBeUndefined();
+      expect(
+        c.rentalListing?.is?.isBillsIncluded,
+        "isBillsIncluded must be in rentalListing.is",
+      ).toBe(true);
+      expect(
+        c.isBillsIncluded,
+        "isBillsIncluded must not be at root level",
+      ).toBeUndefined();
+      expect(
+        c.property?.is?.isBillsIncluded,
+        "isBillsIncluded must not be inside property.is",
+      ).toBeUndefined();
     },
   },
 
@@ -617,10 +792,19 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "No chain house for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.saleListing?.is?.chain, "chain=false must be in saleListing.is").toBe(false);
+      expect(
+        c.saleListing?.is?.chain,
+        "chain=false must be in saleListing.is",
+      ).toBe(false);
       expect(c.chain, "chain must not be at root level").toBeUndefined();
-      expect(c.property?.is?.chain, "chain must not be in property.is").toBeUndefined();
-      expect(c.property?.is?.chainFree, "chainFree on property must not be used — use saleListing.is.chain").toBeUndefined();
+      expect(
+        c.property?.is?.chain,
+        "chain must not be in property.is",
+      ).toBeUndefined();
+      expect(
+        c.property?.is?.chainFree,
+        "chainFree on property must not be used — use saleListing.is.chain",
+      ).toBeUndefined();
     },
   },
 
@@ -629,9 +813,18 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Freehold detached house for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.saleListing?.is?.tenureType, "tenureType must be in saleListing.is").toBe("FREEHOLD");
-      expect(c.tenureType, "tenureType must not be at root level").toBeUndefined();
-      expect(c.property?.is?.tenureType, "tenureType must not be inside property.is").toBeUndefined();
+      expect(
+        c.saleListing?.is?.tenureType,
+        "tenureType must be in saleListing.is",
+      ).toBe("FREEHOLD");
+      expect(
+        c.tenureType,
+        "tenureType must not be at root level",
+      ).toBeUndefined();
+      expect(
+        c.property?.is?.tenureType,
+        "tenureType must not be inside property.is",
+      ).toBeUndefined();
     },
   },
 
@@ -640,8 +833,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Detached house for sale",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.property?.is?.type, "type must be in property.is.type").toBeDefined();
-      expect(c.property?.is?.classification?.type, "type must not be nested inside classification").toBeUndefined();
+      expect(
+        c.property?.is?.type,
+        "type must be in property.is.type",
+      ).toBeDefined();
+      expect(
+        c.property?.is?.classification?.type,
+        "type must not be nested inside classification",
+      ).toBeUndefined();
     },
   },
 
@@ -651,7 +850,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const bed = c.property?.is?.bedroomFeatures?.some?.bed;
-      expect(bed, "bed must be in property.is.bedroomFeatures.some.bed").toBeDefined();
+      expect(
+        bed,
+        "bed must be in property.is.bedroomFeatures.some.bed",
+      ).toBeDefined();
       expect(bed?.has, "single bed size must use has: KING").toBe("KING");
       expect(c.bedSizes, "bedSizes must not be at root level").toBeUndefined();
     },
@@ -661,9 +863,13 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const bed = c.property?.is?.bedroomFeatures?.some?.bed;
-      expect(bed, "bed must be in property.is.bedroomFeatures.some.bed").toBeDefined();
+      expect(
+        bed,
+        "bed must be in property.is.bedroomFeatures.some.bed",
+      ).toBeDefined();
       // single value → has, multiple → hasSome
-      const hasDouble = bed?.has === "DOUBLE" || bed?.hasSome?.includes("DOUBLE");
+      const hasDouble =
+        bed?.has === "DOUBLE" || bed?.hasSome?.includes("DOUBLE");
       expect(hasDouble, "DOUBLE must appear in bed filter").toBe(true);
     },
   },
@@ -673,9 +879,16 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "House for sale with a log burner as secondary heating",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      const secondary = c.property?.is?.energyAndUtilities?.is?.secondaryHeatingType;
-      expect(secondary, "secondaryHeatingType must be in property.is.energyAndUtilities.is").toBeDefined();
-      expect(c.secondaryHeatingType, "secondaryHeatingType must not be at root level").toBeUndefined();
+      const secondary =
+        c.property?.is?.energyAndUtilities?.is?.secondaryHeatingType;
+      expect(
+        secondary,
+        "secondaryHeatingType must be in property.is.energyAndUtilities.is",
+      ).toBeDefined();
+      expect(
+        c.secondaryHeatingType,
+        "secondaryHeatingType must not be at root level",
+      ).toBeUndefined();
     },
   },
 
@@ -685,12 +898,16 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const rec = c.property?.is?.reception?.some;
-      expect(rec, "reception must be in property.is.reception.some").toBeDefined();
+      expect(
+        rec,
+        "reception must be in property.is.reception.some",
+      ).toBeDefined();
       // If only 1 type returned it can be a scalar; if 2 types it must be { in: [...] }
       if (rec?.type?.in) {
-        expect(rec.type.in, "multi-type reception must include LIVING_ROOM and DINING_ROOM").toEqual(
-          expect.arrayContaining(["LIVING_ROOM", "DINING_ROOM"])
-        );
+        expect(
+          rec.type.in,
+          "multi-type reception must include LIVING_ROOM and DINING_ROOM",
+        ).toEqual(expect.arrayContaining(["LIVING_ROOM", "DINING_ROOM"]));
       }
     },
   },
@@ -701,18 +918,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const lte = c.rentalListing?.is?.holdingDeposit?.lte;
-      expect(lte, "holdingDeposit.lte must be inside rentalListing.is").toBeLessThanOrEqual(500);
-      expect(c.holdingDeposit, "holdingDeposit must not be at root level").toBeUndefined();
-    },
-  },
-
-  // VERIFICATION LEVEL — must be at root level on the Listing
-  {
-    query: "Verified listings only for sale",
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expectInClause: (c: any) => {
-      expect(c.verificationLevel, "verificationLevel must be at root level").toBe("VERIFIED");
-      expect(c.property?.is?.verificationLevel, "verificationLevel must not be inside property.is").toBeUndefined();
+      expect(
+        lte,
+        "holdingDeposit.lte must be inside rentalListing.is",
+      ).toBeLessThanOrEqual(500);
+      expect(
+        c.holdingDeposit,
+        "holdingDeposit must not be at root level",
+      ).toBeUndefined();
     },
   },
 
@@ -721,16 +934,28 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "Flat to rent available within the next 3 months",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.moveInDate?.lte, "moveInDate.lte must be at root level for availability deadline").toBeDefined();
-      expect(c.property?.is?.moveInDate, "moveInDate must not be inside property.is").toBeUndefined();
+      expect(
+        c.moveInDate?.lte,
+        "moveInDate.lte must be at root level for availability deadline",
+      ).toBeDefined();
+      expect(
+        c.property?.is?.moveInDate,
+        "moveInDate must not be inside property.is",
+      ).toBeUndefined();
     },
   },
   {
     query: "House to rent available from September",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.moveInDate?.gte, "moveInDate.gte must be at root level for available from date").toBeDefined();
-      expect(c.property?.is?.moveInDate, "moveInDate must not be inside property.is").toBeUndefined();
+      expect(
+        c.moveInDate?.gte,
+        "moveInDate.gte must be at root level for available from date",
+      ).toBeDefined();
+      expect(
+        c.property?.is?.moveInDate,
+        "moveInDate must not be inside property.is",
+      ).toBeUndefined();
     },
   },
 
@@ -740,8 +965,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const band = c.property?.is?.runningCosts?.is?.councilTaxBand;
-      expect(band, "councilTaxBand must be in property.is.runningCosts.is").toBe("D");
-      expect(c.councilTaxBand, "councilTaxBand must not be at root level").toBeUndefined();
+      expect(
+        band,
+        "councilTaxBand must be in property.is.runningCosts.is",
+      ).toBe("D");
+      expect(
+        c.councilTaxBand,
+        "councilTaxBand must not be at root level",
+      ).toBeUndefined();
     },
   },
 
@@ -750,7 +981,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     query: "House for sale with at most 2 bathrooms",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
-      expect(c.property?.is?.numberBathrooms?.lte, "numberBathrooms.lte must be ≤ 2").toBeLessThanOrEqual(2);
+      expect(
+        c.property?.is?.numberBathrooms?.lte,
+        "numberBathrooms.lte must be ≤ 2",
+      ).toBeLessThanOrEqual(2);
     },
   },
 
@@ -760,7 +994,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const size = c.property?.is?.bedroomFeatures?.some?.size?.gte;
-      expect(size, "bedroomFeatures.some.size.gte must be set for bedroom size filter").toBeDefined();
+      expect(
+        size,
+        "bedroomFeatures.some.size.gte must be set for bedroom size filter",
+      ).toBeDefined();
       expect(size, "size must be ≥ 15").toBeGreaterThanOrEqual(15);
     },
   },
@@ -771,7 +1008,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const size = c.property?.is?.kitchenFeatures?.some?.size?.gte;
-      expect(size, "kitchenFeatures.some.size.gte must be set for kitchen size filter").toBeDefined();
+      expect(
+        size,
+        "kitchenFeatures.some.size.gte must be set for kitchen size filter",
+      ).toBeDefined();
     },
   },
 
@@ -781,7 +1021,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const size = c.property?.is?.reception?.some?.size?.gte;
-      expect(size, "reception.some.size.gte must be set for reception size filter").toBeDefined();
+      expect(
+        size,
+        "reception.some.size.gte must be set for reception size filter",
+      ).toBeDefined();
     },
   },
 
@@ -791,7 +1034,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const yard = c.property?.is?.outdoorSpace?.is?.yard?.some;
-      expect(yard, "yard must be in property.is.outdoorSpace.is.yard.some").toBeDefined();
+      expect(
+        yard,
+        "yard must be in property.is.outdoorSpace.is.yard.some",
+      ).toBeDefined();
       expect(yard?.facing, "facing must be SOUTH").toBe("SOUTH");
       expect(c.yard, "yard must not be at root level").toBeUndefined();
     },
@@ -803,7 +1049,10 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const size = c.property?.is?.outdoorSpace?.is?.land?.some?.size?.gte;
-      expect(size, "land.some.size.gte must be in property.is.outdoorSpace.is.land.some").toBeDefined();
+      expect(
+        size,
+        "land.some.size.gte must be in property.is.outdoorSpace.is.land.some",
+      ).toBeDefined();
       expect(size, "size must be ≥ 2000").toBeGreaterThanOrEqual(2000);
     },
   },
@@ -814,8 +1063,14 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const room = c.property?.is?.otherRoom?.some;
-      expect(room, "otherRoom must be in property.is.otherRoom.some").toBeDefined();
-      expect(c.otherRoom, "otherRoom must not be at root level").toBeUndefined();
+      expect(
+        room,
+        "otherRoom must be in property.is.otherRoom.some",
+      ).toBeDefined();
+      expect(
+        c.otherRoom,
+        "otherRoom must not be at root level",
+      ).toBeUndefined();
     },
   },
 
@@ -825,8 +1080,13 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
-      expect(amenity?.type, "amenity type must be GREEN_SPACE for trail").toBe("GREEN_SPACE");
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
+      expect(amenity?.type, "amenity type must be GREEN_SPACE for trail").toBe(
+        "GREEN_SPACE",
+      );
       expect(amenity?.subtype, "amenity subtype must be TRAIL").toBe("TRAIL");
     },
   },
@@ -837,9 +1097,18 @@ const queriesWithClauseChecks: ClauseCheck[] = [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expectInClause: (c: any) => {
       const amenity = c.property?.is?.amenities?.some;
-      expect(amenity, "amenities must be inside property.is.amenities.some").toBeDefined();
-      expect(amenity?.distanceM?.lte, "distanceM.lte must be set for amenity distance filter").toBeDefined();
-      expect(amenity?.distanceM?.lte, "distanceM.lte must be ≤ 500").toBeLessThanOrEqual(500);
+      expect(
+        amenity,
+        "amenities must be inside property.is.amenities.some",
+      ).toBeDefined();
+      expect(
+        amenity?.distanceM?.lte,
+        "distanceM.lte must be set for amenity distance filter",
+      ).toBeDefined();
+      expect(
+        amenity?.distanceM?.lte,
+        "distanceM.lte must be ≤ 500",
+      ).toBeLessThanOrEqual(500);
     },
   },
 ];
@@ -862,13 +1131,18 @@ describe.sequential("AI search — RAG query parsing", () => {
 
         const data = await res.json();
 
-        expect(res.ok, `${query} — ${data.message ?? res.statusText}`).toBe(true);
+        expect(res.ok, `${query} — ${data.message ?? res.statusText}`).toBe(
+          true,
+        );
         expect(typeof data.count).toBe("number");
-        expect(data.count, `Expected results but got 0 for: "${query}"`).toBeGreaterThan(0);
+        expect(
+          data.count,
+          `Expected results but got 0 for: "${query}"`,
+        ).toBeGreaterThan(0);
 
         console.log(`  → ${data.count} results (${data.effectiveListingType})`);
       },
-      30_000
+      30_000,
     );
   });
 
@@ -890,15 +1164,20 @@ describe.sequential("AI search — RAG query parsing", () => {
         const data = await res.json();
 
         if (!res.ok) {
-          console.error(`\n  FAILED: "${query}"\n  Status: ${res.status}\n  Error: ${data.message ?? data.statusMessage ?? res.statusText}`);
+          console.error(
+            `\n  FAILED: "${query}"\n  Status: ${res.status}\n  Error: ${data.message ?? data.statusMessage ?? res.statusText}`,
+          );
         }
 
-        expect(res.ok, `${res.status} — ${data.message ?? data.statusMessage ?? res.statusText}`).toBe(true);
+        expect(
+          res.ok,
+          `${res.status} — ${data.message ?? data.statusMessage ?? res.statusText}`,
+        ).toBe(true);
         expect(typeof data.count).toBe("number");
 
         console.log(`  → ${data.count} results (${data.effectiveListingType})`);
       },
-      30_000
+      30_000,
     );
   });
 
@@ -923,17 +1202,22 @@ describe.sequential("AI search — RAG query parsing", () => {
           console.error(
             `\n  FAILED: "${query}"\n  Status: ${res.status}\n  Error: ${
               data.message ?? data.statusMessage ?? res.statusText
-            }`
+            }`,
           );
         }
 
-        expect(res.ok, `${res.status} — ${data.message ?? data.statusMessage ?? res.statusText}`).toBe(true);
+        expect(
+          res.ok,
+          `${res.status} — ${data.message ?? data.statusMessage ?? res.statusText}`,
+        ).toBe(true);
 
-        console.log(`  → generatedWhereClause: ${JSON.stringify(data.generatedWhereClause)}`);
+        console.log(
+          `  → generatedWhereClause: ${JSON.stringify(data.generatedWhereClause)}`,
+        );
 
         expectInClause(data.generatedWhereClause);
       },
-      30_000
+      30_000,
     );
   });
 });

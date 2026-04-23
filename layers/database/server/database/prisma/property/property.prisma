@@ -32,8 +32,6 @@ model Property {
   securityFeatures         Security?
   storageFeatures          Storage?
   user                     User?                  @relation(fields: [userId], references: [id])
-  agents                   Agent[]                @relation("AgentToProperty")
-  estateAgent              EstateAgent?           @relation(fields: [estateAgentId], references: [id])
   type                     PropertyType           @relation(fields: [propertyTypeId], references: [id])
   classification           PropertyClassification @relation(fields: [propertyClassificationId], references: [id])
   createdAt                DateTime               @default(now())

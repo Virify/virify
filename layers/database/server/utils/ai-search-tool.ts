@@ -88,7 +88,7 @@ sharedOwnership: true for shared ownership schemes. "shared ownership" → share
 moveInDateBefore: ISO date string (YYYY-MM-DD). Property available ON OR BEFORE this date. Use for "move in next month", "available by June", "available within 3 months", "available soon". Compute from today's date. "next month" → last day of next month. "within 3 months" → today + 3 months.
 moveInDateAfter: ISO date string (YYYY-MM-DD). Property available FROM this date. Use for "available from September", "available after the summer". Compute from today's date.
 listingTier: "BASIC" | "PREMIUM" | "FEATURED". Only set when explicitly requested. "featured listings" → listingTier:"FEATURED". "premium listings" → listingTier:"PREMIUM".
-verificationLevel: "UNVERIFIED" | "BASIC" | "VERIFIED" | "FULLY_VERIFIED". "verified" → VERIFIED. "fully verified" → FULLY_VERIFIED.
+
 yearBuiltAfter / yearBuiltBefore: 4-digit year (number). "built after 2000" → yearBuiltAfter:2000. "Victorian" → yearBuiltBefore:1910. "Edwardian" → yearBuiltAfter:1901, yearBuiltBefore:1910. "1970s" → yearBuiltAfter:1970, yearBuiltBefore:1979. "new build" → use classificationNames instead.
 FLOOR NUMBERING: 0 = Ground Floor, 1 = First Floor, 2 = Second Floor, etc. A "2 storey" or "2 floor" house has totalFloors=2 (ground + first).
 floorLevel: Floor a room is on. "ground floor flat" → floorLevel:0. "first floor flat" → floorLevel:1. "second floor flat" → floorLevel:2.
@@ -125,7 +125,6 @@ sellerUsername: Exact username of the seller. "listings by john.doe" → sellerU
 - Neighbourhood names, street names, postcode sectors — use location context passed separately
 - School catchment areas — no catchment data available`;
 
-
 // ---------------------------------------------------------------------------
 // OpenAI tool definition — JSON Schema for SearchParameters
 // ---------------------------------------------------------------------------
@@ -133,7 +132,8 @@ export const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
   type: "function",
   function: {
     name: "set_search_parameters",
-    description: "Extract all property search parameters from the user's natural language query",
+    description:
+      "Extract all property search parameters from the user's natural language query",
     parameters: {
       type: "object",
       properties: {
@@ -141,16 +141,41 @@ export const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         priceMin: { type: "number" },
         priceMax: { type: "number" },
         listingTier: { type: "string", enum: ["BASIC", "PREMIUM", "FEATURED"] },
-        tenureTypes: { type: "array", items: { type: "string", enum: ["FREEHOLD", "LEASEHOLD", "COMMONHOLD"] } },
-        chain: { type: "boolean", description: "false = chain free / no chain. true = chain present. 'chain free' always means false." },
+        tenureTypes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["FREEHOLD", "LEASEHOLD", "COMMONHOLD"],
+          },
+        },
+        chain: {
+          type: "boolean",
+          description:
+            "false = chain free / no chain. true = chain present. 'chain free' always means false.",
+        },
         sharedOwnership: { type: "boolean" },
-        priceType: { type: "string", enum: ["FIXED", "OFFERS_OVER", "GUIDE_PRICE"] },
-        saleAvailabilityStatuses: { type: "array", items: { type: "string", enum: ["AVAILABLE", "UNDER_OFFER", "SOLD"] } },
-        furnishedStatuses: { type: "array", items: { type: "string", enum: ["FURNISHED", "UNFURNISHED", "PART_FURNISHED"] } },
+        priceType: {
+          type: "string",
+          enum: ["FIXED", "OFFERS_OVER", "GUIDE_PRICE"],
+        },
+        saleAvailabilityStatuses: {
+          type: "array",
+          items: { type: "string", enum: ["AVAILABLE", "UNDER_OFFER", "SOLD"] },
+        },
+        furnishedStatuses: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["FURNISHED", "UNFURNISHED", "PART_FURNISHED"],
+          },
+        },
         isBillsIncluded: { type: "boolean" },
         rentalLength: { type: "string", enum: ["SHORT_TERM", "LONG_TERM"] },
         rentFrequency: { type: "string", enum: ["WEEKLY", "MONTHLY"] },
-        rentalAvailabilityStatuses: { type: "array", items: { type: "string", enum: ["AVAILABLE", "LET_AGREED", "LET"] } },
+        rentalAvailabilityStatuses: {
+          type: "array",
+          items: { type: "string", enum: ["AVAILABLE", "LET_AGREED", "LET"] },
+        },
         depositMax: { type: "number" },
         holdingDepositMax: { type: "number" },
         numberBedroomsExact: { type: "number" },
@@ -166,72 +191,515 @@ export const SEARCH_TOOL: OpenAI.Chat.ChatCompletionTool = {
         sizeMin: { type: "number" },
         yearBuiltAfter: { type: "number", description: "4-digit year" },
         yearBuiltBefore: { type: "number", description: "4-digit year" },
-        totalFloorsMax: { type: "number", description: "Max number of floors in the building (count, not index). '2 storey'/'2 floor' → 2. 'single storey'/'bungalow' → 1. 'low-rise' → 4." },
+        totalFloorsMax: {
+          type: "number",
+          description:
+            "Max number of floors in the building (count, not index). '2 storey'/'2 floor' → 2. 'single storey'/'bungalow' → 1. 'low-rise' → 4.",
+        },
         numberKitchensExact: { type: "number" },
         numberKitchensMin: { type: "number" },
         numberOtherRoomsExact: { type: "number" },
         numberOtherRoomsMin: { type: "number" },
         vacant: { type: "boolean" },
-        constructionType: { type: "string", enum: ["STANDARD", "NON_STANDARD"] },
-        floorLevel: { type: "number", description: "Floor level using 0-based convention: 0=Ground Floor, 1=First Floor, 2=Second Floor, etc. 'ground floor flat' → 0. 'first floor flat' → 1." },
-        propertyTypeName: { type: "string", enum: ["House", "Cottage", "Bungalow", "Flat", "Land", "Farms", "Specialty", "Student Accommodation"] },
-        classificationNames: { type: "array", items: { type: "string", enum: ["Terraced", "Detached", "Semi-detached", "End of Terrace", "Mansion", "Converted", "Studio", "Maisonette", "High-rise", "Within a Complex", "Penthouse", "Residential", "Commercial", "Agricultural", "Development Plot", "Development Potential", "Non-working", "Working", "Small Holding", "Retirement Home", "New Build Home", "Flat", "House", "House-share"] } },
-        parkingFeatures: { type: "array", items: { type: "string", enum: ["GARAGE", "DRIVEWAY", "PERMIT_PARKING", "ON_STREET", "NO_PARKING", "CARPORT", "ALLOCATED_PARKING", "EV_CHARGING"] } },
+        constructionType: {
+          type: "string",
+          enum: ["STANDARD", "NON_STANDARD"],
+        },
+        floorLevel: {
+          type: "number",
+          description:
+            "Floor level using 0-based convention: 0=Ground Floor, 1=First Floor, 2=Second Floor, etc. 'ground floor flat' → 0. 'first floor flat' → 1.",
+        },
+        propertyTypeName: {
+          type: "string",
+          enum: [
+            "House",
+            "Cottage",
+            "Bungalow",
+            "Flat",
+            "Land",
+            "Farms",
+            "Specialty",
+            "Student Accommodation",
+          ],
+        },
+        classificationNames: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "Terraced",
+              "Detached",
+              "Semi-detached",
+              "End of Terrace",
+              "Mansion",
+              "Converted",
+              "Studio",
+              "Maisonette",
+              "High-rise",
+              "Within a Complex",
+              "Penthouse",
+              "Residential",
+              "Commercial",
+              "Agricultural",
+              "Development Plot",
+              "Development Potential",
+              "Non-working",
+              "Working",
+              "Small Holding",
+              "Retirement Home",
+              "New Build Home",
+              "Flat",
+              "House",
+              "House-share",
+            ],
+          },
+        },
+        parkingFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "GARAGE",
+              "DRIVEWAY",
+              "PERMIT_PARKING",
+              "ON_STREET",
+              "NO_PARKING",
+              "CARPORT",
+              "ALLOCATED_PARKING",
+              "EV_CHARGING",
+            ],
+          },
+        },
         hasGarden: { type: "boolean" },
-        gardenFacing: { type: "string", enum: ["NORTH", "EAST", "SOUTH", "WEST"] },
-        gardenPositions: { type: "array", items: { type: "string", enum: ["FRONT", "REAR", "SIDE"] } },
+        gardenFacing: {
+          type: "string",
+          enum: ["NORTH", "EAST", "SOUTH", "WEST"],
+        },
+        gardenPositions: {
+          type: "array",
+          items: { type: "string", enum: ["FRONT", "REAR", "SIDE"] },
+        },
         gardenSizeMin: { type: "number", description: "Min garden size in m²" },
-        outdoorAreaMin: { type: "number", description: "Min total outdoor area in m²" },
+        outdoorAreaMin: {
+          type: "number",
+          description: "Min total outdoor area in m²",
+        },
         landSizeMin: { type: "number", description: "Min land size in m²" },
         landSeparateParcel: { type: "boolean" },
-        outdoorSpaceFeatures: { type: "array", items: { type: "string", enum: ["SUN_TERRACE", "TERRACE", "BALCONY", "PATIO", "SEPARATE_PARCEL", "SHED", "SUMMER_HOUSE", "GARDEN_OFFICE", "POOL"] } },
-        landFeatures: { type: "array", items: { type: "string", enum: ["WOODLAND", "PADDOCK", "STABLES", "TENNIS_COURT", "ORCHARD", "POND", "OUTBUILDING"] } },
+        outdoorSpaceFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "SUN_TERRACE",
+              "TERRACE",
+              "BALCONY",
+              "PATIO",
+              "SEPARATE_PARCEL",
+              "SHED",
+              "SUMMER_HOUSE",
+              "GARDEN_OFFICE",
+              "POOL",
+            ],
+          },
+        },
+        landFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "WOODLAND",
+              "PADDOCK",
+              "STABLES",
+              "TENNIS_COURT",
+              "ORCHARD",
+              "POND",
+              "OUTBUILDING",
+            ],
+          },
+        },
         hasYard: { type: "boolean" },
-        yardFacing: { type: "string", enum: ["NORTH", "EAST", "SOUTH", "WEST"] },
-        yardPositions: { type: "array", items: { type: "string", enum: ["FRONT", "REAR", "SIDE"] } },
+        yardFacing: {
+          type: "string",
+          enum: ["NORTH", "EAST", "SOUTH", "WEST"],
+        },
+        yardPositions: {
+          type: "array",
+          items: { type: "string", enum: ["FRONT", "REAR", "SIDE"] },
+        },
         yardSizeMin: { type: "number", description: "Min yard size in m²" },
-        epcRatings: { type: "array", items: { type: "string", enum: ["A", "B", "C", "D", "E", "F", "G"] } },
-        primaryHeatingTypes: { type: "array", items: { type: "string", enum: ["GAS_CENTRAL", "ELECTRIC", "OIL", "UNDERFLOOR", "BIOMASS", "HEAT_PUMP", "DISTRICT", "STORAGE_HEATERS", "LPG", "PASSIVE", "SOLAR_THERMAL", "OTHER"] } },
-        secondaryHeatingTypes: { type: "array", items: { type: "string", enum: ["GAS_CENTRAL", "ELECTRIC", "OIL", "UNDERFLOOR", "BIOMASS", "HEAT_PUMP", "DISTRICT", "STORAGE_HEATERS", "LPG", "PASSIVE", "SOLAR_THERMAL", "OTHER"] } },
-        boilerType: { type: "string", enum: ["COMBI", "SYSTEM", "CONVENTIONAL", "BACK_BOILER"] },
-        hotWaterSource: { type: "string", enum: ["BOILER", "IMMERSION_HEATER", "SOLAR_THERMAL", "HEAT_PUMP", "OTHER"] },
-        renewables: { type: "array", items: { type: "string", enum: ["SOLAR_PV", "BATTERY_STORAGE", "SMART_METER", "EV_CHARGING"] } },
-        connectedUtilitiesInclude: { type: "array", items: { type: "string", enum: ["GAS", "ELECTRICITY", "WATER", "SEWAGE", "DRAINAGE", "SEPTIC_TANK", "CESSPIT", "RAINWATER_HARVESTING"] } },
-        connectedUtilitiesExclude: { type: "array", items: { type: "string", enum: ["GAS", "ELECTRICITY", "WATER", "SEWAGE", "DRAINAGE", "SEPTIC_TANK", "CESSPIT", "RAINWATER_HARVESTING"] } },
-        broadbandType: { type: "string", enum: ["ADSL", "FTTC", "FTTP", "CABLE", "MOBILE"] },
+        epcRatings: {
+          type: "array",
+          items: { type: "string", enum: ["A", "B", "C", "D", "E", "F", "G"] },
+        },
+        primaryHeatingTypes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "GAS_CENTRAL",
+              "ELECTRIC",
+              "OIL",
+              "UNDERFLOOR",
+              "BIOMASS",
+              "HEAT_PUMP",
+              "DISTRICT",
+              "STORAGE_HEATERS",
+              "LPG",
+              "PASSIVE",
+              "SOLAR_THERMAL",
+              "OTHER",
+            ],
+          },
+        },
+        secondaryHeatingTypes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "GAS_CENTRAL",
+              "ELECTRIC",
+              "OIL",
+              "UNDERFLOOR",
+              "BIOMASS",
+              "HEAT_PUMP",
+              "DISTRICT",
+              "STORAGE_HEATERS",
+              "LPG",
+              "PASSIVE",
+              "SOLAR_THERMAL",
+              "OTHER",
+            ],
+          },
+        },
+        boilerType: {
+          type: "string",
+          enum: ["COMBI", "SYSTEM", "CONVENTIONAL", "BACK_BOILER"],
+        },
+        hotWaterSource: {
+          type: "string",
+          enum: [
+            "BOILER",
+            "IMMERSION_HEATER",
+            "SOLAR_THERMAL",
+            "HEAT_PUMP",
+            "OTHER",
+          ],
+        },
+        renewables: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["SOLAR_PV", "BATTERY_STORAGE", "SMART_METER", "EV_CHARGING"],
+          },
+        },
+        connectedUtilitiesInclude: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "GAS",
+              "ELECTRICITY",
+              "WATER",
+              "SEWAGE",
+              "DRAINAGE",
+              "SEPTIC_TANK",
+              "CESSPIT",
+              "RAINWATER_HARVESTING",
+            ],
+          },
+        },
+        connectedUtilitiesExclude: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "GAS",
+              "ELECTRICITY",
+              "WATER",
+              "SEWAGE",
+              "DRAINAGE",
+              "SEPTIC_TANK",
+              "CESSPIT",
+              "RAINWATER_HARVESTING",
+            ],
+          },
+        },
+        broadbandType: {
+          type: "string",
+          enum: ["ADSL", "FTTC", "FTTP", "CABLE", "MOBILE"],
+        },
         fullFibreAvailable: { type: "boolean" },
         maxDownloadSpeedMin: { type: "number" },
-        securityFeatures: { type: "array", items: { type: "string", enum: ["GATED_COMMUNITY", "CCTV", "ALARM_SYSTEM", "NEIGHBORHOOD_WATCH", "INTERCOM_SYSTEM", "SECURITY", "RECEPTION"] } },
-        storageFeatures: { type: "array", items: { type: "string", enum: ["ATTIC", "BASEMENT", "SEPARATE_DRESSING", "UNDER_STAIRS_STORAGE"] } },
-        accessibilityFeatures: { type: "array", items: { type: "string", enum: ["WHEELCHAIR_FRIENDLY", "STEP_FREE_ACCESS", "WIDE_DOORWAYS", "WET_ROOM", "HANDRAILS", "ELEVATOR", "STAIRS", "ACCESSIBLE_PARKING"] } },
+        securityFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "GATED_COMMUNITY",
+              "CCTV",
+              "ALARM_SYSTEM",
+              "NEIGHBORHOOD_WATCH",
+              "INTERCOM_SYSTEM",
+              "SECURITY",
+              "RECEPTION",
+            ],
+          },
+        },
+        storageFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "ATTIC",
+              "BASEMENT",
+              "SEPARATE_DRESSING",
+              "UNDER_STAIRS_STORAGE",
+            ],
+          },
+        },
+        accessibilityFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "WHEELCHAIR_FRIENDLY",
+              "STEP_FREE_ACCESS",
+              "WIDE_DOORWAYS",
+              "WET_ROOM",
+              "HANDRAILS",
+              "ELEVATOR",
+              "STAIRS",
+              "ACCESSIBLE_PARKING",
+            ],
+          },
+        },
         petFriendly: { type: "boolean" },
-        buildingFeatures: { type: "array", items: { type: "string", enum: ["POOL", "INTERNET", "CONCIERGE", "SHOP", "GYM"] } },
-        bedroomFeatures: { type: "array", items: { type: "string", enum: ["EN_SUITE", "BUILT_IN_STORAGE", "WALK_IN_WARDROBE", "BAY_WINDOW", "BALCONY", "HAS_VIEW", "PATIO_DOORS", "BUILT_IN_DESK"] }, description: "Features tied to a bedroom. Also set this when the user mentions the feature without specifying a room — pair it with receptionFeatures/otherRoomFeatures so the search spans all room types." },
-        bedSizes: { type: "array", items: { type: "string", enum: ["SINGLE", "DOUBLE", "QUEEN", "KING", "SUPER_KING"] } },
-        bedroomSizeMin: { type: "number", description: "Min size of a single bedroom in m²" },
-        bathroomFeatures: { type: "array", items: { type: "string", enum: ["TOILET", "EN_SUITE", "BATHTUB", "WALK_IN_SHOWER"] } },
-        bathroomSizeMin: { type: "number", description: "Min size of a single bathroom in m²" },
-        kitchenFeatures: { type: "array", items: { type: "string", enum: ["MODERN", "OPEN_PLAN", "WHITE_GOODS", "BREAKFAST_BAR", "ISLAND", "UTILITY_ACCESS", "PANTRY"] } },
-        kitchenSizeMin: { type: "number", description: "Min size of a single kitchen in m²" },
-        receptionTypes: { type: "array", items: { type: "string", enum: ["LIVING_ROOM", "FAMILY_ROOM", "DINING_ROOM", "GAMES_ROOM", "HOME_CINEMA"] } },
-        receptionFeatures: { type: "array", items: { type: "string", enum: ["OPEN_PLAN", "OPEN_CONCEPT", "FIREPLACE", "BALCONY", "BAY_WINDOW", "BUILT_IN_SHELVING", "HAS_VIEW", "PATIO_DOORS", "BUILT_IN_STORAGE", "SERVING_HATCH", "BAR_AREA", "SOUND_PROOFING", "ACCOUSTIC_PANELS", "STONE_FLOORING", "HARDWOOD_FLOORING", "BUILT_IN_DESK", "CONSERVATORY"] } },
-        receptionSizeMin: { type: "number", description: "Min size of a single reception room in m²" },
-        otherRoomTypes: { type: "array", items: { type: "string", enum: ["OFFICE", "STUDY", "LIBRARY", "GYM", "WORKSHOP", "POOL_ROOM", "WINE_CELLAR", "SPA", "OTHER"] } },
-        otherRoomFeatures: { type: "array", items: { type: "string", enum: ["OPEN_PLAN", "OPEN_CONCEPT", "FIREPLACE", "BALCONY", "BAY_WINDOW", "BUILT_IN_SHELVING", "HAS_VIEW", "PATIO_DOORS", "BUILT_IN_STORAGE", "SERVING_HATCH", "BAR_AREA", "SOUND_PROOFING", "ACCOUSTIC_PANELS", "STONE_FLOORING", "HARDWOOD_FLOORING", "BUILT_IN_DESK", "CONSERVATORY"] } },
-        otherRoomSizeMin: { type: "number", description: "Min size of a single other room (office, study, gym, etc.) in m²" },
-        utilityFeatures: { type: "array", items: { type: "string", enum: ["STORAGE", "SINK", "PLUMBING"] } },
-        amenityType: { type: "string", enum: ["TRANSPORT", "EDUCATION", "HEALTHCARE", "SHOPPING_ENTERTAINMENT", "GREEN_SPACE"] },
-        amenitySubtype: { type: "string", enum: ["TRAIN_STATION", "BUS_STOP", "MOTORWAY_ACCESS", "SCHOOL", "UNIVERSITY", "HOSPITAL", "MEDICAL_CENTRE", "SHOP", "RESTAURANT", "CINEMA", "GYM", "PARK", "TRAIL", "PLAYGROUND", "OTHER"] },
+        buildingFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["POOL", "INTERNET", "CONCIERGE", "SHOP", "GYM"],
+          },
+        },
+        bedroomFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "EN_SUITE",
+              "BUILT_IN_STORAGE",
+              "WALK_IN_WARDROBE",
+              "BAY_WINDOW",
+              "BALCONY",
+              "HAS_VIEW",
+              "PATIO_DOORS",
+              "BUILT_IN_DESK",
+            ],
+          },
+          description:
+            "Features tied to a bedroom. Also set this when the user mentions the feature without specifying a room — pair it with receptionFeatures/otherRoomFeatures so the search spans all room types.",
+        },
+        bedSizes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["SINGLE", "DOUBLE", "QUEEN", "KING", "SUPER_KING"],
+          },
+        },
+        bedroomSizeMin: {
+          type: "number",
+          description: "Min size of a single bedroom in m²",
+        },
+        bathroomFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: ["TOILET", "EN_SUITE", "BATHTUB", "WALK_IN_SHOWER"],
+          },
+        },
+        bathroomSizeMin: {
+          type: "number",
+          description: "Min size of a single bathroom in m²",
+        },
+        kitchenFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "MODERN",
+              "OPEN_PLAN",
+              "WHITE_GOODS",
+              "BREAKFAST_BAR",
+              "ISLAND",
+              "UTILITY_ACCESS",
+              "PANTRY",
+            ],
+          },
+        },
+        kitchenSizeMin: {
+          type: "number",
+          description: "Min size of a single kitchen in m²",
+        },
+        receptionTypes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "LIVING_ROOM",
+              "FAMILY_ROOM",
+              "DINING_ROOM",
+              "GAMES_ROOM",
+              "HOME_CINEMA",
+            ],
+          },
+        },
+        receptionFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "OPEN_PLAN",
+              "OPEN_CONCEPT",
+              "FIREPLACE",
+              "BALCONY",
+              "BAY_WINDOW",
+              "BUILT_IN_SHELVING",
+              "HAS_VIEW",
+              "PATIO_DOORS",
+              "BUILT_IN_STORAGE",
+              "SERVING_HATCH",
+              "BAR_AREA",
+              "SOUND_PROOFING",
+              "ACCOUSTIC_PANELS",
+              "STONE_FLOORING",
+              "HARDWOOD_FLOORING",
+              "BUILT_IN_DESK",
+              "CONSERVATORY",
+            ],
+          },
+        },
+        receptionSizeMin: {
+          type: "number",
+          description: "Min size of a single reception room in m²",
+        },
+        otherRoomTypes: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "OFFICE",
+              "STUDY",
+              "LIBRARY",
+              "GYM",
+              "WORKSHOP",
+              "POOL_ROOM",
+              "WINE_CELLAR",
+              "SPA",
+              "OTHER",
+            ],
+          },
+        },
+        otherRoomFeatures: {
+          type: "array",
+          items: {
+            type: "string",
+            enum: [
+              "OPEN_PLAN",
+              "OPEN_CONCEPT",
+              "FIREPLACE",
+              "BALCONY",
+              "BAY_WINDOW",
+              "BUILT_IN_SHELVING",
+              "HAS_VIEW",
+              "PATIO_DOORS",
+              "BUILT_IN_STORAGE",
+              "SERVING_HATCH",
+              "BAR_AREA",
+              "SOUND_PROOFING",
+              "ACCOUSTIC_PANELS",
+              "STONE_FLOORING",
+              "HARDWOOD_FLOORING",
+              "BUILT_IN_DESK",
+              "CONSERVATORY",
+            ],
+          },
+        },
+        otherRoomSizeMin: {
+          type: "number",
+          description:
+            "Min size of a single other room (office, study, gym, etc.) in m²",
+        },
+        utilityFeatures: {
+          type: "array",
+          items: { type: "string", enum: ["STORAGE", "SINK", "PLUMBING"] },
+        },
+        amenityType: {
+          type: "string",
+          enum: [
+            "TRANSPORT",
+            "EDUCATION",
+            "HEALTHCARE",
+            "SHOPPING_ENTERTAINMENT",
+            "GREEN_SPACE",
+          ],
+        },
+        amenitySubtype: {
+          type: "string",
+          enum: [
+            "TRAIN_STATION",
+            "BUS_STOP",
+            "MOTORWAY_ACCESS",
+            "SCHOOL",
+            "UNIVERSITY",
+            "HOSPITAL",
+            "MEDICAL_CENTRE",
+            "SHOP",
+            "RESTAURANT",
+            "CINEMA",
+            "GYM",
+            "PARK",
+            "TRAIL",
+            "PLAYGROUND",
+            "OTHER",
+          ],
+        },
         amenityDistanceMax: { type: "number" },
-        councilTaxBand: { type: "string", enum: ["A", "B", "C", "D", "E", "F", "G", "H"] },
+        councilTaxBand: {
+          type: "string",
+          enum: ["A", "B", "C", "D", "E", "F", "G", "H"],
+        },
         serviceChargesMax: { type: "number" },
         groundRentMax: { type: "number" },
-        moveInDateBefore: { type: "string", description: "ISO date (YYYY-MM-DD) — include listings available on or before this date" },
-        moveInDateAfter: { type: "string", description: "ISO date (YYYY-MM-DD) — include listings available from this date" },
-        sellerUsername: { type: "string", description: "Exact username of the seller/owner who listed the property. Only set when the user explicitly references a specific username (e.g. 'listings by john.doe', 'properties from @jane'). Extract only the username handle, not any @ prefix." },
-        verificationLevel: { type: "string", enum: ["UNVERIFIED", "BASIC", "VERIFIED", "FULLY_VERIFIED"] },
-        usedTerms: { type: "array", items: { type: "string" }, description: "REQUIRED. Short human-readable label for every filter you set. One label per distinct concept. Examples: For sale, 3+ bedrooms, Under £400000, Detached house, Chain free, South-facing garden, Pet friendly, EPC C or better, Near a school. Must not be empty if any parameters were set." },
-        ignoredTerms: { type: "array", items: { type: "string" }, description: "Parts of the query you could not map to any filter. Return [] if nothing was ignored." },
+        moveInDateBefore: {
+          type: "string",
+          description:
+            "ISO date (YYYY-MM-DD) — include listings available on or before this date",
+        },
+        moveInDateAfter: {
+          type: "string",
+          description:
+            "ISO date (YYYY-MM-DD) — include listings available from this date",
+        },
+        sellerUsername: {
+          type: "string",
+          description:
+            "Exact username of the seller/owner who listed the property. Only set when the user explicitly references a specific username (e.g. 'listings by john.doe', 'properties from @jane'). Extract only the username handle, not any @ prefix.",
+        },
+
+        usedTerms: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "REQUIRED. Short human-readable label for every filter you set. One label per distinct concept. Examples: For sale, 3+ bedrooms, Under £400000, Detached house, Chain free, South-facing garden, Pet friendly, EPC C or better, Near a school. Must not be empty if any parameters were set.",
+        },
+        ignoredTerms: {
+          type: "array",
+          items: { type: "string" },
+          description:
+            "Parts of the query you could not map to any filter. Return [] if nothing was ignored.",
+        },
       },
       required: ["usedTerms"],
       additionalProperties: false,

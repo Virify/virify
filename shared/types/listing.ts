@@ -1,104 +1,115 @@
-import type { Address, Prisma } from "~~/layers/database/server/database/prisma/generated/client";
-import type { SaleAvailabilityStatus, RentalAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client";
+import type {
+  Address,
+  Prisma,
+} from "~~/layers/database/server/database/prisma/generated/client";
+import type {
+  SaleAvailabilityStatus,
+  RentalAvailabilityStatus,
+} from "~~/layers/database/server/database/prisma/generated/client";
 import type { MapMarker } from "~~/shared/types/map";
 import type { DraftListingWithFullPayload } from "~~/shared/types/draft";
 import type { QueryAnalysis } from "./ai";
 
 export type ListingWithFullProperty = Prisma.ListingGetPayload<{
   include: {
-    rentalListing: true,
-    saleListing: true,
+    rentalListing: true;
+    saleListing: true;
     property: {
       include: {
-        address: true,
-        media: true,
-        type: true,
-        classification: true,
+        address: true;
+        media: true;
+        type: true;
+        classification: true;
         bedroomFeatures: {
           include: {
-            media: true,
-          },
-        },
+            media: true;
+          };
+        };
         bathroomFeatures: {
           include: {
-            media: true,
-          },
-        },
+            media: true;
+          };
+        };
         otherRoom: {
           include: {
-            media: true,
-          },
-        },
-        parking: true,
-        amenities: true,
-        additionalFeatures: true,
-        accessibilityFeatures: true,
+            media: true;
+          };
+        };
+        parking: true;
+        amenities: true;
+        additionalFeatures: true;
+        accessibilityFeatures: true;
         kitchenFeatures: {
           include: {
-            media: true,
-          },
-        },
+            media: true;
+          };
+        };
         reception: {
           include: {
-            media: true,
-          },
-        },
-        utility: true,
+            media: true;
+          };
+        };
+        utility: true;
         outdoorSpace: {
           include: {
             garden: {
               include: {
-                media: true,
-              },
-            },
+                media: true;
+              };
+            };
             yard: {
               include: {
-                media: true,
-              },
-            },
+                media: true;
+              };
+            };
             land: {
               include: {
-                media: true,
-              },
-            },
-            media: true,
-          },
-        },
-        energyAndUtilities: true,
-        securityFeatures: true,
-        storageFeatures: true,
-        runningCosts: true,
-      },
-    },
+                media: true;
+              };
+            };
+            media: true;
+          };
+        };
+        energyAndUtilities: true;
+        securityFeatures: true;
+        storageFeatures: true;
+        runningCosts: true;
+      };
+    };
     user: {
       select: {
-        id: true,
-        username: true,
-        email: true,
-        createdAt: true,
-        avatar: true,
-      },
-    },
+        id: true;
+        username: true;
+        email: true;
+        createdAt: true;
+        avatar: true;
+      };
+    };
     ListingPriceHistory: {
-      orderBy: { createdAt: 'desc'},
+      orderBy: { createdAt: "desc" };
       select: {
-        id: true,
-        oldPrice: true,
-        newPrice: true,
-        changePercent: true,
-        createdAt: true,
-      },
-    },
-  },
+        id: true;
+        oldPrice: true;
+        newPrice: true;
+        changePercent: true;
+        createdAt: true;
+      };
+    };
+  };
 }>;
 
-export type ListingCardData = Omit<ListingWithFullProperty, 'property' | 'user'> & {
-  property: NonNullable<ListingWithFullProperty['property']> & {
+export type ListingCardData = Omit<
+  ListingWithFullProperty,
+  "property" | "user"
+> & {
+  property: NonNullable<ListingWithFullProperty["property"]> & {
     address: Address;
-    type: NonNullable<ListingWithFullProperty['property']>['type'];
-    classification: NonNullable<ListingWithFullProperty['property']>['classification'];
+    type: NonNullable<ListingWithFullProperty["property"]>["type"];
+    classification: NonNullable<
+      ListingWithFullProperty["property"]
+    >["classification"];
   };
-  user: NonNullable<ListingWithFullProperty['user']> & {
+  user: NonNullable<ListingWithFullProperty["user"]> & {
     username: string;
     avatar?: string | null;
   };
@@ -137,7 +148,10 @@ export type ListingSearchOptional = {
   skip?: number | undefined;
 };
 
-export type AvailabilityOptions = SaleAvailabilityStatus | RentalAvailabilityStatus | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];
+export type AvailabilityOptions =
+  | SaleAvailabilityStatus
+  | RentalAvailabilityStatus
+  | (SaleAvailabilityStatus | RentalAvailabilityStatus)[];
 
 /**
  * Listing Card Select Object
@@ -150,8 +164,14 @@ export const listingMinimalFields = {
   id: true,
   price: true,
   ListingPriceHistory: {
-    orderBy: { createdAt: 'desc' as const },
-    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+    orderBy: { createdAt: "desc" as const },
+    select: {
+      id: true,
+      oldPrice: true,
+      newPrice: true,
+      changePercent: true,
+      createdAt: true,
+    },
   },
   rentalListing: { select: { id: true } },
   saleListing: { select: { id: true } },
@@ -161,7 +181,7 @@ export const listingMinimalFields = {
         select: {
           image: true,
         },
-        orderBy: { sortOrder: 'asc' as const },
+        orderBy: { sortOrder: "asc" as const },
         take: 1, // Only need the first image (main image)
       },
       address: {
@@ -192,8 +212,14 @@ export const listingConversationCardFields = {
   id: true,
   price: true,
   ListingPriceHistory: {
-    orderBy: { createdAt: 'desc' as const },
-    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+    orderBy: { createdAt: "desc" as const },
+    select: {
+      id: true,
+      oldPrice: true,
+      newPrice: true,
+      changePercent: true,
+      createdAt: true,
+    },
   },
   rentalListing: { select: { id: true } },
   saleListing: { select: { id: true } },
@@ -204,7 +230,7 @@ export const listingConversationCardFields = {
           image: true,
           metadata: true,
         },
-        orderBy: { sortOrder: 'asc' as const },
+        orderBy: { sortOrder: "asc" as const },
       },
       address: {
         select: {
@@ -235,8 +261,14 @@ export const listingCardFields = {
   rentalListing: true,
   saleListing: true,
   ListingPriceHistory: {
-    orderBy: { createdAt: 'desc' as const },
-    select: { id: true, oldPrice: true, newPrice: true, changePercent: true, createdAt: true },
+    orderBy: { createdAt: "desc" as const },
+    select: {
+      id: true,
+      oldPrice: true,
+      newPrice: true,
+      changePercent: true,
+      createdAt: true,
+    },
   },
   property: {
     select: {
@@ -245,7 +277,7 @@ export const listingCardFields = {
           image: true,
           metadata: true,
         },
-        orderBy: { sortOrder: 'asc' as const },
+        orderBy: { sortOrder: "asc" as const },
       },
       address: {
         select: {
@@ -306,6 +338,7 @@ export const listingCardFields = {
       },
     },
   },
+  ownershipVerified: true,
   createdAt: true,
   updatedAt: true,
   user: {
@@ -364,4 +397,6 @@ export type ListingWithSimilar = {
 /**
  * Union type for editing - either a draft or a live listing
  */
-export type EditableListing = DraftListingWithFullPayload | ListingWithFullProperty;
+export type EditableListing =
+  | DraftListingWithFullPayload
+  | ListingWithFullProperty;

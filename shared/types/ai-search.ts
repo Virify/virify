@@ -35,7 +35,6 @@ import type {
   StorageFeature,
   TenureType,
   UtilityFeature,
-  VerificationLevel,
 } from "~~/layers/database/server/database/prisma/generated/enums";
 
 // ---------------------------------------------------------------------------
@@ -74,10 +73,7 @@ export interface SearchParameters {
 
   // Move-in date
   moveInDateBefore?: string; // ISO date — available on or before
-  moveInDateAfter?: string;  // ISO date — available from
-
-  // Listing
-  verificationLevel?: VerificationLevel;
+  moveInDateAfter?: string; // ISO date — available from
 
   // Property
   numberBedroomsExact?: number;

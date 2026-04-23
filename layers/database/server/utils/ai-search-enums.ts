@@ -35,7 +35,6 @@ import {
   StorageFeature,
   TenureType,
   UtilityFeature,
-  VerificationLevel,
 } from "../database/prisma/generated/client";
 
 // ---------------------------------------------------------------------------
@@ -84,7 +83,7 @@ export const VALID_SCALAR: Record<string, Set<string>> = {
   priceType: new Set(Object.values(SalePriceType)),
   rentalLength: new Set(Object.values(RentalLengthType)),
   rentFrequency: new Set(Object.values(RentalPriceType)),
-  verificationLevel: new Set(Object.values(VerificationLevel)),
+
   listingTier: new Set(Object.values(ListingTier)),
   gardenFacing: new Set(Object.values(GardenFacing)),
   // Amenity enums validated here to prevent invalid Prisma enum crashes
@@ -94,7 +93,10 @@ export const VALID_SCALAR: Record<string, Set<string>> = {
 };
 
 /** Returns `val` only if it is a member of the allowed set for `key`; otherwise `undefined`. */
-export function filterScalar<T extends string>(val: T | undefined, key: keyof typeof VALID_SCALAR): T | undefined {
+export function filterScalar<T extends string>(
+  val: T | undefined,
+  key: keyof typeof VALID_SCALAR,
+): T | undefined {
   if (!val) return undefined;
   return VALID_SCALAR[key].has(val) ? val : undefined;
 }
@@ -103,7 +105,10 @@ export function filterScalar<T extends string>(val: T | undefined, key: keyof ty
  * Filters `arr` to only values present in the allowed set for `key`.
  * Also normalises a scalar string to a single-element array (GPT occasionally returns one).
  */
-export function filterEnum<T extends string>(arr: T[] | string | undefined, key: keyof typeof VALID): T[] | undefined {
+export function filterEnum<T extends string>(
+  arr: T[] | string | undefined,
+  key: keyof typeof VALID,
+): T[] | undefined {
   if (!arr) return undefined;
   // GPT occasionally returns a scalar string instead of an array — normalise it
   const normalised: T[] = Array.isArray(arr) ? arr : [arr as T];
