@@ -12,15 +12,15 @@ import type { ListingCardType } from "#imports";
 /**
  * Event types for analytics tracking
  */
-export type AnalyticsEventType = 
-  | 'view'           // User views a listing detail page
-  | 'impression'     // Listing appears in search results
-  | 'click'          // User clicks listing card in search results  
-  | 'favourite'      // User favourites/unfavourites a listing
-  | 'enquiry'        // User sends an enquiry
-  | 'share'          // User shares a listing
-  | 'search'         // User performs a search
-  | 'mortgage_calc'; // User uses mortgage calculator
+export type AnalyticsEventType =
+  | "view" // User views a listing detail page
+  | "impression" // Listing appears in search results
+  | "click" // User clicks listing card in search results
+  | "favourite" // User favourites/unfavourites a listing
+  | "enquiry" // User sends an enquiry
+  | "share" // User shares a listing
+  | "search" // User performs a search
+  | "mortgage_calc"; // User uses mortgage calculator
 
 /**
  * Base payload for all tracking events
@@ -36,7 +36,12 @@ export interface TrackingBasePayload {
 /**
  * Traffic source types
  */
-export type TrafficSourceType = 'search' | 'direct' | 'social' | 'email' | 'referral';
+export type TrafficSourceType =
+  | "search"
+  | "direct"
+  | "social"
+  | "email"
+  | "referral";
 
 /**
  * Listing event payload (view, click, enquiry, share)
@@ -61,7 +66,7 @@ export interface TrackingImpressionBatchPayload extends TrackingBasePayload {
  */
 export interface TrackingFavouritePayload extends TrackingBasePayload {
   listingId: number | string;
-  action: 'add' | 'remove';
+  action: "add" | "remove";
 }
 
 /**
@@ -87,6 +92,7 @@ export interface TrackingSearchPayload extends TrackingBasePayload {
   };
   radius: number;
   resultCount: number;
+  searchType?: "ai" | "traditional";
   filters?: Record<string, unknown>;
   usedTerms?: string[];
   ignoredTerms?: string[];
@@ -142,7 +148,7 @@ export interface UserAnalyticsSummary {
   activeListings: number;
   listingsWithNotes: number;
   averageViewsPerListing: number;
-  
+
   // Buyer/Searcher Analytics (Your Activity)
   sentEnquiries: number; // Enquiries you sent
   sentEnquiriesWithReplies: number; // Enquiries you sent that got replies
@@ -160,22 +166,22 @@ export interface AnalyticsAggregates {
   totalPageViews?: number;
   uniqueVisitors?: number;
   averageSessionDuration?: number;
-  
-  // Business metrics  
+
+  // Business metrics
   totalListings?: number;
   activeListings?: number;
   totalUsers?: number;
   activeUsers?: number;
-  
+
   // Engagement metrics
   totalSearches?: number;
   totalEnquiries?: number;
   conversionRate?: number;
-  
+
   // Growth metrics
   newUsersThisMonth?: number;
   newListingsThisMonth?: number;
-  
+
   // Add more analytics metrics as needed
 }
 
@@ -217,7 +223,7 @@ export type RecentItem = {
     };
   };
   isFavourite?: boolean;
-}
+};
 
 /**
  * Quick analytics for dashboard homepage (lightweight)
@@ -308,5 +314,5 @@ export interface ComprehensiveAnalytics {
   topListings: ListingAnalytics[];
   trafficSources: TrafficSource[];
   deviceBreakdown: DeviceBreakdown[];
-  period: '7d' | '30d' | '90d';
+  period: "7d" | "30d" | "90d";
 }

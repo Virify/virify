@@ -17,4 +17,5 @@ export type AISearchResponse = {
   totalPages: number;
   currentPage: number;
   totalResults: number;
+  hashKey?: string;
 };

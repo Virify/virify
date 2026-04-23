@@ -1,20 +1,44 @@
 <template>
-  <div class="p-dock" :class="{
-    'p-dock--has-grid': showGrid
-  }">
-    <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap" :class="{
-      '| container': showGrid
-    }">
+  <div
+    class="p-dock"
+    :class="{
+      'p-dock--has-grid': showGrid,
+    }"
+  >
+    <OrganismsPaneSlider
+      @boundary-exceeded="updateViewMode"
+      :left-slot="showGrid"
+      :right-slot="showMap"
+      :class="{
+        '| container': showGrid,
+      }"
+    >
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="isLoading || results.length" :results :is-loading="isLoading" :sort-by="sortBy"
-          @open-popover="handleOpenPopover" />
-        <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
+        <OrganismsResults
+          v-if="isLoading || results.length"
+          :results
+          :is-loading="isLoading"
+          :sort-by="sortBy"
+          @open-popover="handleOpenPopover"
+        />
+        <MoleculesAiSearchNoResults
+          v-else
+          :last-search-query="searchState?.query || 'No previous search'"
+        />
       </template>
 
       <!-- Use v-show to keep map in DOM once initialized, avoiding expensive re-initialization -->
       <template #right>
-        <LazyOrganismsAiSearchMapView v-if="mapHasBeenShown" v-show="showMap" class="p-dock__map" :results
-          :is-searching="isLoading" :has-searched="resultsAreCurrentForLocation" :radius :location />
+        <LazyOrganismsAiSearchMapView
+          v-if="mapHasBeenShown"
+          v-show="showMap"
+          class="p-dock__map"
+          :results
+          :is-searching="isLoading"
+          :has-searched="resultsAreCurrentForLocation"
+          :radius
+          :location
+        />
       </template>
     </OrganismsPaneSlider>
 
@@ -25,36 +49,45 @@
 </template>
 
 <script setup lang="ts">
-import type { SortOrder } from '~/composables/useSearchState'
+import type { SortOrder } from "~/composables/useSearchState";
 
 /**
  * Search Results Page
  * Displays results from either traditional or AI-enhanced search
  * Results are stored in searchState composable
  */
-const {
-  isLoading,
-  searchState,
-  fetchResults,
-  setSortOrder,
-  sortSelectOpen,
-} = useSearchState()
-const { state: newSearchState } = useGlobalSearchState()
+const { isLoading, searchState, fetchResults, setSortOrder, sortSelectOpen } =
+  useSearchState();
+const { state: newSearchState } = useGlobalSearchState();
 
 /**
  * Re-run search on page load if we have search metadata but no results
  * This handles page refreshes and back/forward navigation
  */
 onMounted(async () => {
-  const { state } = useSearchResults()
-  const { params: { hash } } = useRoute()
+  const { state } = useSearchResults();
+  const {
+    params: { hash },
+  } = useRoute();
 
   // Check if a search hash exists; is a string; and is different from
   // the existing search results state
   if (hash && isString(hash) && hash !== state.value.hash) {
-    console.log('Fetch new params', {
-      hash
-    })
+    const { setResults, setResultsHash } = useSearchResults();
+    const { updateState } = useSearchState();
+
+    const response = await $fetch<{ results: ListingCardData[] }>(
+      "/api/search/hash",
+      { method: "POST", body: { hash } },
+    );
+
+    if (response?.results) {
+      setResults(response.results);
+      setResultsHash(hash);
+      updateState({ hasSearched: true });
+    }
+
+    return;
   }
 
   /**
@@ -62,160 +95,177 @@ onMounted(async () => {
    *  The below code will all be probably deprecated, but leaving for
    *  now until new server side cache is working
    */
-  const { location, radius } = asObject(newSearchState.value)
-  const { results = [], searchType } = asObject(searchState.value)
+  const { location, radius } = asObject(newSearchState.value);
+  const { results = [], searchType } = asObject(searchState.value);
 
   // If we have results already, nothing to do
-  if ((results as unknown[])?.length > 0) return
+  if ((results as unknown[])?.length > 0) return;
 
   // Perform traditional search
-  if (searchType === 'traditional') {
-    const { traditionalSearchForm } = asObject(searchState.value)
+  if (searchType === "traditional") {
+    const { traditionalSearchForm } = asObject(searchState.value);
 
-    await fetchResults({
-      location,
-      radius
-    }, {
-      type: 'traditional',
-      body: {
-        ...asObject(traditionalSearchForm)
-      }
-    })
+    await fetchResults(
+      {
+        location,
+        radius,
+      },
+      {
+        type: "traditional",
+        body: {
+          ...asObject(traditionalSearchForm),
+        },
+      },
+    );
   }
 
   // Perform AI search
-  else if (searchType === 'ai') {
-    const { listingType, query } = asObject(searchState.value)
+  else if (searchType === "ai") {
+    const { listingType, query } = asObject(searchState.value);
 
     // Do not search if no query is provided
-    if (!query) return
+    if (!query) return;
 
-    await fetchResults({
-      location,
-      radius,
-    }, {
-      type: 'ai',
-      body: {
-        query,
-        listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
-      }
-    })
+    await fetchResults(
+      {
+        location,
+        radius,
+      },
+      {
+        type: "ai",
+        body: {
+          query,
+          listingType:
+            listingType === "sale"
+              ? "sale"
+              : listingType === "rent"
+                ? "rent"
+                : "all",
+        },
+      },
+    );
   }
-})
+});
 
 /**
  * Reference to the dock component
  */
-const dockRef = ref<{ showPopover: (type: 'location' | 'filters') => void } | null>(null)
+const dockRef = ref<{
+  showPopover: (type: "location" | "filters") => void;
+} | null>(null);
 
 /**
  * Handle opening the dock popover
  */
-function handleOpenPopover(type: 'location' | 'filters' | 'sort') {
-  if (type === 'sort') {
-    sortSelectOpen.value = true
-    return
+function handleOpenPopover(type: "location" | "filters" | "sort") {
+  if (type === "sort") {
+    sortSelectOpen.value = true;
+    return;
   }
 
-  dockRef.value?.showPopover(type)
+  dockRef.value?.showPopover(type);
 }
 
 /**
  *  Update layout
  */
-const { currentView, setCurrentView } = useResultsViewMode()
+const { currentView, setCurrentView } = useResultsViewMode();
 
 function updateViewMode(newView: string) {
-  setCurrentView(newView === 'left' ? 'map' : 'grid')
+  setCurrentView(newView === "left" ? "map" : "grid");
 }
 
 const showGrid = computed(() => {
-  return currentView.value === 'grid' || currentView.value === 'split'
-})
+  return currentView.value === "grid" || currentView.value === "split";
+});
 
 const showMap = computed(() => {
-  return currentView.value === 'map' || currentView.value === 'split'
-})
+  return currentView.value === "map" || currentView.value === "split";
+});
 
 // Track if the map has ever been shown to avoid re-initializing it
-const mapHasBeenShown = ref(false)
-watch(showMap, (value) => {
-  if (value) mapHasBeenShown.value = true
-}, { immediate: true })
+const mapHasBeenShown = ref(false);
+watch(
+  showMap,
+  (value) => {
+    if (value) mapHasBeenShown.value = true;
+  },
+  { immediate: true },
+);
 
 // Track if results are current for the displayed location
 const resultsAreCurrentForLocation = computed(() => {
-  return searchState.value?.hasSearched || false
-})
+  return searchState.value?.hasSearched || false;
+});
 
 /**
  *  Handle searches
  */
-const location = computed(() => asObject(newSearchState.value).location)
-const radius = computed(() => asObject(newSearchState.value).radius)
-const sortBy = computed(() => asObject(searchState.value).sortBy)
+const location = computed(() => asObject(newSearchState.value).location);
+const radius = computed(() => asObject(newSearchState.value).radius);
+const sortBy = computed(() => asObject(searchState.value).sortBy);
 
 watch(sortBy, (newValue) => {
-  setSortOrder(newValue as SortOrder)
-  fetchResults()
-})
+  setSortOrder(newValue as SortOrder);
+  fetchResults();
+});
 
 watch(currentView, (layout) => {
-  if (layout !== 'map') return
-  window.scrollTo({ top: 0, behavior: 'instant' })
-})
+  if (layout !== "map") return;
+  window.scrollTo({ top: 0, behavior: "instant" });
+});
 
 /**
  *  Ensure missing results do not break the map
  */
 const results = computed((): ListingCardData[] => {
-  const { results } = asObject(searchState.value)
-  if (!Array.isArray(results)) return []
+  const { results } = asObject(searchState.value);
+  if (!Array.isArray(results)) return [];
   // Filter out any results with null properties and properly type as ListingCardData
-  return results.filter((r): r is ListingCardData => r.property !== null)
-})
+  return results.filter((r): r is ListingCardData => r.property !== null);
+});
 
 /**
  * SEO Meta
  */
 const locationName = computed(() => {
-  const loc = location.value
-  if (!loc) return 'UK'
-  return loc.place_name_en || loc.place_name || loc.text || 'UK'
-})
+  const loc = location.value;
+  if (!loc) return "UK";
+  return loc.place_name_en || loc.place_name || loc.text || "UK";
+});
 
 const searchQueryText = computed(() => {
-  return searchState.value?.query || 'properties'
-})
+  return searchState.value?.query || "properties";
+});
 
 const seoTitle = computed(() => {
-  return `${searchQueryText.value} in ${locationName.value} | Virify Property Search`
-})
+  return `${searchQueryText.value} in ${locationName.value} | Virify Property Search`;
+});
 
 const seoDescription = computed(() => {
-  const loc = locationName.value
-  const query = searchQueryText.value
-  return `Find ${query} in ${loc}. Search properties for sale and rent with Virify's AI-powered property search. Compare prices, view photos, and find your perfect home.`
-})
+  const loc = locationName.value;
+  const query = searchQueryText.value;
+  return `Find ${query} in ${loc}. Search properties for sale and rent with Virify's AI-powered property search. Compare prices, view photos, and find your perfect home.`;
+});
 
 useHead({
   title: seoTitle,
-})
+});
 
 useSeoMeta({
   description: seoDescription,
-  ogType: 'website',
+  ogType: "website",
   ogTitle: seoTitle,
   ogDescription: seoDescription,
-  ogSiteName: 'Virify',
-  ogImage: '/img/og-search.jpg',
-  ogLocale: 'en_GB',
-  twitterCard: 'summary_large_image',
+  ogSiteName: "Virify",
+  ogImage: "/img/og-search.jpg",
+  ogLocale: "en_GB",
+  twitterCard: "summary_large_image",
   twitterTitle: seoTitle,
   twitterDescription: seoDescription,
-  twitterImage: '/img/og-search.jpg',
-  robots: 'index, follow',
-})
+  twitterImage: "/img/og-search.jpg",
+  robots: "index, follow",
+});
 
 /**
  * Structured data for search results (SEO)
@@ -223,29 +273,33 @@ useSeoMeta({
 useHead({
   script: [
     {
-      type: 'application/ld+json',
-      innerHTML: computed(() => JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'SearchResultsPage',
-        'name': seoTitle.value,
-        'description': seoDescription.value,
-        'mainEntity': {
-          '@type': 'ItemList',
-          'numberOfItems': results.value.length,
-          'itemListElement': results.value.slice(0, 10).map((result: any, index: number) => ({
-            '@type': 'ListItem',
-            'position': index + 1,
-            'item': {
-              '@type': 'RealEstateListing',
-              'name': result.property?.address?.street || 'Property',
-              'url': `https://virify.co.uk/listing/${result.id}`
-            }
-          }))
-        }
-      }))
-    }
-  ]
-})
+      type: "application/ld+json",
+      innerHTML: computed(() =>
+        JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SearchResultsPage",
+          name: seoTitle.value,
+          description: seoDescription.value,
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: results.value.length,
+            itemListElement: results.value
+              .slice(0, 10)
+              .map((result: any, index: number) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                item: {
+                  "@type": "RealEstateListing",
+                  name: result.property?.address?.street || "Property",
+                  url: `https://virify.co.uk/listing/${result.id}`,
+                },
+              })),
+          },
+        }),
+      ),
+    },
+  ],
+});
 </script>
 
 <style lang="scss">

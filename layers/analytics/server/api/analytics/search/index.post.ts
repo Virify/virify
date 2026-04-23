@@ -2,7 +2,8 @@ import * as z from "zod";
 import { trackSearch } from "~~/layers/database/server/utils/analytics";
 
 const trackSearchSchema = z.object({
-  listingType: z.enum(['sale', 'rent', 'all']),
+  searchType: z.enum(["ai", "traditional"]).default("ai"),
+  listingType: z.enum(["sale", "rent", "all"]),
   query: z.string().min(1, "Query is required"),
   radius: z.number().min(0),
   resultCount: z.number().int().min(0),
@@ -31,9 +32,10 @@ export default defineEventHandler(async (event) => {
     const { user } = await getUserSession(event);
 
     // Reconstruct the GeocodingFeature shape expected by the trackSearch utility
-    const { location, usedTerms, ignoredTerms, ...rest } = data;
+    const { location, usedTerms, ignoredTerms, searchType, ...rest } = data;
     await trackSearch({
       ...rest,
+      searchType,
       userId: user?.id,
       usedTerms,
       ignoredTerms,
@@ -43,14 +45,17 @@ export default defineEventHandler(async (event) => {
         place_name: location.placeName,
         text: location.text,
         geometry: {
-          type: 'Point',
+          type: "Point",
           coordinates: [location.lon, location.lat] as [number, number],
         },
-      } as Parameters<typeof trackSearch>[0]['location'],
+      } as Parameters<typeof trackSearch>[0]["location"],
     });
     return { success: true };
   } catch (error) {
-    console.error('[analytics/search] ERROR:', error);
-    return { success: false, error: error instanceof Error ? error.message : String(error) };
+    console.error("[analytics/search] ERROR:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
   }
 });

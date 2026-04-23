@@ -215,6 +215,7 @@ function createSearchState() {
 
         setResults(results as unknown[]);
         trackSearch({
+          searchType: "ai",
           listingType: effectiveListingType ?? listingType,
           query: query as string,
           location: location as GeocodingFeature,
@@ -248,6 +249,7 @@ function createSearchState() {
         setResults(response.results);
 
         trackSearch({
+          searchType: "traditional",
           listingType: formData.isSale ? "sale" : "rent",
           query: buildQueryFromTraditionalFormData(formData),
           location: location as GeocodingFeature,
