@@ -1,4 +1,4 @@
-import type { ListingWithFullProperty } from "./listing";
+import type { ListingCardType } from "./listing";
 
 export type QueryAnalysis = {
   usedTerms: string[];
@@ -6,8 +6,9 @@ export type QueryAnalysis = {
 };
 
 export type AISearchResponse = {
-  results: ListingWithFullProperty[];
+  results: ListingCardType[];
   query: string;
+  effectiveListingType: "sale" | "rent" | "all";
   generatedWhereClause: any;
   queryAnalysis: QueryAnalysis | null;
   locationContext: any;
