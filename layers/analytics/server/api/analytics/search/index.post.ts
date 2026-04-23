@@ -4,7 +4,7 @@ import { trackSearch } from "~~/layers/database/server/utils/analytics";
 const trackSearchSchema = z.object({
   listingType: z.enum(['sale', 'rent', 'all']),
   query: z.string().min(1, "Query is required"),
-  radius: z.number().int().min(0),
+  radius: z.number().min(0),
   resultCount: z.number().int().min(0),
   location: z.object({
     id: z.string(),
