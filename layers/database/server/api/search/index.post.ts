@@ -1,10 +1,12 @@
 import * as z from "zod";
+import { hash } from "ohash";
 
 const searchTypeSchema = z.object({
   type: z.enum(["traditional", "ai"]).default("traditional"),
 });
 
 export default defineEventHandler(async (event) => {
+  const storage = useStorage();
   try {
     const { type } = await readValidatedBody(event, searchTypeSchema.parse);
 
@@ -35,16 +37,48 @@ export default defineEventHandler(async (event) => {
       const params = buildTraditionalParams(body);
       const orderBy = buildListingOrderBy(body.sortBy);
 
-      return fetchTraditionalSearchListings(
+      const results = await fetchTraditionalSearchListings(
         params,
         locationPropertyIds,
         orderBy,
       );
+
+      let hashKey: string | undefined = body.hash;
+
+      if (!body.hash) {
+        const response = {
+          type,
+          params,
+          locationData,
+          orderBy,
+        };
+
+        let hashKey = hash(response);
+        const hashValue = JSON.stringify(response);
+
+        await storage.setItem(`search:${hashKey}`, hashValue);
+        console.log(
+          `Stored search result for hashKey: ${hashKey} ${hashValue}`,
+        );
+      }
+
+      return {
+        results,
+        hashKey,
+      };
     } else {
       checkAiConfiguration();
 
-      const { listingType, query, location, radius, page, limit, sortBy } =
-        await readValidatedBody(event, ragSearchSchema.parse);
+      const {
+        listingType,
+        query,
+        location,
+        radius,
+        page,
+        limit,
+        sortBy,
+        hash,
+      } = await readValidatedBody(event, ragSearchSchema.parse);
 
       const locationData = extractLocationForfiltering(location, radius);
 

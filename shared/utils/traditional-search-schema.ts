@@ -123,4 +123,5 @@ export const traditionalSearchSchema = z.object({
     z.number().min(0).nullable().optional(),
   ),
   sizeUnit: z.enum(["sqmtr", "sqft"]).optional().default("sqmtr"),
+  hash: z.string().optional(),
 });

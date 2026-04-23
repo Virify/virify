@@ -270,14 +270,14 @@ function createSearchState() {
         const queryAnalysis = buildQueryAnalysisFromFormData(formData);
         setQueryAnalysis(queryAnalysis);
         setActiveTerms(queryAnalysis?.usedTerms);
-        setResults(response as unknown[]);
+        setResults(response.results);
 
         trackSearch({
           listingType: formData.isSale ? "sale" : "rent",
           query: buildQueryFromTraditionalFormData(formData),
           location: location as GeocodingFeature,
           radius: radius as number,
-          resultCount: (response as unknown[])?.length ?? 0,
+          resultCount: response.results?.length ?? 0,
           usedTerms: queryAnalysis?.usedTerms ?? [],
           ignoredTerms: [],
         });

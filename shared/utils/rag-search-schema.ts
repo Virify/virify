@@ -33,4 +33,5 @@ export const ragSearchSchema = z.object({
     .enum(["relevance", "price-asc", "price-desc", "date-desc", "date-asc"])
     .optional()
     .default("relevance"),
+  hash: z.string().optional(),
 });
