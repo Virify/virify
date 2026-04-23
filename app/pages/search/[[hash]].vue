@@ -6,8 +6,7 @@
       '| container': showGrid
     }">
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="isLoading || results.length" :results :is-loading="isLoading"
-          :sort-by="sortBy"
+        <OrganismsResults v-if="isLoading || results.length" :results :is-loading="isLoading" :sort-by="sortBy"
           @open-popover="handleOpenPopover" />
         <MoleculesAiSearchNoResults v-else :last-search-query="searchState?.query || 'No previous search'" />
       </template>
@@ -46,6 +45,22 @@ const {
  * This handles page refreshes and back/forward navigation
  */
 onMounted(async () => {
+  const { state } = useSearchResults()
+  const { params: { hash } } = useRoute()
+
+  // Check if a search hash exists; is a string; and is different from
+  // the existing search results state
+  if (hash && isString(hash) && hash !== state.value.hash) {
+    console.log('Fetch new params', {
+      hash
+    })
+  }
+
+  /**
+   *  @TODO
+   *  The below code will all be probably deprecated, but leaving for
+   *  now until new server side cache is working
+   */
   const {
     results = [],
     location,
