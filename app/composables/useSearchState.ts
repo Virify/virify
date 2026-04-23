@@ -71,17 +71,6 @@ function createSearchState() {
   }
 
   /**
-   *  Update state layout
-   */
-  function setLocation(value: GeocodingFeature, callback?: () => void) {
-    // Update state - don't clear results, they'll be cleared when search starts
-    updateState({ location: value });
-
-    // Run optional callback
-    _runCallback(callback);
-  }
-
-  /**
    *  Update state sort order
    */
   function setQuery(value: string, callback?: () => void) {
@@ -104,20 +93,6 @@ function createSearchState() {
 
     // Update state
     updateState({ queryAnalysis: value });
-
-    // Run optional callback
-    _runCallback(callback);
-  }
-
-  /**
-   *  Update state sort order
-   */
-  function setLocationRadius(value: number, callback?: () => void) {
-    // Check value is valid
-    if (!Number.isInteger(value)) return;
-
-    // Update state
-    updateState({ radius: value });
 
     // Run optional callback
     _runCallback(callback);
@@ -314,8 +289,6 @@ function createSearchState() {
     setSortOrder,
     setSearchType,
     setListingType,
-    setLocation,
-    setLocationRadius,
     setSearchPending,
     setQuery,
     setQueryAnalysis,
