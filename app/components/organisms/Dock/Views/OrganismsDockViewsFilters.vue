@@ -28,10 +28,11 @@ const emits = defineEmits(['search-started'])
 /**
  *  Fetch filters
  */
+const { state } = useGlobalSearchState()
 const { searchState, isLoading, fetchResults } = useSearchState()
 
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location, radius } = asObject(searchState.value)
+  const { location, radius } = asObject(state.value)
 
   emits('search-started')
 
@@ -45,7 +46,8 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
 }
 
 async function aiSearchSubmit(query: string) {
-  const { location, radius, listingType } = asObject(searchState.value)
+  const { location, radius } = asObject(state.value)
+  const { listingType } = asObject(searchState.value)
 
   emits('search-started')
 
