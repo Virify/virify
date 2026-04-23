@@ -33,17 +33,7 @@ export const traditionalSearchSchema = z.object({
     })
     .passthrough()
     .optional(),
-  radius: z.number().min(0).max(40).optional(),
-  boundaryPolygon: z
-    .object({
-      type: z.enum(["Polygon", "MultiPolygon"]),
-      coordinates: z.union([
-        z.array(z.array(z.array(z.number()))), // Polygon
-        z.array(z.array(z.array(z.array(z.number())))), // MultiPolygon
-      ]),
-    })
-    .optional(),
-  bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]).optional(),
+  radius: z.number().min(0).max(40),
   rentIncludes: z.object({
     "let-agreed": z.boolean().default(false),
     "short-term-lets": z.boolean().default(false),

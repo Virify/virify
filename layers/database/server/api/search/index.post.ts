@@ -1,5 +1,4 @@
 import * as z from "zod";
-import { AISearchResponse } from "~~/shared/types/ai";
 
 const searchTypeSchema = z.object({
   type: z.enum(["traditional", "ai"]).default("traditional"),
@@ -14,40 +13,28 @@ export default defineEventHandler(async (event) => {
         event,
         traditionalSearchSchema.parse,
       );
-      const lat = body.location?.geometry?.coordinates?.[1];
-      const lon = body.location?.geometry?.coordinates?.[0];
-      const boundaryPolygon = body.location?.boundaryPolygon;
-      const bbox = body.location?.bbox;
+
+      const locationData = extractLocationForfiltering(
+        body.location,
+        body.radius,
+      );
 
       let locationPropertyIds: number[] | null = null;
 
-      if (lat && lon) {
+      if (locationData.lat && locationData.lon) {
         const { propertyIds } = await handleLocationFilter(
-          lat,
-          lon,
-          body.radius,
-          bbox,
-          boundaryPolygon,
+          locationData.lat,
+          locationData.lon,
+          locationData.radius,
+          locationData.bbox,
+          locationData.boundaryPolygon,
         );
         locationPropertyIds = propertyIds;
       }
 
-      const params: TraditionalSearchParams = {
-        isSale: body.isSale,
-        price: body.price,
-        minBedrooms: body.minBedrooms,
-        minBathrooms: body.minBathrooms,
-        maxBathrooms: body.maxBathrooms,
-        additionalFeatures: body.additionalFeatures,
-        propertyTypes: body.propertyTypes,
-        minSize: body.minSize,
-        maxSize: body.maxSize,
-        sizeUnit: body.sizeUnit,
-        saleIncludes: body.saleIncludes,
-        rentIncludes: body.rentIncludes,
-      };
-
+      const params = buildTraditionalParams(body);
       const orderBy = buildListingOrderBy(body.sortBy);
+
       return fetchTraditionalSearchListings(
         params,
         locationPropertyIds,
@@ -59,18 +46,14 @@ export default defineEventHandler(async (event) => {
       const { listingType, query, location, radius, page, limit, sortBy } =
         await readValidatedBody(event, ragSearchSchema.parse);
 
-      // Extract location data from the full location object
-      const lat = location?.geometry?.coordinates?.[1];
-      const lon = location?.geometry?.coordinates?.[0];
-      const boundaryPolygon = location?.boundaryPolygon;
-      const bbox = location?.bbox;
+      const locationData = extractLocationForfiltering(location, radius);
 
       const { propertyIds, locationContext } = await handleLocationFilter(
-        lat,
-        lon,
-        radius,
-        bbox as [number, number, number, number] | undefined,
-        boundaryPolygon,
+        locationData.lat,
+        locationData.lon,
+        locationData.radius,
+        locationData.bbox,
+        locationData.boundaryPolygon,
       );
 
       const { whereClause, queryAnalysis } = await constructPrismaWhereClause(
@@ -87,21 +70,25 @@ export default defineEventHandler(async (event) => {
             ? "rent"
             : "all";
 
+      const baseResponse = {
+        query,
+        effectiveListingType,
+        generatedWhereClause: whereClause,
+        queryAnalysis,
+        locationContext,
+        searchType: "rag_sql" as const,
+      };
+
       // If propertyIds is an empty array, no properties were found, so we can return early.
       if (Array.isArray(propertyIds) && propertyIds.length === 0) {
-        return {
+        return buildAISearchResponse({
+          ...baseResponse,
           results: [],
-          query,
-          effectiveListingType,
-          generatedWhereClause: whereClause,
-          queryAnalysis,
-          locationContext,
           count: 0,
-          searchType: "rag_sql",
           totalPages: 0,
-          currentPage: page,
+          currentPage: 0,
           totalResults: 0,
-        } as AISearchResponse;
+        });
       }
 
       // Fetch listings with or without pagination
@@ -113,19 +100,14 @@ export default defineEventHandler(async (event) => {
 
       const totalCount = listings.length;
 
-      return {
+      return buildAISearchResponse({
+        ...baseResponse,
         results: listings,
-        query,
-        effectiveListingType,
-        generatedWhereClause: whereClause,
-        queryAnalysis,
-        locationContext,
         count: totalCount,
-        searchType: "rag_sql",
-        currentPage: page,
+        currentPage: page!,
         totalPages: shouldPaginate ? Math.ceil(totalCount / limit) : 1,
         totalResults: totalCount,
-      } as AISearchResponse;
+      });
     }
   } catch (error) {
     console.error("Search error:", error);
