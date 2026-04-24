@@ -1,4 +1,7 @@
-import type { ListingType, TrackSearch } from "../database/prisma/generated/client";
+import type {
+  ListingType,
+  TrackSearch,
+} from "../database/prisma/generated/client";
 
 export interface TrackSearchParams {
   listingType: string;
@@ -9,6 +12,7 @@ export interface TrackSearchParams {
   userId?: number;
   usedTerms?: string[];
   ignoredTerms?: string[];
+  searchType?: "ai" | "traditional";
 }
 
 /**
@@ -18,7 +22,9 @@ export interface TrackSearchParams {
  * @param userId - The ID of the user for whom to get analytics aggregates
  * @returns AnalyticsAggregates - An object containing business analytics metrics
  */
-export async function getAnalyticsAggregates(userId: number): Promise<AnalyticsAggregates> {
+export async function getAnalyticsAggregates(
+  userId: number,
+): Promise<AnalyticsAggregates> {
   // TODO: Implement actual analytics queries
   // This should return business intelligence metrics, not user notification counts
 
@@ -117,7 +123,11 @@ export async function getTotalListingViews(userId: number): Promise<number> {
 /**
  * Get views for user's listings in a specific date range
  */
-export async function getListingViewsByDateRange(userId: number, startDate: Date, endDate: Date): Promise<number> {
+export async function getListingViewsByDateRange(
+  userId: number,
+  startDate: Date,
+  endDate: Date,
+): Promise<number> {
   const listingIds = await getUserListingIds(userId);
   if (listingIds.length === 0) return 0;
 
@@ -145,7 +155,9 @@ export async function getActiveListingsCount(userId: number): Promise<number> {
 /**
  * Get total enquiries received on user's listings
  */
-export async function getReceivedEnquiriesCount(userId: number): Promise<number> {
+export async function getReceivedEnquiriesCount(
+  userId: number,
+): Promise<number> {
   return await prisma.conversation.count({
     where: { receiverId: userId },
   });
@@ -167,7 +179,9 @@ export async function getSentEnquiriesCount(userId: number): Promise<number> {
 /**
  * Get sent enquiries that received replies
  */
-export async function getSentEnquiriesWithRepliesCount(userId: number): Promise<number> {
+export async function getSentEnquiriesWithRepliesCount(
+  userId: number,
+): Promise<number> {
   return await prisma.conversation.count({
     where: {
       senderId: userId,
@@ -367,11 +381,14 @@ export async function getUserListingAnalytics(userId: number) {
   // Calculate percentage change
   let percentageChange = 0;
   if (twoMonthsAgoViews > 0) {
-    percentageChange = Math.round(((previousMonthViews - twoMonthsAgoViews) / twoMonthsAgoViews) * 100);
+    percentageChange = Math.round(
+      ((previousMonthViews - twoMonthsAgoViews) / twoMonthsAgoViews) * 100,
+    );
   }
 
   // Calculate average views per listing
-  const averageViewsPerListing = totalListings > 0 ? Math.round(totalViews / totalListings) : 0;
+  const averageViewsPerListing =
+    totalListings > 0 ? Math.round(totalViews / totalListings) : 0;
 
   return {
     // Seller analytics
@@ -401,10 +418,15 @@ export async function getUserListingAnalytics(userId: number) {
  * @param sessionId Optional session ID for tracking unique views
  * @returns The created ListingView record
  */
-export async function recordListingView(listingId: number | string, userId?: number | null, sessionId?: string | null) {
+export async function recordListingView(
+  listingId: number | string,
+  userId?: number | null,
+  sessionId?: string | null,
+) {
   const view = await prisma.listingView.create({
     data: {
-      listingId: typeof listingId === "string" ? parseInt(listingId) : listingId,
+      listingId:
+        typeof listingId === "string" ? parseInt(listingId) : listingId,
       userId,
       sessionId,
     },
@@ -451,7 +473,11 @@ export async function getListingViewsCount(listingIds: number[]) {
  * @param endDate End date for the range
  * @returns The number of views in the given date range
  */
-export async function getListingViewsInDateRange(listingIds: number[], startDate: Date, endDate: Date) {
+export async function getListingViewsInDateRange(
+  listingIds: number[],
+  startDate: Date,
+  endDate: Date,
+) {
   return prisma.listingView.count({
     where: {
       listingId: {
@@ -471,7 +497,10 @@ export async function getListingViewsInDateRange(listingIds: number[], startDate
  * @param limit Maximum number of listings to return
  * @returns Array of recently viewed listings
  */
-export async function getRecentViewedListings(userId: number, limit: number = 6): Promise<RecentlyViewed[]> {
+export async function getRecentViewedListings(
+  userId: number,
+  limit: number = 6,
+): Promise<RecentlyViewed[]> {
   return prisma.listingView.findMany({
     where: {
       userId,
@@ -505,7 +534,13 @@ export async function getViewedListingsPaginated(
     period?: "30" | "60" | "all";
   },
 ): Promise<{ viewedListings: RecentlyViewed[]; total: number }> {
-  const { skip, take, sort = "newest", filter = "all", period = "30" } = options || {};
+  const {
+    skip,
+    take,
+    sort = "newest",
+    filter = "all",
+    period = "30",
+  } = options || {};
 
   const whereClause: any = { userId };
 
@@ -523,13 +558,16 @@ export async function getViewedListingsPaginated(
     whereClause.listing = { rentalListing: { isNot: null } };
   }
 
-  let orderBy: any
+  let orderBy: any;
   if (sort === "listing-newest") {
-    orderBy = { listing: { publishedAt: "desc" } }
+    orderBy = { listing: { publishedAt: "desc" } };
   } else if (sort === "listing-oldest") {
-    orderBy = { listing: { publishedAt: "asc" } }
+    orderBy = { listing: { publishedAt: "asc" } };
   } else {
-    orderBy = sort === "oldest" ? { createdAt: "asc" as const } : { createdAt: "desc" as const }
+    orderBy =
+      sort === "oldest"
+        ? { createdAt: "asc" as const }
+        : { createdAt: "desc" as const };
   }
 
   // Get distinct listing IDs first for accurate total count
@@ -563,8 +601,20 @@ export async function getViewedListingsPaginated(
  * @param params Search tracking parameters
  * @returns The created or updated track record
  */
-export async function trackSearch(params: TrackSearchParams): Promise<TrackSearch> {
-  const { listingType, query, location, radius, resultCount, userId, usedTerms = [], ignoredTerms = [] } = params;
+export async function trackSearch(
+  params: TrackSearchParams,
+): Promise<TrackSearch> {
+  const {
+    listingType,
+    query,
+    location,
+    radius,
+    resultCount,
+    userId,
+    usedTerms = [],
+    ignoredTerms = [],
+    searchType = "ai",
+  } = params;
 
   const listingTypeUpper = listingType.toLocaleUpperCase();
   const locationId = location.id || "";
@@ -608,6 +658,7 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
   // Create new record with count = 1
   return prisma.trackSearch.create({
     data: {
+      searchType,
       listingType: listingTypeUpper as ListingType,
       locationId,
       locationPlaceName,
@@ -630,7 +681,9 @@ export async function trackSearch(params: TrackSearchParams): Promise<TrackSearc
  * @param limit Maximum number of trending searches to return
  * @returns Trending searches sorted by user count
  */
-export async function getTrendingSearches(limit: number = 10): Promise<TrackSearch[]> {
+export async function getTrendingSearches(
+  limit: number = 10,
+): Promise<TrackSearch[]> {
   const searches = await prisma.trackSearch.findMany({
     orderBy: {
       updatedAt: "desc",
@@ -639,7 +692,9 @@ export async function getTrendingSearches(limit: number = 10): Promise<TrackSear
   });
 
   // Sort by number of unique users and take top results
-  return searches.sort((a, b) => b.userIds.length - a.userIds.length).slice(0, limit);
+  return searches
+    .sort((a, b) => b.userIds.length - a.userIds.length)
+    .slice(0, limit);
 }
 
 /**
@@ -648,7 +703,9 @@ export async function getTrendingSearches(limit: number = 10): Promise<TrackSear
  * @param limit Maximum number of unique query strings to return
  * @returns Unique query strings from recent successful searches
  */
-export async function getRecentSearchQueries(limit: number = 6): Promise<string[]> {
+export async function getRecentSearchQueries(
+  limit: number = 6,
+): Promise<{ query: string; searchType: string }[]> {
   const searches = await prisma.trackSearch.findMany({
     where: {
       resultCount: { gt: 0 },
@@ -658,18 +715,19 @@ export async function getRecentSearchQueries(limit: number = 6): Promise<string[
     },
     select: {
       query: true,
+      searchType: true,
     },
     take: limit * 4, // Fetch extra to allow deduplication
   });
 
   const seen = new Set<string>();
-  const unique: string[] = [];
+  const unique: { query: string; searchType: string }[] = [];
 
-  for (const { query } of searches) {
+  for (const { query, searchType } of searches) {
     const normalised = query.trim().toLowerCase();
     if (!seen.has(normalised)) {
       seen.add(normalised);
-      unique.push(query.trim());
+      unique.push({ query: query.trim(), searchType });
     }
     if (unique.length >= limit) break;
   }

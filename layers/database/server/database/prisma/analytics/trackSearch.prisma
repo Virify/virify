@@ -3,6 +3,7 @@
 model TrackSearch {
   id                Int         @id @default(autoincrement())
   locationId        String      @default("") // MapTiler geocoding ID for re-geocoding
+  searchType        String      @default("ai") // "ai" | "traditional"
   listingType       ListingType
   locationPlaceName String
   locationText      String

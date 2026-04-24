@@ -8,20 +8,21 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage();
   const { hash } = await readValidatedBody(event, hashSchema.parse);
 
-  // TODO Fetch from redis using hashKey
-  const hashedSearch = await storage.getItem(`search:${hash}`, { parse: true });
+  const storedBody = await storage.getItem(`search:${hash}`);
 
-  if (!hashedSearch) {
-    return {};
+  if (!storedBody) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Search not found or has expired. Please search again.",
+    });
   }
 
-  /**
-   * Re-post if hash with spread params
-   */
+  // Re-run the original search body exactly as it was submitted.
+  // Pass `hash` so the handler knows not to generate and store a new one.
   const results = await $fetch("/api/search", {
     method: "POST",
     body: {
-      ...(hashedSearch as Object),
+      ...(storedBody as object),
       hash,
     },
   });
