@@ -131,6 +131,13 @@ export default defineNuxtConfig({
       security: { rateLimiter: { tokensPerInterval: 3, interval: 300000, throwError: false } },
     },
   },
+  app: {
+    head: {
+      meta: [
+        { name: "facebook-domain-verification", content: "ulpkdjeqxu1yqezjns7k5jben6eyib" },
+      ],
+    },
+  },
   devtools: { enabled: true },
   vite: {
     // Apparently needed to prevent Vite from hanging on file changes in some environments (e.g. WSL, Docker on Windows) and also will stop concurrent builds from stepping on each other's files
