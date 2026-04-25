@@ -14,12 +14,12 @@
             @location-selected="updateLocation" />
 
           <OrganismsDockViewsFooter class="o-dock__popover-content" :popover-id="popoverId"
-            :currently-open="popover?.type" @open-popover="showPopover" @close-popover="hidePopover" />
+            :currently-open="popover?.type" @open-popover="setPopoverName" @close-popover="hidePopover" />
         </template>
       </div>
     </div>
 
-    <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="showPopover"
+    <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="setPopoverName"
       class="o-dock__menu | elevate-300" />
   </div>
 </template>
@@ -42,17 +42,12 @@ interface Popover {
  */
 const popoverId = useId()
 const popover = shallowRef<null | Popover>(null)
+const { popoverName, setPopoverName } = useDockPopover()
 
 /**
  *  Toggle popovers
  */
 const $popover = useTemplateRef('$popover')
-
-function getValidPopoverType(type: PopoverType): boolean {
-  const validTypes: PopoverType[] = ['filters', 'location']
-
-  return validTypes.includes(type)
-}
 
 function getValidPopoverComponent(type: PopoverType): Component {
   if (type === 'filters') {
@@ -62,37 +57,30 @@ function getValidPopoverComponent(type: PopoverType): Component {
   return OrganismsDockViewsLocation
 }
 
-function showPopover(type: PopoverType) {
-  if (!getValidPopoverType(type)) return
+watch(popoverName, (newName) => {
+  if (!newName) {
+    $popover.value?.hidePopover()
 
-  const component = getValidPopoverComponent(type)
+    return
+  }
 
   popover.value = {
-    type,
-    component
+    type: newName,
+    component: getValidPopoverComponent(newName)
   }
 
   $popover.value?.showPopover()
   $popover.value?.focus()
-}
+})
 
 function hidePopover() {
-  $popover.value?.hidePopover()
+  setPopoverName(null)
 }
-
-/**
- * Expose showPopover to parent components
- */
-defineExpose({
-  showPopover
-})
 
 /**
  *  Close popover when results are updated
  */
-const { state } = useGlobalSearchState()
-const { searchState, fetchResults } = useSearchState()
-const results = computed(() => asObject(searchState.value).results)
+const { results } = useSearchResults()
 
 watch(results, () => {
   hidePopover()
@@ -101,10 +89,10 @@ watch(results, () => {
 /**
  *  Re-search when location is updated
  */
-function updateLocation() {
-  const { location, radius } = asObject(state.value)
+const { fetchResults } = useFetchResults()
 
-  fetchResults({ location, radius })
+function updateLocation() {
+  fetchResults()
   hidePopover()
 }
 

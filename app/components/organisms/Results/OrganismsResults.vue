@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 defineEmits<{
-  'open-popover': [type: 'location' | 'filters' | 'sort']
+  'open-popover': [type: 'location' | 'filters' | 'sort-order']
 }>()
 
 /**

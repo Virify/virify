@@ -57,14 +57,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  'open-popover': [type: 'location' | 'filters' | 'sort']
+  'open-popover': [type: 'location' | 'filters' | 'sort-order']
 }>()
 
 /**
  * Open sort in the dock
  */
 function openSort() {
-  emit('open-popover', 'sort')
+  emit('open-popover', 'sort-order')
 }
 
 /**

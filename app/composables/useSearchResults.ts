@@ -10,7 +10,6 @@ interface QueryAnalysis {
 }
 
 interface SearchResults {
-  pending: boolean,
   usedTerms?: string[],
   ignoredTerms?: string[],
   results: Result[],
@@ -19,7 +18,6 @@ interface SearchResults {
 
 const useSearchResults = createSharedComposable(() => {
   const state = useState<SearchResults>('search-results', () => ({
-    pending: false,
     results: []
   }))
 
@@ -65,20 +63,35 @@ const useSearchResults = createSharedComposable(() => {
   }
 
   /**
-   *  Set pending state
+   *  Expose results, hash, etc.
    */
-  function setPendingState(isPending: boolean) {
-    state.value.pending = !!isPending
-  }
+  const results = computed(() => {
+    return state.value.results
+  })
+
+  const hash = computed(() => {
+    return state.value.hash
+  })
+
+  const usedTerms = computed(() => {
+    return state.value.usedTerms
+  })
+
+  const ignoredTerms = computed(() => {
+    return state.value.ignoredTerms
+  })
 
   /**
    *  Interface
    */
   return {
     state,
+    results,
+    hash,
+    usedTerms,
+    ignoredTerms,
     setResults,
     setQueryAnalysis,
-    setPendingState,
     setResultsHash
   }
 })

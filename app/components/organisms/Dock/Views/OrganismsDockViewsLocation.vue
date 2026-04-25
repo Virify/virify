@@ -1,6 +1,6 @@
 <template>
   <div class="o-dock-views-location | flow">
-    <MoleculesAiSearchLoading v-if="isLoading" />
+    <MoleculesAiSearchLoading v-if="pending" />
 
     <template v-else>
       <h2 class="| title-md">Location</h2>
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-const { isLoading } = useSearchState()
+const { pending } = useFetchResults()
 
 const emits = defineEmits(['location-selected'])
 

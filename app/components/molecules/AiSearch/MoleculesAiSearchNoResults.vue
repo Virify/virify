@@ -1,7 +1,7 @@
 <template>
   <div class="no-results">
     <!-- Search context pills -->
-    <MoleculesResultsContext :query-analysis="searchState?.queryAnalysis" :location :radius />
+    <MoleculesResultsContext :location :radius />
 
     <!-- Big header -->
     <h2 class="no-results__title | title-xl">No results found</h2>
@@ -28,9 +28,7 @@ const props = defineProps<{
   lastSearchQuery: string;
 }>();
 
-const { location, radius } = useGlobalSearchState()
-const { searchState, setQuery } = useSearchState()
-
+const { location, radius, setQuery } = useGlobalSearchState()
 const { suggestedSearches: examplePrompts } = useAiSuggestedSearches();
 
 function searchWithPrompt(prompt: string) {

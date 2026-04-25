@@ -59,7 +59,7 @@ function updateLoctionQuery({ target }: InputEvent) {
 /**
  *  Handle autocomplete events
  */
-const { location, radius, setLocation, setRadius } = useGlobalSearchState()
+const { locationName, radius, setLocation, setRadius } = useGlobalSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
 async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeature>) {
@@ -73,8 +73,8 @@ async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeatur
   setLocation(enhancedLocation)
 
   // Sync location with useState location
-  if (isString(location.value) && locationQuery.value !== location.value) {
-    locationQuery.value = location.value
+  if (isString(locationName.value) && locationQuery.value !== locationName.value) {
+    locationQuery.value = locationName.value
   }
 
   // Close popover
