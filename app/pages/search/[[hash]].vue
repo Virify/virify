@@ -6,8 +6,7 @@
       '| container': showGrid,
     }">
       <template #left v-if="showGrid">
-        <OrganismsResults v-if="pending || resultsValidated.length" :results="resultsValidated" :is-loading="pending"
-          @open-popover="setPopoverName" />
+        <OrganismsResults v-if="pending || resultsValidated.length" :results="resultsValidated" :is-loading="pending" />
 
         <MoleculesAiSearchNoResults v-else :last-search-query="query || 'No previous search'" />
       </template>

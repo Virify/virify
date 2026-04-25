@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  lastSearchQuery: string;
+  lastSearchQuery: string
 }>();
 
 const { location, radius, setQuery } = useGlobalSearchState()

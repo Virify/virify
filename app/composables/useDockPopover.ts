@@ -1,4 +1,4 @@
-type Popover = 'sort-order' | 'filter' | 'location'
+type Popover = 'sort-order' | 'filters' | 'location'
 
 // @TODO convert to ts enum
 const VALID_NAMES = ['filters', 'location', 'sort-order']

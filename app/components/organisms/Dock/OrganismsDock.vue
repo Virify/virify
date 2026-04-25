@@ -14,23 +14,19 @@
             @location-selected="updateLocation" />
 
           <OrganismsDockViewsFooter class="o-dock__popover-content" :popover-id="popoverId"
-            :currently-open="popover?.type" @open-popover="setPopoverName" @close-popover="hidePopover" />
+            :currently-open="popover?.type" />
         </template>
       </div>
     </div>
 
-    <OrganismsDockMenu :popover-id="popoverId" :currently-open="popover?.type" @open-popover="setPopoverName"
-      class="o-dock__menu | elevate-300" />
+    <OrganismsDockMenu :popover-id="popoverId" class="o-dock__menu | elevate-300" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { OrganismsDockViewsLocation, OrganismsDockViewsFilters } from '#components'
 
-export type PopoverType = 'location' | 'filters'
-export type PopoverEmits = {
-  (e: 'open-popover', value: PopoverType): void
-}
+export type PopoverType = 'sort-order' | 'filters' | 'location'
 
 interface Popover {
   type: PopoverType
@@ -58,6 +54,8 @@ function getValidPopoverComponent(type: PopoverType): Component {
 }
 
 watch(popoverName, (newName) => {
+  if (newName === 'sort-order') return
+
   if (!newName) {
     $popover.value?.hidePopover()
 
@@ -74,6 +72,8 @@ watch(popoverName, (newName) => {
 })
 
 function hidePopover() {
+  popover.value = null
+
   setPopoverName(null)
 }
 
@@ -105,7 +105,7 @@ onMounted(() => {
 
     if (newState !== 'closed') return
 
-    popover.value = null
+    hidePopover()
   })
 })
 </script>

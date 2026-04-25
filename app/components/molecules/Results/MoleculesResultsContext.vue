@@ -22,7 +22,7 @@
 
       <li v-if="sortLabel">
         <button type="button" class="m-results-context__button" aria-label="Change sort order"
-          @click.prevent="openSort">
+          @click.prevent="openSortOrder">
           <AtomsIcon icon="search/sort" width="16" height="16" />
 
           <span class="m-results-context__tag">
@@ -56,29 +56,21 @@ const props = withDefaults(defineProps<Props>(), {
   sortBy: 'relevance'
 })
 
-const emit = defineEmits<{
-  'open-popover': [type: 'location' | 'filters' | 'sort-order']
-}>()
-
 /**
  * Open sort in the dock
  */
-function openSort() {
-  emit('open-popover', 'sort-order')
+const { setPopoverName } = useDockPopover()
+
+function openSortOrder() {
+  setPopoverName('sort-order')
 }
 
-/**
- * Open filters in the dock
- */
 function openFilters() {
-  emit('open-popover', 'filters')
+  setPopoverName('filters')
 }
 
-/**
- * Open location in the dock
- */
 function openLocation() {
-  emit('open-popover', 'location')
+  setPopoverName('location')
 }
 
 /**
@@ -92,14 +84,21 @@ const { location, radius, terms } = useActiveSearchTerms()
 const radiusText = computed(() => {
   if (!radius && radius !== 0) return ''
   if (radius === 0) return 'This location only'
+
   return `Within ${radius} Miles`
 })
 
 /**
  * Sort label for display
  */
+const { sortOrder } = useGlobalSearchState()
+
 const sortLabel = computed(() => {
-  return selectOptionSortOrder.find(o => o.value === (props.sortBy || 'relevance'))?.key ?? 'Relevance'
+  const match = selectOptionSortOrder.find(({ value }) => {
+    return value === sortOrder.value
+  })
+
+  return (match || selectOptionSortOrder[0]!).key
 })
 
 </script>

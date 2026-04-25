@@ -45,18 +45,20 @@ import {
 /**
  *  Sort order state
  */
+type Popover = 'sort-order' | 'filters' | 'location' | null
+
 const isExpanded = shallowRef(false)
 const { state } = useGlobalSearchState()
 const { popoverName, setPopoverName } = useDockPopover()
 
-watch(popoverName, (newName: string) => {
+watch(popoverName, (newName: Popover) => {
   if (newName !== 'sort-order') return
 
   isExpanded.value = true
 })
 
-watch(isExpanded, (newState) => {
-  if (newState) return
+watch(isExpanded, (newState: boolean) => {
+  if (newState || popoverName.value !== 'sort-order') return
 
   setPopoverName(null)
 })
