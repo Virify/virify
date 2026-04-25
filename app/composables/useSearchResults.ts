@@ -4,8 +4,15 @@ interface Result {
   [key: string]: unknown
 }
 
+interface QueryAnalysis {
+  usedTerms?: string[],
+  ignoredTerms?: string[],
+}
+
 interface SearchResults {
   pending: boolean,
+  usedTerms?: string[],
+  ignoredTerms?: string[],
   results: Result[],
   hash?: string | null
 }
@@ -43,11 +50,35 @@ const useSearchResults = createSharedComposable(() => {
   }
 
   /**
+   *  Update used and ignored terms
+   */
+  function setQueryAnalysis(queryAnalysis: QueryAnalysis) {
+    const { usedTerms, ignoredTerms } = asObject(queryAnalysis)
+
+    if (isArrayOfStrings(usedTerms)) {
+      state.value.usedTerms = usedTerms
+    }
+
+    if (isArrayOfStrings(ignoredTerms)) {
+      state.value.ignoredTerms = ignoredTerms
+    }
+  }
+
+  /**
+   *  Set pending state
+   */
+  function setPendingState(isPending: boolean) {
+    state.value.pending = !!isPending
+  }
+
+  /**
    *  Interface
    */
   return {
     state,
     setResults,
+    setQueryAnalysis,
+    setPendingState,
     setResultsHash
   }
 })

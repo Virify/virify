@@ -41,6 +41,19 @@ const useGlobalSearchState = createSharedComposable(() => {
   /**
    *  Toggle search type
    */
+  function setQuery(query: string) {
+    if (!isString(query)) {
+      state.value.ai = ''
+
+      return
+    }
+
+    state.value.ai = query
+  }
+
+  /**
+   *  Toggle search type
+   */
   function setType(type: 'ai' | 'traditional') {
     if (type === 'ai') {
       state.value.type = 'ai'
@@ -143,6 +156,7 @@ const useGlobalSearchState = createSharedComposable(() => {
     setState,
     setLocation,
     setRadius,
+    setQuery,
     setFormData,
     setSortOrder,
     getFetchBody
