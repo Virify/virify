@@ -5,16 +5,16 @@ interface Result {
 }
 
 interface SearchResults {
+  pending: boolean,
   results: Result[],
   hash?: string | null
 }
 
 const useSearchResults = createSharedComposable(() => {
-  const state = useState<SearchResults>('search-results', () => {
-    return {
-      results: [] as Result[]
-    }
-  })
+  const state = useState<SearchResults>('search-results', () => ({
+    pending: false,
+    results: []
+  }))
 
   /**
    *  Update results
