@@ -30,7 +30,7 @@
  */
 const { location, radius, query, locationName, } = useGlobalSearchState();
 const { results, hash: currentHash } = useSearchResults()
-const { pending, fetchResults } = useFetchResults()
+const { pending, fetchResults, fetchHash } = useFetchResults()
 
 /**
  * Re-run search on page load if we have search metadata but no results
@@ -44,13 +44,10 @@ onMounted(async () => {
   if (hash && isString(hash) && hash !== currentHash.value) {
     const { setResults, setResultsHash } = useSearchResults();
 
-    const response = await $fetch<{ results: ListingCardData[], hash: string }>(
-      "/api/search/hash",
-      { method: "POST", body: { hash } },
-    );
+    const { results } = await fetchHash(hash);
 
-    setResults(response?.results);
-    setResultsHash(response?.hash);
+    setResults(results);
+    setResultsHash(hash);
 
     return;
   }

@@ -11,22 +11,40 @@ const useFetchResults = createSharedComposable(() => {
   }
 
   /**
-   *  Fetcher
+   *  Fetchers
    */
   const { getFetchBody } = useGlobalSearchState()
 
   async function fetchResults() {
     setPending(true)
 
-    await new Promise((resolve) => {
+    const response = await new Promise((resolve) => {
       console.log('FETCH', getFetchBody())
 
       setTimeout(() => {
         resolve(true)
-      }, 500)
+      }, 2000)
     })
 
     setPending(false)
+
+    return response
+  }
+
+  async function fetchHash(hash: string) {
+    setPending(true)
+
+    const response = await new Promise((resolve) => {
+      console.log('FETCH', { hash })
+
+      setTimeout(() => {
+        resolve(true)
+      }, 2000)
+    })
+
+    setPending(false)
+
+    return response
   }
 
   /**
@@ -35,7 +53,8 @@ const useFetchResults = createSharedComposable(() => {
   return {
     pending,
     setPending,
-    fetchResults
+    fetchResults,
+    fetchHash
   }
 })
 
