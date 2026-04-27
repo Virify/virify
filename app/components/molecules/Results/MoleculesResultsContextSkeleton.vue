@@ -2,7 +2,18 @@
   <div class="m-results-context-skeleton" aria-hidden>
     <div class="m-results-context-skeleton__title | v-skeleton" aria-hidden></div>
     <div class="m-results-context-skeleton__pills" aria-hidden>
-      <div class="m-results-context-skeleton__pill" v-for="_ of 3">
+      <div class="m-results-context-skeleton__pill">
+        <div class="m-results-context-skeleton__pill-img | v-skeleton"></div>
+        <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
+        <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
+      </div>
+
+      <div class="m-results-context-skeleton__pill">
+        <div class="m-results-context-skeleton__pill-img | v-skeleton"></div>
+        <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
+      </div>
+
+      <div class="m-results-context-skeleton__pill">
         <div class="m-results-context-skeleton__pill-img | v-skeleton"></div>
         <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
         <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
