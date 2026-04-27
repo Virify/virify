@@ -2,9 +2,10 @@
   <div class="p-dock" :class="{
     'p-dock--has-grid': showGrid,
   }">
-    <OrganismsPaneSlider @boundary-exceeded="updateViewMode" :left-slot="showGrid" :right-slot="showMap" :class="{
-      '| container': showGrid,
-    }">
+    <OrganismsPaneSlider v-if="isMounted" @boundary-exceeded="updateViewMode" :left-slot="showGrid"
+      :right-slot="showMap" :class="{
+        '| container': showGrid,
+      }">
       <template #left v-if="showGrid">
         <OrganismsResults v-if="pending || resultsValidated.length" :results="resultsValidated" :is-loading="pending" />
 
@@ -18,13 +19,17 @@
       </template>
     </OrganismsPaneSlider>
 
-    <MoleculesAiSearchLoading v-if="pending" class="p-dock__loading" />
+    <MoleculesAiSearchLoading v-if="!isMounted || pending" class="p-dock__loading" />
 
     <OrganismsDock />
   </div>
 </template>
 
 <script setup lang="ts">
+import { useMounted } from '@vueuse/core';
+
+const isMounted = useMounted()
+
 /**
  * Search Results Page
  */
