@@ -56,11 +56,6 @@ onMounted(async () => {
 });
 
 /**
- *  Handle opening the dock popover
- */
-const { setPopoverName } = useDockPopover()
-
-/**
  *  Update layout
  */
 const { currentView, setCurrentView } = useResultsViewMode();
