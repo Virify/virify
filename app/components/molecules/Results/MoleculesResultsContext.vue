@@ -5,13 +5,13 @@
     </h2>
 
     <ul class="m-results-context__list">
-      <li v-if="location || radiusText">
+      <li v-if="searchedLocation || radiusText">
         <button type="button" class="m-results-context__button" aria-label="Expand location"
           @click.prevent="openLocation">
           <AtomsIcon icon="explore/map" width="16" height="16" />
 
-          <span v-if="location" class="m-results-context__tag">
-            {{ location }},
+          <span v-if="searchedLocation" class="m-results-context__tag">
+            {{ searchedLocation }},
           </span>
 
           <span v-if="radiusText" class="m-results-context__tag">
@@ -31,12 +31,12 @@
         </button>
       </li>
 
-      <li v-if="terms.length">
+      <li v-if="usedTerms.length">
         <button type="button" class="m-results-context__button" aria-label="Expand filters"
           @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
-          <span class="m-results-context__tag" v-for="term in terms" :key="term">
+          <span class="m-results-context__tag" v-for="term in usedTerms" :key="term">
             {{ term }}
           </span>
         </button>
@@ -76,16 +76,16 @@ function openLocation() {
 /**
  * Search terms from query analysis - capitalized
  */
-const { location, radius, terms } = useActiveSearchTerms()
+const { searchedLocation, searchedRadius, usedTerms } = useSearchResults()
 
 /**
  * Radius text for display
  */
 const radiusText = computed(() => {
-  if (!radius && radius !== 0) return ''
-  if (radius === 0) return 'This location only'
+  if (!searchedRadius.value && searchedRadius.value !== 0) return ''
+  if (searchedRadius.value === 0) return 'This location only'
 
-  return `Within ${radius} Miles`
+  return `Within ${searchedRadius.value} Miles`
 })
 
 /**

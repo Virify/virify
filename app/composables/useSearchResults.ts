@@ -10,14 +10,18 @@ interface QueryAnalysis {
 }
 
 interface SearchResults {
-  usedTerms?: string[],
-  ignoredTerms?: string[],
+  usedTerms: string[],
+  ignoredTerms: string[],
+  searchedRadius?: number,
+  searchedLocation?: string | null,
   results: Result[],
   hash?: string | null
 }
 
 const useSearchResults = createSharedComposable(() => {
   const state = useState<SearchResults>('search-results', () => ({
+    usedTerms: [],
+    ignoredTerms: [],
     results: []
   }))
 
@@ -63,6 +67,28 @@ const useSearchResults = createSharedComposable(() => {
   }
 
   /**
+   *  Set location string
+   */
+  function setSearchedLocation(location?: string) {
+    if (!isString(location)) {
+      state.value.searchedLocation = null
+
+      return
+    }
+
+    state.value.searchedLocation = location
+  }
+
+  /**
+   *  Set radius number
+   */
+  function setSearchedRadius(radius?: number | null) {
+    if (!radius && radius !== 0) radius = 0
+
+    state.value.searchedRadius = radius
+  }
+
+  /**
    *  Expose results, hash, etc.
    */
   const results = computed(() => {
@@ -81,6 +107,14 @@ const useSearchResults = createSharedComposable(() => {
     return state.value.ignoredTerms
   })
 
+  const searchedLocation = computed(() => {
+    return state.value.searchedLocation
+  })
+
+  const searchedRadius = computed(() => {
+    return state.value.searchedRadius
+  })
+
   /**
    *  Interface
    */
@@ -90,9 +124,13 @@ const useSearchResults = createSharedComposable(() => {
     hash,
     usedTerms,
     ignoredTerms,
+    searchedLocation,
+    searchedRadius,
     setResults,
     setQueryAnalysis,
-    setResultsHash
+    setResultsHash,
+    setSearchedLocation,
+    setSearchedRadius
   }
 })
 
