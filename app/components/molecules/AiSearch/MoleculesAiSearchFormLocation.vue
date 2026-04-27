@@ -5,7 +5,7 @@
         <legend class="| visually-hidden">Location</legend>
 
         <input ref="$searchInput" type="text" class="m-ai-search-form-location__input | body-md"
-          placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery" @focus="showPopover"
+          placeholder="Where do you want to live?" aria-label="Location" v-model="locationText" @focus="showPopover"
           @input="updateLoctionQuery" />
 
         <AtomsSelect name="radius" aria-label="Location radius"
@@ -16,7 +16,7 @@
       <client-only>
         <Transition name="m-ai-search-form-location">
           <div role="presentation" class="m-ai-search-form-location__popover" v-show="popoverExpanded">
-            <MoleculesAutocompletePopover :search-value="locationQueryLocal"
+            <MoleculesAutocompletePopover :search-value="locationTextLocal"
               @location-selected="handleLocationSelected" />
           </div>
         </Transition>
@@ -41,17 +41,17 @@ const emit = defineEmits(['location-selected'])
  *  Set autocomplete value. Set as useState rather than shallowRef so
  *  that the model syncs across all inputs (e.g. modal and dock)
  */
-const locationQuery = useState<string>('location-name', () => '')
+const { locationText, setLocationText } = useLocationInput()
 
 /**
- *  Store a local copy of locationQuery - this prevents the
+ *  Store a local copy of locationText - this prevents the
  *  autocomplete watcher firing multiple times if the component
  *  appears multiple times on the page (e.g. modal and dock)
  */
-const locationQueryLocal = shallowRef('')
+const locationTextLocal = shallowRef('')
 
 function updateLoctionQuery({ target }: InputEvent) {
-  locationQueryLocal.value = (target as HTMLInputElement)?.value
+  locationTextLocal.value = (target as HTMLInputElement)?.value
 
   showPopover()
 }
@@ -73,8 +73,8 @@ async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeatur
   setLocation(enhancedLocation)
 
   // Sync location with useState location
-  if (isString(locationName.value) && locationQuery.value !== locationName.value) {
-    locationQuery.value = locationName.value
+  if (isString(locationName.value) && locationText.value !== locationName.value) {
+    setLocationText(locationName.value)
   }
 
   // Close popover

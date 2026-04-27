@@ -80,6 +80,7 @@ const useFetchResults = createSharedComposable(() => {
 
     // Allow updating the hash from the returned results
     const { setLocation, setRadius, locationName } = useGlobalSearchState()
+    const { setLocationText } = useLocationInput()
 
     /**
      *  Fetch results
@@ -111,6 +112,7 @@ const useFetchResults = createSharedComposable(() => {
       if (location) {
         setLocation(location as GeocodingFeature)
         setSearchedLocation(locationName.value)
+        setLocationText(locationName.value)
       }
 
       // Save search radius
