@@ -117,13 +117,20 @@ const useGlobalSearchState = createSharedComposable(() => {
    *  Get body for a fetch request
    */
   function getFetchBody() {
+    const { type, location, radius, ai, traditional } = asObject(state.value)
+
+    // Get appropriate query for current search type
+    const query = type === 'ai' ? ai : traditional
+
+    // If no location of query has been added, return an empty body
+    if (!location || !query) return null
+
+    // Stringify body to be posted
     return JSON.stringify({
-      type: state.value.type,
-      location: state.value.location,
-      radius: state.value.radius,
-      query: state.value.type === 'ai'
-        ? state.value.ai
-        : state.value.traditional
+      type,
+      location,
+      radius,
+      query
     })
   }
 
