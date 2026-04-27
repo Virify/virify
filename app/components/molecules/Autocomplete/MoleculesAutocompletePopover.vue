@@ -211,8 +211,6 @@ const { isPending, setPendingWhile } = usePending()
 const { autoComplete } = useMap();
 
 watchDebounced(() => props.searchValue, (newVal?: string, oldVal?: string) => {
-  console.log('Watcher!')
-
   setPendingWhile(async () => {
     // Reset suppressAutocomplete if user is typing new content
     if (suppressAutocomplete.value && newVal && oldVal && newVal !== oldVal) {
