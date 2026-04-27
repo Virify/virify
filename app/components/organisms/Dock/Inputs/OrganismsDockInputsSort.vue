@@ -7,7 +7,7 @@
 
     <SelectPortal>
       <SelectContent position="popper" align="center" :side-offset="24" side="top" :body-lock="false"
-        class="o-dock-inputs-sort__popover">
+        :disable-outside-pointer-events="false" class="o-dock-inputs-sort__popover">
         <SelectScrollUpButton />
 
         <SelectViewport class="o-dock-inputs-sort__popover-list">
