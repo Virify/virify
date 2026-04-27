@@ -30,7 +30,7 @@ const emits = defineEmits(['search-started'])
  */
 const { pending, fetchResults } = useFetchResults()
 
-async function searchSubmit(formData: TraditionalSearchData) {
+async function searchSubmit() {
   emits('search-started')
 
   await fetchResults()
