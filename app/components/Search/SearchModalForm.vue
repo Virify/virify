@@ -83,6 +83,7 @@ async function aiSearchSubmit(query: string) {
 
   try {
     setPending(true)
+    setFormData(query, 'ai')
 
     // Navigate to search results page
     emit('animate-to-dock')
