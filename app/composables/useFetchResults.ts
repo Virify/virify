@@ -48,7 +48,11 @@ const useFetchResults = createSharedComposable(() => {
       method: 'POST',
       body: fetchBody
     }).then(({ data }) => {
-      const { results = [], hashKey, queryAnalysis } = asObject(data.value)
+      const {
+        results = [],
+        hashKey,
+        queryAnalysis
+      } = asObject(data.value)
 
       // Save results
       setResults(results)
@@ -77,12 +81,26 @@ const useFetchResults = createSharedComposable(() => {
     // Allow updating the hash from the returned results
     const { setLocation, setRadius, locationName } = useGlobalSearchState()
 
-    // Fetch results
-    return useFetch('/api/search/hash', {
+    /**
+     *  Fetch results
+     *
+     *  @TODO
+     *  Using useFetch would fail to fetch properly, probably because of
+     *  they way the key is generated for the endpoint. We should 
+     *  probably look into why this is and fix properly so the hash and
+     *  search endpoints are more consistent
+     */
+    return await $fetch('/api/search/hash', {
       method: 'POST',
       body: JSON.stringify({ hash })
-    }).then(({ data }) => {
-      const { results = [], hashKey, queryAnalysis, location, radius } = asObject(data.value)
+    }).then((data) => {
+      const {
+        results = [],
+        hashKey,
+        queryAnalysis,
+        location,
+        radius
+      } = asObject(data)
 
       // Save results
       setResults(results)
