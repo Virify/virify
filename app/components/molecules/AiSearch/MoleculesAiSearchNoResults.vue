@@ -16,10 +16,9 @@
       </li>
     </ul>
 
-    <!-- CTA -->
-    <NuxtLink to="/" class="no-results__cta | button button-md button-secondary">
+    <button @click.prevent="showModal" class="no-results__cta | button button-sm button-secondary">
       Start a new search
-    </NuxtLink>
+    </button>
   </div>
 </template>
 
@@ -28,6 +27,7 @@ const props = defineProps<{
   lastSearchQuery: string
 }>();
 
+const { showModal } = useGlobalSearch()
 const { location, radius, setQuery } = useGlobalSearchState()
 const { suggestedSearches: examplePrompts } = useAiSuggestedSearches();
 
@@ -79,6 +79,8 @@ function searchWithPrompt(prompt: string) {
 
   &__cta {
     margin-top: var(--size-16);
+    padding-left: var(--size-24);
+    padding-right: var(--size-24);
   }
 }
 </style>
