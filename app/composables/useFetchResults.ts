@@ -79,7 +79,12 @@ const useFetchResults = createSharedComposable(() => {
       method: 'POST',
       body: JSON.stringify({ hash })
     }).then(({ data }) => {
-      console.log({ data: data.value })
+      const { results = [], hashKey, queryAnalysis } = asObject(data.value)
+
+      // Save results
+      setResults(results)
+      setResultsHash(hashKey)
+      setQueryAnalysis(queryAnalysis)
     }).finally(() => {
       setPending(false)
     })
