@@ -54,7 +54,7 @@ const useSearchResults = createSharedComposable(() => {
   /**
    *  Update used and ignored terms
    */
-  function setQueryAnalysis(queryAnalysis: QueryAnalysis) {
+  function setQueryAnalysis(queryAnalysis: QueryAnalysis | unknown) {
     const { usedTerms, ignoredTerms } = asObject(queryAnalysis)
 
     if (isArrayOfStrings(usedTerms)) {
