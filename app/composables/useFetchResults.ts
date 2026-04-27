@@ -21,7 +21,7 @@ const useFetchResults = createSharedComposable(() => {
   /**
    *  Fetchers
    */
-  const { getFetchBody, location, radius } = useGlobalSearchState()
+  const { getFetchBody } = useGlobalSearchState()
 
   async function fetchResults() {
     setPending(true)
@@ -74,17 +74,32 @@ const useFetchResults = createSharedComposable(() => {
       return
     }
 
+    // Allow updating the hash from the returned results
+    const { setLocation, setRadius, locationName } = useGlobalSearchState()
+
     // Fetch results
     return useFetch('/api/search/hash', {
       method: 'POST',
       body: JSON.stringify({ hash })
     }).then(({ data }) => {
-      const { results = [], hashKey, queryAnalysis } = asObject(data.value)
+      const { results = [], hashKey, queryAnalysis, location, radius } = asObject(data.value)
 
       // Save results
       setResults(results)
       setResultsHash(hashKey)
       setQueryAnalysis(queryAnalysis)
+
+      // Save search location
+      if (location) {
+        setLocation(location as GeocodingFeature)
+        setSearchedLocation(locationName.value)
+      }
+
+      // Save search radius
+      if (isNumber(radius)) {
+        setRadius(radius)
+        setSearchedRadius(radius)
+      }
     }).finally(() => {
       setPending(false)
     })

@@ -69,7 +69,7 @@ const useSearchResults = createSharedComposable(() => {
   /**
    *  Set location string
    */
-  function setSearchedLocation(location?: string) {
+  function setSearchedLocation(location?: string | null) {
     if (!isString(location)) {
       state.value.searchedLocation = null
 

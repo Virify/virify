@@ -27,5 +27,13 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  return results;
+  // Get location, radius from hash result
+  const { location, radius } = asObject(storedBody)
+
+  // Return result
+  return {
+    location,
+    radius,
+    ...asObject(results)
+  };
 });

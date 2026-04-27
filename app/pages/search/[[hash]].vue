@@ -44,9 +44,11 @@ onMounted(async () => {
   if (isString(hash) && hash !== currentHash.value) {
     const { setResults, setResultsHash } = useSearchResults();
 
+    // Set existing results, if they exist
     setResults(results);
     setResultsHash(hash);
 
+    // Fetch hash
     return fetchHash(hash);
   }
 
