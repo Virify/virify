@@ -41,18 +41,20 @@ onMounted(async () => {
 
   // Check if a search hash exists; is a string; and is different from
   // the existing search results state
-  if (hash && isString(hash) && hash !== currentHash.value) {
+  if (isString(hash) && hash !== currentHash.value) {
     const { setResults, setResultsHash } = useSearchResults();
-
-    const { results } = await fetchHash(hash);
 
     setResults(results);
     setResultsHash(hash);
 
-    return;
+    return fetchHash(hash);
   }
 
-  fetchResults()
+  // If hash exists, assume the hash has not changed and do nothing
+  if (isString(hash)) return
+
+  // Fetch results
+  fetchResults();
 });
 
 /**

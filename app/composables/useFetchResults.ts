@@ -48,11 +48,17 @@ const useFetchResults = createSharedComposable(() => {
       method: 'POST',
       body: fetchBody
     }).then(({ data }) => {
-      const { hash, results = [], queryAnalysis } = asObject(data.value)
+      const { results = [], hashKey, queryAnalysis } = asObject(data.value)
 
-      setResultsHash(hash)
+      // Save results
       setResults(results)
+      setResultsHash(hashKey)
       setQueryAnalysis(queryAnalysis)
+
+      // If hash exists, navigate to it
+      if (isString(hashKey)) {
+        navigateTo('/search/' + hashKey)
+      }
     }).finally(() => {
       setPending(false)
     })
