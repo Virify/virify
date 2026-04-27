@@ -82,6 +82,8 @@ const useGlobalSearchState = createSharedComposable(() => {
    *  Update search query
    */
   function setFormData(formData: TraditionalFormData | string, type = state.value.type) {
+    setType(type)
+
     if (type === 'ai') {
       state.value.ai = formData as string
 
