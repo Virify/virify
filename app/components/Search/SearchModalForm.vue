@@ -11,7 +11,7 @@
       </template>
 
       <template v-slot:ai>
-        <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit"
+        <MoleculesAiSearchFormFilters :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit"
           @reset-search="searchReset" />
       </template>
     </OrganismsFilterSwitcher>

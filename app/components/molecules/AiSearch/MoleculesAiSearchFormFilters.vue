@@ -64,6 +64,9 @@ function searchReset() {
  */
 const { searchQuery } = useAi();
 
+/**
+ *  @TODO convert this to a v-model
+ */
 watch(() => props.initialQuery, (newQuery) => {
   if (!newQuery) return
   searchQuery.value = newQuery;
