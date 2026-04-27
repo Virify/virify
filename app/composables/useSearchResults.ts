@@ -28,7 +28,7 @@ const useSearchResults = createSharedComposable(() => {
   /**
    *  Update results
    */
-  function setResults(results: Result[]) {
+  function setResults(results: Result[] | unknown) {
     if (!Array.isArray(results)) {
       state.value.results = []
 
@@ -41,7 +41,7 @@ const useSearchResults = createSharedComposable(() => {
   /**
    *  Update hash
    */
-  function setResultsHash(str: string) {
+  function setResultsHash(str?: string | unknown) {
     if (!isString(str)) {
       state.value.hash = null
 

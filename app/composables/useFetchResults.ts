@@ -1,6 +1,14 @@
 import { createSharedComposable } from '@vueuse/core'
 
 const useFetchResults = createSharedComposable(() => {
+  const {
+    setResults,
+    setResultsHash,
+    setSearchedLocation,
+    setSearchedRadius,
+    setQueryAnalysis
+  } = useSearchResults()
+
   /**
    *  Externally track pending state
    */
@@ -13,38 +21,62 @@ const useFetchResults = createSharedComposable(() => {
   /**
    *  Fetchers
    */
-  const { getFetchBody } = useGlobalSearchState()
+  const { getFetchBody, location, radius } = useGlobalSearchState()
 
   async function fetchResults() {
     setPending(true)
 
-    const response = await new Promise((resolve) => {
-      console.log('FETCH', getFetchBody())
+    // Check if a fetch body exists
+    const fetchBody = getFetchBody()
 
-      setTimeout(() => {
-        resolve(true)
-      }, 2000)
+    // If not, return
+    if (!fetchBody) {
+      setPending(false)
+
+      return
+    }
+
+    // Set location, radius used in the search
+    const { locationName, radius } = useGlobalSearchState()
+
+    // Save searched location, radius
+    setSearchedLocation(locationName.value || undefined)
+    setSearchedRadius(radius.value)
+
+    // Fetch results
+    return useFetch('/api/search/', {
+      method: 'POST',
+      body: fetchBody
+    }).then(({ data }) => {
+      const { hash, results = [], queryAnalysis } = asObject(data.value)
+
+      setResultsHash(hash)
+      setResults(results)
+      setQueryAnalysis(queryAnalysis)
+    }).finally(() => {
+      setPending(false)
     })
-
-    setPending(false)
-
-    return response
   }
 
   async function fetchHash(hash: string) {
     setPending(true)
 
-    const response = await new Promise((resolve) => {
-      console.log('FETCH', { hash })
+    // Check if hash string exists
+    if (!isString(hash)) {
+      setPending(false)
 
-      setTimeout(() => {
-        resolve(true)
-      }, 2000)
+      return
+    }
+
+    // Fetch results
+    return useFetch('/api/search/hash', {
+      method: 'POST',
+      body: JSON.stringify({ hash })
+    }).then(({ data }) => {
+      console.log({ data: data.value })
+    }).finally(() => {
+      setPending(false)
     })
-
-    setPending(false)
-
-    return response
   }
 
   /**
