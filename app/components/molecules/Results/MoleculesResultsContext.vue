@@ -85,7 +85,11 @@ const radiusText = computed(() => {
   if (!searchedRadius.value && searchedRadius.value !== 0) return ''
   if (searchedRadius.value === 0) return 'This location only'
 
-  return `Within ${searchedRadius.value} Miles`
+  // Only suffix 's' for non-single distances
+  const distanceUnit = searchedRadius.value === 1 ? 'mile' : 'miles'
+
+  // Return value
+  return `Within ${searchedRadius.value} ${distanceUnit}`
 })
 
 /**
