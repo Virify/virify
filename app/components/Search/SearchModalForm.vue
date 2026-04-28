@@ -11,7 +11,7 @@
       </template>
 
       <template v-slot:ai>
-        <MoleculesAiSearchFormFilters :initial-query :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit"
+        <MoleculesAiSearchFormFilters :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit"
           @reset-search="searchReset" />
       </template>
     </OrganismsFilterSwitcher>
@@ -44,40 +44,24 @@ function hideTraditionalFormLoader() {
 /**
  *  Fetch filters
  */
-const { setQuery, setListingType, searchState, updateState, setSearchPending } = useSearchState()
+const { location, setQuery, setFormData } = useGlobalSearchState()
+const { setPending } = useFetchResults()
 const toast = useToast()
-
-const initialQuery = computed(() => {
-  const { query } = asObject(searchState.value)
-
-  return query
-})
 
 /**
  *  Traditional search form handler
  */
 async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location } = asObject(searchState.value)
-
-  if (!location) {
+  if (!location.value) {
     return
   }
 
   try {
-    setSearchPending(true)
-
-    // Build query analysis from form data for filter badges
-    const queryAnalysis = buildQueryAnalysisFromFormData(formData)
+    setPending(true)
 
     // Set search parameters and navigate instead of fetching here
     // The search page will handle the fetch
-    updateState({
-      searchType: 'traditional',
-      traditionalSearchForm: formData,
-      queryAnalysis,
-      results: [],
-      hasSearched: true
-    })
+    setFormData(formData, 'traditional')
 
     // Navigate to search results page
     emit('animate-to-dock')
@@ -85,7 +69,7 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
   } catch (error) {
     console.error('Traditional search error:', error)
     toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error', icon: 'i-lucide-search-x' })
-    setSearchPending(false)
+    setPending(false)
   }
 }
 
@@ -93,34 +77,20 @@ async function traditionalSearchSubmit(formData: TraditionalSearchData) {
  *  AI search form handler
  */
 async function aiSearchSubmit(query: string) {
-  setListingType(props.listingType)
-
-  const { location, radius, listingType } = asObject(searchState.value)
-
-  if (!location) {
+  if (!location.value) {
     return
   }
 
   try {
-    setSearchPending(true)
-
-    // Set search parameters and navigate instead of fetching here
-    // The search page will handle the fetch
-    updateState({
-      searchType: 'ai',
-      query,
-      listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
-      radius,
-      results: [],
-      hasSearched: true
-    })
+    setPending(true)
+    setFormData(query, 'ai')
 
     // Navigate to search results page
     emit('animate-to-dock')
   } catch (error) {
     console.error('AI search error:', error)
     toast.add({ title: 'Error', description: 'Search failed. Please try again.', color: 'error', icon: 'i-lucide-search-x' })
-    setSearchPending(false)
+    setPending(false)
   }
 };
 
@@ -134,9 +104,7 @@ function searchReset() {
  *
  */
 const hasLocation = computed(() => {
-  const { location } = asObject(searchState.value)
-
-  return import.meta.client && !!location
+  return import.meta.client && !!location.value
 })
 
 </script>

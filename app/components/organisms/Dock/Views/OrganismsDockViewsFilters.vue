@@ -1,15 +1,15 @@
 <template>
   <div class="| flow">
-    <MoleculesAiSearchLoading v-if="isLoading" />
+    <MoleculesAiSearchLoading v-if="pending" />
 
     <template v-else>
       <OrganismsFilterSwitcher>
         <template v-slot:traditional>
-          <OrganismsTraditionalSearchForm @submit-search="traditionalSearchSubmit" />
+          <OrganismsTraditionalSearchForm @submit-search="searchSubmitTraditional" />
         </template>
 
         <template v-slot:ai>
-          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="aiSearchSubmit"
+          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="searhSubmitAi"
             @reset-search="searchReset" />
         </template>
       </OrganismsFilterSwitcher>
@@ -18,6 +18,12 @@
 </template>
 
 <script setup lang="ts">
+/**
+ *  @TODO - maybe move this to a better location, or improve the import
+ *          aliasing to be less brittle
+ */
+import type { FormState } from '../../TraditionalSearch/OrganismsTraditionalSearchForm.vue'
+
 const initialQuery = ref('')
 
 /**
@@ -28,42 +34,25 @@ const emits = defineEmits(['search-started'])
 /**
  *  Fetch filters
  */
-const { searchState, isLoading, fetchResults } = useSearchState()
+const { pending, fetchResults } = useFetchResults()
+const { setFormData } = useGlobalSearchState()
 
-async function traditionalSearchSubmit(formData: TraditionalSearchData) {
-  const { location, radius } = asObject(searchState.value)
-
+function searhSubmitAi(query: string) {
+  setFormData(query, 'ai')
   emits('search-started')
 
-  await fetchResults({
-    location,
-    radius
-  }, {
-    type: 'traditional',
-    body: formData
-  },)
+  fetchResults()
 }
 
-async function aiSearchSubmit(query: string) {
-  const { location, radius, listingType } = asObject(searchState.value)
-
+function searchSubmitTraditional(formData: Partial<FormState>) {
+  setFormData(formData, 'traditional')
   emits('search-started')
 
-  await fetchResults({
-    location,
-    radius,
-  }, {
-    type: 'ai',
-    body: {
-      query,
-      listingType: listingType === 'sale' ? 'sale' : listingType === 'rent' ? 'rent' : 'all',
-    }
-  })
+  fetchResults()
 }
 
 function searchReset() {
-  // Navigate to home to start fresh
-  navigateTo('/')
+  setFormData('')
 }
 
 </script>

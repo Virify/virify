@@ -1,14 +1,18 @@
 <template>
   <div class="m-ai-search-loading">
     <img src="/img/v-loader.svg" class="m-ai-search-loading__spinner" />
-    <p class="m-ai-search-loading__content | body-lg" data-allow-mismatch="text">
+
+    <p v-if="isMounted" class="m-ai-search-loading__content | body-lg">
       {{ loadingMessage }}
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useMounted } from '@vueuse/core';
 import { loadingMessages } from '~/utils/search-form/loading-messages';
+
+const isMounted = useMounted()
 
 const loadingMessage = computed(() => {
   const randomIndex = Math.floor(Math.random() * loadingMessages.length);
@@ -25,8 +29,9 @@ const loadingMessage = computed(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: var(--size-24);
-  padding: 0 var(--size-16) var(--size-24);
+  padding: var(--size-24);
   box-sizing: border-box;
 
   &__spinner {

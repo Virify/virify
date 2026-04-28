@@ -1,5 +1,5 @@
 <template>
-  <SelectRoot v-model="searchState.sortBy" v-model:open="sortSelectOpen">
+  <SelectRoot v-model="state.sortOrder" v-model:open="isExpanded">
     <SelectTrigger class="o-dock-inputs-sort__button" v-bind="$attrs">
       <AtomsIcon icon="search/sort" />
       <SelectValue class="o-dock-inputs-sort__button-value | body-sm" placeholder="Select sort order" />
@@ -7,7 +7,7 @@
 
     <SelectPortal>
       <SelectContent position="popper" align="center" :side-offset="24" side="top" :body-lock="false"
-        class="o-dock-inputs-sort__popover">
+        :disable-outside-pointer-events="false" class="o-dock-inputs-sort__popover">
         <SelectScrollUpButton />
 
         <SelectViewport class="o-dock-inputs-sort__popover-list">
@@ -45,7 +45,23 @@ import {
 /**
  *  Sort order state
  */
-const { searchState, sortSelectOpen } = useSearchState()
+type Popover = 'sort-order' | 'filters' | 'location' | null
+
+const isExpanded = shallowRef(false)
+const { state } = useGlobalSearchState()
+const { popoverName, setPopoverName } = useDockPopover()
+
+watch(popoverName, (newName: Popover) => {
+  if (newName !== 'sort-order') return
+
+  isExpanded.value = true
+})
+
+watch(isExpanded, (newState: boolean) => {
+  if (newState || popoverName.value !== 'sort-order') return
+
+  setPopoverName(null)
+})
 
 </script>
 

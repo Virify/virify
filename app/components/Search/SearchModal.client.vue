@@ -29,18 +29,15 @@ const { popoverId, showModal, hideModal } = useGlobalSearch()
 /**
  *  Activate focus trap on open, close
  */
+const { location } = useGlobalSearchState()
 const $modalContent = useTemplateRef('modal-content')
 
 const { activate, deactivate } = useFocusTrap($modalContent, {
   escapeDeactivates: false,
   initialFocus: () => {
-    const { searchState } = useSearchState()
-
-    // Get location from search state
-    const { location } = asObject(searchState?.value)
 
     // If no location is selected, use default initial focus
-    if (!location) return
+    if (!location.value) return
 
     // Otherwise skip to the form type switcher
     const wrapper = $modalContent.value

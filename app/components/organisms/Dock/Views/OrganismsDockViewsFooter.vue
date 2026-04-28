@@ -32,18 +32,18 @@ defineProps<Props>()
 /**
  * Emits
  */
-const emits = defineEmits<PopoverEmits & { (e: 'close-popover'): void }>()
+const { popoverName, setPopoverName } = useDockPopover()
 
 function showFiltersDialog() {
-  emits('open-popover', 'filters')
+  setPopoverName('filters')
 }
 
 function showLocationDialog() {
-  emits('open-popover', 'location')
+  setPopoverName('location')
 }
 
 function hidePopover() {
-  emits('close-popover')
+  setPopoverName(null)
 }
 </script>
 

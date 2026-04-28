@@ -1,12 +1,10 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar
-        :ui="{
-          title: 'title-sm m-0!',
-          right: 'flex items-center gap-1',
-        }"
-      >
+      <UDashboardNavbar :ui="{
+        title: 'title-sm m-0!',
+        right: 'flex items-center gap-1',
+      }">
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
@@ -22,7 +20,8 @@
       <!-- Loading State -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-if="loading">
         <div v-for="i in 3" :key="i" class="h-full">
-          <UPageCard variant="naked" class="p-4 border border-accented/50 bg-elevated/30 rounded-lg h-full animate-pulse">
+          <UPageCard variant="naked"
+            class="p-4 border border-accented/50 bg-elevated/30 rounded-lg h-full animate-pulse">
             <div class="flex items-start gap-3">
               <div class="w-10 h-10 rounded-lg bg-muted"></div>
               <div class="flex flex-col gap-2 flex-1">
@@ -37,12 +36,8 @@
       <!-- Saved Locations Grid -->
       <OrganismsDashboardListingCardGrid ref="pageTop" v-else-if="entries.length > 0">
         <div v-for="location in entries" :key="location.id" class="h-full">
-          <OrganismsDashboardListingCardSavedLocation
-            :location="location"
-            @edit="handleEdit"
-            @delete="handleDelete"
-            @search="handleSearch"
-          />
+          <OrganismsDashboardListingCardSavedLocation :location="location" @edit="handleEdit" @delete="handleDelete"
+            @search="handleSearch" />
         </div>
       </OrganismsDashboardListingCardGrid>
 
@@ -63,7 +58,7 @@ definePageMeta({
 });
 
 const { entries, getEntries, deleteEntry } = useSavedLocation();
-const { setLocation } = useSearchState();
+const { setLocation } = useGlobalSearchState();
 const { showDialog } = useDialog();
 const toast = useToast();
 const router = useRouter();
@@ -104,11 +99,11 @@ function handleSearch(location: UserSavedLocation) {
   // Set the location in search state with full geocoding feature data
   // This includes bbox, boundary, coordinates - everything needed for map visualization
   setLocation(location.geocodingFeature);
-  
+
   // Build the search URL with location name (slug-friendly)
   const locationSlug = encodeURIComponent(location.location.toLowerCase().replace(/\s+/g, '-').replace(/,/g, ''));
   const radius = 5; // Default radius in miles
-  
+
   // Navigate to search - the location data is already in searchState
   router.push(`/search/all/${locationSlug}/${radius}/`);
 }

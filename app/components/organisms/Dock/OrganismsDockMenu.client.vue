@@ -16,28 +16,25 @@
       <span class="o-dock-menu__mobile-label | faded-text body-xs">Location</span>
 
       <OrganismsDockInputsLocation class="o-dock-menu__fix-height" :popovertarget="popoverId"
-        :is-expanded="currentlyOpen === 'location'" @click.prevent="showLocationDialog" />
+        :is-expanded="popoverName === 'location'" @click.prevent="showLocationDialog" />
     </li>
 
     <li class="o-dock-menu__item o-dock-menu__item--fit-content">
       <span class="o-dock-menu__mobile-label | faded-text body-xs">Property</span>
 
       <OrganismsDockInputsFilters class="o-dock-menu__fix-height" :popovertarget="popoverId"
-        :is-expanded="currentlyOpen === 'filters'" @click.prevent="showFiltersDialog" :disabled="!hasLocation">
+        :is-expanded="popoverName === 'filters'" @click.prevent="showFiltersDialog" :disabled="!location">
       </OrganismsDockInputsFilters>
     </li>
   </ul>
 </template>
 
 <script setup lang="ts">
-import type { PopoverType, PopoverEmits } from './OrganismsDock.vue'
-
 /**
  *  Props
  */
 interface Props {
   popoverId?: string
-  currentlyOpen?: PopoverType
 }
 
 defineProps<Props>()
@@ -45,26 +42,20 @@ defineProps<Props>()
 /**
  *  Open popover
  */
-const emits = defineEmits<PopoverEmits>()
+const { popoverName, setPopoverName } = useDockPopover()
 
 function showLocationDialog() {
-  emits('open-popover', 'location')
+  setPopoverName('location')
 }
 
 function showFiltersDialog() {
-  emits('open-popover', 'filters')
+  setPopoverName('filters')
 }
 
 /**
  *  Check if a location has been added
  */
-const { searchState } = useSearchState()
-
-const hasLocation = computed(() => {
-  const { location } = asObject(searchState.value)
-
-  return (location as Record<string, unknown>)?.place_name_en
-})
+const { location } = useGlobalSearchState()
 
 </script>
 

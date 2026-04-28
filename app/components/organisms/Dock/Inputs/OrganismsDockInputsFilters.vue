@@ -2,7 +2,7 @@
   <button type="button" class="o-dock-inputs-filters" :class="{
     'o-dock-inputs-filters--active': isExpanded
   }">
-    <span v-if="isLoading" class="o-dock-inputs-filters__pending-icon">
+    <span v-if="pending" class="o-dock-inputs-filters__pending-icon">
       <AtomsIcon title="Pending" icon="animated-dots/animated-dots" />
     </span>
 
@@ -24,15 +24,14 @@
 
 
 <script setup lang="ts">
-const { searchState, isLoading } = useSearchState()
+const { usedTerms } = useSearchResults()
+const { pending } = useFetchResults()
 
 /**
  *  Count filters
  */
 const filtersCount = computed(() => {
-  const { queryAnalysis } = asObject(searchState.value)
-
-  return queryAnalysis?.usedTerms?.length || 0
+  return usedTerms.value?.length || 0
 })
 
 /**

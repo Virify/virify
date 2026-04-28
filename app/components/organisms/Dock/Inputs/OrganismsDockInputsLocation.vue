@@ -23,18 +23,7 @@
 </template>
 
 <script setup lang="ts">
-const { searchState } = useSearchState()
-
-const locationName = computed(() => {
-  const location = searchState.value?.location
-  return location?.place_name_en || location?.place_name || ''
-})
-
-const radius = computed(() => {
-  const { radius } = asObject(searchState.value)
-
-  return radius
-})
+const { locationName, radius } = useGlobalSearchState()
 
 /**
  *  Is expanded styling

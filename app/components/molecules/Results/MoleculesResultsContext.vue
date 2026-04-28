@@ -5,13 +5,13 @@
     </h2>
 
     <ul class="m-results-context__list">
-      <li v-if="location || radiusText">
+      <li v-if="searchedLocation || radiusText">
         <button type="button" class="m-results-context__button" aria-label="Expand location"
           @click.prevent="openLocation">
           <AtomsIcon icon="explore/map" width="16" height="16" />
 
-          <span v-if="location" class="m-results-context__tag">
-            {{ location }},
+          <span v-if="searchedLocation" class="m-results-context__tag">
+            {{ searchedLocation }},
           </span>
 
           <span v-if="radiusText" class="m-results-context__tag">
@@ -22,7 +22,7 @@
 
       <li v-if="sortLabel">
         <button type="button" class="m-results-context__button" aria-label="Change sort order"
-          @click.prevent="openSort">
+          @click.prevent="openSortOrder">
           <AtomsIcon icon="search/sort" width="16" height="16" />
 
           <span class="m-results-context__tag">
@@ -31,12 +31,12 @@
         </button>
       </li>
 
-      <li v-if="terms.length">
+      <li v-if="usedTerms.length">
         <button type="button" class="m-results-context__button" aria-label="Expand filters"
           @click.prevent="openFilters">
           <AtomsIcon icon="explore/ai" width="16" height="16" />
 
-          <span class="m-results-context__tag" v-for="term in terms" :key="term">
+          <span class="m-results-context__tag" v-for="term in usedTerms" :key="term">
             {{ term }}
           </span>
         </button>
@@ -56,50 +56,53 @@ const props = withDefaults(defineProps<Props>(), {
   sortBy: 'relevance'
 })
 
-const emit = defineEmits<{
-  'open-popover': [type: 'location' | 'filters' | 'sort']
-}>()
-
 /**
  * Open sort in the dock
  */
-function openSort() {
-  emit('open-popover', 'sort')
+const { setPopoverName } = useDockPopover()
+
+function openSortOrder() {
+  setPopoverName('sort-order')
 }
 
-/**
- * Open filters in the dock
- */
 function openFilters() {
-  emit('open-popover', 'filters')
+  setPopoverName('filters')
 }
 
-/**
- * Open location in the dock
- */
 function openLocation() {
-  emit('open-popover', 'location')
+  setPopoverName('location')
 }
 
 /**
  * Search terms from query analysis - capitalized
  */
-const { location, radius, terms } = useActiveSearchTerms()
+const { searchedLocation, searchedRadius, usedTerms } = useSearchResults()
 
 /**
  * Radius text for display
  */
 const radiusText = computed(() => {
-  if (!radius && radius !== 0) return ''
-  if (radius === 0) return 'This location only'
-  return `Within ${radius} Miles`
+  if (!searchedRadius.value && searchedRadius.value !== 0) return ''
+  if (searchedRadius.value === 0) return 'This location only'
+
+  // Only suffix 's' for non-single distances
+  const distanceUnit = searchedRadius.value === 1 ? 'mile' : 'miles'
+
+  // Return value
+  return `Within ${searchedRadius.value} ${distanceUnit}`
 })
 
 /**
  * Sort label for display
  */
+const { sortOrder } = useGlobalSearchState()
+
 const sortLabel = computed(() => {
-  return selectOptionSortOrder.find(o => o.value === (props.sortBy || 'relevance'))?.key ?? 'Relevance'
+  const match = selectOptionSortOrder.find(({ value }) => {
+    return value === sortOrder.value
+  })
+
+  return (match || selectOptionSortOrder[0]!).key
 })
 
 </script>

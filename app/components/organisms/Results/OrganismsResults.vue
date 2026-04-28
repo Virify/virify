@@ -9,8 +9,7 @@
     </template>
 
     <template v-else>
-      <MoleculesResultsContext v-if="results.length" :count="results.length" :sort-by
-        @open-popover="$emit('open-popover', $event)" />
+      <MoleculesResultsContext v-if="results.length" :count="results.length" />
 
       <div class="o-results__grid">
         <PropertyCardRoot v-for="result of paginatedResults" :key="result.listingId" v-bind="result" />
@@ -32,13 +31,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isLoading: false,
-  sortBy: 'relevance'
+  isLoading: false
 })
-
-defineEmits<{
-  'open-popover': [type: 'location' | 'filters' | 'sort']
-}>()
 
 /**
  *  Pagination

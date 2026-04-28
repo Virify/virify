@@ -11,16 +11,26 @@ const DEFAULT_SUGGESTED_SEARCHES = [
 
 export const useAiSuggestedSearches = createSharedComposable(() => {
   const { data: recentSearches } = useAsyncData(
-    'ai-suggested-searches',
-    () => useRequestFetch()<string[]>('/api/analytics/search/recent'),
-    { default: (): string[] => [], immediate: true },
+    "ai-suggested-searches",
+    () =>
+      useRequestFetch()<{ query: string; searchType: string }[]>(
+        "/api/analytics/search/recent",
+      ),
+    {
+      default: (): { query: string; searchType: string }[] => [],
+      immediate: true,
+    },
   );
 
   const suggestedSearches = computed(() => {
-    const recent = recentSearches.value ?? []
-    const needed = Math.max(0, 6 - recent.length)
-    const defaults = DEFAULT_SUGGESTED_SEARCHES.filter((d) => !recent.includes(d)).slice(0, needed)
-    return [...recent, ...defaults].slice(0, 6)
+    const recent = (recentSearches.value ?? [])
+      .filter((s) => s.searchType === "ai")
+      .map((s) => s.query);
+    const needed = Math.max(0, 6 - recent.length);
+    const defaults = DEFAULT_SUGGESTED_SEARCHES.filter(
+      (d) => !recent.includes(d),
+    ).slice(0, needed);
+    return [...recent, ...defaults].slice(0, 6);
   });
 
   return { suggestedSearches };

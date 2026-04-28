@@ -5,18 +5,18 @@
         <legend class="| visually-hidden">Location</legend>
 
         <input ref="$searchInput" type="text" class="m-ai-search-form-location__input | body-md"
-          placeholder="Where do you want to live?" aria-label="Location" v-model="locationQuery"
-          @input="updateAutocompleteValue" @focus="showPopover" />
+          placeholder="Where do you want to live?" aria-label="Location" v-model="locationText" @focus="showPopover"
+          @input="updateLoctionQuery" />
 
         <AtomsSelect name="radius" aria-label="Location radius"
           class="m-ai-search-form-location__radius m-ai-search-form-location__radius--desktop | body-md"
-          v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
+          v-model="radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
       </fieldset>
 
       <client-only>
         <Transition name="m-ai-search-form-location">
           <div role="presentation" class="m-ai-search-form-location__popover" v-show="popoverExpanded">
-            <MoleculesAutocompletePopover :search-value="autocompleteValue"
+            <MoleculesAutocompletePopover :search-value="locationTextLocal"
               @location-selected="handleLocationSelected" />
           </div>
         </Transition>
@@ -24,13 +24,13 @@
     </div>
 
     <AtomsSelect name="radius" aria-label="Location radius"
-      class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md"
-      v-model="searchState.radius" :options="selectOptionRadius" @change="handleRadiusSelected" />
+      class="m-ai-search-form-location__radius m-ai-search-form-location__radius--mobile | body-md" v-model="radius"
+      :options="selectOptionRadius" @change="handleRadiusSelected" />
   </form>
 </template>
 
 <script setup lang="ts">
-import { onClickOutside, useDebounceFn } from "@vueuse/core";
+import { onClickOutside } from "@vueuse/core";
 
 /**
  *  Emits
@@ -38,60 +38,44 @@ import { onClickOutside, useDebounceFn } from "@vueuse/core";
 const emit = defineEmits(['location-selected'])
 
 /**
- *  Set autocomplete value
+ *  Set autocomplete value. Set as useState rather than shallowRef so
+ *  that the model syncs across all inputs (e.g. modal and dock)
  */
-const autocompleteValue = ref('')
-
-const getAutocomplete = useDebounceFn((value: string) => {
-  autocompleteValue.value = value
-}, 200)
-
-function updateAutocompleteValue({ target }: Event) {
-  const { value } = asObject(target)
-
-  showPopover()
-  getAutocomplete(value as string)
-}
+const { locationText, setLocationText } = useLocationInput()
 
 /**
- *  Global and input state
+ *  Store a local copy of locationText - this prevents the
+ *  autocomplete watcher firing multiple times if the component
+ *  appears multiple times on the page (e.g. modal and dock)
  */
-const { searchState } = useSearchState()
+const locationTextLocal = shallowRef('')
 
-// Local input value - synced with global state but editable
-const locationQueryLocal = ref('')
+function updateLoctionQuery({ target }: InputEvent) {
+  locationTextLocal.value = (target as HTMLInputElement)?.value
 
-// Sync from global state when location changes
-watch(() => searchState.value?.location, (location) => {
-  if (location) {
-    locationQueryLocal.value = location.place_name_en || location.place_name || ''
-  }
-}, { immediate: true })
-
-// Expose as locationQuery for template
-const locationQuery = computed({
-  get: () => locationQueryLocal.value,
-  set: (value: string) => { locationQueryLocal.value = value }
-})
+  showPopover()
+}
 
 /**
  *  Handle autocomplete events
  */
-const { setLocation, setLocationRadius } = useSearchState()
+const { locationName, radius, setLocation, setRadius } = useGlobalSearchState()
 const { enhanceWithBoundaryPolygon } = useMap();
 
-async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
-  const locationUnref = unref(location)
+async function handleLocationSelected(selectedLocation: MaybeRef<GeocodingFeature>) {
+  const locationUnref = unref(selectedLocation)
 
   // Get enhanced location, falling back to normal location
   const enhancedLocation = await enhanceWithBoundaryPolygon(locationUnref)
     .catch(() => locationUnref);
 
-  // Update input immediately with full location name
-  locationQueryLocal.value = enhancedLocation.place_name_en || enhancedLocation.place_name || ''
-
   // Update global state
-  setLocation(enhancedLocation, hidePopover)
+  setLocation(enhancedLocation)
+
+  // Sync location with useState location
+  if (isString(locationName.value) && locationText.value !== locationName.value) {
+    setLocationText(locationName.value)
+  }
 
   // Close popover
   hidePopover()
@@ -106,11 +90,9 @@ async function handleLocationSelected(location: MaybeRef<GeocodingFeature>) {
 /**
  *  Update radius via state when updated
  */
-async function handleRadiusSelected() {
-  const { radius } = asObject(searchState.value)
-
+async function handleRadiusSelected({ target }: InputEvent) {
   // Update radius for location
-  setLocationRadius(Number(radius) || 0)
+  setRadius((target as HTMLSelectElement)?.value)
 
   // Let DOM refresh before showing modal, so location popover is closed
   await nextTick()
