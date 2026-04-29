@@ -2,7 +2,7 @@
   <div class="p-dock" :class="{
     'p-dock--has-grid': showGrid,
   }">
-    <OrganismsPaneSlider v-if="isMounted" @boundary-exceeded="updateViewMode" :left-slot="showGrid"
+    <OrganismsPaneSlider v-if="!hash || isMounted" @boundary-exceeded="updateViewMode" :left-slot="showGrid"
       :right-slot="showMap" :class="{
         '| container': showGrid,
       }">
@@ -19,7 +19,7 @@
       </template>
     </OrganismsPaneSlider>
 
-    <MoleculesAiSearchLoading v-if="!isMounted || pending" class="p-dock__loading" />
+    <MoleculesAiSearchLoading v-if="hash && (!isMounted || pending)" class="p-dock__loading" />
 
     <OrganismsDock />
   </div>
@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { useMounted } from '@vueuse/core';
 
+const { params: { hash } } = useRoute();
 const isMounted = useMounted()
 
 /**
@@ -42,8 +43,6 @@ const { pending, fetchResults, fetchHash } = useFetchResults()
  * This handles page refreshes and back/forward navigation
  */
 onMounted(async () => {
-  const { params: { hash } } = useRoute();
-
   // Check if a search hash exists; is a string; and is different from
   // the existing search results state
   if (isString(hash) && hash !== currentHash.value) {
