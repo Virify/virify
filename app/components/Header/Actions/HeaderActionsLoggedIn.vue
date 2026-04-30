@@ -187,7 +187,7 @@ async function logOut() {
     border-radius: var(--border-radius-pill);
     background: light-dark(var(--blue-400), var(--blue-100));
     color: var(--monochrome-900);
-    font-size: var(--font-md);
+    font-size: var(--font-sm);
     object-fit: contain;
   }
 
