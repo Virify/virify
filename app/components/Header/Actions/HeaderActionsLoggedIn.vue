@@ -109,7 +109,13 @@ const userImage = computed(() => {
 })
 
 const userName = computed(() => {
-  return user.value?.username
+  const { firstName, lastName, username } = asObject(user.value)
+
+  // Get full name
+  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim()
+
+  // Return either the full name or, if no name given, the username
+  return fullName ?? username
 })
 
 /**
