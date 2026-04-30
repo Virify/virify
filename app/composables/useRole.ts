@@ -1,4 +1,3 @@
-
 export function useRole() {
   const { user } = useUserSession()
 
