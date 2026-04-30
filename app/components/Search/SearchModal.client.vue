@@ -191,9 +191,17 @@ async function animateFormToDock() {
 const { isWaitingListMode } = useWaitingListMode();
 // @TODO end
 
-function showUniversalSearch({ key, metaKey }: KeyboardEvent) {
-  if (!metaKey || key !== 'k') return
+function showUniversalSearch({ key, metaKey, ctrlKey }: KeyboardEvent) {
+  const { keyName } = useSpecialKey()
 
+  // Check if special key is being pressed
+  const isMeta = keyName === 'meta' && metaKey
+  const isCtrl = keyName === 'ctrl' && ctrlKey
+
+  // Check if 'k' is also being pressed
+  if (!(isMeta || isCtrl) || key !== 'k') return
+
+  // If special key and 'k' is being pressed, show modal
   showModal()
 }
 
