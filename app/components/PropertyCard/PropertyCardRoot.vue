@@ -4,11 +4,8 @@
       <div v-if="isListingHidden" class="property-card-root__hidden-overlay">
         <UIcon name="i-lucide-eye-off" class="property-card-root__hidden-icon" aria-hidden />
         <span class="body-md">Hidden</span>
-        <button
-          type="button"
-          class="property-card-root__hidden-undo | button-none body-sm"
-          @click="unhideListing(listingId!)"
-        >
+        <button type="button" class="property-card-root__hidden-undo | button-none body-sm"
+          @click="unhideListing(listingId!)">
           Undo
         </button>
       </div>
@@ -27,20 +24,10 @@
         loading="lazy" />
 
       <ClientOnly>
-        <UBadge
-          v-if="viewingLabel"
-          :label="viewingLabel"
-          icon="i-lucide-calendar"
-          size="lg"
-          color="secondary"
-          variant="solid"
-          class="absolute top-2 right-2 z-1 text-xs"
-        />
-        <AtomsPriceReducedBadge
-          :price-history="priceHistory"
-          :current-price="currentPriceNumber"
-          class="absolute top-2 left-2 z-1 text-xs"
-        />
+        <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
+          variant="solid" class="absolute top-2 right-2 z-1 text-xs" />
+        <AtomsPriceReducedBadge :price-history="priceHistory" :current-price="currentPriceNumber"
+          class="absolute top-2 left-2 z-1 text-xs" />
       </ClientOnly>
     </div>
 
@@ -86,11 +73,11 @@
       </MoleculesScrollBox>
 
       <div class="property-card-root__buttons" aria-role="presentation">
-        <component :is="viewLinkComponent.is" :href="viewLinkComponent.href"
+        <PropertyCardMaybeLink :href="viewLinkUrl" as="span"
           class="property-card-root__button property-card-root__button--view | body-sm"
           @click="!disabledInteractions && listingId && trackClick(listingId)">
           View
-        </component>
+        </PropertyCardMaybeLink>
 
         <AtomsEnquireButton v-if="listingId && userId" :disabled="disabledInteractions" :listing-id :user-id="userId"
           class="property-card-root__button property-card-root__button--enquire | body-sm" />
@@ -157,7 +144,7 @@ const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewin
 
 onMounted(() => {
   if (loggedIn.value && props.listingId && viewings.value.length === 0) {
-    fetchViewings().catch(() => {})
+    fetchViewings().catch(() => { })
   }
 })
 
@@ -174,21 +161,16 @@ const isListingHidden = computed(() =>
 const hasPriceHistory = computed(() => !!props.priceHistory?.length)
 
 /**
- *  Conditionally show as links
+ *  Only include link URL if interactions are not disabled
  */
-const viewLinkComponent = computed(() => {
+const viewLinkUrl = computed(() => {
   const { viewUrl, disabledInteractions } = props
 
-  if (!disabledInteractions && viewUrl) {
-    return {
-      is: 'a',
-      href: viewUrl
-    }
+  if (disabledInteractions) {
+    return undefined
   }
 
-  return {
-    is: 'span'
-  }
+  return viewUrl
 })
 
 /**
@@ -297,6 +279,7 @@ const imageCarouselArray = computed(() => {
   }
 
   &--hidden {
+
     .property-card-root__images,
     .property-card-root__content {
       opacity: 0.35;
