@@ -371,7 +371,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
 
 .o-listing-mobile-banner {
   position: fixed;
-  bottom: env(safe-area-inset-bottom, 0);
+  bottom: 0;
   left: 0;
   z-index: 5;
   width: 100%;
@@ -383,6 +383,8 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
   flex-direction: column;
   gap: var(--size-10);
   transition: border-radius var(--animation-slow) var(--ease-out);
+  /* Force Chrome iOS to use visual viewport for fixed positioning, not layout viewport */
+  transform: translateZ(0);
 
   &--expanded {
     border-top-right-radius: var(--border-radius-3xl);
