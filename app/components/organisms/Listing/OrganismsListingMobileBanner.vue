@@ -371,7 +371,7 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
 
 .o-listing-mobile-banner {
   position: fixed;
-  bottom: env(safe-area-inset-bottom, 0);
+  bottom: 0;
   left: 0;
   z-index: 5;
   width: 100%;
