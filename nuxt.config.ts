@@ -187,8 +187,6 @@ export default defineNuxtConfig({
               port: process.env.REDISPORT ? parseInt(process.env.REDISPORT) : undefined,
               username: process.env.REDISUSER,
             }
-            username: process.env.REDISUSER,
-          }
           : { driver: "memory" },
     },
     devStorage: {
