@@ -125,12 +125,21 @@ const useGlobalSearchState = createSharedComposable(() => {
     // If no location of query has been added, return an empty body
     if (!location || !query) return null
 
+    if (type === 'ai') {
+      return JSON.stringify({
+        type,
+        location,
+        radius,
+        query
+      })
+    }
+
     // Stringify body to be posted
     return JSON.stringify({
+      ...(query as Record<string, unknown>),
       type,
       location,
       radius,
-      query
     })
   }
 
