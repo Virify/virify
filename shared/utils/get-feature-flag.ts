@@ -1,7 +1,7 @@
 import { useRuntimeConfig } from '#imports'
 
-export function getFeatureFlagConfig(): Record<string, boolean> {
+export function getFeatureFlagConfig() {
   const { featureFlags } = useRuntimeConfig().public
 
-  return asObject(featureFlags)
+  return featureFlags
 }
