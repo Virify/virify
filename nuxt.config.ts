@@ -1,6 +1,6 @@
 import vue from "@vitejs/plugin-vue";
 
-function matchIfExistOrDefault(key: string, defaultValue: boolean): boolean {
+function envIfExistOrDefault(key: string, defaultValue: boolean): boolean {
   const matchedKey = process.env[key]
 
   // If a key exists, check if it is 'true'
@@ -33,9 +33,9 @@ export default defineNuxtConfig({
     public: {
       isWaitingList: process.env.DEPLOYMENT_ENV === "waiting-list",
       featureFlags: {
-        search: matchIfExistOrDefault('ALLOW_SEARCH', false),
-        signup: matchIfExistOrDefault('ALLOW_SIGNUP', true),
-        createListing: matchIfExistOrDefault('ALLOW_CREATE_LISTING', true)
+        search: envIfExistOrDefault('ALLOW_SEARCH', false),
+        signup: envIfExistOrDefault('ALLOW_SIGNUP', true),
+        createListing: envIfExistOrDefault('ALLOW_CREATE_LISTING', true)
       }
     },
   },
