@@ -1,5 +1,15 @@
 import vue from "@vitejs/plugin-vue";
 
+function matchIfExistOrDefault(key: string, defaultValue: boolean): boolean {
+  const matchedKey = process.env[key]
+
+  // If a key exists, check if it is 'true'
+  if (matchedKey) return matchedKey === 'true'
+
+  // If no key exists, return default value
+  return defaultValue
+}
+
 export default defineNuxtConfig({
   extends: [
     "./layers/cloudflare",
@@ -22,6 +32,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       isWaitingList: process.env.DEPLOYMENT_ENV === "waiting-list",
+      featureFlags: {
+        search: matchIfExistOrDefault('ALLOW_SEARCH', false),
+        signup: matchIfExistOrDefault('ALLOW_SIGNUP', true),
+        createListing: matchIfExistOrDefault('ALLOW_CREATE_LISTING', true)
+      }
     },
   },
   modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
@@ -172,6 +187,8 @@ export default defineNuxtConfig({
               port: process.env.REDISPORT ? parseInt(process.env.REDISPORT) : undefined,
               username: process.env.REDISUSER,
             }
+            username: process.env.REDISUSER,
+          }
           : { driver: "memory" },
     },
     devStorage: {
