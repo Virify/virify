@@ -69,6 +69,12 @@ const { showModal } = useGlobalSearch()
     background: light-dark(var(--blue-700), var(--blue-400));
     border: 1px solid light-dark(var(--blue-600), var(--blue-500));
     border-radius: var(--border-radius-md);
+
+    .a-meta-key {
+      display: block;
+      width: var(--size-14);
+      height: var(--size-14);
+    }
   }
 }
 </style>

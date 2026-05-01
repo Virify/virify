@@ -3,19 +3,13 @@
     <PopoverTrigger class="header-actions-logged-in__toggle | body-md">
       Account
 
-      <span role="img" class="header-actions-logged-in__profile-image">
-        <UAvatar
-          :src="user?.avatar || undefined"
-          icon="i-lucide-user"
-          size="lg"
-          :as="{ img: 'img' }"
-        />
-        <span
-          v-if="notificationsTotal > 0"
-          class="header-actions-logged-in__unread-badge"
-          aria-label="Unread notifications"
-        />
-      </span>
+      <div role="presentation" class="header-actions-logged-in__profile">
+        <NuxtImg v-if="userImage" :src="userImage" class="header-actions-logged-in__profile-image" />
+        <AvatarInitials v-else :name="userName" class="header-actions-logged-in__profile-image" />
+
+        <span v-if="notificationsTotal > 0" class="header-actions-logged-in__unread-badge"
+          aria-label="Unread notifications"></span>
+      </div>
     </PopoverTrigger>
 
     <PopoverPortal>
@@ -106,9 +100,23 @@ async function openNotifications() {
 }
 
 /**
- *  Log user out
+ *  User info and logout
  */
 const { clear, user } = useUserSession()
+
+const userImage = computed(() => {
+  return user.value?.avatar
+})
+
+const userName = computed(() => {
+  const { firstName, lastName, username } = asObject(user.value)
+
+  // Get full name
+  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim()
+
+  // Return either the full name or, if no name given, the username
+  return fullName ?? username
+})
 
 /**
  *  Account navigation
@@ -169,35 +177,31 @@ async function logOut() {
     }
   }
 
-  &__profile-image {
+  &__profile {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  }
+
+  &__profile-image {
     width: var(--size-36);
     height: var(--size-36);
     border-radius: var(--border-radius-pill);
-    background: light-dark(var(--monochrome-700), var(--monochrome-400));
+    background: light-dark(var(--blue-400), var(--blue-100));
+    color: var(--monochrome-900);
+    font-size: var(--font-sm);
     object-fit: contain;
-    color: light-dark(var(--monochrome-100), var(--monochrome-900));
-
-    .a-icon {
-      display: block;
-      width: var(--size-24);
-      height: var(--size-24);
-    }
   }
 
   &__unread-badge {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 10px;
-    height: 10px;
+    top: -3px;
+    right: -3px;
+    width: 13px;
+    height: 13px;
     border-radius: var(--border-radius-pill);
     background: var(--error);
-    border: 2px solid var(--background-100);
+    border: 2px solid var(--background-200);
     pointer-events: none;
+    box-sizing: border-box;
   }
 
   &__popover {
