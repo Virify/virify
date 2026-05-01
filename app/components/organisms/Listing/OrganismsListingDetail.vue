@@ -189,8 +189,11 @@
     <MoleculesImageGalleryModal :images="galleryImages" :show="showImageModal" :initial-index="modalImageIndex"
       @close="closeImageModal" />
 
+    <!-- Sentinel: when visible the user has scrolled past the listing into the footer -->
+    <div ref="$listingEnd" />
+
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop" :price="priceFormatted" :overview-visible="isOverviewVisible"
+      <OrganismsListingMobileBanner v-if="!isDesktop && !isBeyondListing" :price="priceFormatted" :overview-visible="isOverviewVisible"
         :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal" :price-type="priceType"
         :address="address" :property-type="property?.type?.name" :property-size="property?.size || undefined"
         :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined"
@@ -444,6 +447,24 @@ const isMobileGalleryVisible = shallowRef(false);
 
 useIntersectionObserver($mobileCarousel, ([entry]) => {
   isMobileGalleryVisible.value = !!entry?.isIntersecting;
+});
+
+/**
+ *  Hide mobile banner once the user scrolls past the listing into the footer
+ */
+const $listingEnd = useTemplateRef('$listingEnd');
+const isBeyondListing = shallowRef(false);
+
+useIntersectionObserver($listingEnd, ([entry]) => {
+  if (!entry) return;
+  if (entry.isIntersecting) {
+    // Sentinel entered viewport — user is in the footer area
+    isBeyondListing.value = true;
+  } else if (entry.boundingClientRect.top > 0) {
+    // Sentinel is below viewport — user scrolled back up into the listing
+    isBeyondListing.value = false;
+  }
+  // If top <= 0 and not intersecting, sentinel scrolled above viewport (fully past it) — stay hidden
 });
 
 /**
