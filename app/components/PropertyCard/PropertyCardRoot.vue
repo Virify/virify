@@ -1,21 +1,11 @@
 <template>
-  <section
-    class="property-card-root"
-    :class="{ 'property-card-root--hidden': isListingHidden }"
-  >
+  <section class="property-card-root" :class="{ 'property-card-root--hidden': isListingHidden }">
     <Transition name="fade">
       <div v-if="isListingHidden" class="property-card-root__hidden-overlay">
-        <UIcon
-          name="i-lucide-eye-off"
-          class="property-card-root__hidden-icon"
-          aria-hidden
-        />
+        <UIcon name="i-lucide-eye-off" class="property-card-root__hidden-icon" aria-hidden />
         <span class="body-md">Hidden</span>
-        <button
-          type="button"
-          class="property-card-root__hidden-undo | button-none body-sm"
-          @click="unhideListing(listingId!)"
-        >
+        <button type="button" class="property-card-root__hidden-undo | button-none body-sm"
+          @click="unhideListing(listingId!)">
           Undo
         </button>
       </div>
@@ -24,70 +14,33 @@
     <div class="property-card-root__images | v-skeleton">
       <template v-if="imageCarouselArray">
         <PropertyCardCarousel :slides="imageCarouselArray" v-slot="{ slide }">
-          <PropertyCardImage
-            :provider="imageProvider"
-            :src="slide"
-            :alt="propertyImageAlt"
-            variant="card"
-            class="property-card-root__image"
-            width="491"
-            height="368"
-            loading="lazy"
-          />
+          <PropertyCardImage :provider="imageProvider" :src="slide" :alt="propertyImageAlt" variant="card"
+            class="property-card-root__image" width="491" height="368" loading="lazy" />
         </PropertyCardCarousel>
       </template>
 
-      <PropertyCardImage
-        v-else-if="propertyImage"
-        :provider="imageProvider"
-        :src="propertyImage"
-        :alt="propertyImageAlt"
-        variant="card"
-        class="property-card-root__image"
-        width="491"
-        height="368"
-        loading="lazy"
-      />
+      <PropertyCardImage v-else-if="propertyImage" :provider="imageProvider" :src="propertyImage"
+        :alt="propertyImageAlt" variant="card" class="property-card-root__image" width="491" height="368"
+        loading="lazy" />
 
       <ClientOnly>
-        <UBadge
-          v-if="viewingLabel"
-          :label="viewingLabel"
-          icon="i-lucide-calendar"
-          size="lg"
-          color="secondary"
-          variant="solid"
-          class="absolute top-2 right-2 z-1 text-xs"
-        />
-        <AtomsPriceReducedBadge
-          :price-history="priceHistory"
-          :current-price="currentPriceNumber"
-          class="absolute top-2 left-2 z-1 text-xs"
-        />
+        <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
+          variant="solid" class="absolute top-2 right-2 z-1 text-xs" />
+        <AtomsPriceReducedBadge :price-history="priceHistory" :current-price="currentPriceNumber"
+          class="absolute top-2 left-2 z-1 text-xs" />
       </ClientOnly>
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
       <h2 class="property-card-root__price">
-        <PropertyCardPill
-          v-if="priceLabel"
-          :content="priceLabel"
-          variant="orange"
-        />
-        <PropertyCardPill
-          v-if="rentFrequency"
-          :content="rentFrequency"
-          variant="orange"
-        />
+        <PropertyCardPill v-if="priceLabel" :content="priceLabel" variant="orange" />
+        <PropertyCardPill v-if="rentFrequency" :content="rentFrequency" variant="orange" />
 
         <span class="property-card-root__price-amount | title-md">
           {{ price }}
 
-          <AtomsPriceHistoryPopover
-            v-if="hasPriceHistory"
-            :price-history="priceHistory!"
-            :current-price="currentPriceNumber!"
-          />
+          <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!"
+            :current-price="currentPriceNumber!" />
         </span>
       </h2>
 
@@ -98,11 +51,7 @@
         {{ overviewAddress }}
       </p>
 
-      <MoleculesScrollBox
-        v-if="labels?.length"
-        :scroll-indicator="true"
-        class="property-card-root__labels-scrollbox"
-      >
+      <MoleculesScrollBox v-if="labels?.length" :scroll-indicator="true" class="property-card-root__labels-scrollbox">
         <ul class="property-card-root__labels">
           <li v-for="label of labels" :key="label">
             <PropertyCardPill :content="label" />
@@ -110,17 +59,9 @@
         </ul>
       </MoleculesScrollBox>
 
-      <MoleculesScrollBox
-        v-if="icons?.length"
-        :scroll-indicator="true"
-        class="property-card-root__icons-scrollbox"
-      >
+      <MoleculesScrollBox v-if="icons?.length" :scroll-indicator="true" class="property-card-root__icons-scrollbox">
         <ul class="property-card-root__icons">
-          <li
-            v-for="{ icon, count, label } of validIcons"
-            :key="label"
-            class="property-card-root__icon"
-          >
+          <li v-for="{ icon, count, label } of validIcons" :key="label" class="property-card-root__icon">
             <span class="property-card-root__icon-count">
               <AtomsIcon :icon aria-hidden />
               {{ count }}
@@ -132,51 +73,29 @@
       </MoleculesScrollBox>
 
       <div class="property-card-root__buttons" aria-role="presentation">
-        <PropertyCardMaybeLink
-          :href="viewLinkUrl"
-          as="span"
+        <PropertyCardMaybeLink :href="viewLinkUrl" as="span"
           class="property-card-root__button property-card-root__button--view | body-sm"
-          @click="!disabledInteractions && listingId && trackClick(listingId)"
-        >
+          @click="!disabledInteractions && listingId && trackClick(listingId)">
           View
         </PropertyCardMaybeLink>
 
-        <AtomsEnquireButton
-          v-if="listingId && userId"
-          :disabled="disabledInteractions"
-          :listing-id
-          :user-id="userId"
-          class="property-card-root__button property-card-root__button--enquire | body-sm"
-        />
+        <AtomsEnquireButton v-if="listingId && userId" :disabled="disabledInteractions" :listing-id :user-id="userId"
+          class="property-card-root__button property-card-root__button--enquire | body-sm" />
       </div>
 
-      <div
-        v-if="!disabledInteractions"
-        class="property-card-root__footer"
-        aria-role="presentation"
-      >
+      <div v-if="!disabledInteractions" class="property-card-root__footer" aria-role="presentation">
         <PropertyCardSeller :name="sellerName" :profile-image="sellerImage" />
 
         <div role="presentation" class="property-card-root__footer-text">
-          <span
-            role="presentation"
-            class="property-card-root__footer-name | body-xs"
-          >
+          <span role="presentation" class="property-card-root__footer-name | body-xs">
             {{ profileText }}
           </span>
-          <time
-            :datetime="dateChanged"
-            class="property-card-root__footer-date | body-2xs"
-          >
+          <time :datetime="dateChanged" class="property-card-root__footer-date | body-2xs">
             {{ timeAgo }}
           </time>
         </div>
 
-        <PropertyCardInteractions
-          v-if="listingId"
-          :listing-id
-          class="property-card-root__interactions"
-        />
+        <PropertyCardInteractions v-if="listingId" :listing-id class="property-card-root__interactions" />
       </div>
     </div>
   </section>
@@ -184,137 +103,130 @@
 
 <script setup lang="ts">
 interface FacilitiesIcon {
-  icon: string;
-  label: string;
-  count?: number;
+  icon: string
+  label: string
+  count?: number
 }
 
 interface Props {
-  saleOrRent?: "buy" | "rent" | string;
-  propertyImage?: string;
-  carouselImages?: string[];
-  propertyImageAlt?: string;
-  disabledInteractions?: boolean;
-  imageProvider?: "cloudflare" | "local";
-  price?: string;
-  priceLabel?: string;
-  rentFrequency?: string;
-  priceHistory?: PriceHistoryEntry[];
-  currentPriceNumber?: number;
-  overview?: string;
-  overviewAddress?: string;
-  dateChanged?: string;
-  dateChangedType?: "Added" | "Updated" | string;
-  labels?: string[];
-  icons?: FacilitiesIcon[];
-  sellerImage?: string;
-  sellerName?: string;
-  viewUrl?: string;
-  listingId?: number;
-  userId?: number;
+  saleOrRent?: 'buy' | 'rent' | string
+  propertyImage?: string
+  carouselImages?: string[]
+  propertyImageAlt?: string
+  disabledInteractions?: boolean
+  imageProvider?: 'cloudflare' | 'local'
+  price?: string
+  priceLabel?: string
+  rentFrequency?: string
+  priceHistory?: PriceHistoryEntry[]
+  currentPriceNumber?: number
+  overview?: string
+  overviewAddress?: string
+  dateChanged?: string
+  dateChangedType?: 'Added' | 'Updated' | string
+  labels?: string[]
+  icons?: FacilitiesIcon[]
+  sellerImage?: string
+  sellerName?: string
+  viewUrl?: string
+  listingId?: number
+  userId?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  imageProvider: "cloudflare",
-});
+  imageProvider: 'cloudflare'
+})
 
-const { isHidden, unhideListing } = useHiddenListings();
-const { trackClick } = useAnalyticsTracking();
-const { loggedIn } = useUserSession();
-const {
-  viewings,
-  getActiveViewingForListing,
-  getViewingStatusLabel,
-  fetchViewings,
-} = useViewings();
+const { isHidden, unhideListing } = useHiddenListings()
+const { trackClick } = useAnalyticsTracking()
+const { loggedIn } = useUserSession()
+const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings()
 
 onMounted(() => {
   if (loggedIn.value && props.listingId && viewings.value.length === 0) {
-    fetchViewings().catch(() => {});
+    fetchViewings().catch(() => { })
   }
-});
+})
 
 const viewingLabel = computed(() => {
-  if (!props.listingId) return null;
-  const v = getActiveViewingForListing(props.listingId);
-  return v ? getViewingStatusLabel(v) : null;
-});
+  if (!props.listingId) return null
+  const v = getActiveViewingForListing(props.listingId)
+  return v ? getViewingStatusLabel(v) : null
+})
 
-const isListingHidden = computed(
-  () =>
-    !props.disabledInteractions &&
-    !!props.listingId &&
-    isHidden(props.listingId),
-);
+const isListingHidden = computed(() =>
+  !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
+)
 
-const hasPriceHistory = computed(() => !!props.priceHistory?.length);
+const hasPriceHistory = computed(() => !!props.priceHistory?.length)
 
 /**
  *  Only include link URL if interactions are not disabled
  */
 const viewLinkUrl = computed(() => {
-  const { viewUrl, disabledInteractions } = props;
+  const { viewUrl, disabledInteractions } = props
 
   if (disabledInteractions) {
-    return undefined;
+    return undefined
   }
 
-  return viewUrl;
-});
+  return viewUrl
+})
 
 /**
  *  Format profile text
  */
 const profileText = computed(() => {
-  const { saleOrRent, sellerName = "Virify" } = props;
+  const { saleOrRent, sellerName = 'Virify' } = props
 
   switch (saleOrRent) {
-    case "buy":
-      return `Sold by ${sellerName}`;
-    case "rent":
-      return `Let by ${sellerName}`;
+    case 'buy':
+      return `Sold by ${sellerName}`
+    case 'rent':
+      return `Let by ${sellerName}`
     default:
-      return `By ${sellerName}`;
+      return `By ${sellerName}`
   }
-});
+})
 
 /**
  *  Ensure icons are valid
  */
 const validIcons = computed(() => {
-  const { icons } = props;
+  const { icons } = props
 
   return asArray(icons).filter((icon: FacilitiesIcon) => {
-    return isObject(icon) && isString(icon.label) && isString(icon.icon);
-  });
-});
+    return isObject(icon) && isString(icon.label) && isString(icon.icon)
+  })
+})
 
 /**
  *  Get date as 'time ago'
  */
 const timeAgo = computed(() => {
-  const { dateChanged, dateChangedType } = props;
+  const { dateChanged, dateChangedType } = props
 
-  return [dateChangedType, getTimeAgo(dateChanged)].filter(Boolean).join(" ");
-});
+  return [dateChangedType, getTimeAgo(dateChanged)].filter(Boolean).join(' ')
+})
 
 /**
  *  Get populated images for image carousel
  */
 const imageCarouselArray = computed(() => {
-  const { carouselImages } = asObject(props);
+  const { carouselImages } = asObject(props)
 
   // If carousel images is not a populated array, return nothing
   if (!isPopulatedArray(carouselImages)) {
-    return null;
+    return null
   }
 
   // Get only array entries that are strings
-  const imageStrings = carouselImages?.filter(isString) as string[];
+  const imageStrings = carouselImages?.filter(isString) as string[]
 
   // Return array only if it has entries
-  return imageStrings.length ? imageStrings : null;
-});
+  return imageStrings.length ? imageStrings : null
+})
+
 </script>
 
 <style lang="scss">
@@ -367,6 +279,7 @@ const imageCarouselArray = computed(() => {
   }
 
   &--hidden {
+
     .property-card-root__images,
     .property-card-root__content {
       opacity: 0.35;
