@@ -1,10 +1,10 @@
 import type { User } from '#auth-utils'
+import { Role } from '~~/layers/database/server/database/prisma/generated/enums'
 import { asObject } from '#shared/utils'
 
-const VALID_ROLES = ['ADMIN', 'AGENT', 'USER'] as const
 const FALLBACK_ROLE = 'PUBLIC'
 
-type ValidRole = (typeof VALID_ROLES)[number]
+type ValidRole = Role
 type FallbackRole = typeof FALLBACK_ROLE
 
 /**
@@ -13,7 +13,7 @@ type FallbackRole = typeof FALLBACK_ROLE
 function getIsValidRole(role: unknown): role is ValidRole {
   if (!role || typeof role !== 'string') return false
 
-  return VALID_ROLES.includes(role as ValidRole)
+  return Object.values(Role).includes(role as Role)
 }
 
 /**

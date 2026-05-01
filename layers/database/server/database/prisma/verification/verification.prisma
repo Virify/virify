@@ -35,6 +35,6 @@ enum Reviewed {
 
 enum Role {
   USER
-  BUSINESS
+  AGENT
   ADMIN
 }
