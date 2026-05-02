@@ -5,13 +5,13 @@ const alwaysAllowedRoutes = [
   '/terms/**',
   '/privacy/**',
   '/guides/**',
+  '/listing/**',
   '/price-paid/**',
   '/cookie/**',
   '/support/**',
 ]
 
 const featureFlagRoutes = {
-  '/listing/**': ['search'],
   '/search/**': ['search'],
   '/login/**': ['signup'],
   '/account/**': ['signup'],
