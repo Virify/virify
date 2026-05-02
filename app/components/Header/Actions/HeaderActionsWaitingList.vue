@@ -16,7 +16,6 @@
 
 <script setup lang="ts">
 import { ViewsDialogLogin, ViewsDialogWaitingList } from '#components'
-import { watchImmediate } from '@vueuse/core'
 
 const { showDialog } = useDialog()
 
@@ -35,7 +34,7 @@ function showSignupForm() {
 const { query } = useRoute()
 const isAllowLogin = shallowRef(false)
 
-watchImmediate(query, () => {
+onMounted(() => {
   const { showLogin } = asObject(query)
 
   isAllowLogin.value = showLogin === 'true'
