@@ -2,7 +2,7 @@
   <footer class="o-footer">
     <div class="o-footer__container | container">
       <!-- Logo Section -->
-      <div class="o-footer__brand" v-if="!isWaitingListMode">
+      <div class="o-footer__brand">
         <nuxt-link to="/" class="o-footer__logo-link">
           <svg width="113" height="32" class="o-footer__logo">
             <title>Virify logo</title>
@@ -12,14 +12,8 @@
       </div>
 
       <div class="o-footer__sections">
-        <div class="o-footer__brand" v-if="isWaitingListMode">
-          <nuxt-link to="/" class="o-footer__logo-link">
-            <AtomsIcon title="Virify Ltd" icon="logo/horizontal-colour" width="120" height="54"
-              class="o-footer__logo" />
-          </nuxt-link>
-        </div>
         <!-- List Property Section -->
-        <div v-if="footerConfig.showSellProperty" class="o-footer__section">
+        <div v-if="createListing" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Sell Property</h3>
           <div class="o-footer__cta">
             <a href="#" class="o-footer__button | button button-secondary button-xs">List your property</a>
@@ -27,7 +21,7 @@
         </div>
 
         <!-- Property Tools Section -->
-        <div v-if="footerConfig.showPropertyTools" class="o-footer__section">
+        <div class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Property Tools</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/price-paid" class="o-footer__link | body-sm">Price Paid Data</nuxt-link></li>
@@ -36,7 +30,7 @@
         </div>
 
         <!-- Guides Section -->
-        <div v-if="footerConfig.showGuides" class="o-footer__section">
+        <div class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Guides</h3>
           <ul class="o-footer__links">
             <li><nuxt-link to="/guides" class="o-footer__link | body-sm">All Guides</nuxt-link></li>
@@ -49,7 +43,7 @@
         </div>
 
         <!-- Company Section -->
-        <div v-if="footerConfig.showCompany" class="o-footer__section">
+        <div class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Company</h3>
           <ul class="o-footer__links">
             <!-- <li><a href="#" class="o-footer__link | body-sm">About Us</a></li> -->
@@ -79,30 +73,10 @@
 
 <script setup lang="ts">
 
-const { isWaitingListMode, config } = useWaitingListMode()
+const { createListing } = useFeatureFlag()
 
 // Get guide categories for footer navigation
 const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
-
-// Determine which sections to show
-const footerConfig = computed(() => {
-  if (!isWaitingListMode.value) {
-    // Show everything when not in waiting-list mode
-    return {
-      showSellProperty: true,
-      showPropertyTools: true,
-      showGuides: true,
-      showCompany: true,
-    }
-  }
-  // Use waiting-list config when in waiting-list mode
-  return {
-    showSellProperty: config.footer.showSellProperty,
-    showPropertyTools: config.footer.showPropertyTools,
-    showGuides: config.footer.showGuides,
-    showCompany: config.footer.showCompany,
-  }
-})
 
 const currentYear = new Date().getFullYear();
 </script>
