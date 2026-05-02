@@ -187,9 +187,7 @@ async function animateFormToDock() {
 /**
  *  Universal search
  */
-// @TODO - waiting list - remove once live
-const { isWaitingListMode } = useWaitingListMode();
-// @TODO end
+const { search, isAdmin } = useFeatureFlag()
 
 function showUniversalSearch({ key, metaKey, ctrlKey }: KeyboardEvent) {
   const { keyName } = useSpecialKey()
@@ -206,9 +204,7 @@ function showUniversalSearch({ key, metaKey, ctrlKey }: KeyboardEvent) {
 }
 
 onMounted(() => {
-  // @TODO - waiting list - remove once live
-  if (isWaitingListMode.value) return
-  // @TODO end
+  if (!(search || isAdmin.value)) return
 
   window.addEventListener('keydown', showUniversalSearch)
 })

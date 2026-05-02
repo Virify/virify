@@ -4,15 +4,8 @@
       <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
         <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
         <ClientOnly>
-          <UBadge
-            v-if="viewingLabel"
-            :label="viewingLabel"
-            icon="i-lucide-calendar"
-            size="lg"
-            color="secondary"
-            variant="solid"
-            class="mb-1 absolute top-2 right-2 z-1 text-xs"
-            />
+          <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
+            variant="solid" class="mb-1 absolute top-2 right-2 z-1 text-xs" />
         </ClientOnly>
       </div>
 
@@ -22,15 +15,8 @@
             role="presentation">
             <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
             <ClientOnly>
-              <UBadge
-                v-if="viewingLabel"
-                :label="viewingLabel"
-                icon="i-lucide-calendar"
-                size="lg"
-                color="secondary"
-                variant="solid"
-                class="mb-1 absolute top-2 right-2 z-1 text-xs"
-                />
+              <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
+                variant="solid" class="mb-1 absolute top-2 right-2 z-1 text-xs" />
             </ClientOnly>
           </div>
 
@@ -41,8 +27,7 @@
             :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
             :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
-            :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null"
-            :listing-id="listing?.id"
+            :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null" :listing-id="listing?.id"
             :price-history="listing?.ListingPriceHistory ?? undefined"
             :current-price-number="listing?.price ?? undefined"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
@@ -154,15 +139,8 @@
               <div class="p-listing__sidebar-carousel">
                 <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
                 <ClientOnly>
-                  <UBadge
-                    v-if="viewingLabel"
-                    :label="viewingLabel"
-                    icon="i-lucide-calendar"
-                    size="lg"
-                    color="secondary"
-                    variant="solid"
-                    class="mb-1 absolute top-2 right-2 z-1 text-xs"
-                    />
+                  <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
+                    variant="solid" class="mb-1 absolute top-2 right-2 z-1 text-xs" />
                 </ClientOnly>
               </div>
             </div>
@@ -176,8 +154,7 @@
             :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
             :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
-            :agent="listing?.user || {}"
-            :price-history="listing?.ListingPriceHistory ?? undefined"
+            :agent="listing?.user || {}" :price-history="listing?.ListingPriceHistory ?? undefined"
             :current-price-number="listing?.price ?? undefined"
             :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
             :is-draft="isDraft" />
@@ -193,16 +170,16 @@
     <div ref="$listingEnd" />
 
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop && !isBeyondListing" :price="priceFormatted" :overview-visible="isOverviewVisible"
-        :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal" :price-type="priceType"
-        :address="address" :property-type="property?.type?.name" :property-size="property?.size || undefined"
-        :bedrooms="property?.numberBedrooms || undefined" :bathrooms="property?.numberBathrooms || undefined"
-        :other-rooms="property?.numberOtherRooms || undefined" :has-garden="hasGarden" :has-land="hasLand"
-        :receptions="property?.numberReceptions || undefined" :classification="property?.classification?.name"
-        :year-built="property?.yearBuilt || undefined" :construction-type="property?.constructionType || undefined"
+      <OrganismsListingMobileBanner v-if="!isDesktop && !isBeyondListing" :price="priceFormatted"
+        :overview-visible="isOverviewVisible" :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal"
+        :price-type="priceType" :address="address" :property-type="property?.type?.name"
+        :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
+        :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
+        :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
+        :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
+        :construction-type="property?.constructionType || undefined"
         :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
-        :agent="listing?.user || {}"
-        :price-history="listing?.ListingPriceHistory ?? undefined"
+        :agent="listing?.user || {}" :price-history="listing?.ListingPriceHistory ?? undefined"
         :current-price-number="listing?.price ?? undefined"
         :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
         :is-draft="isDraft" />
@@ -220,7 +197,6 @@ const props = defineProps<{
 }>();
 
 const { trackView } = useAnalyticsTracking();
-const { isWaitingListMode } = useWaitingListMode();
 
 /**
  *  Content
@@ -422,7 +398,7 @@ onMounted(() => {
     trackView(props.listing.id);
   }
   if (loggedIn.value && viewings.value.length === 0) {
-    fetchViewings().catch(() => {});
+    fetchViewings().catch(() => { });
   }
 });
 

@@ -12,7 +12,7 @@
 
       <LazyHeaderDesktopRoot class="header-base__nav header-base__nav--desktop" hydrate-on-visible :menu="mainMenu" />
 
-      <template v-if="signup">
+      <template v-if="signup || isAdmin">
         <LazyHeaderActionsLoggedIn v-if="loggedIn" />
         <LazyHeaderActionsGuest v-else />
       </template>
@@ -38,7 +38,7 @@ const { loggedIn } = useUserSession();
  *  Check whether to skip the wait list - this doesn't need to be
  *  reactive so we don't need to use computed functions
  */
-const { signup } = useFeatureFlag();
+const { signup, isAdmin } = useFeatureFlag();
 
 /**
  *  Add subtle shadow to menu when user has scrolled

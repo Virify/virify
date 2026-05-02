@@ -10,7 +10,7 @@
     </button>
 
     <div :id="menuId" class="header-mobile-nav__menu" :hidden="!isExpanded">
-      <div v-if="!isWaitingListMode" class="header-mobile-nav__menu-search | container">
+      <div v-if="search || isAdmin" class="header-mobile-nav__menu-search | container">
         <HeaderActionsSearch />
       </div>
 
@@ -77,9 +77,10 @@ watch(isExpanded, (newState) => {
 })
 */
 
-// @TODO - waiting list - remove once live
-const { isWaitingListMode } = useWaitingListMode();
-// @TODO end
+/**
+ *  Conditionally allow search bar
+ */
+const { search, isAdmin } = useFeatureFlag();
 
 </script>
 
