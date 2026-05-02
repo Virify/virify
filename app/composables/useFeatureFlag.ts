@@ -7,6 +7,7 @@ export function useFeatureFlag() {
     role,
     roleActive,
     isAdmin,
-    isAgent
+    isAgent,
+    checkFeatureFlag
   }
 }

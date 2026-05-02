@@ -10,6 +10,7 @@ export async function useFeatureFlag(event: H3Event<EventHandlerRequest>) {
     role,
     roleActive,
     isAdmin,
-    isAgent
+    isAgent,
+    checkFeatureFlag
   }
 }
