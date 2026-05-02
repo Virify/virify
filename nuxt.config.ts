@@ -35,7 +35,8 @@ export default defineNuxtConfig({
       featureFlags: {
         search: envIfExistOrDefault('ALLOW_SEARCH', false),
         signup: envIfExistOrDefault('ALLOW_SIGNUP', true),
-        createListing: envIfExistOrDefault('ALLOW_CREATE_LISTING', true)
+        createListing: envIfExistOrDefault('ALLOW_CREATE_LISTING', true),
+        mortgageCalculator: envIfExistOrDefault('ALLOW_MORTGAGE_CALC', false),
       }
     },
   },

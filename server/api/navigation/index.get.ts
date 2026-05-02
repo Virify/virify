@@ -78,8 +78,8 @@ function formatGuides(category: GuideCategory, parentSlug = '/guides/') {
   return formattedCategory
 }
 
-export default defineCachedEventHandler(async () => {
-  const { isWaitingList } = useRuntimeConfig().public
+export default defineCachedEventHandler(async (event) => {
+  const { mortgageCalculator, isAdmin } = await useFeatureFlag(event)
 
   const baseNavigation: MenuItem[] = [
     {
@@ -124,7 +124,7 @@ export default defineCachedEventHandler(async () => {
   ];
 
   // If is waiting list, add waiting list URL to nav
-  if (!isWaitingList) {
+  if (mortgageCalculator || isAdmin) {
     for (let dropdown of baseNavigation) {
       if (dropdown.id !== 'property-info') continue
 
@@ -158,8 +158,13 @@ export default defineCachedEventHandler(async () => {
     dropdown.children?.push(...formattedGuides)
   }
 
-
   return baseNavigation
 }, {
-  maxAge: 86400 // 24 hours (60*60*24)
+  maxAge: 86400, // 24 hours (60*60*24),
+  getKey: async (event) => {
+    const { mortgageCalculator, isAdmin } = await useFeatureFlag(event)
+    const showMortgageCalculator = isAdmin || mortgageCalculator
+
+    return showMortgageCalculator ? 'calculator' : 'no-calculator'
+  }
 })
