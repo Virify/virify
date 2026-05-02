@@ -37,27 +37,28 @@ const useFetchResults = createSharedComposable(() => {
     }
 
     // Set location, radius used in the search
-    const { locationName, radius } = useGlobalSearchState()
+    const { locationName, radius, state } = useGlobalSearchState()
 
     // Save searched location, radius
     setSearchedLocation(locationName.value || undefined)
     setSearchedRadius(radius.value)
 
     // Fetch results
-    return useFetch('/api/search/', {
+    return useFetch<{ results?: ListingCardType[], hashKey?: string, queryAnalysis?: QueryAnalysis }>('/api/search/', {
       method: 'POST',
       body: fetchBody
     }).then(({ data }) => {
-      const {
-        results = [],
-        hashKey,
-        queryAnalysis
-      } = asObject(data.value)
+      const { results = [], hashKey, queryAnalysis } = data.value ?? {}
 
-      // Save results
       setResults(results)
       setResultsHash(hashKey)
-      setQueryAnalysis(queryAnalysis)
+
+      // Traditional search has no server-side queryAnalysis — build it from form data
+      const analysis = state.value.type === 'traditional' && state.value.traditional
+        ? buildQueryAnalysisFromFormData(state.value.traditional as TraditionalSearchData)
+        : queryAnalysis
+
+      setQueryAnalysis(analysis)
 
       // If hash exists, navigate to it
       if (isString(hashKey)) {
@@ -91,17 +92,11 @@ const useFetchResults = createSharedComposable(() => {
      *  probably look into why this is and fix properly so the hash and
      *  search endpoints are more consistent
      */
-    return await $fetch('/api/search/hash', {
+    return await $fetch<{ results?: ListingCardType[], hashKey?: string, queryAnalysis?: QueryAnalysis, location?: unknown, radius?: unknown }>('/api/search/hash', {
       method: 'POST',
       body: JSON.stringify({ hash })
     }).then((data) => {
-      const {
-        results = [],
-        hashKey,
-        queryAnalysis,
-        location,
-        radius
-      } = asObject(data)
+      const { results = [], hashKey, queryAnalysis, location, radius } = data ?? {}
 
       // Save results
       setResults(results)

@@ -11,7 +11,7 @@
 export function useLocationInput() {
   const locationText = useState<string>('location-name', () => '')
 
-  function setLocationText(newLocation: string) {
+  function setLocationText(newLocation: string | null) {
     if (!isString(newLocation)) {
       locationText.value = ''
 
