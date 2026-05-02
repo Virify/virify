@@ -10,7 +10,7 @@
       <span class="m-price-marker__price | body-xs font-semibold" aria-hidden="true">
         {{ priceDisplay }}
       </span>
-      <template v-if="id && !(signup || isAdmin)">
+      <template v-if="id && (signup || isAdmin)">
         <AtomsFavouriteButton @click.stop :listing-id="Number(id)" />
         <AtomsNoteButton @click.stop :listing-id="Number(id)" />
       </template>
