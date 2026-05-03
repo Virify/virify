@@ -106,5 +106,5 @@ Map instances are stored in a module-level cache keyed by a map ID string. `useI
 ```bash
 MAPTILER_API_KEY=...           # public — MapTiler map tiles and geocoding
 MAPBOX_ACCESS_TOKEN=...        # public — Mapbox fallback
-EASYPOSTCODES_KEY=...          # public — UK postcode lookup
+EASYPOSTCODES_KEY=...          # private — UK postcode lookup
 ```
