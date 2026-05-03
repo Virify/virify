@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
    *  Ensure a valid API key exists
    */
   if (typeof easyPostcodeAPI !== 'string') {
-    throw new TypeError('Now API key supplied for postcode service')
+    throw new TypeError('No API key supplied for postcode service')
   }
 
   /**
