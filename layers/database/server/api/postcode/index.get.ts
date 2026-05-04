@@ -25,10 +25,10 @@ export default defineEventHandler(async (event) => {
    */
   const cacheHit = await storage.getItem(postcode)
 
-  if (cacheHit && typeof cacheHit === 'string') {
     console.log('Returning postcode from cache')
+  if (cacheHit) {
 
-    return JSON.parse(cacheHit)
+    return cacheHit
   }
 
   /**
