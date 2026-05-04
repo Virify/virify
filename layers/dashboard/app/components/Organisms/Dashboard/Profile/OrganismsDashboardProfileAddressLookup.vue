@@ -162,7 +162,7 @@ const lookupPostcode = async () => {
   }).then((response) => {
     setAddressResults(response);
   }).catch(() => {
-    addressError.value = "Error fetching postcode";
+    addressError.value = "Error fetching postcode. Please check the postcode is valid and try again";
   }).finally(() => {
     lookupPending.value = false
   })
