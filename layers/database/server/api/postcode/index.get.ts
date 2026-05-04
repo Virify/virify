@@ -1,7 +1,12 @@
 import * as z from "zod";
 
 const postcodeSchema = z.object({
-  postcode: z.string().trim().toUpperCase().pipe(z.string().min(4).max(8))
+  postcode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .transform((str) => str.replace(/\s/g, ''))
+    .pipe(z.string().min(4).max(8))
 });
 
 export default defineEventHandler(async (event) => {
