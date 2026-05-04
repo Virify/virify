@@ -14,14 +14,17 @@
     <div class="property-card-root__images | v-skeleton">
       <template v-if="imageCarouselArray">
         <PropertyCardCarousel :slides="imageCarouselArray" v-slot="{ slide }">
-          <PropertyCardImage :provider="imageProvider" :src="slide" :alt="propertyImageAlt" variant="card"
-            class="property-card-root__image" width="491" height="368" loading="lazy" />
+          <PropertyCardMaybeLink :href="viewLinkUrl">
+            <PropertyCardImage :provider="imageProvider" :src="slide" :alt="propertyImageAlt" variant="card"
+              class="property-card-root__image" width="491" height="368" loading="lazy" />
+          </PropertyCardMaybeLink>
         </PropertyCardCarousel>
       </template>
 
-      <PropertyCardImage v-else-if="propertyImage" :provider="imageProvider" :src="propertyImage"
-        :alt="propertyImageAlt" variant="card" class="property-card-root__image" width="491" height="368"
-        loading="lazy" />
+      <PropertyCardMaybeLink v-else-if="propertyImage" :href="viewLinkUrl">
+        <PropertyCardImage :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt" variant="card"
+          class="property-card-root__image" width="491" height="368" loading="lazy" />
+      </PropertyCardMaybeLink>
 
       <ClientOnly>
         <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
@@ -37,7 +40,9 @@
         <PropertyCardPill v-if="rentFrequency" :content="rentFrequency" variant="orange" />
 
         <span class="property-card-root__price-amount | title-md">
-          {{ price }}
+          <PropertyCardMaybeLink :href="viewLinkUrl">
+            {{ price }}
+          </PropertyCardMaybeLink>
 
           <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!"
             :current-price="currentPriceNumber!" />
@@ -45,10 +50,12 @@
       </h2>
 
       <p class="property-card-root__overview">
-        <strong class="property-card-root__overview-address">
-          {{ overview }}
-        </strong>
-        {{ overviewAddress }}
+        <PropertyCardMaybeLink :href="viewLinkUrl">
+          <strong class="property-card-root__overview-address">
+            {{ overview }}
+          </strong>
+          {{ overviewAddress }}
+        </PropertyCardMaybeLink>
       </p>
 
       <MoleculesScrollBox v-if="labels?.length" :scroll-indicator="true" class="property-card-root__labels-scrollbox">
@@ -291,6 +298,10 @@ const imageCarouselArray = computed(() => {
   &__image {
     width: 100%;
     aspect-ratio: 4/3;
+
+    a {
+      display: block;
+    }
   }
 
   &__images {
@@ -337,6 +348,11 @@ const imageCarouselArray = computed(() => {
     font-weight: var(--font-semisemibold);
     margin-bottom: auto;
     padding-right: var(--size-16);
+
+    a,
+    a:hover {
+      text-decoration: none;
+    }
   }
 
   &__overview-address {
