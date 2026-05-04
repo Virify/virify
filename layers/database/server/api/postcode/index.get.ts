@@ -54,6 +54,9 @@ export default defineEventHandler(async (event) => {
   }).catch((err) => {
     console.error(err)
 
-    throw new TypeError('Unable to fetch postcode')
+    throw createError({
+      status: 500,
+      statusMessage: `Unable to fetch addresses for '${postcode}'`
+    })
   })
 });
