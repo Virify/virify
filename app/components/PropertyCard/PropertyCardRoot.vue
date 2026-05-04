@@ -1,5 +1,5 @@
 <template>
-  <section class="property-card-root" :class="{ 'property-card-root--hidden': isListingHidden }">
+  <section ref="root" class="property-card-root" :class="{ 'property-card-root--hidden': isListingHidden }">
     <Transition name="fade">
       <div v-if="isListingHidden" class="property-card-root__hidden-overlay">
         <UIcon name="i-lucide-eye-off" class="property-card-root__hidden-icon" aria-hidden />
@@ -29,9 +29,10 @@
       <ClientOnly>
         <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
           variant="solid" class="absolute top-2 right-2 z-1 text-xs" />
-        <AtomsPriceReducedBadge :price-history="priceHistory" :current-price="currentPriceNumber"
-          class="absolute top-2 left-2 z-1 text-xs" />
       </ClientOnly>
+
+      <PropertyCardHistory v-if="hasPriceHistory" class="property-card-root__image-overlay" :historic="priceHistory"
+        :current="currentPriceNumber" :card-width="cardWidth" />
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
@@ -43,9 +44,6 @@
           <PropertyCardMaybeLink :href="viewLinkUrl">
             {{ price }}
           </PropertyCardMaybeLink>
-
-          <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!"
-            :current-price="currentPriceNumber!" />
         </span>
       </h2>
 
@@ -109,6 +107,8 @@
 </template>
 
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core'
+
 interface FacilitiesIcon {
   icon: string
   label: string
@@ -165,7 +165,22 @@ const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
 )
 
-const hasPriceHistory = computed(() => !!props.priceHistory?.length)
+/**
+ *  Get property card size
+ */
+const cardWidth = shallowRef(200)
+const cardRoot = useTemplateRef('root')
+
+useResizeObserver(cardRoot, ([elem]) => {
+  const { width } = asObject(elem?.contentRect)
+
+  cardWidth.value = Math.floor(width)
+})
+
+/**
+ *  Price history
+ */
+const hasPriceHistory = computed(() => asArray(props.priceHistory).length)
 
 /**
  *  Only include link URL if interactions are not disabled
@@ -313,6 +328,12 @@ const imageCarouselArray = computed(() => {
   &__image {
     display: block;
     object-fit: cover;
+  }
+
+  &__image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   &__content {
