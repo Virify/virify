@@ -174,7 +174,7 @@ const cardRoot = useTemplateRef('root')
 useResizeObserver(cardRoot, ([elem]) => {
   const { width } = asObject(elem?.contentRect)
 
-  cardWidth.value = Math.floor(width)
+  cardWidth.value = Math.floor(Number(width))
 })
 
 /**
