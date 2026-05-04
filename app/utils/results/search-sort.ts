@@ -2,7 +2,7 @@
  * Utility functions for sorting search results
  */
 
-export const applySortToResults = (results: ListingWithFullProperty[], sortBy: string): ListingWithFullProperty[] => {
+export const applySortToResults = (results: ListingCardData[], sortBy: string): ListingCardData[] => {
   if (sortBy === 'relevance' || !results) return results;
 
   const sortFunctions = {
