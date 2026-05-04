@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
   /**
    *  Allow fetching postcodes from storage
    */
-  const cacheHit = storage.getItem(postcode)
+  const cacheHit = await storage.getItem(postcode)
 
   if (cacheHit && typeof cacheHit === 'string') {
     console.log('Returning postcode from cache')
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   }).then(async (response) => {
     const responseString = JSON.stringify(response)
 
-    storage.setItem(postcode, responseString)
+    await storage.setItem(postcode, responseString)
 
     console.log('Fetched and saved new postcode')
 
