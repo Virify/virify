@@ -13,8 +13,6 @@ export default defineEventHandler(async (event) => {
   const { easyPostcodeAPI } = useRuntimeConfig()
   const { postcode } = await getValidatedQuery(event, postcodeSchema.parse)
 
-  console.log('Formatted postcode', postcode)
-
   /**
    *  Get storage, with set base to avoid conflicts
    */
@@ -25,8 +23,8 @@ export default defineEventHandler(async (event) => {
    */
   const cacheHit = await storage.getItem(postcode)
 
-    console.log('Returning postcode from cache')
   if (cacheHit) {
+    console.log(`Returning addresses for '${postcode}' from cache`)
 
     return cacheHit
   }
@@ -41,7 +39,7 @@ export default defineEventHandler(async (event) => {
   /**
    *  Fetch postcode from easypostcodes
    */
-  console.log('Fetching new postcode')
+  console.log(`Fetching new addresses for '${postcode}'`)
 
   return await $fetch(`https://api.easypostcodes.com/addresses/${postcode}?includeGeo=true`, {
     headers: { 'Key': easyPostcodeAPI },
@@ -50,7 +48,7 @@ export default defineEventHandler(async (event) => {
 
     await storage.setItem(postcode, responseString)
 
-    console.log('Fetched and saved new postcode')
+    console.log(`Fetched and saved new addresses for '${postcode}'`)
 
     return response
   }).catch((err) => {
