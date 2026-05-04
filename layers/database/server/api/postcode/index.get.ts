@@ -6,7 +6,7 @@ const postcodeSchema = z.object({
     .trim()
     .toUpperCase()
     .transform((str) => str.replace(/\s/g, ''))
-    .pipe(z.string().min(4).max(8))
+    .pipe(z.string().min(3).max(8))
 });
 
 export default defineEventHandler(async (event) => {
