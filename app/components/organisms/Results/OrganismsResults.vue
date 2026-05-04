@@ -35,6 +35,29 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 /**
+ *  Sort results
+ *
+ *  @TODO - update the 'applySortToResults' function to work with the
+ *          restructure of formattedResults so that we can do the
+ *          formatted results transform before sortedResults. This means
+ *          we are not re-running the same effective transforms on the
+ *          results every time someone changes the sort order
+ */
+const sortedResults = computed(() => {
+  const { state } = useGlobalSearchState()
+  const { sortOrder } = asObject(state.value)
+
+  return applySortToResults(asArray(props.results), sortOrder)
+})
+
+/**
+ *  Format results
+ */
+const formattedResults = computed(() => {
+  return sortedResults.value.map(mapToCardProps)
+})
+
+/**
  *  Pagination
  */
 const RESULTS_PER_PAGE = 24;
@@ -51,7 +74,7 @@ function updateCurrentPage(newIndex: number) {
 
 // Get paginatable results length
 const resultsLength = computed(() => {
-  const results = asArray(resultsComponents.value)
+  const results = asArray(formattedResults.value)
 
   return results.length
 })
@@ -76,36 +99,12 @@ const paginatedResults = computed(() => {
   if (!resultsLength.value) return []
 
   // Else return sliced results
-  //
-  // @TODO - we probably want to have `.map(mapToCardProps)`
-  //         earlier in the lifecycle of data processing. Having this 
-  //         here means we are re-formatting every time someone
-  //         paginates, meaning a user might end up formatting the same
-  //         thing multiple times if navigating back/forth. If we format
-  //         earlier - maybe even using the:
-  //
-  //         > fetch(..., { transform: () => ... }))
-  // 
-  //         function - we can optimise this even further and make data
-  //         processing even more simple
-  //
-  //         Leaving here for now as this works more than well enough
-  //         for the time being
-  //
-  //         We probably also want to update `mapToCardProps` to
-  //         `formatSearchResults` at some point - should be a simple
-  //         swap
-  return asArray(resultsComponents.value).slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value).map(mapToCardProps)
+  return formattedResults.value.slice(firstPaginatedIndex.value - 1, lastPaginatedIndex.value)
 })
 
 /**
- *  Determine card props for each result
+ *  Analytics tracking
  */
-const resultsComponents = computed(() => {
-  return asArray(props.results)
-})
-
-// Track impressions when results are displayed
 const { trackImpressions } = useAnalyticsTracking()
 
 watch(() => props.results, (newResults) => {
