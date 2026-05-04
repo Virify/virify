@@ -148,6 +148,7 @@ const sortLabel = computed(() => {
     border: 1px solid light-dark(var(--blue-700), var(--blue-300));
     border-radius: var(--border-radius-lg);
     padding: var(--results-context-gap);
+    scrollbar-width: thin;
     cursor: pointer;
 
     @include mq.tablet {
