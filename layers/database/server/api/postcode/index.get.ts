@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
    */
   console.log('Fetching new postcode')
 
-  await $fetch(`https://api.easypostcodes.com/addresses/${postcode}?includeGeo=true`, {
+  return await $fetch(`https://api.easypostcodes.com/addresses/${postcode}?includeGeo=true`, {
     headers: { 'Key': easyPostcodeAPI },
   }).then(async (response) => {
     const responseString = JSON.stringify(response)
