@@ -119,7 +119,6 @@ const foundAddresses = ref<{ label: string; value: string }[]>([]);
 const rawAddresses = ref<any[]>([]);
 const selectedAddress = ref<string | undefined>(undefined);
 const addressError = ref<string | undefined>(undefined);
-const postcodeCache = new Map<string, any[]>();
 
 const clearAddress = () => {
   emit("update:modelValue", {
@@ -154,43 +153,20 @@ const setAddressResults = (data: any[]) => {
 
 const lookupPostcode = async () => {
   addressError.value = undefined;
-  const normalised = postcode.value.trim().toUpperCase();
-  if (!normalised) {
-    addressError.value = "Please enter a postcode";
-    return;
-  }
+  lookupPending.value = true
 
-  const cached = postcodeCache.get(normalised);
-  if (cached) {
-    setAddressResults(cached);
-    return;
-  }
-
-  const config = useRuntimeConfig();
-  const apiKey = config.public.EASYPOSTCODES_KEY as string;
-  if (!apiKey) {
-    addressError.value = "Address lookup service not configured";
-    return;
-  }
-
-  lookupPending.value = true;
-  try {
-    const data: any = await $fetch(`https://api.easypostcodes.com/addresses/${normalised}?includeGeo=true`, {
-      headers: { 'Key': apiKey },
-    });
-
-    if (data && data.length > 0) {
-      postcodeCache.set(normalised, data);
-      setAddressResults(data);
-    } else {
-      addressError.value = "No addresses found for this postcode";
-    }
-  } catch (error) {
-    addressError.value = "Failed to find address. Please check the postcode and try again.";
-  } finally {
-    lookupPending.value = false;
-  }
-};
+  await $fetch('/api/postcode', {
+    query: {
+      postcode: postcode.value.trim()
+    },
+  }).then((response) => {
+    setAddressResults(response);
+  }).catch(() => {
+    addressError.value = "Error fetching postcode. Please check the postcode is valid and try again";
+  }).finally(() => {
+    lookupPending.value = false
+  })
+}
 
 const onAddressSelect = (value: string) => {
   const selectedRaw = rawAddresses.value.find((addr: any) => addr.envelopeAddress?.summaryLine === value);
