@@ -2,19 +2,20 @@
   <div class="m-results-context-skeleton" aria-hidden>
     <div class="m-results-context-skeleton__title | v-skeleton" aria-hidden></div>
     <div class="m-results-context-skeleton__pills" aria-hidden>
-      <div class="m-results-context-skeleton__pill">
+      <div class="m-results-context-skeleton__pill m-results-context-skeleton__pill--location">
         <div class="m-results-context-skeleton__pill-img | v-skeleton"></div>
         <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
         <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
       </div>
 
-      <div class="m-results-context-skeleton__pill">
+      <div class="m-results-context-skeleton__pill m-results-context-skeleton__pill--sort">
         <div class="m-results-context-skeleton__pill-img | v-skeleton"></div>
-        <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
+        <div class="m-results-context-skeleton__pill-text  | v-skeleton"></div>
       </div>
 
-      <div class="m-results-context-skeleton__pill">
+      <div class="m-results-context-skeleton__pill m-results-context-skeleton__pill--type">
         <div class="m-results-context-skeleton__pill-img | v-skeleton"></div>
+        <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
         <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
         <div class="m-results-context-skeleton__pill-text | v-skeleton"></div>
       </div>
@@ -52,15 +53,19 @@
     border: 1px solid light-dark(var(--blue-700), var(--blue-300));
     border-radius: var(--border-radius-lg);
     padding: var(--results-context-gap);
-    width: min(100%, 30ch);
+    width: min(100%, 35ch);
     box-sizing: border-box;
 
     @include mq.tablet {
       border-radius: var(--border-radius-xl);
     }
 
-    &:last-child {
-      width: min(100%, 40ch);
+    &--sort {
+      width: min(100%, 12ch);
+    }
+
+    &--type {
+      width: min(100%, 35ch);
     }
   }
 

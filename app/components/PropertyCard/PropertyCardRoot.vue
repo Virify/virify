@@ -1,5 +1,5 @@
 <template>
-  <section class="property-card-root" :class="{ 'property-card-root--hidden': isListingHidden }">
+  <section ref="root" class="property-card-root" :class="{ 'property-card-root--hidden': isListingHidden }">
     <Transition name="fade">
       <div v-if="isListingHidden" class="property-card-root__hidden-overlay">
         <UIcon name="i-lucide-eye-off" class="property-card-root__hidden-icon" aria-hidden />
@@ -14,21 +14,25 @@
     <div class="property-card-root__images | v-skeleton">
       <template v-if="imageCarouselArray">
         <PropertyCardCarousel :slides="imageCarouselArray" v-slot="{ slide }">
-          <PropertyCardImage :provider="imageProvider" :src="slide" :alt="propertyImageAlt" variant="card"
-            class="property-card-root__image" width="491" height="368" loading="lazy" />
+          <PropertyCardMaybeLink :href="viewLinkUrl">
+            <PropertyCardImage :provider="imageProvider" :src="slide" :alt="propertyImageAlt" variant="card"
+              class="property-card-root__image" width="491" height="368" loading="lazy" />
+          </PropertyCardMaybeLink>
         </PropertyCardCarousel>
       </template>
 
-      <PropertyCardImage v-else-if="propertyImage" :provider="imageProvider" :src="propertyImage"
-        :alt="propertyImageAlt" variant="card" class="property-card-root__image" width="491" height="368"
-        loading="lazy" />
+      <PropertyCardMaybeLink v-else-if="propertyImage" :href="viewLinkUrl">
+        <PropertyCardImage :provider="imageProvider" :src="propertyImage" :alt="propertyImageAlt" variant="card"
+          class="property-card-root__image" width="491" height="368" loading="lazy" />
+      </PropertyCardMaybeLink>
 
       <ClientOnly>
         <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
           variant="solid" class="absolute top-2 right-2 z-1 text-xs" />
-        <AtomsPriceReducedBadge :price-history="priceHistory" :current-price="currentPriceNumber"
-          class="absolute top-2 left-2 z-1 text-xs" />
       </ClientOnly>
+
+      <PropertyCardHistory v-if="hasPriceHistory" class="property-card-root__image-overlay" :historic="priceHistory"
+        :current="currentPriceNumber" :card-width="cardWidth" />
     </div>
 
     <div class="property-card-root__content | flow flow-sm" role="presentation">
@@ -37,18 +41,19 @@
         <PropertyCardPill v-if="rentFrequency" :content="rentFrequency" variant="orange" />
 
         <span class="property-card-root__price-amount | title-md">
-          {{ price }}
-
-          <AtomsPriceHistoryPopover v-if="hasPriceHistory" :price-history="priceHistory!"
-            :current-price="currentPriceNumber!" />
+          <PropertyCardMaybeLink :href="viewLinkUrl">
+            {{ price }}
+          </PropertyCardMaybeLink>
         </span>
       </h2>
 
       <p class="property-card-root__overview">
-        <strong class="property-card-root__overview-address">
-          {{ overview }}
-        </strong>
-        {{ overviewAddress }}
+        <PropertyCardMaybeLink :href="viewLinkUrl">
+          <strong class="property-card-root__overview-address">
+            {{ overview }}
+          </strong>
+          {{ overviewAddress }}
+        </PropertyCardMaybeLink>
       </p>
 
       <MoleculesScrollBox v-if="labels?.length" :scroll-indicator="true" class="property-card-root__labels-scrollbox">
@@ -102,6 +107,8 @@
 </template>
 
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core'
+
 interface FacilitiesIcon {
   icon: string
   label: string
@@ -158,7 +165,22 @@ const isListingHidden = computed(() =>
   !props.disabledInteractions && !!props.listingId && isHidden(props.listingId)
 )
 
-const hasPriceHistory = computed(() => !!props.priceHistory?.length)
+/**
+ *  Get property card size
+ */
+const cardWidth = shallowRef(200)
+const cardRoot = useTemplateRef('root')
+
+useResizeObserver(cardRoot, ([elem]) => {
+  const { width } = asObject(elem?.contentRect)
+
+  cardWidth.value = Math.floor(Number(width))
+})
+
+/**
+ *  Price history
+ */
+const hasPriceHistory = computed(() => asArray(props.priceHistory).length)
 
 /**
  *  Only include link URL if interactions are not disabled
@@ -291,6 +313,10 @@ const imageCarouselArray = computed(() => {
   &__image {
     width: 100%;
     aspect-ratio: 4/3;
+
+    a {
+      display: block;
+    }
   }
 
   &__images {
@@ -302,6 +328,12 @@ const imageCarouselArray = computed(() => {
   &__image {
     display: block;
     object-fit: cover;
+  }
+
+  &__image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   &__content {
@@ -337,6 +369,11 @@ const imageCarouselArray = computed(() => {
     font-weight: var(--font-semisemibold);
     margin-bottom: auto;
     padding-right: var(--size-16);
+
+    a,
+    a:hover {
+      text-decoration: none;
+    }
   }
 
   &__overview-address {
