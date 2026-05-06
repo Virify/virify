@@ -2,6 +2,7 @@
   <!-- <UPageColumns> -->
   <div>
     <UPricingPlan
+      v-if="isAdmin || (createListing && isAgent)"
       title="Personal Tier"
       badge="Free to use"
       variant="subtle"
@@ -85,6 +86,8 @@
 
 <script setup lang="ts">
 import { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
+
+const { isAgent, isAdmin, createListing } = useFeatureFlag()
 
 const emit = defineEmits<{
   'select-tier': [tier: ListingTier]
