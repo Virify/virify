@@ -14,7 +14,12 @@ export default defineEventHandler(async (event) => {
 
   const config = useRuntimeConfig();
 
-  // Only apply restrictions if in waiting-list mode
+  /**
+   *  @TODO
+   *  We should update waiting list mode to use the `useFeatureFlag`
+   *  composable, but as this will soon be deprecated we can probably
+   *  just leave for now and refactor entirely when waiting list is over
+   */
   if (!isAdmin && config.public.DEPLOYMENT_ENV === 'waiting-list') {
     const path = event.path;
 
