@@ -5,3 +5,9 @@ export function getFeatureFlagConfig() {
 
   return featureFlags
 }
+
+export function checkFeatureFlag(flag: string) {
+  const flags = getFeatureFlagConfig()
+
+  return !!flags[flag as keyof typeof flags]
+}

@@ -1,14 +1,12 @@
 <template>
-  <div class="o-listing-buttons" role="presentation" v-if="!isWaitingListMode">
+  <div class="o-listing-buttons" role="presentation" v-if="signup || isAdmin">
+    <!-- @TODO we should move this v-if to the parent -->
     <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
-    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
+    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost"
+      :listing-id="listingId" />
 
-    <AtomsEnquireButton
-      v-if="!isDraft && agent?.id"
-      :listing-id="listingId"
-      :user-id="agent.id"
-      class="o-listing-buttons__contact | button button-secondary button-full"
-    >
+    <AtomsEnquireButton v-if="!isDraft && agent?.id" :listing-id="listingId" :user-id="agent.id"
+      class="o-listing-buttons__contact | button button-secondary button-full">
       Enquire
     </AtomsEnquireButton>
   </div>
@@ -26,7 +24,8 @@ interface Props {
   }
   isDraft?: boolean
 }
-const { isWaitingListMode } = useWaitingListMode();
+const { signup, isAdmin } = useFeatureFlag()
+
 const props = defineProps<Props>()
 </script>
 

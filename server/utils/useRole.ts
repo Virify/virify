@@ -9,6 +9,8 @@ export async function useRole(event: H3Event<EventHandlerRequest>) {
 
   return {
     role,
-    roleActive
+    roleActive,
+    isAdmin: role === 'ADMIN',
+    isAgent: role === 'AGENT'
   }
 }

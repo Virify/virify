@@ -8,7 +8,7 @@
 
     <OrganismsFormsLogin @form-success="formSuccess" />
 
-    <div v-if="!isWaitingListMode">
+    <div v-if="signup">
       <AtomsDivider text="or" />
 
       <div class="| center-text flow flow-sm">
@@ -41,7 +41,7 @@ defineProps({
 })
 const { fetch } = useUserSession();
 const { hideDialog } = useDialog();
-const { isWaitingListMode } = useWaitingListMode();
+const { signup } = useFeatureFlag();
 
 /**
  *  Modal control
@@ -73,7 +73,6 @@ async function formSuccess() {
 }
 </script>
 <style>
-
 .protected-page-message {
   margin-bottom: var(--size-16);
   word-wrap: break-word;

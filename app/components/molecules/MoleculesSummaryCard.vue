@@ -12,23 +12,23 @@
       <AtomsCloudFlareImage v-if="hasImage" :src="listing.image?.[0]?.image"
         :alt="listing.image?.[0]?.metadata?.alt || 'Listing image'" variant="card" :placeholder="true"
         class="summary-card__image" />
-      <AtomsPriceReducedBadge
-        :price-history="listing.priceHistory"
-        :current-price="listing.price ?? undefined"
-        class="summary-card__price-reduced-badge"
-      />
+      <AtomsPriceReducedBadge :price-history="listing.priceHistory" :current-price="listing.price ?? undefined"
+        class="summary-card__price-reduced-badge" />
     </div>
     <!-- Content -->
     <div class="summary-card__content">
       <!-- Price and Actions -->
       <div class="summary-card__header">
         <div class="summary-card__price | title-md">
-          <p class="summary-card__price-value">{{ formattedPrice }} <AtomsPriceHistoryPopover v-if="listing.priceHistory?.length" :price-history="listing.priceHistory!" :current-price="listing.price!" /></p>
+          <p class="summary-card__price-value">{{ formattedPrice }}
+            <AtomsPriceHistoryPopover v-if="listing.priceHistory?.length" :price-history="listing.priceHistory!"
+              :current-price="listing.price!" />
+          </p>
           <p class="summary-card__price-type | body-xs">
             {{ formattedPriceType }}
           </p>
         </div>
-        <div class="summary-card__actions" @click.stop v-if="!isWaitingListMode">
+        <div class="summary-card__actions" @click.stop v-if="signup || isAdmin">
           <AtomsFavouriteButton :listing-id="Number(listing.id)" class="a-favourite-button" />
           <AtomsNoteButton :listing-id="Number(listing.id)" class="note-button" />
         </div>
@@ -93,7 +93,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { isWaitingListMode } = useWaitingListMode();
+const { signup, isAdmin } = useFeatureFlag();
 
 // Computed properties
 const formattedPrice = computed(() => {

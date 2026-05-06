@@ -1,10 +1,11 @@
 <template>
   <div class="p-index">
-    <div v-if="isWaitingListMode" class="p-index__hero">
+    <HomepageSectionSearch v-if="search || isAdmin" class="p-index__search | container" />
+
+    <div v-else class="p-index__hero">
       <HomepageSectionSignup class="| container" />
     </div>
 
-    <HomepageSectionSearch v-else class="p-index__search | container" />
 
     <!-- Features -->
     <HomepageSectionComingSoon class="| container" />
@@ -12,13 +13,13 @@
     <a id="homepage-content" class="| inline-scroll-margin"></a>
 
     <HomepageSectionAiScroller class="| container" />
-    
+
     <div class="p-index__bg-change">
       <HomepageSectionMapScroller class="| container" />
     </div>
 
     <HomepageSectionComms class="| container" />
-    
+
     <div class="p-index__bg-change">
       <HomepageSectionLocation class="| container" />
     </div>
@@ -54,15 +55,15 @@
       }">
       <template #body>
         <UPageCard v-for="(feature, index) in cmsContent?.buyersBenefits.features" :key="index"
-        icon="i-lucide-chart-no-axes-gantt" :title="feature.title" :description="feature.description"
-        class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right" :ui="{
-          root: 'bg-[#2b3945]! ring-0',
-          container: 'shadow-xl',
-          title: 'title-md',
-          leadingIcon: 'h-6 w-6 text-secondary',
-          description: 'body-sm',
-          body: 'flex flex-col justify-evenly',
-        }">
+          icon="i-lucide-chart-no-axes-gantt" :title="feature.title" :description="feature.description"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-bottom-right" :ui="{
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'title-md',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-sm',
+            body: 'flex flex-col justify-evenly',
+          }">
         </UPageCard>
       </template>
     </UPageSection>
@@ -152,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-const { isWaitingListMode } = useWaitingListMode();
+const { search, isAdmin } = useFeatureFlag();
 
 // Fetch CMS content - module automatically uses correct perspective
 const { data: cmsContent, error: cmsError } =
