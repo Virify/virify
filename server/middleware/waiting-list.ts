@@ -9,18 +9,11 @@ export default defineEventHandler(async (event) => {
     isAdmin,
     search,
     signup,
+    waitingList,
     mortgageCalculator
   } = await useFeatureFlag(event)
 
-  const config = useRuntimeConfig();
-
-  /**
-   *  @TODO
-   *  We should update waiting list mode to use the `useFeatureFlag`
-   *  composable, but as this will soon be deprecated we can probably
-   *  just leave for now and refactor entirely when waiting list is over
-   */
-  if (!isAdmin && config.public.DEPLOYMENT_ENV === 'waiting-list') {
+  if (waitingList && !isAdmin) {
     const path = event.path;
 
     // Allow these API endpoints in waiting list mode

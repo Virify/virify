@@ -31,8 +31,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      isWaitingList: process.env.DEPLOYMENT_ENV === "waiting-list",
       featureFlags: {
+        waitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
         search: envIfExistOrDefault('ALLOW_SEARCH', false),
         signup: envIfExistOrDefault('ALLOW_SIGNUP', true),
         createListing: envIfExistOrDefault('ALLOW_CREATE_LISTING', true),

@@ -6,7 +6,6 @@ export default defineNuxtConfig({
     public: {
       redirectCookieName: "redirect",
       loginUrl: "/login",
-      DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
     },
   },
   imports: {

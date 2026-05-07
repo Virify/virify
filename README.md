@@ -523,7 +523,7 @@ allowedRoutes: [
 
 The waiting list middleware ([`server/middleware/waiting-list.ts`](./server/middleware/waiting-list.ts)) enforces API restrictions by:
 
-1. Checking if `DEPLOYMENT_ENV === 'waiting-list'`
+1. Checking if `useFeatureFlag().waitingList`
 2. Blocking all API calls except those explicitly allowed
 3. Returning 403 Forbidden for blocked endpoints
 
