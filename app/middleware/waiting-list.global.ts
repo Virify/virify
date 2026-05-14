@@ -13,6 +13,7 @@ const alwaysAllowedRoutes = [
 
 const featureFlagRoutes = {
   '/search/**': ['search'],
+  '/browse/': ['search'],
   '/login/**': ['signup'],
   '/account/**': ['signup'],
   '/dashboard/**': ['signup'],
