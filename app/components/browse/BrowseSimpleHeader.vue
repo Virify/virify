@@ -89,6 +89,7 @@ const sortBy = [
     flex: 1 0;
     flex-direction: column;
     gap: var(--size-4);
+    white-space: nowrap;
 
     &--buy-or-rent {
       white-space: nowrap;

@@ -85,6 +85,7 @@ watch([min, max], () => {
     flex: 0;
     flex-direction: column;
     gap: var(--size-4);
+    white-space: nowrap;
   }
 
   &__button {
@@ -93,6 +94,7 @@ watch([min, max], () => {
     border-radius: var(--border-radius-xl);
     white-space: nowrap;
     padding: var(--size-12) var(--size-20);
+    white-space: nowrap;
   }
 
   &__popover {
