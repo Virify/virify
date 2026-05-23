@@ -1,6 +1,6 @@
 <template>
   <div class="p-browse | container">
-    <BrowseHeader :count="results.length" />
+    <BrowseSimpleHeader :count="results.length" />
 
     <OrganismsResults v-if="results.length" :results :is-loading="isPending" />
 
