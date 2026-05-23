@@ -11,10 +11,10 @@
       <BrowseRangePopover legend="Price" min-label="Min price" max-label="Max price" name="price"
         :options="priceOptions" v-model="initialPrice" />
 
-      <BrowseRangePopover legend="Bedroom count" min-label="Min bedrooms" max-label="Max bedrooms" name="bedrooms"
+      <BrowseRangePopover legend="Bedrooms" min-label="Min bedrooms" max-label="Max bedrooms" name="bedrooms"
         :options="bedroomOptions" />
 
-      <BrowseRangePopover legend="Bathroom count" min-label="Min bathrooms" max-label="Max bathrooms" name="bathrooms"
+      <BrowseRangePopover legend="Bathrooms" min-label="Min bathrooms" max-label="Max bathrooms" name="bathrooms"
         :options="bathroomOptions" />
 
       <label class="browse-simple-header__label | body-sm faded-text">
