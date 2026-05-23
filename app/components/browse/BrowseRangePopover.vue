@@ -4,7 +4,7 @@
       {{ legend }}
 
       <PopoverTrigger type="button" class="browse-range-popover__button | body-sm">
-        {{ minSelected }} - {{ maxSelected }}
+        {{ currentSelection }}
       </PopoverTrigger>
     </div>
 
@@ -41,7 +41,7 @@ interface Props {
   minLabel: string
   maxLabel: string
   name: string
-  options: { key: string | number, value: string | number }[]
+  options: { key: string, value: string | number }[]
 }
 
 const props = defineProps<Props>()
@@ -49,20 +49,35 @@ const props = defineProps<Props>()
 /**
  *  Store min/max value
  */
-
 const min = ref(props.options.at(0)?.value)
 const max = ref(props.options.at(-1)?.value)
 
-const minSelected = computed(() => {
-  const match = props.options.find(({ value }) => value === min.value)
+const currentSelection = computed(() => {
+  const { options, name } = props
 
-  return match?.key
-})
+  // Get min, max selection
+  const minSelected = options.find(({ value }) => value === min.value)
+  const maxSelected = options.find(({ value }) => value === max.value)
 
-const maxSelected = computed(() => {
-  const match = props.options.find(({ value }) => value === max.value)
+  // If min, max the same then only show the max
+  if (min.value === max.value) return maxSelected?.key
 
-  return match?.key
+  // Disgusting temporary formatting - ignore this, it'll be deleted soon
+  if (name === 'bedrooms') {
+    const minValue = minSelected?.key.replace(/\sbedroom.*/, '')
+    const maxValue = maxSelected?.key
+
+    return `${minValue}-${maxValue}`
+  }
+
+  if (name === 'bathrooms') {
+    const minValue = minSelected?.key.replace(/\sbathroom.*/, '')
+    const maxValue = maxSelected?.key
+
+    return `${minValue}-${maxValue}`
+  }
+
+  return `${minSelected?.key} - ${maxSelected?.key}`
 })
 
 /**
