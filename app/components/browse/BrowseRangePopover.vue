@@ -99,13 +99,13 @@ watch([min, max], () => {
     display: flex;
     flex: 0;
     flex-direction: column;
-    gap: var(--size-4);
+    gap: var(--size-6);
     white-space: nowrap;
   }
 
   &__button {
     width: fit-content;
-    border: 1px solid var(--input-text-border);
+    border: 1px solid var(--border-color-200);
     border-radius: var(--border-radius-xl);
     white-space: nowrap;
     padding: var(--size-12) var(--size-20);
@@ -131,7 +131,7 @@ watch([min, max], () => {
 
   &__popover-select {
     width: 100%;
-    border: 1px solid var(--input-text-border);
+    border: 1px solid var(--border-color-200);
     border-radius: var(--border-radius-xl);
     white-space: nowrap;
     padding: var(--size-12) var(--size-16);

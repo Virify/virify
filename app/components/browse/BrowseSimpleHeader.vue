@@ -75,7 +75,7 @@ const sortBy = [
   position: sticky;
   top: calc(var(--size-8) + var(--header-height));
   margin: 0 auto var(--size-16);
-  padding: var(--size-12);
+  padding: var(--size-12) var(--size-20) var(--size-16);
   background: var(--background-100);
 
   &__form {
@@ -88,7 +88,7 @@ const sortBy = [
     display: flex;
     flex: 1 0;
     flex-direction: column;
-    gap: var(--size-4);
+    gap: var(--size-6);
     white-space: nowrap;
 
     &--buy-or-rent {
@@ -105,7 +105,7 @@ const sortBy = [
   &__button,
   &__input {
     width: 100%;
-    border: 1px solid var(--input-text-border);
+    border: 1px solid var(--border-color-200);
     border-radius: var(--border-radius-xl);
     white-space: nowrap;
 
