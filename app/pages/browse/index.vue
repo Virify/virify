@@ -2,6 +2,10 @@
   <div class="p-browse | container">
     <BrowseSimpleHeader :count="results.length" />
 
+    <h2 class="p-browse__title | title-sm">
+      Showing {{ results.length }} result{{ results.length === 1 ? '' : 's' }}
+    </h2>
+
     <OrganismsResults v-if="results.length" :results :is-loading="isPending" />
 
     <div v-else class="p-browse__no-results">
@@ -26,6 +30,10 @@ const { results, isPending } = useViewAllListings()
 
 <style lang="scss">
 .p-browse {
+
+  &__title {
+    margin: var(--size-24) 0;
+  }
 
   &__no-results {
     display: flex;

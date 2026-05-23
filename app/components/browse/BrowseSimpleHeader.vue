@@ -1,9 +1,5 @@
 <template>
   <div class="browse-simple-header | gradient-box">
-    <h2 class="browse-header__title | title-sm">
-      Showing {{ count }} results
-    </h2>
-
     <form class="browse-simple-header__form">
       <label class="browse-simple-header__label browse-simple-header__label--buy-or-rent | body-sm faded-text">
         Buy or rent?
@@ -39,12 +35,6 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  count: number
-}
-
-defineProps<Props>()
-
 const buyOrRent = [
   { key: 'buy', value: 'Buy' },
   { key: 'rent', value: 'Rent' },

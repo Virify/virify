@@ -1,34 +1,29 @@
 <template>
   <div class="browse-header | gradient-box">
-    <h2 class="browse-header__title | title-sm">
-      Showing {{ count }} results
-    </h2>
 
-    <div class="browse-header__overview">
-      <ul class="browse-header__active-filters">
-        <li>
-          <AtomsIcon icon="ai/prompt" class="browse-header__active-filters-icon" />
-        </li>
+    <ul class="browse-header__active-filters">
+      <li>
+        <AtomsIcon icon="ai/prompt" class="browse-header__active-filters-icon" />
+      </li>
 
-        <li v-if="!filters.length">
-          <AtomsPill class="disabled">
-            No filters applied
-          </AtomsPill>
-        </li>
+      <li v-if="!filters.length">
+        <AtomsPill class="disabled">
+          No filters applied
+        </AtomsPill>
+      </li>
 
-        <li v-for="filter in filters" :key="filter">
-          <AtomsPill>
-            {{ filter }}
-          </AtomsPill>
-        </li>
-      </ul>
+      <li v-for="filter in filters" :key="filter">
+        <AtomsPill>
+          {{ filter }}
+        </AtomsPill>
+      </li>
+    </ul>
 
-      <button class="browse-header__show-filters | body-sm" @click.prevent="showBrowseForm">
-        <AtomsIcon icon="search/filter" />
+    <button class="browse-header__show-filters | body-sm" @click.prevent="showBrowseForm">
+      <AtomsIcon icon="search/filter" />
 
-        Show filters
-      </button>
-    </div>
+      Show filters
+    </button>
   </div>
 </template>
 
@@ -72,18 +67,10 @@ const filters = ref<string[]>([])
   margin: 0 auto var(--size-16);
   padding: var(--size-12);
   background: var(--background-100);
-
-  &__title {
-    padding: 0 var(--size-4);
-    margin: 0;
-  }
-
-  &__overview {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--size-16);
-  }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-16);
 
   &__active-filters {
     display: flex;
