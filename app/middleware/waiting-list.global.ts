@@ -16,6 +16,7 @@ const featureFlagRoutes = {
   '/login/**': ['signup'],
   '/account/**': ['signup'],
   '/dashboard/**': ['signup'],
+  '/dashboard/create-listing/**': ['createListing']
 }
 
 export default defineNuxtRouteMiddleware(({ path }) => {
