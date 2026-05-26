@@ -5,8 +5,19 @@
  *          enabled
  */
 export function useViewAllListings() {
-  const results = ref([])
-  const isPending = ref(false)
+  const { data, status } = useFetch<ListingCardData[]>('/api/listings')
+
+  const results = computed<ListingCardData[]>(() => {
+    if (!Array.isArray(data.value)) {
+      return []
+    }
+
+    return data.value
+  })
+
+  const isPending = computed<boolean>(() => {
+    return status.value === 'pending'
+  })
 
   return {
     results,
