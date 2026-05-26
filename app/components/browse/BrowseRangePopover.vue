@@ -9,7 +9,7 @@
     </div>
 
     <PopoverPortal>
-      <PopoverContent>
+      <PopoverContent :side-offset="8">
         <div class="browse-range-popover__popover | gradient-box">
           <label class="browse-range-popover__popover-label | body-sm faded-text">
             {{ minLabel }}
