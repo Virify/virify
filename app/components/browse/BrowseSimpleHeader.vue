@@ -50,16 +50,29 @@ const priceOptions = [
 const bedroomOptions = [
   { value: 0, key: 'Any' },
   { value: 0.5, key: 'Studio' },
-  { value: 1, key: '1 bedroom' }
+  { value: 1, key: '1 bedroom' },
+  { value: 2, key: '2 bedrooms' },
+  { value: 3, key: '3 bedrooms' },
+  { value: 4, key: '4 bedrooms' },
+  { value: 5, key: '5 bedrooms' },
+  { value: 6, key: '6 bedrooms' },
+  { value: 7, key: '7 bedrooms' },
+  { value: 8, key: '8+ bedrooms' },
 ]
 
 const bathroomOptions = [
   { value: 0, key: 'Any' },
-  { value: 1, key: '1 bathroom' }
+  { value: 1, key: '1 bathrooms' },
+  { value: 2, key: '2 bathrooms' },
+  { value: 3, key: '3 bathrooms' },
+  { value: 4, key: '4 bathrooms' },
+  { value: 5, key: '5+ bathrooms' },
 ]
 
 const propertyType = [
-  { value: 'house', key: 'House' }
+  { value: 'detatched-house', key: 'Detatched House' },
+  { value: 'semi-detatched', key: 'Semi-detached House' },
+  { value: 'flat', key: 'Flat' },
 ]
 
 const sortBy = [
