@@ -99,7 +99,6 @@ const sortBy = [
 
   &__label {
     display: flex;
-    flex: 1 0;
     flex-direction: column;
     gap: var(--size-6);
     white-space: nowrap;
@@ -107,7 +106,6 @@ const sortBy = [
     &--buy-or-rent {
       white-space: nowrap;
       width: min-content;
-      flex: 0 0;
     }
   }
 
