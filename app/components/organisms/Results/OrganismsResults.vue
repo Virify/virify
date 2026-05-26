@@ -9,7 +9,7 @@
     </template>
 
     <template v-else>
-      <MoleculesResultsContext v-if="results.length" :count="results.length" />
+      <MoleculesResultsContext v-if="showContext && results.length" :count="results.length" />
 
       <div class="o-results__grid">
         <PropertyCardRoot v-for="result of paginatedResults" :key="result.listingId" v-bind="result" />
@@ -26,12 +26,14 @@
 <script setup lang="ts">
 interface Props {
   isLoading?: boolean
+  showContext: boolean
   results: ListingCardData[]
   sortBy?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  isLoading: false
+  isLoading: false,
+  showContext: true
 })
 
 /**
