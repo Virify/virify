@@ -83,7 +83,9 @@ const currentSelection = computed(() => {
 /**
  *  Track min/max value
  */
-const minMax = defineModel()
+const minMax = defineModel({
+  default: () => []
+})
 
 watch([min, max], () => {
   minMax.value = [min.value, max.value]
