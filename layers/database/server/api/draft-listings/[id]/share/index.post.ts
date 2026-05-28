@@ -51,6 +51,11 @@ export default defineEventHandler(async (event) => {
 
   const updated = await addSharedUserToDraftListing(draftIdNum, targetUser.id);
 
+  // Bust the owner's draft listings cache so the new shared user is reflected immediately
+  const storage = useStorage("cache");
+  const keys = await storage.getKeys(`draft-listings:${user.id}:`);
+  await Promise.all(keys.map((k) => storage.removeItem(k)));
+
   return {
     success: true,
     sharedUsers: updated.sharedUsers,
