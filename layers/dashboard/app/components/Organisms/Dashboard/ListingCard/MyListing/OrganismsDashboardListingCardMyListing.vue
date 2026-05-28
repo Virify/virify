@@ -315,14 +315,11 @@
         <p class="body-xs text-muted-foreground">{{ dateLabel }}</p>
         <div class="flex gap-2 items-center ml-auto">
           <AtomsShareButton
-            v-if="canShare"
+            :is-draft="isDraft"
             :url="shareUrl"
             :title="shareTitle"
-          />
-          <UIcon
-            v-else
-            name="i-lucide-share-2"
-            class="w-4 h-4 text-muted-foreground/40"
+            :draft-listing-id="draftListing?.id"
+            :shared-users="draftListing?.sharedUsers"
           />
         </div>
       </div>
@@ -501,6 +498,12 @@ const tierBadge = computed(() => {
 // Share — only for live (non-draft, non-archived) listings
 const canShare = computed(
   () => !props.listing.isDraft && !props.listing.archived,
+);
+
+const isDraft = computed(() => props.listing.isDraft);
+
+const draftListing = computed(() =>
+  props.listing.isDraft ? (props.listing as DraftListingForCard) : null,
 );
 
 const shareUrl = computed(() => {

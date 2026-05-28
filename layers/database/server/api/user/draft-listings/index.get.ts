@@ -31,7 +31,13 @@ export default defineEventHandler(async (event) => {
 
     // Apply search if provided
     if (search.trim()) {
-      where.OR = [{ property: { address: { fullAddress: { contains: search, mode: "insensitive" } } } }];
+      where.OR = [
+        {
+          property: {
+            address: { fullAddress: { contains: search, mode: "insensitive" } },
+          },
+        },
+      ];
 
       const numericSearch = Number(search);
       if (!Number.isNaN(numericSearch)) {
@@ -72,7 +78,9 @@ export default defineEventHandler(async (event) => {
               accessibilityFeatures: { select: { features: true } },
               additionalFeatures: { select: { petFriendly: true } },
               parking: { select: { features: true } },
-              outdoorSpace: { select: { garden: true, yard: true, land: true } },
+              outdoorSpace: {
+                select: { garden: true, yard: true, land: true },
+              },
             },
           },
           user: {
@@ -80,6 +88,15 @@ export default defineEventHandler(async (event) => {
               id: true,
               username: true,
               email: true,
+            },
+          },
+          sharedUsers: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              avatar: true,
             },
           },
         },
@@ -99,6 +116,9 @@ export default defineEventHandler(async (event) => {
     return result;
   } catch (error) {
     console.error("Error fetching draft listings:", error);
-    throw createError({ statusCode: 500, statusMessage: "Internal Server Error" });
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Internal Server Error",
+    });
   }
 });

@@ -15,42 +15,120 @@
       />
 
       <template #content>
-        <p class="body-sm text-muted pb-2 font-medium">Share listing</p>
+        <div v-if="!isDraft">
+          <p class="body-sm text-muted pb-2 font-medium">Share listing</p>
 
-        <!-- Social grid -->
-        <div class="grid grid-cols-3 gap-1 mb-2">
+          <!-- Social grid -->
+          <div class="grid grid-cols-3 gap-1 mb-2">
+            <UButton
+              v-for="platform in platforms"
+              :key="platform.label"
+              variant="subtle"
+              color="neutral"
+              size="xs"
+              class="flex flex-col items-center gap-1 h-auto py-3 px-1"
+              @click="share(platform)"
+            >
+              <UTooltip :text="`Open on ${platform.label}`">
+                <UIcon
+                  :name="platform.icon"
+                  class="w-4 h-4 shrink-0"
+                  :style="{ color: platform.color }"
+                />
+              </UTooltip>
+            </UButton>
+          </div>
+
+          <USeparator class="mb-2" />
+
+          <!-- Copy link -->
           <UButton
-            v-for="platform in platforms"
-            :key="platform.label"
             variant="subtle"
             color="neutral"
             size="xs"
-            class="flex flex-col items-center gap-1 h-auto py-3 px-1"
-            @click="share(platform)"
-          >
-            <UTooltip :text="`Open on ${platform.label}`">
-              <UIcon
-                :name="platform.icon"
-                class="w-4 h-4 shrink-0"
-                :style="{ color: platform.color }"
-              />
-            </UTooltip>
-          </UButton>
+            class="w-full justify-start body-sm"
+            :label="copied ? 'Copied!' : 'Copy link'"
+            :icon="copied ? 'i-lucide-check' : 'i-lucide-copy'"
+            @click="copyLink"
+          />
         </div>
 
-        <USeparator class="mb-2" />
+        <div v-else class="flex flex-col gap-2">
+          <p class="body-sm font-medium">Allow others to preview this draft:</p>
 
-        <!-- Copy link -->
-        <UButton
-          variant="subtle"
-          color="neutral"
-          size="xs"
-          icon="i-lucide-copy"
-          class="w-full justify-start body-sm"
-          :label="copied ? 'Copied!' : 'Copy link'"
-          :icon="copied ? 'i-lucide-check' : 'i-lucide-copy'"
-          @click="copyLink"
-        />
+          <UForm
+            :state="formState"
+            @submit.prevent="submitShare"
+            class="flex flex-col gap-2"
+          >
+            <UFormField name="email" :error="emailError">
+              <UInput
+                v-model="formState.email"
+                class="w-full"
+                size="xs"
+                placeholder="Enter email address"
+                icon="i-lucide-circle-user"
+                :disabled="isSubmitting"
+                @input="emailError = ''"
+              />
+            </UFormField>
+
+            <UButton
+              type="submit"
+              class="body-sm w-full justify-center"
+              color="secondary"
+              variant="subtle"
+              size="xs"
+              :label="isSubmitting ? 'Adding...' : 'Add user'"
+              :disabled="!formState.email || isSubmitting"
+              :loading="isSubmitting"
+            />
+          </UForm>
+
+          <template v-if="sharedUsers.length">
+            <USeparator />
+            <div class="flex flex-col gap-2">
+              <p class="body-xs text-muted font-medium">Shared with:</p>
+              <div
+                v-for="sharedUser in sharedUsers"
+                :key="sharedUser.id"
+                class="flex items-center gap-2"
+              >
+                <UAvatar
+                  :src="sharedUser.avatar ?? undefined"
+                  :alt="displayName(sharedUser)"
+                  size="xs"
+                />
+                <span class="body-xs truncate flex-1">{{
+                  displayName(sharedUser)
+                }}</span>
+                <UButton
+                  variant="ghost"
+                  color="neutral"
+                  size="xs"
+                  icon="i-lucide-x"
+                  :padded="false"
+                  :loading="removingIds.has(sharedUser.id)"
+                  :disabled="removingIds.has(sharedUser.id)"
+                  @click="removeUser(sharedUser.id)"
+                />
+              </div>
+            </div>
+          </template>
+
+          <USeparator />
+
+          <!-- Copy preview link -->
+          <UButton
+            variant="subtle"
+            color="neutral"
+            size="xs"
+            class="w-full justify-start body-sm"
+            :label="copied ? 'Copied!' : 'Copy preview link'"
+            :icon="copied ? 'i-lucide-check' : 'i-lucide-copy'"
+            @click="copyLink"
+          />
+        </div>
       </template>
     </UPopover>
   </ClientOnly>
@@ -60,12 +138,39 @@
 interface Props {
   url: string;
   title?: string;
+  isDraft: boolean;
+  draftListingId?: number;
+  sharedUsers?: SharedUser[];
 }
 
 const props = defineProps<Props>();
 
 const open = ref(false);
 const copied = ref(false);
+
+const formState = reactive({ email: "" });
+
+const {
+  sharedUsers,
+  emailError,
+  isSubmitting,
+  removingIds,
+  addUser,
+  removeUser,
+} = useDraftListingShare(props.draftListingId, props.sharedUsers ?? []);
+
+function displayName(user: SharedUser): string {
+  if (user.firstName || user.lastName) {
+    return [user.firstName, user.lastName].filter(Boolean).join(" ");
+  }
+  return user.email;
+}
+
+async function submitShare() {
+  if (!formState.email) return;
+  const success = await addUser(formState.email);
+  if (success) formState.email = "";
+}
 
 const platforms = [
   {
