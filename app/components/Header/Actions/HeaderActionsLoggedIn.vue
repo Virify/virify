@@ -4,11 +4,22 @@
       Account
 
       <div role="presentation" class="header-actions-logged-in__profile">
-        <NuxtImg v-if="userImage" :src="userImage" class="header-actions-logged-in__profile-image" />
-        <AvatarInitials v-else :name="userName" class="header-actions-logged-in__profile-image" />
+        <NuxtImg
+          v-if="userImage"
+          :src="userImage"
+          class="header-actions-logged-in__profile-image"
+        />
+        <AvatarInitials
+          v-else
+          :name="userName"
+          class="header-actions-logged-in__profile-image"
+        />
 
-        <span v-if="notificationsTotal > 0" class="header-actions-logged-in__unread-badge"
-          aria-label="Unread notifications"></span>
+        <span
+          v-if="notificationsTotal > 0"
+          class="header-actions-logged-in__unread-badge"
+          aria-label="Unread notifications"
+        ></span>
       </div>
     </PopoverTrigger>
 
@@ -18,21 +29,36 @@
         :align-offset="-16"
         :side-offset="8"
         class="header-actions-logged-in__popover | gradient-box"
-        :class="{ 'header-actions-logged-in__popover--wide': activePanel === 'notifications' }"
+        :class="{
+          'header-actions-logged-in__popover--wide':
+            activePanel === 'notifications',
+        }"
       >
         <!-- Main nav panel -->
         <template v-if="activePanel === 'main'">
-          <nuxt-link v-for="{ title, url } of accountLinks" :key="title" :to="url"
-            class="header-actions-logged-in__button">
+          <nuxt-link
+            v-for="{ title, url } of accountLinks"
+            :key="title"
+            :to="url"
+            class="header-actions-logged-in__button"
+          >
             {{ title }}
           </nuxt-link>
 
-          <button type="button" class="header-actions-logged-in__button" @click="openNotifications">
+          <button
+            type="button"
+            class="header-actions-logged-in__button"
+            @click="openNotifications"
+          >
             Notifications
 
-            <span class="header-actions-logged-in__notifications | body-2xs" :class="{
-              'header-actions-logged-in__notifications--active': notificationsTotal
-            }">
+            <span
+              class="header-actions-logged-in__notifications | body-2xs"
+              :class="{
+                'header-actions-logged-in__notifications--active':
+                  notificationsTotal,
+              }"
+            >
               {{ notificationsTotal }}
             </span>
           </button>
@@ -43,8 +69,11 @@
             <HeaderDarkModeToggle />
           </label>
 
-          <button type="button" class="header-actions-logged-in__button header-actions-logged-in__button--logout"
-            @click.prevent="logOut">
+          <button
+            type="button"
+            class="header-actions-logged-in__button header-actions-logged-in__button--logout"
+            @click.prevent="logOut"
+          >
             Log out
             <AtomsIcon icon="account/logout" />
           </button>
@@ -66,92 +95,91 @@ import {
   PopoverContent,
   PopoverPortal,
   PopoverRoot,
-  PopoverTrigger
-} from 'reka-ui'
+  PopoverTrigger,
+} from "reka-ui";
 
 /**
  *  Panel switching
  */
-const popoverOpen = ref(false)
-const activePanel = ref<'main' | 'notifications'>('main')
+const popoverOpen = ref(false);
+const activePanel = ref<"main" | "notifications">("main");
 
 watch(popoverOpen, (open) => {
-  if (!open) activePanel.value = 'main'
-})
+  if (!open) activePanel.value = "main";
+});
 
 /**
  *  Show notifications
  */
-const { notificationCounts, fetchNotificationCounts, fetchNotifications } = useNotifications()
+const { notificationCounts, fetchNotificationCounts, fetchNotifications } =
+  useNotifications();
 
 onMounted(() => {
   fetchNotificationCounts();
-})
+});
 
 const notificationsTotal = computed<number>(() => {
-  const { total = 0 } = asObject(notificationCounts.value) as { total?: number }
+  const { total = 0 } = asObject(notificationCounts.value) as {
+    total?: number;
+  };
 
-  return total
-})
+  return total;
+});
 
 async function openNotifications() {
-  activePanel.value = 'notifications'
-  await fetchNotifications({ force: true, page: 1 })
+  activePanel.value = "notifications";
+  await fetchNotifications({ force: true, page: 1 });
 }
 
 /**
  *  User info and logout
  */
-const { clear, user } = useUserSession()
+const { clear, user } = useUserSession();
 
 const userImage = computed(() => {
-  return user.value?.avatar
-})
+  return user.value?.avatar;
+});
 
 const userName = computed(() => {
-  const { firstName, lastName, username } = asObject(user.value)
+  const { firstName, lastName, username } = asObject(user.value);
 
   // Get full name
-  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim()
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
   // Return either the full name or, if no name given, the username
-  return fullName ?? username
-})
+  return fullName ?? username;
+});
 
 /**
  *  Account navigation
  */
 const accountLinks = computed(() => {
   const links: { title: string; url: string }[] = [
-    { title: 'Dashboard', url: '/dashboard' },
-    { title: 'Settings', url: '/dashboard/profile' },
-  ]
+    { title: "Dashboard", url: "/dashboard" },
+    { title: "Settings", url: "/dashboard/profile" },
+  ];
   if (isAdmin(user.value as Parameters<typeof isAdmin>[0])) {
-    links.splice(1, 0, { title: 'Admin Dashboard', url: '/admin' })
+    links.splice(1, 0, { title: "Admin Dashboard", url: "/admin" });
   }
-  return links
-})
+  return links;
+});
 
 async function logOut() {
-  await clear()
+  await clear();
 
   // Notify other open tabs to also log out
-  try { new BroadcastChannel('virify:auth').postMessage({ type: 'logout' }) } catch {}
+  try {
+    new BroadcastChannel("virify:auth").postMessage({ type: "logout" });
+  } catch {}
 
-  const { path } = useRoute()
-
-  if (path.startsWith('/account')) {
-    navigateTo('/')
-  }
+  navigateTo("/");
 }
-
 </script>
 
 <style lang="scss">
 @use "#styles/_utils/media" as mq;
 
 .header-actions-logged-in {
-
   &__toggle {
     display: flex;
     align-items: center;
