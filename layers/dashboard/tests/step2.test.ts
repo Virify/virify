@@ -28,11 +28,6 @@ describe("createInitialStep2Values", () => {
     expect(state.property.address.street).toBeNull();
   });
 
-  it("description starts empty", () => {
-    const state = createInitialStep2Values();
-    expect(state.property.description).toBe("");
-  });
-
   it("totalFloors defaults to 1", () => {
     const state = createInitialStep2Values();
     expect(state.property.totalFloors).toBe(1);
@@ -83,10 +78,19 @@ describe("isAddressValid", () => {
 
 describe("isStep2Valid", () => {
   const validAddress = {
-    number: null, flat: null, name: null,
-    street: "High St", city: "London", postcode: "EC1A 1BB",
-    country: null, locality: null, county: null, district: null, fullAddress: null,
-    lat: null, lon: null,
+    number: null,
+    flat: null,
+    name: null,
+    street: "High St",
+    city: "London",
+    postcode: "EC1A 1BB",
+    country: null,
+    locality: null,
+    county: null,
+    district: null,
+    fullAddress: null,
+    lat: null,
+    lon: null,
   };
 
   const validState = {
@@ -94,7 +98,6 @@ describe("isStep2Valid", () => {
       address: validAddress,
       type: 1,
       classification: 2,
-      description: "A lovely property in the city centre area.",
       totalFloors: 1,
       constructionType: null,
       size: null,
@@ -107,22 +110,30 @@ describe("isStep2Valid", () => {
   });
 
   it("returns false when address is incomplete", () => {
-    expect(isStep2Valid({ property: { ...validState.property, address: createEmptyAddress() } })).toBe(false);
+    expect(
+      isStep2Valid({
+        property: { ...validState.property, address: createEmptyAddress() },
+      }),
+    ).toBe(false);
   });
 
   it("returns false when type is not set", () => {
-    expect(isStep2Valid({ property: { ...validState.property, type: 0 as any } })).toBe(false);
-  });
-
-  it("returns false when description is too short (< 10 chars)", () => {
-    expect(isStep2Valid({ property: { ...validState.property, description: "Too short" } })).toBe(false);
-  });
-
-  it("returns false when description is empty", () => {
-    expect(isStep2Valid({ property: { ...validState.property, description: "" } })).toBe(false);
+    expect(
+      isStep2Valid({ property: { ...validState.property, type: 0 as any } }),
+    ).toBe(false);
   });
 
   it("returns false when totalFloors is 0", () => {
-    expect(isStep2Valid({ property: { ...validState.property, totalFloors: 0 } })).toBe(false);
+    expect(
+      isStep2Valid({ property: { ...validState.property, totalFloors: 0 } }),
+    ).toBe(false);
+  });
+
+  it("returns false when classification is not set", () => {
+    expect(
+      isStep2Valid({
+        property: { ...validState.property, classification: 0 as any },
+      }),
+    ).toBe(false);
   });
 });

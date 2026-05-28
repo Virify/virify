@@ -2,7 +2,7 @@
 // Step 2: Property Basics - Utilities
 // ============================================================================
 
-import type { SelectOption } from './create-listing'
+import type { SelectOption } from "./create-listing";
 
 // ============================================================================
 // Construction Type Options
@@ -10,10 +10,10 @@ import type { SelectOption } from './create-listing'
 
 /** Construction type options */
 export const constructionTypeItems: SelectOption[] = [
-  { value: null, label: 'Not specified' },
-  { value: 'STANDARD', label: 'Standard' },
-  { value: 'NON_STANDARD', label: 'Non-standard' },
-]
+  { value: null, label: "Not specified" },
+  { value: "STANDARD", label: "Standard" },
+  { value: "NON_STANDARD", label: "Non-standard" },
+];
 
 // ============================================================================
 // Default Values
@@ -35,7 +35,7 @@ export function createEmptyAddress(): AddressParsed {
     fullAddress: null,
     lat: null,
     lon: null,
-  }
+  };
 }
 
 /** Create initial Step 2 state */
@@ -45,13 +45,12 @@ export function createInitialStep2Values(): Step2FormData {
       address: createEmptyAddress(),
       type: null as unknown as number,
       classification: null as unknown as number,
-      description: '',
       totalFloors: 1,
       constructionType: null,
       size: null,
       yearBuilt: null,
     },
-  }
+  };
 }
 
 // ============================================================================
@@ -59,9 +58,11 @@ export function createInitialStep2Values(): Step2FormData {
 // ============================================================================
 
 /** Check if address is valid (has required fields) */
-export function isAddressValid(address: AddressParsed | null | undefined): boolean {
-  if (!address) return false
-  return !!(address.street && address.city && address.postcode)
+export function isAddressValid(
+  address: AddressParsed | null | undefined,
+): boolean {
+  if (!address) return false;
+  return !!(address.street && address.city && address.postcode);
 }
 
 /** Validate Step 2 form */
@@ -70,10 +71,8 @@ export function isStep2Valid(state: Step2FormData): boolean {
     isAddressValid(state.property.address) &&
     state.property.type &&
     state.property.classification &&
-    state.property.description &&
-    state.property.description.length >= 10 &&
     state.property.totalFloors >= 1
-  )
+  );
 }
 
 // ============================================================================
@@ -81,7 +80,7 @@ export function isStep2Valid(state: Step2FormData): boolean {
 // ============================================================================
 
 /** Get current year for year built bounds */
-export const currentYear = new Date().getFullYear()
+export const currentYear = new Date().getFullYear();
 
 /** Minimum year for year built */
-export const minYearBuilt = 1500
+export const minYearBuilt = 1500;

@@ -1,11 +1,10 @@
-import { z } from 'zod';
-import { invalidateListingCache } from '~~/layers/database/server/utils/cache';
+import { z } from "zod";
 
 /**
  * DELETE /api/draft-listings/[id]/media
  * Delete media images from a draft or live listing (bulk delete)
  * Also deletes from Cloudflare
- * 
+ *
  * Works for BOTH draft listings (draftId) and live listings (listingId)
  */
 
@@ -21,12 +20,12 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Get ID from route param as fallback (for backwards compatibility)
-    const routeId = parseInt(getRouterParam(event, 'id') || '0');
+    const routeId = parseInt(getRouterParam(event, "id") || "0");
 
     const body = await readBody(event);
     const parsed = requestSchema.parse(body);
     const { cloudflareIds } = parsed;
-    
+
     // Use body params if provided, otherwise fall back to route param (draft)
     const draftId = parsed.draftId ?? (parsed.listingId ? undefined : routeId);
     const listingId = parsed.listingId;
@@ -34,7 +33,7 @@ export default defineEventHandler(async (event) => {
     if (!draftId && !listingId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Either draftId or listingId must be provided',
+        statusMessage: "Either draftId or listingId must be provided",
       });
     }
 
@@ -50,7 +49,7 @@ export default defineEventHandler(async (event) => {
       if (!existingListing || !existingListing.property) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Listing or property not found',
+          statusMessage: "Listing or property not found",
         });
       }
 
@@ -65,46 +64,15 @@ export default defineEventHandler(async (event) => {
       if (!existingDraft || !existingDraft.property) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Draft listing or property not found',
+          statusMessage: "Draft listing or property not found",
         });
       }
 
       propertyId = existingDraft.property.id;
     }
 
-    const config = useRuntimeConfig();
-
     // Delete from Cloudflare in parallel
-    const deletePromises = cloudflareIds.map(async (imageId) => {
-      try {
-        const cloudflareUrl = `https://api.cloudflare.com/client/v4/accounts/${config.CF_ACCOUNT_ID}/images/v1/${imageId}`;
-        const response = await fetch(cloudflareUrl, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${config.CF_IMAGES_API_KEY}`,
-          },
-        });
-
-        const data = await response.json();
-        
-        // Check if error is "not found" - that's OK, already deleted
-        if (!data.success) {
-          const errorMessage = data.errors?.[0]?.message || '';
-          const isNotFound = errorMessage.toLowerCase().includes('not found') || response.status === 404;
-          
-          if (!isNotFound) {
-            console.warn(`Failed to delete Cloudflare image ${imageId}:`, data.errors);
-          }
-        }
-
-        return { id: imageId, success: true };
-      } catch (error) {
-        console.warn(`Error deleting Cloudflare image ${imageId}:`, error);
-        return { id: imageId, success: false };
-      }
-    });
-
-    await Promise.all(deletePromises);
+    await deleteCloudflareImages(cloudflareIds);
 
     // Delete from database
     const deleteResult = await prisma.media.deleteMany({
@@ -124,7 +92,7 @@ export default defineEventHandler(async (event) => {
       deleted: deleteResult.count,
     };
   } catch (error) {
-    console.error('Media delete error:', error);
+    console.error("Media delete error:", error);
     return errorResponse(error, event);
   }
 });

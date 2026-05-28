@@ -73,7 +73,9 @@ describe("getFloorText", () => {
 
 describe("getRoomType", () => {
   it("returns 'Kitchen' if roomNumber is null", () => {
-    expect(getRoomType({ roomNumber: null, name: "Main Kitchen" })).toBe("Kitchen");
+    expect(getRoomType({ roomNumber: null, name: "Main Kitchen" })).toBe(
+      "Kitchen",
+    );
   });
 
   it("returns room name converted for type 'other'", () => {
@@ -163,7 +165,9 @@ describe("getRoomTypeIcon", () => {
   });
 
   it("returns bedrooms icon when room has bedSize property", () => {
-    expect(getRoomTypeIcon({ bedSize: "DOUBLE" }, "Other")).toBe("property/bedrooms");
+    expect(getRoomTypeIcon({ bedSize: "DOUBLE" }, "Other")).toBe(
+      "property/bedrooms",
+    );
   });
 
   it("returns bathrooms icon for Bathroom roomType", () => {
@@ -187,7 +191,9 @@ describe("getRoomTypeIcon", () => {
   });
 
   it("returns other-room icon for unknown room type", () => {
-    expect(getRoomTypeIcon({ type: "spa" }, "Room")).toBe("property/other-room");
+    expect(getRoomTypeIcon({ type: "spa" }, "Room")).toBe(
+      "property/other-room",
+    );
   });
 });
 
@@ -262,12 +268,12 @@ describe("getMaxImagesForTier", () => {
     expect(getMaxImagesForTier("PREMIUM")).toBe(50);
   });
 
-  it("returns 20 for FEATURED", () => {
-    expect(getMaxImagesForTier("FEATURED")).toBe(20);
+  it("returns 30 for FEATURED", () => {
+    expect(getMaxImagesForTier("FEATURED")).toBe(30);
   });
 
-  it("returns 8q for BASIC", () => {
-    expect(getMaxImagesForTier("BASIC")).toBe(8);
+  it("returns 20 for BASIC", () => {
+    expect(getMaxImagesForTier("BASIC")).toBe(20);
   });
 
   it("returns 5 (default) for null", () => {

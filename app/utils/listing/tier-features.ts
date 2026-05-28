@@ -72,7 +72,9 @@ export const tierFeatures: TierFeatures[] = [
  * @param tier - The tier to get features for
  * @returns Array of features for the tier
  */
-export function getTierFeatures(tier: "PREMIUM" | "FEATURED" | "BASIC"): string[] {
+export function getTierFeatures(
+  tier: "PREMIUM" | "FEATURED" | "BASIC",
+): string[] {
   const tierData = tierFeatures.find((t) => t.tier === tier);
   return tierData?.features || [];
 }
@@ -87,7 +89,7 @@ export function getTierFeaturesMap(): Record<string, string[]> {
       acc[tier.tier] = tier.features;
       return acc;
     },
-    {} as Record<string, string[]>
+    {} as Record<string, string[]>,
   );
 }
 
@@ -96,18 +98,20 @@ export function getTierFeaturesMap(): Record<string, string[]> {
  * @param tier - The tier to get image limit for
  * @returns Maximum number of images allowed
  */
-export function getMaxImagesForTier(tier: "PREMIUM" | "FEATURED" | "BASIC" | null | undefined): number {
+export function getMaxImagesForTier(
+  tier: "PREMIUM" | "FEATURED" | "BASIC" | null | undefined,
+): number {
   if (!tier) return 5; // Default to basic tier limit
-  
+
   const tierLower = tier.toLowerCase() as "premium" | "featured" | "basic";
-  
+
   switch (tierLower) {
     case "premium":
       return 50;
     case "featured":
-      return 20;
+      return 30;
     case "basic":
     default:
-      return 8;
+      return 20;
   }
 }
