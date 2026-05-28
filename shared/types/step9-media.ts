@@ -3,6 +3,8 @@
  * Types for media uploads and room assignments
  */
 
+import type { Ref } from "vue";
+
 /** Media assignment for property images */
 export interface MediaAssignment {
   cloudflareId: string;

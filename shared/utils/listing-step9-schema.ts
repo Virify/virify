@@ -108,9 +108,10 @@ export const step9Validation = {
    * Check if step 9 form is valid
    * Images are optional, so step is always valid
    */
-  isStep9Valid: (_data: Step9FormState): boolean => {
-    // Images are optional, step is always valid
-    return true;
+  isStep9Valid: (data: Step9FormState): boolean => {
+    return !!(
+      data.property.description && data.property.description.length >= 10
+    );
   },
 
   /**
