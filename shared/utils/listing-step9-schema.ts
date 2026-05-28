@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import type { MediaAssignment, Step9FormState } from '../types/step9-media'
+import { z } from "zod";
+import type { MediaAssignment, Step9FormState } from "../types/step9-media";
 
 /**
  * Step 9: Property Images Schema
@@ -8,9 +8,13 @@ import type { MediaAssignment, Step9FormState } from '../types/step9-media'
 
 // Media assignment schema - for assigning images to rooms
 export const mediaAssignmentSchema = z.object({
-  cloudflareId: z.string().min(1, 'Image ID is required'),
+  cloudflareId: z.string().min(1, "Image ID is required"),
   filename: z.string().optional(),
-  description: z.string().max(500, 'Description must be 500 characters or less').nullable().optional(),
+  description: z
+    .string()
+    .max(500, "Description must be 500 characters or less")
+    .nullable()
+    .optional(),
   // Room IDs (only one should be set, or none for general property images)
   bedroomId: z.number().int().positive().nullable().optional(),
   bathroomId: z.number().int().positive().nullable().optional(),
@@ -23,35 +27,49 @@ export const mediaAssignmentSchema = z.object({
   outdoorSpaceId: z.number().int().positive().nullable().optional(),
   // General property image flag (no room assignment)
   isGeneral: z.boolean().optional().default(true),
-})
+});
 
 // Property schema for Step 9
 export const step9PropertySchema = z.object({
+  description: z
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters",
+    })
+    .max(5000, {
+      message: "Description cannot exceed 5000 characters",
+    }),
   media: z.array(mediaAssignmentSchema).optional().default([]),
-})
+});
 
 // Step 9 form schema
 export const step9Schema = z.object({
   property: step9PropertySchema,
-})
+});
 
 /**
  * Create initial Step 9 values from existing draft data
  */
 export function createInitialStep9Values(draftData?: any): Step9FormState {
-  const property = draftData?.property
-  const existingMedia = property?.media || []
+  const property = draftData?.property;
+  const existingMedia = property?.media || [];
 
   // Map existing media to our format
   const media: MediaAssignment[] = existingMedia.map((m: any) => {
-    const metadata = m.metadata ? JSON.parse(m.metadata) : {}
-    const isGeneral = !m.bedroomId && !m.bathroomId && !m.kitchenId && 
-                      !m.receptionId && !m.otherRoomId && !m.gardenId && 
-                      !m.yardId && !m.landId
+    const metadata = m.metadata ? JSON.parse(m.metadata) : {};
+    const isGeneral =
+      !m.bedroomId &&
+      !m.bathroomId &&
+      !m.kitchenId &&
+      !m.receptionId &&
+      !m.otherRoomId &&
+      !m.gardenId &&
+      !m.yardId &&
+      !m.landId;
 
     return {
-      cloudflareId: m.image || '',
-      filename: metadata.cloudflareImageId || m.image || '',
+      cloudflareId: m.image || "",
+      filename: metadata.cloudflareImageId || m.image || "",
       description: metadata.description || null,
       bedroomId: m.bedroomId || null,
       bathroomId: m.bathroomId || null,
@@ -63,14 +81,15 @@ export function createInitialStep9Values(draftData?: any): Step9FormState {
       landId: m.landId || null,
       outdoorSpaceId: m.outdoorSpaceId || null,
       isGeneral,
-    }
-  })
+    };
+  });
 
   return {
     property: {
+      description: draftData?.property?.description ?? "",
       media,
     },
-  }
+  };
 }
 
 /**
@@ -82,7 +101,7 @@ export const step9Validation = {
    * Note: Images are optional, so this returns true even with 0 images
    */
   hasImages: (data: Step9FormState): boolean => {
-    return data.property.media && data.property.media.length > 0
+    return data.property.media && data.property.media.length > 0;
   },
 
   /**
@@ -91,13 +110,13 @@ export const step9Validation = {
    */
   isStep9Valid: (_data: Step9FormState): boolean => {
     // Images are optional, step is always valid
-    return true
+    return true;
   },
 
   /**
    * Check if step 9 has existing data
    */
   hasExistingStep9Data: (draftData?: any): boolean => {
-    return !!(draftData?.property?.media?.length > 0)
+    return !!(draftData?.property?.media?.length > 0);
   },
-}
+};
