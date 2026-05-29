@@ -1,8 +1,10 @@
 <template>
   <div class="a-listing-status-badges">
-    <AtomsPriceReducedBadge
-      :price-history="priceHistory"
-      :current-price="currentPriceNumber"
+    <PropertyCardHistory
+      v-if="priceHistory?.length && currentPriceNumber"
+      :historic="(priceHistory as Record<string, unknown>[])"
+      :current="currentPriceNumber"
+      :inline="true"
     />
     <ClientOnly>
       <UBadge

@@ -17,11 +17,6 @@
 
       <span class="o-listing-overview__price">
         {{ price }}
-        <AtomsPriceHistoryPopover
-          v-if="priceHistory?.length && currentPriceNumber"
-          :price-history="priceHistory"
-          :current-price="currentPriceNumber"
-        />
       </span>
     </h2>
 
