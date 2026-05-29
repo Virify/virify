@@ -275,6 +275,14 @@ export const useCreateListingSteps = createSharedComposable(() => {
         // Populate step data from the draft
         populateStepDataFromDraft(draft);
 
+        // Snapshot loaded data so dirty-checking doesn't treat it as unsaved
+        Object.keys(stepData.value).forEach((key) => {
+          const step = Number(key);
+          lastSavedStepData.value[step] = JSON.parse(
+            JSON.stringify(stepData.value[step]),
+          );
+        });
+
         // Set current step: if all complete, go to last step (9); otherwise first incomplete
         currentStep.value = allStepsCompleted.value
           ? 9
