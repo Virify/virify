@@ -343,8 +343,8 @@ export function loadStep9(listing: EditableListing) {
   const property = listing.property;
   const existingMedia = property?.media || [];
 
-  // Map existing media to our format
-  const media = existingMedia.map((m: any) => {
+  // Map existing media to our format, filtering out records without a Cloudflare image ID
+  const media = existingMedia.filter((m: any) => m.image).map((m: any) => {
     const metadata = m.metadata ? JSON.parse(m.metadata) : {};
     const isGeneral =
       !m.bedroomId &&
