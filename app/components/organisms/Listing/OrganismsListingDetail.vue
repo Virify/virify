@@ -1,92 +1,214 @@
 <template>
   <main class="p-listing">
     <div class="p-listing" role="presentation">
-      <div ref="$mobile-carousel" class="p-listing__main-carousel p-listing__main-carousel--mobile" role="presentation">
-        <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
+      <div
+        ref="$mobile-carousel"
+        class="p-listing__main-carousel p-listing__main-carousel--mobile"
+        role="presentation"
+      >
+        <MoleculesImageGallery
+          :images="galleryImages"
+          @open-modal="openImageModal"
+        />
         <ClientOnly>
-          <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
-            variant="solid" class="mb-1 absolute top-2 right-2 z-1 text-xs" />
+          <UBadge
+            v-if="viewingLabel"
+            :label="viewingLabel"
+            icon="i-lucide-calendar"
+            size="lg"
+            color="secondary"
+            variant="solid"
+            class="mb-1 absolute top-2 right-2 z-1 text-xs"
+          />
         </ClientOnly>
       </div>
 
       <div class="p-listing__grid | container" role="presentation">
         <div class="p-listing__content | flow flow-sm">
-          <div ref="$desktop-carousel" class="p-listing__main-carousel p-listing__main-carousel--desktop"
-            role="presentation">
-            <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
+          <div
+            ref="$desktop-carousel"
+            class="p-listing__main-carousel p-listing__main-carousel--desktop"
+            role="presentation"
+          >
+            <MoleculesImageGallery
+              :images="galleryImages"
+              @open-modal="openImageModal"
+            />
             <ClientOnly>
-              <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
-                variant="solid" class="mb-1 absolute top-2 right-2 z-1 text-xs" />
+              <UBadge
+                v-if="viewingLabel"
+                :label="viewingLabel"
+                icon="i-lucide-calendar"
+                size="lg"
+                color="secondary"
+                variant="solid"
+                class="mb-1 absolute top-2 right-2 z-1 text-xs"
+              />
             </ClientOnly>
           </div>
 
-          <OrganismsListingOverview ref="$overview" class="p-listing__mobile-overview" :price="priceFormatted"
-            :address="address" :price-type="priceType" :property-type="property?.type?.name"
-            :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
-            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-            :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
-            :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
+          <OrganismsListingOverview
+            ref="$overview"
+            class="p-listing__mobile-overview"
+            :price="priceFormatted"
+            :address="address"
+            :price-type="priceType"
+            :property-type="property?.type?.name"
+            :property-size="property?.size || undefined"
+            :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined"
+            :other-rooms="property?.numberOtherRooms || undefined"
+            :has-garden="hasGarden"
+            :has-land="hasLand"
+            :receptions="property?.numberReceptions || undefined"
+            :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
-            :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null" :listing-id="listing?.id"
+            :chain-free="
+              listing?.saleListing ? !listing?.saleListing?.chain : null
+            "
+            :listing-id="listing?.id"
             :price-history="listing?.ListingPriceHistory ?? undefined"
             :current-price-number="listing?.price ?? undefined"
-            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus" />
+            :open-house-badge-label="openHouseBadgeLabel"
+            :available="
+              listing?.saleListing
+                ? listing?.saleListing?.availabilityStatus
+                : listing?.rentalListing?.availabilityStatus
+            "
+          />
 
           <!-- General Property Information (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
-            <AtomsListingGeneralInfo :description="property?.description || undefined" />
+            <AtomsListingGeneralInfo
+              :description="property?.description || undefined"
+            />
           </div>
 
           <div v-if="listing && property" class="p-listing__section">
-            <MoleculesListingEssentials :listing="listing" :property="property" />
+            <MoleculesListingEssentials
+              :listing="listing"
+              :property="property"
+            />
           </div>
 
           <div v-if="hasRooms" class="p-listing__section">
             <h2 class="title-md">Rooms</h2>
-            <MoleculesListingItemDetails v-if="property?.bedroomFeatures && property.bedroomFeatures.length > 0"
-              :items="property?.bedroomFeatures" type="room" subtype="Bedroom" title="Bedrooms" />
-            <MoleculesListingItemDetails v-if="property?.bathroomFeatures && property.bathroomFeatures.length > 0"
-              :items="property?.bathroomFeatures" type="room" subtype="Bathroom" title="Bathrooms" />
-            <MoleculesListingItemDetails v-if="property?.kitchenFeatures && property.kitchenFeatures.length > 0"
-              :items="property?.kitchenFeatures" type="room" subtype="Kitchen" title="Kitchen" />
-            <MoleculesListingItemDetails v-if="property?.reception && property.reception.length > 0"
-              :items="property?.reception" type="room" subtype="Reception" title="Receptions" />
-            <MoleculesListingItemDetails v-if="property?.otherRoom && property.otherRoom.length > 0"
-              :items="property?.otherRoom" type="room" subtype="Other Rooms" title="Other Rooms" />
+            <MoleculesListingItemDetails
+              v-if="
+                property?.bedroomFeatures && property.bedroomFeatures.length > 0
+              "
+              :items="property?.bedroomFeatures"
+              type="room"
+              subtype="Bedroom"
+              title="Bedrooms"
+            />
+            <MoleculesListingItemDetails
+              v-if="
+                property?.bathroomFeatures &&
+                property.bathroomFeatures.length > 0
+              "
+              :items="property?.bathroomFeatures"
+              type="room"
+              subtype="Bathroom"
+              title="Bathrooms"
+            />
+            <MoleculesListingItemDetails
+              v-if="
+                property?.kitchenFeatures && property.kitchenFeatures.length > 0
+              "
+              :items="property?.kitchenFeatures"
+              type="room"
+              subtype="Kitchen"
+              title="Kitchen"
+            />
+            <MoleculesListingItemDetails
+              v-if="property?.reception && property.reception.length > 0"
+              :items="property?.reception"
+              type="room"
+              subtype="Reception"
+              title="Receptions"
+            />
+            <MoleculesListingItemDetails
+              v-if="property?.otherRoom && property.otherRoom.length > 0"
+              :items="property?.otherRoom"
+              type="room"
+              subtype="Other Rooms"
+              title="Other Rooms"
+            />
             <!-- Outdoor Space Section (if it exists) -->
-            <MoleculesListingItemDetails v-if="property?.outdoorSpace" :items="[property.outdoorSpace]"
-              type="outdoorspace" title="Outdoor Space" :show-floor="false"
-              :total-area="property.outdoorSpace.totalArea" :has-gardens="hasGarden" :has-yards="hasYard"
-              :has-land="hasLand" :gardens="gardensWithDetails" :yards="yardsWithDetails" :lands="landsWithDetails" />
+            <MoleculesListingItemDetails
+              v-if="property?.outdoorSpace"
+              :items="[property.outdoorSpace]"
+              type="outdoorspace"
+              title="Outdoor Space"
+              :show-floor="false"
+              :total-area="property.outdoorSpace.totalArea"
+              :has-gardens="hasGarden"
+              :has-yards="hasYard"
+              :has-land="hasLand"
+              :gardens="gardensWithDetails"
+              :yards="yardsWithDetails"
+              :lands="landsWithDetails"
+            />
           </div>
 
           <!-- Energy & Utilities -->
           <div v-if="property?.energyAndUtilities" class="p-listing__section">
-            <MoleculesListingEnergyUtilities :energy-data="property.energyAndUtilities"
-              :postcode="property?.address?.postcode" />
+            <MoleculesListingEnergyUtilities
+              :energy-data="property.energyAndUtilities"
+              :postcode="property?.address?.postcode"
+            />
           </div>
 
           <div v-if="hasAdditionalDetails" class="p-listing__section">
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-grid">
-              <MoleculesListingFeatures v-if="property?.parking?.features?.length" title="Parking"
-                :features="property?.parking" />
-              <MoleculesListingFeatures v-if="property?.utility?.features?.length" title="Utility"
-                :features="property?.utility" />
-              <MoleculesListingFeatures v-if="property?.storageFeatures?.features?.length" title="Storage"
-                :features="property?.storageFeatures" />
-              <MoleculesListingBroadbandInfo v-if="property?.energyAndUtilities?.broadbandType"
+              <MoleculesListingFeatures
+                v-if="property?.parking?.features?.length"
+                title="Parking"
+                :features="property?.parking"
+              />
+              <MoleculesListingFeatures
+                v-if="property?.utility?.features?.length"
+                title="Utility"
+                :features="property?.utility"
+              />
+              <MoleculesListingFeatures
+                v-if="property?.storageFeatures?.features?.length"
+                title="Storage"
+                :features="property?.storageFeatures"
+              />
+              <MoleculesListingBroadbandInfo
+                v-if="property?.energyAndUtilities?.broadbandType"
                 :broadband-type="property.energyAndUtilities.broadbandType"
-                :max-download-speed-mbps="property.energyAndUtilities.maxDownloadSpeedMbps"
-                :full-fibre-available="property.energyAndUtilities.fullFibreAvailable" />
-              <MoleculesListingFeatures v-if="property?.additionalFeatures?.features?.length"
-                title="Additional Features" :features="property?.additionalFeatures" />
-              <MoleculesListingFeatures v-if="property?.accessibilityFeatures?.features?.length" title="Accessibility"
-                :features="property?.accessibilityFeatures" />
-              <MoleculesListingFeatures v-if="property?.securityFeatures?.features?.length" title="Security"
-                :features="property?.securityFeatures" />
-              <MoleculesListingEnergyInfo v-if="property?.energyAndUtilities" title="Energy & Utilities"
-                :energy-data="property.energyAndUtilities!" />
+                :max-download-speed-mbps="
+                  property.energyAndUtilities.maxDownloadSpeedMbps
+                "
+                :full-fibre-available="
+                  property.energyAndUtilities.fullFibreAvailable
+                "
+              />
+              <MoleculesListingFeatures
+                v-if="property?.additionalFeatures?.features?.length"
+                title="Additional Features"
+                :features="property?.additionalFeatures"
+              />
+              <MoleculesListingFeatures
+                v-if="property?.accessibilityFeatures?.features?.length"
+                title="Accessibility"
+                :features="property?.accessibilityFeatures"
+              />
+              <MoleculesListingFeatures
+                v-if="property?.securityFeatures?.features?.length"
+                title="Security"
+                :features="property?.securityFeatures"
+              />
+              <MoleculesListingEnergyInfo
+                v-if="property?.energyAndUtilities"
+                title="Energy & Utilities"
+                :energy-data="property.energyAndUtilities!"
+              />
               <MoleculesListingMobileCoverage />
             </div>
           </div>
@@ -94,42 +216,73 @@
           <!-- Mortgage Calculator (Sale listings only) -->
           <!-- <div v-if="listing?.saleListing && listing?.price" class="p-listing__section">
             <h2 class="title-md">Mortgage Calculator</h2>
-            <OrganismsMortgageCalculator 
-              :property-price="listing.price" 
-              :listing-id="String(listing.id)" 
+            <OrganismsMortgageCalculator
+              :property-price="listing.price"
+              :listing-id="String(listing.id)"
             />
           </div> -->
 
           <!-- Price Paid History -->
-          <div v-if="property?.address && listing?.id && listing?.saleListing" class="p-listing__section">
-            <MoleculesListingPricePaid :listing-id="listing.id" :price="listing.saleListing ? listing.price : undefined"
-              :property-type="property?.type?.name" :address="{
+          <div
+            v-if="property?.address && listing?.id && listing?.saleListing"
+            class="p-listing__section"
+          >
+            <MoleculesListingPricePaid
+              :listing-id="listing.id"
+              :price="listing.saleListing ? listing.price : undefined"
+              :property-type="property?.type?.name"
+              :address="{
                 number: property.address.number,
                 flat: property.address.flat,
                 street: property.address.street,
                 city: property.address.city,
                 postcode: property.address.postcode,
                 county: property.address.county,
-              }" />
+              }"
+            />
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
           <div v-if="property" class="p-listing__section">
-            <OrganismsListingSectionLocation :lat="property?.address?.lat!" :lon="property?.address?.lon!"
-              :listing="listing" :amenities="property?.amenities" />
+            <OrganismsListingSectionLocation
+              :lat="property?.address?.lat!"
+              :lon="property?.address?.lon!"
+              :listing="listing"
+              :amenities="property?.amenities"
+            />
           </div>
 
-          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
-            <OrganismsListingCrimeScore :lat="property.address.lat" :lon="property.address.lon" />
+          <div
+            v-if="
+              property?.address?.lat && property?.address?.lon && listing?.id
+            "
+            class="p-listing__section"
+          >
+            <OrganismsListingCrimeScore
+              :lat="property.address.lat"
+              :lon="property.address.lon"
+            />
           </div>
 
-          <div v-if="property?.address?.lat && property?.address?.lon && listing?.id" class="p-listing__section">
-            <MoleculesListingFloodRisk :lat="property.address.lat" :lon="property.address.lon" />
+          <div
+            v-if="
+              property?.address?.lat && property?.address?.lon && listing?.id
+            "
+            class="p-listing__section"
+          >
+            <MoleculesListingFloodRisk
+              :lat="property.address.lat"
+              :lon="property.address.lon"
+            />
           </div>
 
           <div class="p-listing__section" v-if="!loggedIn">
-            <MoleculesListingAdvert :title="advertTitle" :description="advertDescription" :link="advertLink"
-              :linkText="advertLinkText" />
+            <MoleculesListingAdvert
+              :title="advertTitle"
+              :description="advertDescription"
+              :link="advertLink"
+              :linkText="advertLinkText"
+            />
           </div>
         </div>
 
@@ -137,52 +290,105 @@
           <Transition name="p-listing-images">
             <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
               <div class="p-listing__sidebar-carousel">
-                <MoleculesImageGallery :images="galleryImages" @open-modal="openImageModal" />
+                <MoleculesImageGallery
+                  :images="galleryImages"
+                  @open-modal="openImageModal"
+                />
                 <ClientOnly>
-                  <UBadge v-if="viewingLabel" :label="viewingLabel" icon="i-lucide-calendar" size="lg" color="secondary"
-                    variant="solid" class="mb-1 absolute top-2 right-2 z-1 text-xs" />
+                  <UBadge
+                    v-if="viewingLabel"
+                    :label="viewingLabel"
+                    icon="i-lucide-calendar"
+                    size="lg"
+                    color="secondary"
+                    variant="solid"
+                    class="mb-1 absolute top-2 right-2 z-1 text-xs"
+                  />
                 </ClientOnly>
               </div>
             </div>
           </Transition>
 
-          <OrganismsListingSidebar :price="priceFormatted" :listing-id="listing?.id || 0" :address="address"
-            :price-type="priceType" :property-type="property?.type?.name" :property-size="property?.size || undefined"
-            :price-number="listing?.price || undefined" :bedrooms="property?.numberBedrooms || undefined"
-            :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-            :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
-            :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
+          <OrganismsListingSidebar
+            :price="priceFormatted"
+            :listing-id="listing?.id || 0"
+            :address="address"
+            :price-type="priceType"
+            :property-type="property?.type?.name"
+            :property-size="property?.size || undefined"
+            :price-number="listing?.price || undefined"
+            :bedrooms="property?.numberBedrooms || undefined"
+            :bathrooms="property?.numberBathrooms || undefined"
+            :other-rooms="property?.numberOtherRooms || undefined"
+            :has-garden="hasGarden"
+            :has-land="hasLand"
+            :receptions="property?.numberReceptions || undefined"
+            :classification="property?.classification?.name"
+            :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
-            :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null" :has-image-slide="!isImagesVisible"
-            :agent="listing?.user || {}" :price-history="listing?.ListingPriceHistory ?? undefined"
+            :chain-free="
+              listing?.saleListing ? !listing?.saleListing?.chain : null
+            "
+            :has-image-slide="!isImagesVisible"
+            :agent="listing?.user || {}"
+            :price-history="listing?.ListingPriceHistory ?? undefined"
             :current-price-number="listing?.price ?? undefined"
-            :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
-            :is-draft="isDraft" />
+            :open-house-badge-label="openHouseBadgeLabel"
+            :available="
+              listing?.saleListing
+                ? listing?.saleListing?.availabilityStatus
+                : listing?.rentalListing?.availabilityStatus
+            "
+            :is-draft="isDraft"
+          />
         </div>
       </div>
     </div>
 
     <!-- Image Gallery Modal -->
-    <MoleculesImageGalleryModal :images="galleryImages" :show="showImageModal" :initial-index="modalImageIndex"
-      @close="closeImageModal" />
+    <MoleculesImageGalleryModal
+      :images="galleryImages"
+      :show="showImageModal"
+      :initial-index="modalImageIndex"
+      @close="closeImageModal"
+    />
 
     <!-- Sentinel: when visible the user has scrolled past the listing into the footer -->
     <div ref="$listingEnd" />
 
     <client-only>
-      <OrganismsListingMobileBanner v-if="!isDesktop && !isBeyondListing" :price="priceFormatted"
-        :overview-visible="isOverviewVisible" :gallery-visible="isMobileGalleryVisible" :modal-open="showImageModal"
-        :price-type="priceType" :address="address" :property-type="property?.type?.name"
-        :property-size="property?.size || undefined" :bedrooms="property?.numberBedrooms || undefined"
-        :bathrooms="property?.numberBathrooms || undefined" :other-rooms="property?.numberOtherRooms || undefined"
-        :has-garden="hasGarden" :has-land="hasLand" :receptions="property?.numberReceptions || undefined"
-        :classification="property?.classification?.name" :year-built="property?.yearBuilt || undefined"
+      <OrganismsListingMobileBanner
+        v-if="!isDesktop && !isBeyondListing"
+        :price="priceFormatted"
+        :overview-visible="isOverviewVisible"
+        :gallery-visible="isMobileGalleryVisible"
+        :modal-open="showImageModal"
+        :price-type="priceType"
+        :address="address"
+        :property-type="property?.type?.name"
+        :property-size="property?.size || undefined"
+        :bedrooms="property?.numberBedrooms || undefined"
+        :bathrooms="property?.numberBathrooms || undefined"
+        :other-rooms="property?.numberOtherRooms || undefined"
+        :has-garden="hasGarden"
+        :has-land="hasLand"
+        :receptions="property?.numberReceptions || undefined"
+        :classification="property?.classification?.name"
+        :year-built="property?.yearBuilt || undefined"
         :construction-type="property?.constructionType || undefined"
-        :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null" :listing-id="listing?.id || 0"
-        :agent="listing?.user || {}" :price-history="listing?.ListingPriceHistory ?? undefined"
+        :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null"
+        :listing-id="listing?.id || 0"
+        :agent="listing?.user || {}"
+        :price-history="listing?.ListingPriceHistory ?? undefined"
         :current-price-number="listing?.price ?? undefined"
-        :available="listing?.saleListing ? listing?.saleListing?.availabilityStatus : listing?.rentalListing?.availabilityStatus"
-        :is-draft="isDraft" />
+        :open-house-badge-label="openHouseBadgeLabel"
+        :available="
+          listing?.saleListing
+            ? listing?.saleListing?.availabilityStatus
+            : listing?.rentalListing?.availabilityStatus
+        "
+        :is-draft="isDraft"
+      />
     </client-only>
   </main>
 </template>
@@ -210,11 +416,19 @@ const priceFormatted = computed(() => {
 
 /** omit street number */
 const address = computed(() => {
-  return property.value?.address.street + ", " + property.value?.address.city + ", " + property.value?.address.postcode.split(" ")[0]
+  return (
+    property.value?.address.street +
+    ", " +
+    property.value?.address.city +
+    ", " +
+    property.value?.address.postcode.split(" ")[0]
+  );
 });
 
 const priceType = computed(() => {
-  return props.listing?.saleListing ? props.listing.saleListing.priceType : props.listing?.rentalListing?.rentFrequency;
+  return props.listing?.saleListing
+    ? props.listing.saleListing.priceType
+    : props.listing?.rentalListing?.rentFrequency;
 });
 
 const hasRooms = computed(() => {
@@ -230,13 +444,16 @@ const hasRooms = computed(() => {
   );
 });
 
-const advertTitle = computed(() => 'List your property with Virify!');
+const advertTitle = computed(() => "List your property with Virify!");
 
-const advertDescription = computed(() => 'Ready to sell or rent? Get your home in front of the right buyers and renters with Virify\'s smart, modern platform.');
+const advertDescription = computed(
+  () =>
+    "Ready to sell or rent? Get your home in front of the right buyers and renters with Virify's smart, modern platform.",
+);
 
-const advertLinkText = computed(() => 'List Your Property');
+const advertLinkText = computed(() => "List Your Property");
 
-const advertLink = computed(() => '/dashboard/create-listing');
+const advertLink = computed(() => "/dashboard/create-listing");
 
 // Handle amenities array/object conversion
 const amenitiesArray = computed(() => {
@@ -267,19 +484,19 @@ const hasLand = computed(() => {
 const gardensWithDetails = computed(() => {
   const gardens = property.value?.outdoorSpace?.garden;
   if (!gardens || !Array.isArray(gardens)) return [];
-  return gardens.filter(g => g.additionalDetails === true);
+  return gardens.filter((g) => g.additionalDetails === true);
 });
 
 const yardsWithDetails = computed(() => {
   const yards = property.value?.outdoorSpace?.yard;
   if (!yards || !Array.isArray(yards)) return [];
-  return yards.filter(y => y.additionalDetails === true);
+  return yards.filter((y) => y.additionalDetails === true);
 });
 
 const landsWithDetails = computed(() => {
   const lands = property.value?.outdoorSpace?.land;
   if (!lands || !Array.isArray(lands)) return [];
-  return lands.filter(l => l.additionalDetails === true);
+  return lands.filter((l) => l.additionalDetails === true);
 });
 
 // Check if property has any additional details to display
@@ -330,7 +547,10 @@ const galleryImages = computed(() => {
     src: item.image,
     alt: (() => {
       try {
-        const metadata = typeof item.metadata === 'string' ? JSON.parse(item.metadata) : item.metadata;
+        const metadata =
+          typeof item.metadata === "string"
+            ? JSON.parse(item.metadata)
+            : item.metadata;
         return metadata?.alt || `Property image ${index + 1}`;
       } catch {
         return `Property image ${index + 1}`;
@@ -346,7 +566,7 @@ const galleryImages = computed(() => {
     yardId: item.yardId,
     landId: item.landId,
     outdoorSpaceId: item.outdoorSpaceId,
-    globalIndex: index
+    globalIndex: index,
   }));
 });
 
@@ -382,13 +602,30 @@ useIntersectionObserver($desktopCarousel, ([entry]) => {
 });
 
 const { loggedIn } = useUserSession();
-const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+const {
+  viewings,
+  getActiveViewingForListing,
+  getViewingStatusLabel,
+  fetchViewings,
+} = useViewings();
 
 const viewingLabel = computed(() => {
   const id = props.listing?.id;
   if (!id) return null;
   const v = getActiveViewingForListing(id);
   return v ? getViewingStatusLabel(v) : null;
+});
+
+const { data: openHouseSessionsData } = useAsyncData(
+  `open-house-${props.listing?.id}`,
+  () => $fetch<OpenHouseSession[]>(`/api/open-house/${props.listing?.id}`),
+  { server: false },
+);
+
+const openHouseBadgeLabel = computed(() => {
+  const sessions = openHouseSessionsData.value;
+  if (!sessions?.length) return null;
+  return `Open House: ${formatOpenHouseDate(sessions[0]!.date)}`;
 });
 
 onMounted(() => {
@@ -398,7 +635,7 @@ onMounted(() => {
     trackView(props.listing.id);
   }
   if (loggedIn.value && viewings.value.length === 0) {
-    fetchViewings().catch(() => { });
+    fetchViewings().catch(() => {});
   }
 });
 
@@ -428,7 +665,7 @@ useIntersectionObserver($mobileCarousel, ([entry]) => {
 /**
  *  Hide mobile banner once the user scrolls past the listing into the footer
  */
-const $listingEnd = useTemplateRef('$listingEnd');
+const $listingEnd = useTemplateRef("$listingEnd");
 const isBeyondListing = shallowRef(false);
 
 useIntersectionObserver($listingEnd, ([entry]) => {
@@ -523,7 +760,9 @@ ul {
       display: block;
       position: sticky;
       top: calc(var(--header-height) + var(--size-32));
-      max-height: calc(100dvh - var(--header-height) - var(--size-32) - var(--size-16));
+      max-height: calc(
+        100dvh - var(--header-height) - var(--size-32) - var(--size-16)
+      );
       overflow: auto;
       overscroll-behavior: contain;
       scrollbar-width: thin;
@@ -659,7 +898,7 @@ ul {
     row-gap: var(--size-12);
   }
 
-  >* {
+  > * {
     break-inside: avoid;
     margin-bottom: var(--size-16);
     display: inline-block;

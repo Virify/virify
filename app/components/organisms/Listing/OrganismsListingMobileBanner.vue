@@ -1,34 +1,65 @@
 <template>
   <Teleport to="body">
-    <div v-show="!galleryVisible && !modalOpen" class="o-listing-mobile-banner" role="presentation" :class="{
-      'o-listing-mobile-banner--expanded': isExpanded
-    }">
+    <div
+      v-show="!galleryVisible && !modalOpen"
+      class="o-listing-mobile-banner"
+      role="presentation"
+      :class="{
+        'o-listing-mobile-banner--expanded': isExpanded,
+      }"
+    >
       <div class="| container" role="presentation">
         <Transition name="o-listing-mobile-banner">
-          <button ref="$handle" v-show="!overviewVisible" type="button" class="o-listing-mobile-banner__drag-handle"
-            :aria-label="isExpanded ? 'Hide additional information' : 'Show additional information'"></button>
+          <button
+            ref="$handle"
+            v-show="!overviewVisible"
+            type="button"
+            class="o-listing-mobile-banner__drag-handle"
+            :aria-label="
+              isExpanded
+                ? 'Hide additional information'
+                : 'Show additional information'
+            "
+          ></button>
         </Transition>
 
         <Teleport to="body">
-          <button v-show="isDragging || isExpanded" ref="$backdrop"
-            class="o-listing-mobile-banner__additional-info-backdrop" @click.prevent="closeExpanded"
-            aria-label="Close additional information"></button>
+          <button
+            v-show="isDragging || isExpanded"
+            ref="$backdrop"
+            class="o-listing-mobile-banner__additional-info-backdrop"
+            @click.prevent="closeExpanded"
+            aria-label="Close additional information"
+          ></button>
         </Teleport>
 
-        <div v-show="isDragging || isExpanded" ref="$additional" class="o-listing-mobile-banner__additional-info"
+        <div
+          v-show="isDragging || isExpanded"
+          ref="$additional"
+          class="o-listing-mobile-banner__additional-info"
           :class="{
-            'o-listing-mobile-banner__additional-info--expanded': isExpanded
-          }">
-
-          <h2 v-if="price"
-            class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs">
+            'o-listing-mobile-banner__additional-info--expanded': isExpanded,
+          }"
+        >
+          <h2
+            v-if="price"
+            class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs"
+          >
             {{ price }}
-            <AtomsPriceHistoryPopover v-if="priceHistory?.length" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
+            <AtomsPriceHistoryPopover
+              v-if="priceHistory?.length"
+              :price-history="priceHistory!"
+              :current-price="currentPriceNumber!"
+            />
 
-            <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+            <AtomsPill
+              class="o-listing-mobile-banner__title-offertype | body-2xs"
+            >
               {{ convertEnumToString(priceType!) }}
             </AtomsPill>
-            <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+            <AtomsPill
+              class="o-listing-mobile-banner__title-offertype | body-2xs"
+            >
               {{ convertEnumToString(available!) }}
             </AtomsPill>
           </h2>
@@ -45,20 +76,46 @@
             </div>
           </ClientOnly>
 
-          <p role="presentation" class="o-listing-mobile-banner__additional-info-address | body-md">
+          <AtomsListingStatusBadges
+            class="o-listing-mobile-banner__status-badges"
+            :price-history="priceHistory"
+            :current-price-number="currentPriceNumber"
+            :open-house-badge-label="openHouseBadgeLabel"
+          />
+
+          <p
+            role="presentation"
+            class="o-listing-mobile-banner__additional-info-address | body-md"
+          >
             {{ address }}
           </p>
 
           <div role="presentation">
-            <h3 class="o-listing-mobile-banner__additional-info-subtitle | title-sm">At a glance</h3>
+            <h3
+              class="o-listing-mobile-banner__additional-info-subtitle | title-sm"
+            >
+              At a glance
+            </h3>
 
-            <OrganismsListingSidebarIcons class="o-listing-mobile-banner__additional-info-icons"
-              :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms" :receptions="receptions"
-              :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand" :classification="classification" />
+            <OrganismsListingSidebarIcons
+              class="o-listing-mobile-banner__additional-info-icons"
+              :property-type="propertyType"
+              :bedrooms="bedrooms"
+              :bathrooms="bathrooms"
+              :receptions="receptions"
+              :other-rooms="otherRooms"
+              :has-garden="hasGarden"
+              :has-land="hasLand"
+              :classification="classification"
+            />
 
             <div class="o-listing-mobile-banner__additional-info-pills">
-              <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree"
-                :year-built="yearBuilt" :construction-type="constructionType" />
+              <OrganismsListingSidebarPills
+                :property-size="propertySize"
+                :chain-free="chainFree"
+                :year-built="yearBuilt"
+                :construction-type="constructionType"
+              />
             </div>
           </div>
 
@@ -67,22 +124,38 @@
 
         <div class="o-listing-mobile-banner__grid" role="presentation">
           <div class="o-listing-mobile-banner__overview" role="presentation">
-            <h2 v-if="price" class="o-listing-mobile-banner__title | title-md lineheight-xs">
+            <h2
+              v-if="price"
+              class="o-listing-mobile-banner__title | title-md lineheight-xs"
+            >
               {{ price }}
-              <AtomsPriceHistoryPopover v-if="priceHistory?.length" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
+              <AtomsPriceHistoryPopover
+                v-if="priceHistory?.length"
+                :price-history="priceHistory!"
+                :current-price="currentPriceNumber!"
+              />
 
-              <AtomsPill class="o-listing-mobile-banner__title-offertype | body-2xs">
+              <AtomsPill
+                class="o-listing-mobile-banner__title-offertype | body-2xs"
+              >
                 {{ convertEnumToString(priceType!) }}
               </AtomsPill>
             </h2>
 
-            <p role="presentation" class="o-listing-mobile-banner__address | body-md">
+            <p
+              role="presentation"
+              class="o-listing-mobile-banner__address | body-md"
+            >
               {{ address }}
             </p>
           </div>
 
-          <OrganismsListingButtons class="o-listing-mobile-banner__buttons" :listing-id="listingId || 0" :agent="agent"
-            :is-draft="isDraft" />
+          <OrganismsListingButtons
+            class="o-listing-mobile-banner__buttons"
+            :listing-id="listingId || 0"
+            :agent="agent"
+            :is-draft="isDraft"
+          />
         </div>
       </div>
     </div>
@@ -94,222 +167,249 @@
  *  Props
  */
 interface Props {
-  price: string
-  overviewVisible?: boolean
-  galleryVisible?: boolean
-  modalOpen?: boolean
-  address?: string
-  priceType?: string
-  propertyType?: string
-  propertySize?: number
-  bedrooms?: number
-  bathrooms?: number
-  receptions?: number
-  otherRooms?: number
-  classification?: string
-  yearBuilt?: string
-  constructionType?: string
-  chainFree?: boolean | null
-  hasGarden?: boolean
-  hasLand?: boolean
-  listingId?: number
+  price: string;
+  overviewVisible?: boolean;
+  galleryVisible?: boolean;
+  modalOpen?: boolean;
+  address?: string;
+  priceType?: string;
+  propertyType?: string;
+  propertySize?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  receptions?: number;
+  otherRooms?: number;
+  classification?: string;
+  yearBuilt?: string;
+  constructionType?: string;
+  chainFree?: boolean | null;
+  hasGarden?: boolean;
+  hasLand?: boolean;
+  listingId?: number;
   agent?: {
-    username?: string | null
-    email?: string | null
-    id?: number | null
-    createdAt?: Date | String | null
-    avatar?: string | null
-  }
-  available?: string
-  isDraft?: boolean
-  priceHistory?: PriceHistoryEntry[]
-  currentPriceNumber?: number
+    username?: string | null;
+    email?: string | null;
+    id?: number | null;
+    createdAt?: Date | String | null;
+    avatar?: string | null;
+  };
+  available?: string;
+  isDraft?: boolean;
+  priceHistory?: PriceHistoryEntry[];
+  currentPriceNumber?: number;
+  openHouseBadgeLabel?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   overviewVisible: true,
   galleryVisible: false,
-  modalOpen: false
-})
+  modalOpen: false,
+});
 
 /**
  *  Mobile banner additional information dragger
  */
 
 // Elements
-const $handle = useTemplateRef('$handle')
-const $backdrop = useTemplateRef('$backdrop')
-const $additional = useTemplateRef('$additional')
+const $handle = useTemplateRef("$handle");
+const $backdrop = useTemplateRef("$backdrop");
+const $additional = useTemplateRef("$additional");
 
 // Drag thresholds
-const DRAG_OPEN_THRESHOLD = 80
-const DRAG_CLOSE_THRESHOLD = 120
+const DRAG_OPEN_THRESHOLD = 80;
+const DRAG_CLOSE_THRESHOLD = 120;
 
 // Drag handle open state
-const isExpanded = shallowRef(false)
-const additionalInfoHeight = shallowRef(0)
+const isExpanded = shallowRef(false);
+const additionalInfoHeight = shallowRef(0);
 
 // Drag events
-const isDragging = shallowRef(false)
-const backdropIsDragging = shallowRef(false)
+const isDragging = shallowRef(false);
+const backdropIsDragging = shallowRef(false);
 
 // Auto-close when overview becomes visible again OR gallery becomes visible OR modal opens
-watch(() => props.overviewVisible, (newValue, oldValue) => {
-  if (newValue && !oldValue && isExpanded.value) {
-    // Overview just became visible and banner is expanded - auto close
-    closeExpanded()
-  }
-})
+watch(
+  () => props.overviewVisible,
+  (newValue, oldValue) => {
+    if (newValue && !oldValue && isExpanded.value) {
+      // Overview just became visible and banner is expanded - auto close
+      closeExpanded();
+    }
+  },
+);
 
-watch(() => props.galleryVisible, (isVisible) => {
-  if (isVisible && isExpanded.value) {
-    // Gallery is visible and banner is expanded - auto close
-    closeExpanded()
-  }
-})
+watch(
+  () => props.galleryVisible,
+  (isVisible) => {
+    if (isVisible && isExpanded.value) {
+      // Gallery is visible and banner is expanded - auto close
+      closeExpanded();
+    }
+  },
+);
 
-watch(() => props.modalOpen, (isOpen) => {
-  if (isOpen && isExpanded.value) {
-    // Modal opened and banner is expanded - auto close
-    closeExpanded()
-  }
-})
+watch(
+  () => props.modalOpen,
+  (isOpen) => {
+    if (isOpen && isExpanded.value) {
+      // Modal opened and banner is expanded - auto close
+      closeExpanded();
+    }
+  },
+);
 
 // Set up dragging
 useVerticalDrag($handle, {
   onDragMounted() {
-    closeExpanded()
+    closeExpanded();
   },
   onDragStart() {
-    isDragging.value = true
+    isDragging.value = true;
     if (isExpanded.value) {
-      additionalInfoHeight.value = unref($additional)?.clientHeight || 0
+      additionalInfoHeight.value = unref($additional)?.clientHeight || 0;
     }
   },
   onDrag({ relativeY }) {
     if (isExpanded.value) {
       // Handle dragging down when expanded (to close) - exact mirror of drag up behavior
-      const clampedValue = clampNumber(-relativeY, { min: 0, max: DRAG_CLOSE_THRESHOLD })
-      const infoHeight = additionalInfoHeight.value
-      const remainingHeight = infoHeight - clampedValue
+      const clampedValue = clampNumber(-relativeY, {
+        min: 0,
+        max: DRAG_CLOSE_THRESHOLD,
+      });
+      const infoHeight = additionalInfoHeight.value;
+      const remainingHeight = infoHeight - clampedValue;
 
       // Set styling during drag
       setStyle($additional, {
-        height: remainingHeight + 'px',
-        overflow: 'hidden'
-      })
+        height: remainingHeight + "px",
+        overflow: "hidden",
+      });
 
       // Auto-close when threshold reached - but let it animate smoothly
       if (-relativeY > DRAG_CLOSE_THRESHOLD) {
-        isDragging.value = false
+        isDragging.value = false;
 
         // Set final closed state with smooth transition
         setStyle($additional, {
-          height: '0px',
-          overflow: 'hidden'
-        })
+          height: "0px",
+          overflow: "hidden",
+        });
 
         // Set expanded state after animation completes
         setTimeout(() => {
-          isExpanded.value = false
-        }, 200) // Match animation duration
+          isExpanded.value = false;
+        }, 200); // Match animation duration
       }
     } else {
       // Handle dragging up when collapsed (to open)
-      const clampedValue = clampNumber(relativeY, { min: 0, max: DRAG_OPEN_THRESHOLD })
+      const clampedValue = clampNumber(relativeY, {
+        min: 0,
+        max: DRAG_OPEN_THRESHOLD,
+      });
 
       // Set styling
       setStyle($additional, {
-        height: clampedValue + 'px',
+        height: clampedValue + "px",
         opacity: clampedValue / DRAG_OPEN_THRESHOLD,
-        overflow: 'hidden'
-      })
+        overflow: "hidden",
+      });
 
       setStyle($backdrop, {
-        opacity: clampedValue / DRAG_OPEN_THRESHOLD
-      })
+        opacity: clampedValue / DRAG_OPEN_THRESHOLD,
+      });
 
       // Open
       if (relativeY > DRAG_OPEN_THRESHOLD) {
-        isDragging.value = false
-        openExpanded()
+        isDragging.value = false;
+        openExpanded();
       }
     }
   },
   onDragEnd({ relativeY }) {
-    isDragging.value = false
+    isDragging.value = false;
 
     if (isExpanded.value) {
       // Handle drag end when expanded (closing) - reverse of opening logic
       if (-relativeY > DRAG_CLOSE_THRESHOLD) {
-        return closeExpanded()
+        return closeExpanded();
       }
 
-      openExpanded()
+      openExpanded();
     } else {
       // Handle drag end when collapsed (opening)
       if (relativeY > DRAG_OPEN_THRESHOLD) {
-        return openExpanded()
+        return openExpanded();
       }
 
-      closeExpanded()
+      closeExpanded();
     }
-  }
-})
+  },
+});
 
 useVerticalDrag($backdrop, {
   onDragStart() {
-    additionalInfoHeight.value = unref($additional)?.clientHeight || 0
+    additionalInfoHeight.value = unref($additional)?.clientHeight || 0;
   },
   onDrag({ relativeY }) {
-    const infoHeight = additionalInfoHeight.value
-    const reverseDifference = infoHeight + relativeY
-    const reverseThreshold = infoHeight - DRAG_CLOSE_THRESHOLD
+    const infoHeight = additionalInfoHeight.value;
+    const reverseDifference = infoHeight + relativeY;
+    const reverseThreshold = infoHeight - DRAG_CLOSE_THRESHOLD;
 
     // Get clamp value
-    const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
+    const clampedValue = clampNumber(reverseDifference, {
+      min: 0,
+      max: infoHeight,
+    });
 
     // Close backdrop
     if (clampedValue < reverseThreshold) {
-      backdropIsDragging.value = false
+      backdropIsDragging.value = false;
 
-      return closeExpanded()
+      return closeExpanded();
     }
 
     // Set styling
     setStyle($additional, {
-      height: clampedValue + 'px',
+      height: clampedValue + "px",
       opacity: clampedValue / infoHeight,
-      overflow: 'hidden'
-    })
+      overflow: "hidden",
+    });
 
     setStyle($additional, {
       opacity: clampedValue / infoHeight,
-    })
+    });
   },
   onDragEnd({ relativeY }) {
     // Once dragging has stopped, check if backdrop is above threshold
-    const infoHeight = additionalInfoHeight.value
-    const reverseDifference = infoHeight + relativeY
-    const reverseThreshold = infoHeight - DRAG_CLOSE_THRESHOLD
+    const infoHeight = additionalInfoHeight.value;
+    const reverseDifference = infoHeight + relativeY;
+    const reverseThreshold = infoHeight - DRAG_CLOSE_THRESHOLD;
 
     // Get clamp value
-    const clampedValue = clampNumber(reverseDifference, { min: 0, max: infoHeight })
+    const clampedValue = clampNumber(reverseDifference, {
+      min: 0,
+      max: infoHeight,
+    });
 
     // Close backdrop
     if (clampedValue < reverseThreshold) {
-      backdropIsDragging.value = false
+      backdropIsDragging.value = false;
 
-      return closeExpanded()
+      return closeExpanded();
     }
 
-    openExpanded()
-  }
-})
+    openExpanded();
+  },
+});
 
 // Viewing badge
 const { loggedIn } = useUserSession();
-const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+const {
+  viewings,
+  getActiveViewingForListing,
+  getViewingStatusLabel,
+  fetchViewings,
+} = useViewings();
 
 onMounted(() => {
   if (loggedIn.value && props.listingId && viewings.value.length === 0) {
@@ -325,49 +425,51 @@ const viewingLabel = computed(() => {
 
 // Methods
 function openExpanded() {
-  isDragging.value = true
-  isExpanded.value = true
+  isDragging.value = true;
+  isExpanded.value = true;
 
   setStyle($additional, {
-    height: '',
+    height: "",
     opacity: 1,
-    overflow: ''
-  })
+    overflow: "",
+  });
 
   setStyle($backdrop, {
-    opacity: 1
-  })
+    opacity: 1,
+  });
 }
 
 function closeExpanded() {
-  isExpanded.value = false
-  isDragging.value = false
+  isExpanded.value = false;
+  isDragging.value = false;
 
   setStyle($additional, {
-    height: '0px',
-    opacity: 0
-  })
+    height: "0px",
+    opacity: 0,
+  });
 
   setStyle($backdrop, {
-    opacity: 0
-  })
+    opacity: 0,
+  });
 }
 
-function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, string | number>) {
-  const el = unref(_el)
+function setStyle(
+  _el: MaybeRef<HTMLElement | null>,
+  styles: Record<string, string | number>,
+) {
+  const el = unref(_el);
 
-  if (!isElement(el)) return
+  if (!isElement(el)) return;
 
   for (let [attr, value] of Object.entries(styles)) {
-    (el.style as any)[attr as string] = value
+    (el.style as any)[attr as string] = value;
   }
 }
-
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/media' as mq;
-@use '#styles/_utils/functions' as fn;
+@use "#styles/_utils/media" as mq;
+@use "#styles/_utils/functions" as fn;
 
 .o-listing-mobile-banner {
   position: fixed;
@@ -411,14 +513,13 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     }
 
     &::before {
-      content: '';
+      content: "";
       width: min(80%, 8ch);
       height: var(--size-6);
       background: var(--foreground-200);
       border-radius: var(--border-radius-pill);
     }
   }
-
 
   &__additional-info {
     box-sizing: border-box;
@@ -452,6 +553,11 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     @include mq.not-tablet {
       display: none;
     }
+  }
+
+  &__status-badges {
+    justify-content: center;
+    margin: var(--size-8) 0 0;
   }
 
   &__additional-info-address {
@@ -497,8 +603,10 @@ function setStyle(_el: MaybeRef<HTMLElement | null>, styles: Record<string, stri
     z-index: 4;
     touch-action: none;
     border: none;
-    background: light-dark(#{ fn.faded-color(30%, var(--monochrome-100))},
-      #{ fn.faded-color(70%, var(--monochrome-100))});
+    background: light-dark(
+      #{fn.faded-color(30%, var(--monochrome-100))},
+      #{fn.faded-color(70%, var(--monochrome-100))}
+    );
   }
 
   &__grid {

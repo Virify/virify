@@ -10,23 +10,51 @@
         </AtomsPill>
       </div>
 
+      <AtomsListingStatusBadges
+        class="o-listing-sidebar__status-badges"
+        :price-history="priceHistory"
+        :current-price-number="currentPriceNumber"
+        :open-house-badge-label="openHouseBadgeLabel"
+      />
 
       {{ price }}
-      <AtomsPriceHistoryPopover v-if="priceHistory?.length" :price-history="priceHistory!" :current-price="currentPriceNumber!" />
+      <AtomsPriceHistoryPopover
+        v-if="priceHistory?.length"
+        :price-history="priceHistory!"
+        :current-price="currentPriceNumber!"
+      />
     </h2>
 
-    <p role="presentation" class="o-listing-sidebar__address | body-md font-bold">
+    <p
+      role="presentation"
+      class="o-listing-sidebar__address | body-md font-bold"
+    >
       {{ address }}
     </p>
 
-    <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
-      :receptions="receptions" :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand"
-      :classification="classification" />
+    <OrganismsListingSidebarIcons
+      :property-type="propertyType"
+      :bedrooms="bedrooms"
+      :bathrooms="bathrooms"
+      :receptions="receptions"
+      :other-rooms="otherRooms"
+      :has-garden="hasGarden"
+      :has-land="hasLand"
+      :classification="classification"
+    />
 
-    <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="newBuild"
-      :construction-type="constructionType" />
+    <OrganismsListingSidebarPills
+      :property-size="propertySize"
+      :chain-free="chainFree"
+      :year-built="newBuild"
+      :construction-type="constructionType"
+    />
 
-    <OrganismsListingButtons :listing-id="listingId" :agent="agent" :is-draft="isDraft" />
+    <OrganismsListingButtons
+      :listing-id="listingId"
+      :agent="agent"
+      :is-draft="isDraft"
+    />
 
     <NuxtLink v-if="agent" to="#" class="o-listing-sidebar__agent-link">
       <OrganismsListingAgent :agent="agent" />
@@ -38,39 +66,45 @@
 
 <script setup lang="ts">
 interface Props {
-  price?: string
-  listingId: number
-  address?: string
-  propertyType?: string
-  propertySize?: number
-  priceType?: string
-  bedrooms?: number
-  bathrooms?: number
-  receptions?: number
-  otherRooms?: number
-  classification?: string
-  yearBuilt?: string
-  constructionType?: string
-  chainFree?: boolean | null
+  price?: string;
+  listingId: number;
+  address?: string;
+  propertyType?: string;
+  propertySize?: number;
+  priceType?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  receptions?: number;
+  otherRooms?: number;
+  classification?: string;
+  yearBuilt?: string;
+  constructionType?: string;
+  chainFree?: boolean | null;
   agent?: {
-    username?: string | null
-    email?: string | null
-    id?: number | null
-    createdAt?: Date | String | null
-    avatar?: string | null
-  }
-  hasGarden?: boolean
-  hasLand?: boolean
-  available?: string
-  isDraft?: boolean
-  priceHistory?: PriceHistoryEntry[]
-  currentPriceNumber?: number
+    username?: string | null;
+    email?: string | null;
+    id?: number | null;
+    createdAt?: Date | String | null;
+    avatar?: string | null;
+  };
+  hasGarden?: boolean;
+  hasLand?: boolean;
+  available?: string;
+  isDraft?: boolean;
+  priceHistory?: PriceHistoryEntry[];
+  currentPriceNumber?: number;
+  openHouseBadgeLabel?: string | null;
 }
 
 const props = defineProps<Props>();
 
 const { loggedIn } = useUserSession();
-const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+const {
+  viewings,
+  getActiveViewingForListing,
+  getViewingStatusLabel,
+  fetchViewings,
+} = useViewings();
 
 onMounted(() => {
   if (loggedIn.value && viewings.value.length === 0) {
@@ -85,11 +119,13 @@ const viewingLabel = computed(() => {
 
 const newBuild = computed(() => {
   // if built in the last 3 years, return "New build"
-  if (props.yearBuilt && new Date().getFullYear() - parseInt(props.yearBuilt) <= 3) {
-    return 'New build';
+  if (
+    props.yearBuilt &&
+    new Date().getFullYear() - parseInt(props.yearBuilt) <= 3
+  ) {
+    return "New build";
   }
 });
-
 </script>
 
 <style lang="scss">
@@ -110,6 +146,11 @@ const newBuild = computed(() => {
       background: var(--blue-400);
       color: var(--monochrome-900);
     }
+  }
+
+  &__status-badges {
+    margin-top: var(--size-8);
+    margin-bottom: var(--size-8);
   }
 
   &__address {

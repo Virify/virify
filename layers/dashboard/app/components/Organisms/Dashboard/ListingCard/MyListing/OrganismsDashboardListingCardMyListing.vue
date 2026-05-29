@@ -314,6 +314,11 @@
       <div class="flex justify-between items-center w-full">
         <p class="body-xs text-muted-foreground">{{ dateLabel }}</p>
         <div class="flex gap-2 items-center ml-auto">
+          <OrganismsDashboardOpenHousePopover
+            v-if="canShare"
+            :listing-id="listing.id"
+            :is-published="isPublished"
+          />
           <AtomsShareButton
             :is-draft="isDraft"
             :url="shareUrl"
