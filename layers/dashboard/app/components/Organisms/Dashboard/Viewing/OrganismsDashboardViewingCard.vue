@@ -20,12 +20,21 @@
             class="text-(--foreground-100) bg-(--background-200) shrink-0"
           />
           <div class="min-w-0">
-            <p class="font-bold body-sm leading-tight truncate">{{ otherUser.username || 'User' }}</p>
-            <p class="body-xs text-(--foreground-200) mt-0.5">{{ formatMessageTimestamp(viewing.createdAt) }}</p>
+            <p class="font-bold body-sm leading-tight truncate">
+              {{ otherUser.username || "User" }}
+            </p>
+            <p class="body-xs text-(--foreground-200) mt-0.5">
+              {{ formatMessageTimestamp(viewing.createdAt) }}
+            </p>
           </div>
         </div>
         <!-- Status badge -->
-        <UBadge :color="statusColor" variant="subtle" size="md" class="shrink-0 mt-0.5">
+        <UBadge
+          :color="statusColor"
+          variant="subtle"
+          size="md"
+          class="shrink-0 mt-0.5"
+        >
           {{ statusLabel }}
         </UBadge>
       </div>
@@ -40,24 +49,42 @@
           target="_blank"
           class="flex items-start gap-2 group"
         >
-          <UIcon name="i-lucide-map-pin" class="size-4 text-secondary shrink-0 mt-0.5" />
-          <p class="body-xs text-(--foreground-100) leading-snug group-hover:text-secondary group-hover:underline transition-colors">{{ address }}</p>
+          <UIcon
+            name="i-lucide-map-pin"
+            class="size-4 text-secondary shrink-0 mt-0.5"
+          />
+          <p
+            class="body-xs text-(--foreground-100) leading-snug group-hover:text-secondary group-hover:underline transition-colors"
+          >
+            {{ address }}
+          </p>
         </NuxtLink>
 
         <!-- Proposed dates (hidden once confirmed or cancelled) -->
         <div v-if="showProposedDates" class="flex flex-col gap-0.5">
-          <div v-for="date in formattedDates" :key="date" class="flex items-center gap-2">
-            <UIcon name="i-lucide-calendar" class="size-4 text-secondary shrink-0" />
+          <div
+            v-for="date in formattedDates"
+            :key="date"
+            class="flex items-center gap-2"
+          >
+            <UIcon
+              name="i-lucide-calendar"
+              class="size-4 text-secondary shrink-0"
+            />
             <p class="body-xs">{{ date }}</p>
           </div>
-          <div v-if="viewing.preferredTimes.length" class="flex flex-wrap gap-1 mt-1">
+          <div
+            v-if="viewing.preferredTimes.length"
+            class="flex flex-wrap gap-1 mt-1"
+          >
             <UBadge
               v-for="pref in viewing.preferredTimes"
               :key="pref"
               color="neutral"
               variant="subtle"
               size="md"
-            >{{ pref }}</UBadge>
+              >{{ pref }}</UBadge
+            >
           </div>
         </div>
 
@@ -75,8 +102,13 @@
 
         <!-- Notes -->
         <div v-if="viewing.notes" class="flex items-start gap-2">
-          <UIcon name="i-lucide-message-square" class="size-4 text-(--foreground-200) shrink-0 mt-0.5" />
-          <p class="body-sm text-(--foreground-200) line-clamp-2 italic">{{ viewing.notes }}</p>
+          <UIcon
+            name="i-lucide-message-square"
+            class="size-4 text-(--foreground-200) shrink-0 mt-0.5"
+          />
+          <p class="body-sm text-(--foreground-200) line-clamp-2 italic">
+            {{ viewing.notes }}
+          </p>
         </div>
 
         <!-- Action buttons -->
@@ -125,9 +157,7 @@ const address = computed(
   () => props.viewing.listing?.property?.address?.fullAddress ?? null,
 );
 
-const showProposedDates = computed(
-  () => props.viewing.status !== "ACCEPTED",
-);
+const showProposedDates = computed(() => !props.viewing.counterProposedAt);
 
 const isActionable = computed(
   () =>
@@ -159,6 +189,7 @@ const statusLabel = computed(
 );
 
 const isCancelledOrRejected = computed(
-  () => props.viewing.status === "CANCELLED" || props.viewing.status === "REJECTED",
+  () =>
+    props.viewing.status === "CANCELLED" || props.viewing.status === "REJECTED",
 );
 </script>

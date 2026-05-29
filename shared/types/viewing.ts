@@ -1,8 +1,13 @@
 // Mirrors the Prisma ViewingStatus enum for use on client and server
-export type ViewingStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'RESCHEDULED' | 'CANCELLED';
+export type ViewingStatus =
+  | "PENDING"
+  | "ACCEPTED"
+  | "REJECTED"
+  | "RESCHEDULED"
+  | "CANCELLED";
 
 /** Which side of the viewing the current user is on */
-export type ViewingRole = 'requester' | 'owner';
+export type ViewingRole = "requester" | "owner";
 
 /** Minimal user shape used inside viewing records */
 export type ViewingUser = {
@@ -28,6 +33,7 @@ export interface ViewingWithDetails {
   requesterId: number;
   ownerId: number;
   conversationId: number | null;
+  openHouseSessionId: number | null;
   /** ISO strings for each date the buyer is available (stored as UTC noon) */
   proposedDates: readonly string[];
   /** Time preferences selected by the buyer (e.g. 'Mornings', 'Evenings', freeform) */
@@ -57,7 +63,7 @@ export interface CreateViewingPayload {
 
 /** Payload to respond to a viewing (owner action) */
 export interface RespondViewingPayload {
-  response: 'accept' | 'reject' | 'reschedule';
+  response: "accept" | "reject" | "reschedule";
   counterProposedAt?: string; // required when response = 'reschedule' or 'accept'
 }
 

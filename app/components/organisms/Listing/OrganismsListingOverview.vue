@@ -8,12 +8,12 @@
         <AtomsPill class="o-listing-sidebar__title-offertype__item | body-xs">
           {{ convertEnumToString(available!) }}
         </AtomsPill>
-        <AtomsPriceReducedBadge
-          :price-history="priceHistory"
-          :current-price="currentPriceNumber"
-        />
       </div>
-
+      <AtomsListingStatusBadges
+        :price-history="priceHistory"
+        :current-price-number="currentPriceNumber"
+        :open-house-badge-label="openHouseBadgeLabel"
+      />
 
       <span class="o-listing-overview__price">
         {{ price }}
@@ -31,47 +31,64 @@
 
     <!-- Property Icons -->
     <div class="o-listing-overview__icons">
-      <OrganismsListingSidebarIcons :property-type="propertyType" :bedrooms="bedrooms" :bathrooms="bathrooms"
-        :receptions="receptions" :other-rooms="otherRooms" :has-garden="hasGarden" :has-land="hasLand"
-        :classification="classification" />
+      <OrganismsListingSidebarIcons
+        :property-type="propertyType"
+        :bedrooms="bedrooms"
+        :bathrooms="bathrooms"
+        :receptions="receptions"
+        :other-rooms="otherRooms"
+        :has-garden="hasGarden"
+        :has-land="hasLand"
+        :classification="classification"
+      />
     </div>
 
     <!-- Property Pills -->
     <div class="o-listing-overview__pills">
-      <OrganismsListingSidebarPills :property-size="propertySize" :chain-free="chainFree" :year-built="yearBuilt"
-        :construction-type="constructionType" />
+      <OrganismsListingSidebarPills
+        :property-size="propertySize"
+        :chain-free="chainFree"
+        :year-built="yearBuilt"
+        :construction-type="constructionType"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 interface Props {
-  price?: string
-  address?: string
-  priceType?: string
-  priceHistory?: PriceHistoryEntry[]
-  currentPriceNumber?: number
-  propertyType?: string
-  propertySize?: number
-  bedrooms?: number
-  bathrooms?: number
-  receptions?: number
-  otherRooms?: number
-  classification?: string
-  yearBuilt?: string
-  constructionType?: string
-  chainFree?: boolean | null
-  hasGarden?: boolean
-  hasLand?: boolean
-  available?: string
-  listingId?: number
+  price?: string;
+  address?: string;
+  priceType?: string;
+  priceHistory?: PriceHistoryEntry[];
+  currentPriceNumber?: number;
+  propertyType?: string;
+  propertySize?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  receptions?: number;
+  otherRooms?: number;
+  classification?: string;
+  yearBuilt?: string;
+  constructionType?: string;
+  chainFree?: boolean | null;
+  hasGarden?: boolean;
+  hasLand?: boolean;
+  available?: string;
+  listingId?: number;
+  openHouseBadgeLabel?: string | null;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 console.log("OrganismsListingOverview loaded with props:", props.address);
 
 const { loggedIn } = useUserSession();
-const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } = useViewings();
+const {
+  viewings,
+  getActiveViewingForListing,
+  getViewingStatusLabel,
+  fetchViewings,
+} = useViewings();
 
 onMounted(() => {
   if (loggedIn.value && viewings.value.length === 0) {
@@ -87,7 +104,7 @@ const viewingLabel = computed(() => {
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/media' as mq;
+@use "#styles/_utils/media" as mq;
 
 .o-listing-overview {
   text-align: center;
