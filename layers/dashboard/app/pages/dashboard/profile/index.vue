@@ -25,7 +25,7 @@
           <OrganismsDashboardAccountHeroCard title="Setup your profile" description="Create your profile information to fully act" label="Save Changes" :loading="isModerating" />
 
           <AtomsDashboardForm>
-            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Not publicly displayed" class="" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <template #error="{ error }">
                 <p>{{ error }}</p>
               </template>
@@ -47,7 +47,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Your family name" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Not publicly displayed" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.lastName"
                 variant="subtle"
