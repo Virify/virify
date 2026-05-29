@@ -46,11 +46,6 @@
             class="o-listing-mobile-banner__title o-listing-mobile-banner__title--mobile-only | title-md lineheight-xs"
           >
             {{ price }}
-            <AtomsPriceHistoryPopover
-              v-if="priceHistory?.length"
-              :price-history="priceHistory!"
-              :current-price="currentPriceNumber!"
-            />
 
             <AtomsPill
               class="o-listing-mobile-banner__title-offertype | body-2xs"
@@ -129,11 +124,6 @@
               class="o-listing-mobile-banner__title | title-md lineheight-xs"
             >
               {{ price }}
-              <AtomsPriceHistoryPopover
-                v-if="priceHistory?.length"
-                :price-history="priceHistory!"
-                :current-price="currentPriceNumber!"
-              />
 
               <AtomsPill
                 class="o-listing-mobile-banner__title-offertype | body-2xs"

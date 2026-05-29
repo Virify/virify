@@ -1,5 +1,5 @@
 <template>
-  <div class="property-card-history">
+  <div class="property-card-history" :class="{ 'property-card-history--inline': inline }">
     <PopoverRoot>
       <PopoverTrigger class="property-card-history__button | body-xs">
         <AtomsIcon :icon="iconName" />
@@ -34,10 +34,14 @@ import {
 interface Props {
   historic?: Record<string, unknown>[]
   current?: number
-  cardWidth: number
+  cardWidth?: number
+  inline?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  cardWidth: 0,
+  inline: false
+})
 
 /**
  *  Price history
@@ -101,6 +105,9 @@ const cardWidthWithUnits = computed(() => {
   padding-right: var(--size-4);
   padding-bottom: var(--size-4);
 
+  &--inline {
+    padding: 0;
+  }
 
   &__button {
     display: flex;

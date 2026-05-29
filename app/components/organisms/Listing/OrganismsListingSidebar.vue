@@ -18,11 +18,6 @@
       />
 
       {{ price }}
-      <AtomsPriceHistoryPopover
-        v-if="priceHistory?.length"
-        :price-history="priceHistory!"
-        :current-price="currentPriceNumber!"
-      />
     </h2>
 
     <p
@@ -56,7 +51,7 @@
       :is-draft="isDraft"
     />
 
-    <NuxtLink v-if="agent?.username" :to="`/profile/${agent.username}`" class="o-listing-sidebar__agent-link">
+    <NuxtLink v-if="agent?.username" :to="`/profile/${agent.username}`" target="_blank" class="o-listing-sidebar__agent-link">
       <OrganismsListingAgent :agent="agent" />
     </NuxtLink>
 
