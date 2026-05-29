@@ -26,6 +26,7 @@ export function useResultsViewMode() {
   function setCurrentView(newView: ViewModeKey) {
     if (!Object.keys(ViewMode).includes(newView)) {
       currentView.value = defaultView
+      return
     }
 
     currentView.value = newView
