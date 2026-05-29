@@ -591,3 +591,87 @@ export async function getUserNotificationPreferences(userId: number) {
     receiveDesktopNotifications: prefs?.receiveDesktopNotifications ?? false,
   };
 }
+
+/**
+ * Find a public profile by username.
+ * Returns only GDPR-safe, publicly visible fields — no email, phone, address, or password data.
+ * @param username Username
+ * @returns Public profile with published listings
+ */
+export async function findPublicProfileByUsername(username: string) {
+  return prisma.user.findFirst({
+    where: { username: { equals: username, mode: 'insensitive' } },
+    select: {
+      id: true,
+      username: true,
+      avatar: true,
+      bio: true,
+      intents: true,
+      interests: true,
+      createdAt: true,
+      verification: {
+        select: { role: true },
+      },
+      listings: {
+        where: { published: true },
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          price: true,
+          createdAt: true,
+          updatedAt: true,
+          rentalListing: true,
+          saleListing: true,
+          ListingPriceHistory: {
+            select: {
+              id: true,
+              oldPrice: true,
+              newPrice: true,
+              changePercent: true,
+              createdAt: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              username: true,
+              avatar: true,
+            },
+          },
+          property: {
+            select: {
+              numberBedrooms: true,
+              numberBathrooms: true,
+              numberReceptions: true,
+              type: true,
+              classification: true,
+              address: {
+                select: {
+                  street: true,
+                  city: true,
+                  postcode: true,
+                  lat: true,
+                  lon: true,
+                  fullAddress: true,
+                },
+              },
+              media: true,
+              outdoorSpace: {
+                include: {
+                  garden: true,
+                  yard: true,
+                  land: true,
+                },
+              },
+              energyAndUtilities: {
+                select: { renewables: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+export type PublicProfile = NonNullable<Awaited<ReturnType<typeof findPublicProfileByUsername>>>;
