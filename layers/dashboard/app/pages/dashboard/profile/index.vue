@@ -198,6 +198,26 @@
           </AtomsDashboardForm>
         </UForm>
       </AtomsDashboardFormContainer>
+
+      <AtomsDashboardFormContainer v-if="isRegularUser">
+        <UAlert
+          title="Upgrade to a Professional Agent Account"
+          icon="i-lucide-building-2"
+          color="info"
+          :ui="{
+            root: 'rounded-lg',
+            title: 'title-xs mb-1',
+            description: 'body-sm font-normal',
+          }"
+        >
+          <template #description>
+            <p>
+              To upgrade to a professional agent account, please email our support team at
+              <a href="mailto:support@virify.co.uk" class="font-medium underline underline-offset-2">support@virify.co.uk</a>.
+            </p>
+          </template>
+        </UAlert>
+      </AtomsDashboardFormContainer>
     </template>
   </UDashboardPanel>
 </template>
@@ -212,6 +232,7 @@ definePageMeta({
 });
 
 const { accountNavigationItems } = useDashboardNavigation();
+const { user } = useUserSession();
 
 const formRef = useTemplateRef<{ setErrors: (errors: FormError[]) => void }>('formRef')
 const { state, pending, onSubmit, profileSchema, isModerating } = await useProfileForm(formRef);
@@ -220,4 +241,6 @@ const intents = profileIntents;
 const isProfileValid = computed(() => profileSchema.safeParse(state).success);
 
 const { avatarFile, avatarPreview, avatarUploading, avatarModerating, avatarRemoving, removeAvatar } = useAvatarUpload(state);
+
+const isRegularUser = computed(() => user.value?.role === 'USER' || !user.value?.role);
 </script>
