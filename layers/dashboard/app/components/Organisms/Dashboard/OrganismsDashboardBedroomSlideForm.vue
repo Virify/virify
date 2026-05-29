@@ -30,7 +30,7 @@
             />
           </UFormField>
 
-          <UFormField label="Bed Size" :name="`property.bedroomFeatures.${bedroomIndex}.bed`" description="Select the bed size" required eagerValidation>
+          <UFormField label="Bed Size" :name="`property.bedroomFeatures.${bedroomIndex}.bed`" description="Which bed size fits comfortably in this room?" required eagerValidation>
             <USelect
               :model-value="selectedBedSize"
               @update:model-value="setBedSize"
