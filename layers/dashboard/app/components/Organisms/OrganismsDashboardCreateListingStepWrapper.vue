@@ -133,7 +133,8 @@ async function handleSave(advance: boolean) {
 
   if (success) {
     if (draftComplete) {
-      // Step 9 complete - close the modal
+      // Step 9 complete - notify parent then close the modal
+      emit('completed')
       closeModal?.()
     } else if (advance) {
       emit('completed')

@@ -374,7 +374,7 @@ function getFieldsToModerate() {
 }
 
 function onStepCompleted() {
-  console.log("Step 9 completed");
+  navigateTo("/dashboard/draft-listings");
 }
 
 function onStepSaved() {
