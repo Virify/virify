@@ -56,7 +56,7 @@
       :is-draft="isDraft"
     />
 
-    <NuxtLink v-if="agent" to="#" class="o-listing-sidebar__agent-link">
+    <NuxtLink v-if="agent?.username" :to="`/profile/${agent.username}`" class="o-listing-sidebar__agent-link">
       <OrganismsListingAgent :agent="agent" />
     </NuxtLink>
 
