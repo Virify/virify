@@ -245,15 +245,15 @@ export const useDashboardNavigation = createSharedComposable(() => {
         text: "Get help",
       },
       children: [
-        {
-          label: "Documentation",
-          type: "link",
-          to: "mailto:support@virify.co.uk",
-          icon: "i-lucide-book-open",
-          tooltip: {
-            text: "Email us at support@virify.co.uk",
-          },
-        },
+        // {
+        //   label: "Documentation",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-book-open",
+        //   tooltip: {
+        //     text: "View documentation",
+        //   },
+        // },
         {
           label: "Contact Support",
           type: "link",
