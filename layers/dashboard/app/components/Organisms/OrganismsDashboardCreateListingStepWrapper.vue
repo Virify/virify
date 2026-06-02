@@ -21,7 +21,7 @@
 
         <div class="flex gap-2">
           <UButton type="button" variant="solid" color="secondary" size="sm" @click="handleSaveProgress"
-            :disabled="!isValid || isSaving || isModerating" :loading="isSaving || isModerating" class="body-sm text-white! cursor-pointer">
+            :disabled="!canSave || isSaving || isModerating" :loading="isSaving || isModerating" class="body-sm text-white! cursor-pointer">
             Save Progress
           </UButton>
 
@@ -50,6 +50,8 @@ interface Props {
   schema: ZodSchema
   state: Record<string, any>
   isValid: boolean
+  /** Optional separate validity check for "Save Progress". Defaults to isValid if omitted. */
+  isSaveValid?: boolean
   apiEndpoint: string
   getSubmissionData: () => Record<string, any>
   /** Explicit list of user-entered text fields to run through moderation before saving. */
@@ -67,6 +69,9 @@ const { saveStep, isSaving, previousStep, getStepData } = useCreateListingSteps(
 const closeModal = inject<() => void>('closeModal')
 const toast = useToast()
 const { moderateFields, isModerating } = useModerateFields()
+
+// canSave uses the step-specific save validity if provided, otherwise falls back to isValid
+const canSave = computed(() => props.isSaveValid !== undefined ? props.isSaveValid : props.isValid)
 
 // Ref to the UForm so we can call setErrors() for moderation failures
 const formRef = ref<{ setErrors: (errors: FormError[]) => void } | null>(null)
@@ -105,7 +110,8 @@ async function handleSaveProgress() {
 
 // Delegate to composable's saveStep
 async function handleSave(advance: boolean) {
-  if (!props.isValid || isSaving.value) return
+  const validityCheck = advance ? props.isValid : canSave.value
+  if (!validityCheck || isSaving.value) return
 
   // Only moderate fields whose values have changed since the last save
   if (props.getFieldsToModerate) {

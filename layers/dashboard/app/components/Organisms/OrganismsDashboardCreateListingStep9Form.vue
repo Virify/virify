@@ -4,6 +4,7 @@
     :schema="step9Schema"
     :state="state"
     :is-valid="isFormValid"
+    :is-save-valid="isSaveValid"
     api-endpoint="/api/listings/update/steps/nine/"
     :get-submission-data="getSubmissionData"
     :get-fields-to-moderate="getFieldsToModerate"
@@ -135,6 +136,9 @@ const isFormValid = computed(
   () =>
     state.property.description.length >= 10 && state.property.media.length > 0,
 );
+
+// Save progress only requires a valid description — photos are required for completion/publish
+const isSaveValid = computed(() => state.property.description.length >= 10);
 
 const {
   uploadProgress,
