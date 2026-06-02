@@ -21,7 +21,7 @@
 
         <div class="flex gap-2">
           <UButton type="button" variant="solid" color="secondary" size="sm" @click="handleSaveProgress"
-            :disabled="!isValid || isSaving || isModerating" :loading="isSaving || isModerating" class="body-sm text-white! cursor-pointer">
+            :disabled="!(isSaveValid ?? isValid) || isSaving || isModerating" :loading="isSaving || isModerating" class="body-sm text-white! cursor-pointer">
             Save Progress
           </UButton>
 
@@ -50,6 +50,9 @@ interface Props {
   schema: ZodSchema
   state: Record<string, any>
   isValid: boolean
+  /** Optional: a looser validity check used only for the Save Progress button.
+   *  Falls back to `isValid` when not provided. */
+  isSaveValid?: boolean
   apiEndpoint: string
   getSubmissionData: () => Record<string, any>
   /** Explicit list of user-entered text fields to run through moderation before saving. */
@@ -105,7 +108,8 @@ async function handleSaveProgress() {
 
 // Delegate to composable's saveStep
 async function handleSave(advance: boolean) {
-  if (!props.isValid || isSaving.value) return
+  const effectiveValid = advance ? props.isValid : (props.isSaveValid ?? props.isValid)
+  if (!effectiveValid || isSaving.value) return
 
   // Only moderate fields whose values have changed since the last save
   if (props.getFieldsToModerate) {

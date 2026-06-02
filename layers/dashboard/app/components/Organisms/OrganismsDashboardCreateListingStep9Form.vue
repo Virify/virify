@@ -4,6 +4,7 @@
     :schema="step9Schema"
     :state="state"
     :is-valid="isFormValid"
+    :is-save-valid="canSaveProgress"
     api-endpoint="/api/listings/update/steps/nine/"
     :get-submission-data="getSubmissionData"
     :get-fields-to-moderate="getFieldsToModerate"
@@ -131,9 +132,13 @@ const state = reactive<Step9FormState>({
   },
 });
 
+// Description alone is enough to save progress; photos are required to complete the step.
+const canSaveProgress = computed(
+  () => state.property.description.length >= 10,
+);
+
 const isFormValid = computed(
-  () =>
-    state.property.description.length >= 10 && state.property.media.length > 0,
+  () => canSaveProgress.value && state.property.media.length > 0,
 );
 
 const {
