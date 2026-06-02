@@ -291,7 +291,7 @@
               :disabled="isDeleting"
               @click="openArchiveDialog"
               icon="i-lucide-trash-2"
-              label="Delete"
+              label="Archive"
             />
             <UButton
               v-else
