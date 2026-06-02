@@ -42,6 +42,9 @@
           Send Support Request
         </AtomsButton>
       </div>
+      <p class="support-dialog__alt-email | body-sm">
+        Alternatively you can email us on <a href="mailto:support@virify.co.uk">support@virify.co.uk</a>
+      </p>
     </MoleculesForm>
   </div>
 </template>
@@ -169,6 +172,16 @@ onUnmounted(() => {
     display: flex;
     justify-content: center;
     margin: var(--size-16) 0;
+  }
+
+  &__alt-email {
+    text-align: center;
+    opacity: 0.6;
+    margin-top: var(--size-8);
+
+    a {
+      text-decoration: underline;
+    }
   }
 
   &__actions {
