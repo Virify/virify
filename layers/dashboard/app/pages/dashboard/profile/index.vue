@@ -11,6 +11,16 @@
         </template>
 
         <template #right>
+          <UButton
+            v-if="state.username"
+            :to="`/profile/${state.username}`"
+            label="View Public Profile"
+            icon="i-lucide-external-link"
+            color="neutral"
+            variant="outline"
+            size="sm"
+            target="_blank"
+          />
           <OrganismsDashboardNotificationButton />
         </template>
 
