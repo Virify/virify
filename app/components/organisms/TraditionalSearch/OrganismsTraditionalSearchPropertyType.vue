@@ -76,12 +76,14 @@ const propertyTypeIcons: Record<string, string> = {
   'Student Accommodation': 'legacy-search/student-accommodation',
 }
 
+const DEFAULT_PRESELECTED_TYPES = ['House', 'Cottage', 'Flat']
+
 callOnce(async () => {
   useFetch<PropertyTypeWithOptions[]>('/api/property-type/').then(({ data }) => {
     const types: PropertyType[] = asArray(data.value)
 
     for (const type of types) {
-      const { name, defaultSelected, options } = asObject(type)
+      const { name, options } = asObject(type)
 
       // Store property options, icon, etc.
       propertyTypes.value.push({
@@ -90,7 +92,7 @@ callOnce(async () => {
       })
 
       // Store whether property type is selected
-      modelSelected.value[name] = defaultSelected ? getOptionsAsStrings(options) : []
+      modelSelected.value[name] = DEFAULT_PRESELECTED_TYPES.includes(name) ? getOptionsAsStrings(options) : []
     }
   })
 })
