@@ -113,8 +113,6 @@ const saleIncludesOptions = [
 
 const rentIncludesOptions = [
   { key: 'let-agreed', label: 'Include let agreed' },
-  { key: 'short-term-lets', label: 'Include short-term lets' },
-  { key: 'long-term-lets', label: 'Include long-term lets' },
 ]
 
 const bedroomMin: RoomCount[] = [
