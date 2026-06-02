@@ -1,6 +1,6 @@
 <template>
   <div class="p-browse | container">
-    <BrowseSimpleHeader class="p-browse__search-form" :count="results.length" />
+    <BrowseHeader class="p-browse__search-form" :count="results.length" />
 
     <h2 class="p-browse__title | title-sm">
       Showing {{ results.length }} result{{ results.length === 1 ? '' : 's' }}
