@@ -257,7 +257,7 @@ export const useDashboardNavigation = createSharedComposable(() => {
         {
           label: "Contact Support",
           type: "link",
-          to: "#",
+          to: "mailto:support@virify.co.uk",
           icon: "i-lucide-headphones",
           tooltip: {
             text: "Contact support team",

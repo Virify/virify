@@ -9,43 +9,7 @@ config()
 
 import { prisma } from '../../../database/server/utils/prisma-client'
 import { MembershipType } from "../../../database/server/database/prisma/generated/enums"
-
-/**
- * Seeding function to populate property types and classifications in the database.
- */
-async function seedPropertyTypes() {
-  const DEFAULT_SELECTED_TYPES = new Set(['House', 'Cottage', 'Flat'])
-
-  const types = {
-    House: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace', 'Mansion'],
-    Cottage: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
-    Bungalow: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
-    Flat: ['Converted', 'Studio', 'Maisonette', 'High-rise', 'Within a Complex', 'Penthouse'],
-    Land: ['Residential', 'Commercial', 'Agricultural', 'Development Plot', 'Development Potential'],
-    Farms: ['Non-working', 'Working', 'Small Holding'],
-    Specialty: ['Retirement Home', 'New Build Home'],
-    'Student Accommodation': ['Flat', 'House', 'House-share'],
-  }
-
-  for (const [typeName, classification] of Object.entries(types)) {
-    const existingType = await prisma.propertyType.findFirst({
-      where: { name: typeName },
-    })
-
-    if (!existingType) {
-      await prisma.propertyType.create({
-        data: {
-          name: typeName,
-          defaultSelected: DEFAULT_SELECTED_TYPES.has(typeName),
-          classifications: {
-            create: classification.map(name => ({ name })),
-          },
-        },
-      })
-      console.log(`✅ Seeded property type '${typeName}'.`)
-    }
-  }
-}
+import { seedPropertyTypes } from './seed-property-types'
 
 /**
  * Seeding function to create an admin user in the database.
@@ -97,7 +61,7 @@ async function seedBaseData() {
     console.log('🌱 Running base database seeder (production)...')
 
     await seedAdminUser()
-    await seedPropertyTypes()
+    await seedPropertyTypes(prisma)
 
     console.log('✅ Base database seeding complete.')
     process.exit(0)
