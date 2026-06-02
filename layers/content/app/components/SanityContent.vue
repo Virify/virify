@@ -424,11 +424,17 @@ const customComponents = {
 
 .content-image {
   margin: var(--size-48) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 
   img {
     max-width: 100%;
     height: auto;
     border-radius: var(--border-radius-lg);
+    display: block;
+    margin: 0 auto;
   }
 }
 
