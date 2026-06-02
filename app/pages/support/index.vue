@@ -185,6 +185,9 @@
         size="md"
         class="font-bold button button-secondary mt-3! self-center"
       />
+      <p class="text-sm text-center opacity-60 mt-1">
+        Alternatively you can email us on <a href="mailto:support@virify.co.uk" class="underline">support@virify.co.uk</a>
+      </p>
     </UForm>
   </UPageSection>
   <!-- final cta section -->
