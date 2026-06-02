@@ -6,8 +6,6 @@ const includesDictionary: Record<string, string> = {
   'shared-ownership': 'shared ownership',
   'retirement': 'retirement properties',
   'let-agreed': 'let agreed',
-  'long-term-lets': 'short-term lets',
-  'short-term-lets': 'long-term lets',
 }
 
 export function buildContractQuery(options: Record<string, boolean>) {

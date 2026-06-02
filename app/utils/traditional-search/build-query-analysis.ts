@@ -125,8 +125,6 @@ function formatFeatureName(key: string): string {
     'chain-free': 'Chain Free',
     'freehold-only': 'Freehold Only',
     'let-agreed': 'Let Agreed',
-    'short-term-lets': 'Short-term Lets',
-    'long-term-lets': 'Long-term Lets',
     'off-street-parking': 'Off-street Parking',
     'disabled-access': 'Disability Access',
     'ev-charging': 'EV Charging',
