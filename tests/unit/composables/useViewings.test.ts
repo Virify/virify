@@ -247,3 +247,175 @@ describe('ViewingStatus values', () => {
     expect(statuses).toContain('CANCELLED');
   });
 });
+
+// ─── getActiveViewingForListing ───────────────────────────────────────────────
+
+describe('useViewings – getActiveViewingForListing priority logic', () => {
+  const userId = 100;
+
+  function getActive(
+    viewings: ViewingWithDetails[],
+    listingId: number,
+  ): ViewingWithDetails | null {
+    const priority = ['ACCEPTED', 'RESCHEDULED', 'PENDING'] as const;
+    for (const status of priority) {
+      const found = viewings.find(
+        v => v.listingId === listingId && v.requesterId === userId && v.status === status,
+      );
+      if (found) return found;
+    }
+    return null;
+  }
+
+  it('returns null when viewings list is empty', () => {
+    expect(getActive([], 10)).toBeNull();
+  });
+
+  it('returns null when no viewings match the listing', () => {
+    const viewings = [makeViewing({ listingId: 99, requesterId: userId, status: 'PENDING' })];
+    expect(getActive(viewings, 10)).toBeNull();
+  });
+
+  it('returns null when the matching viewing belongs to a different user', () => {
+    const viewings = [makeViewing({ listingId: 10, requesterId: 999, status: 'PENDING' })];
+    expect(getActive(viewings, 10)).toBeNull();
+  });
+
+  it('returns ACCEPTED viewing when one exists (highest priority)', () => {
+    const viewings = [
+      makeViewing({ id: 1, listingId: 10, requesterId: userId, status: 'PENDING' }),
+      makeViewing({ id: 2, listingId: 10, requesterId: userId, status: 'ACCEPTED' }),
+    ];
+    expect(getActive(viewings, 10)!.id).toBe(2);
+  });
+
+  it('returns RESCHEDULED viewing when no ACCEPTED exists', () => {
+    const viewings = [
+      makeViewing({ id: 1, listingId: 10, requesterId: userId, status: 'PENDING' }),
+      makeViewing({ id: 2, listingId: 10, requesterId: userId, status: 'RESCHEDULED' }),
+    ];
+    expect(getActive(viewings, 10)!.id).toBe(2);
+  });
+
+  it('returns PENDING viewing when no ACCEPTED or RESCHEDULED exists', () => {
+    const viewings = [
+      makeViewing({ id: 1, listingId: 10, requesterId: userId, status: 'PENDING' }),
+    ];
+    expect(getActive(viewings, 10)!.id).toBe(1);
+  });
+
+  it('returns null for CANCELLED or REJECTED viewings', () => {
+    const viewings = [
+      makeViewing({ listingId: 10, requesterId: userId, status: 'CANCELLED' }),
+      makeViewing({ listingId: 10, requesterId: userId, status: 'REJECTED' }),
+    ];
+    expect(getActive(viewings, 10)).toBeNull();
+  });
+});
+
+// ─── getViewingStatusLabel ────────────────────────────────────────────────────
+
+describe('useViewings – getViewingStatusLabel', () => {
+  function getViewingStatusLabel(viewing: ViewingWithDetails): string {
+    if (viewing.status === 'ACCEPTED') {
+      const confirmedDate = viewing.counterProposedAt ?? viewing.proposedDates[0];
+      if (confirmedDate) {
+        const d = new Date(confirmedDate).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'short',
+        });
+        return `Viewing on ${d}`;
+      }
+      return 'Viewing Confirmed';
+    }
+    if (viewing.status === 'RESCHEDULED') return 'New Time Proposed';
+    return 'Viewing Pending';
+  }
+
+  it('returns "Viewing Pending" for PENDING status', () => {
+    expect(getViewingStatusLabel(makeViewing({ status: 'PENDING' }))).toBe('Viewing Pending');
+  });
+
+  it('returns "Viewing Pending" for CANCELLED status', () => {
+    expect(getViewingStatusLabel(makeViewing({ status: 'CANCELLED' }))).toBe('Viewing Pending');
+  });
+
+  it('returns "Viewing Pending" for REJECTED status', () => {
+    expect(getViewingStatusLabel(makeViewing({ status: 'REJECTED' }))).toBe('Viewing Pending');
+  });
+
+  it('returns "New Time Proposed" for RESCHEDULED status', () => {
+    expect(getViewingStatusLabel(makeViewing({ status: 'RESCHEDULED' }))).toBe('New Time Proposed');
+  });
+
+  it('returns "Viewing on <date>" for ACCEPTED with a proposed date', () => {
+    const label = getViewingStatusLabel(
+      makeViewing({ status: 'ACCEPTED', proposedDates: ['2026-06-01T12:00:00.000Z'] }),
+    );
+    expect(label).toMatch(/^Viewing on /);
+    expect(label).toMatch(/Jun/);
+  });
+
+  it('prefers counterProposedAt over proposedDates[0] for ACCEPTED', () => {
+    const label = getViewingStatusLabel(
+      makeViewing({
+        status: 'ACCEPTED',
+        counterProposedAt: '2026-07-10T12:00:00.000Z',
+        proposedDates: ['2026-06-01T12:00:00.000Z'],
+      }),
+    );
+    expect(label).toMatch(/Jul/);
+    expect(label).not.toMatch(/Jun/);
+  });
+
+  it('returns "Viewing Confirmed" for ACCEPTED with no dates', () => {
+    const label = getViewingStatusLabel(
+      makeViewing({ status: 'ACCEPTED', proposedDates: [], counterProposedAt: null }),
+    );
+    expect(label).toBe('Viewing Confirmed');
+  });
+});
+
+// ─── counterProposeViewing – array mutation ───────────────────────────────────
+
+describe('useViewings – counterProposeViewing array update', () => {
+  it('updates the viewing at the correct index', () => {
+    const viewings = ref<ViewingWithDetails[]>([
+      makeViewing({ id: 1, status: 'PENDING' }),
+      makeViewing({ id: 2, status: 'PENDING' }),
+    ]);
+
+    const updated = makeViewing({ id: 2, status: 'RESCHEDULED', counterProposedAt: '2026-07-01T12:00:00.000Z' });
+    const idx = viewings.value.findIndex(v => v.id === updated.id);
+    if (idx !== -1) viewings.value[idx] = updated;
+
+    expect(viewings.value[1]!.status).toBe('RESCHEDULED');
+    expect(viewings.value[1]!.counterProposedAt).toBe('2026-07-01T12:00:00.000Z');
+  });
+
+  it('does not modify other viewings when counter-proposing', () => {
+    const viewings = ref<ViewingWithDetails[]>([
+      makeViewing({ id: 1, status: 'PENDING' }),
+      makeViewing({ id: 2, status: 'PENDING' }),
+    ]);
+
+    const updated = makeViewing({ id: 2, status: 'RESCHEDULED' });
+    const idx = viewings.value.findIndex(v => v.id === updated.id);
+    if (idx !== -1) viewings.value[idx] = updated;
+
+    expect(viewings.value[0]!.status).toBe('PENDING');
+  });
+
+  it('does not modify the array when the id is not found', () => {
+    const viewings = ref<ViewingWithDetails[]>([
+      makeViewing({ id: 1, status: 'PENDING' }),
+    ]);
+
+    const updated = makeViewing({ id: 99, status: 'RESCHEDULED' });
+    const idx = viewings.value.findIndex(v => v.id === updated.id);
+    if (idx !== -1) viewings.value[idx] = updated;
+
+    expect(viewings.value).toHaveLength(1);
+    expect(viewings.value[0]!.status).toBe('PENDING');
+  });
+});

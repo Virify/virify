@@ -1,11 +1,10 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { loggedIn } = useUserSession()
+  const { loggedIn } = useUserSession();
 
-  // Must be logged in to view draft previews
+  // Must be logged in to view draft previews (owner or shared user — enforced by the API)
   if (!loggedIn.value) {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Page not found'
-    })
+    const redirectCookie = useCookie("redirect");
+    redirectCookie.value = to.fullPath;
+    return navigateTo("/?showLogin=true");
   }
-})
+});

@@ -15,23 +15,33 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const draftId = getRouterParam(event, 'id');
-    
+    const draftId = getRouterParam(event, "id");
+
     if (!draftId || isNaN(Number(draftId))) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Invalid draft listing ID"
+        statusMessage: "Invalid draft listing ID",
       });
     }
 
     const draftIdNum = Number(draftId);
     const draft = await getDraftListingById(draftIdNum);
 
-    // Return 404 if draft doesn't exist or doesn't belong to the user
-    if (!draft || draft.userId !== user.id) {
+    if (!draft) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Draft listing not found"
+        statusMessage: "Draft listing not found",
+      });
+    }
+
+    // Allow access if the user is the owner or a shared user
+    const isOwner = draft.userId === user.id;
+    const isSharedUser = draft.sharedUsers.some((u) => u.id === user.id);
+
+    if (!isOwner && !isSharedUser) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "Draft listing not found",
       });
     }
 

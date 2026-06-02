@@ -160,7 +160,7 @@ export default defineCachedEventHandler(async (event) => {
 
   return baseNavigation
 }, {
-  maxAge: 86400, // 24 hours (60*60*24),
+  maxAge: 300, // 5 minutes (60*5)
   getKey: async (event) => {
     const { mortgageCalculator, isAdmin } = await useFeatureFlag(event)
     const showMortgageCalculator = isAdmin || mortgageCalculator

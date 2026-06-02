@@ -11,6 +11,16 @@
         </template>
 
         <template #right>
+          <UButton
+            v-if="state.username"
+            :to="`/profile/${state.username}`"
+            icon="i-lucide-external-link"
+            label="View Public Profile"
+            variant="ghost"
+            color="neutral"
+            size="sm"
+            target="_blank"
+          />
           <OrganismsDashboardNotificationButton />
         </template>
 
@@ -25,7 +35,7 @@
           <OrganismsDashboardAccountHeroCard title="Setup your profile" description="Create your profile information to fully act" label="Save Changes" :loading="isModerating" />
 
           <AtomsDashboardForm>
-            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Only your username will be displayed" class="" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+            <UFormField label="First Name" name="firstName" required orientation="horizontal" description="Not publicly displayed" class="" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <template #error="{ error }">
                 <p>{{ error }}</p>
               </template>
@@ -47,7 +57,7 @@
 
             <USeparator class="my-4" />
 
-            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Your family name" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
+            <UFormField label="Last Name" name="lastName" required orientation="horizontal" description="Not publicly displayed" :ui="{ root: 'flex flex-col md:flex-row md:flex-wrap items-stretch md:items-start gap-2 md:gap-0', error: 'w-full md:w-80 body-xs', help: 'body-xs text-(--foreground-200)/60 self-center mt-1' }">
               <UInput
                 v-model="state.lastName"
                 variant="subtle"
@@ -198,6 +208,26 @@
           </AtomsDashboardForm>
         </UForm>
       </AtomsDashboardFormContainer>
+
+      <AtomsDashboardFormContainer v-if="isRegularUser">
+        <UAlert
+          title="Upgrade to a Professional Agent Account"
+          icon="i-lucide-building-2"
+          color="info"
+          :ui="{
+            root: 'rounded-lg',
+            title: 'title-xs mb-1',
+            description: 'body-sm font-normal',
+          }"
+        >
+          <template #description>
+            <p>
+              To upgrade to a professional agent account, please email our support team at
+              <a href="mailto:support@virify.co.uk" class="font-medium underline underline-offset-2">support@virify.co.uk</a>.
+            </p>
+          </template>
+        </UAlert>
+      </AtomsDashboardFormContainer>
     </template>
   </UDashboardPanel>
 </template>
@@ -212,6 +242,7 @@ definePageMeta({
 });
 
 const { accountNavigationItems } = useDashboardNavigation();
+const { user } = useUserSession();
 
 const formRef = useTemplateRef<{ setErrors: (errors: FormError[]) => void }>('formRef')
 const { state, pending, onSubmit, profileSchema, isModerating } = await useProfileForm(formRef);
@@ -220,4 +251,6 @@ const intents = profileIntents;
 const isProfileValid = computed(() => profileSchema.safeParse(state).success);
 
 const { avatarFile, avatarPreview, avatarUploading, avatarModerating, avatarRemoving, removeAvatar } = useAvatarUpload(state);
+
+const isRegularUser = computed(() => user.value?.role === 'USER' || !user.value?.role);
 </script>

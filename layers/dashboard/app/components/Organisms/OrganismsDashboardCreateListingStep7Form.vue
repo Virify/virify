@@ -50,7 +50,7 @@
 
           <div class="flex flex-col sm:flex-row gap-6">
             <div class="sm:w-48 shrink-0">
-              <UFormField label="Pet Friendly" name="property.additionalFeatures.petFriendly" description="Suitable for pets?" hint="optional" eager-validation>
+              <UFormField label="Pet Friendly" name="property.additionalFeatures.petFriendly" description="Is the property safe and secure for pets?" hint="optional" eager-validation>
                 <USelect
                   v-model="state.property.additionalFeatures!.petFriendly"
                   :items="petFriendlyOptions"

@@ -1,15 +1,43 @@
 <template>
-  <section class="o-listing-sidebar-agent | body-sm">
+  <NuxtLink
+    v-if="agent?.username"
+    :to="`/profile/${agent.username}`"
+    target="_blank"
+    class="o-listing-sidebar-agent__link"
+  >
+    <section class="o-listing-sidebar-agent | body-sm">
+      <div class="o-listing-sidebar-agent__logo">
+        <UAvatar
+          :src="agent?.avatar || undefined"
+          :name="agent?.username || undefined"
+          :alt="agent?.username || 'Agent'"
+          :ui="{ root: 'bg-transparent', fallback: 'text-(--monochrome-900)' }"
+          size="xl"
+        />
+      </div>
+
+      <div
+        role="presentation"
+        class="o-listing-sidebar-agent__details | flow flow-3xs"
+      >
+        <h3 class="o-listing-sidebar-agent__name | title-xs">
+          {{ agent?.username }}
+        </h3>
+        <!-- <p class="| body-xs">123 Agent Street, SM1 TWN</p> -->
+        <p class="| body-xs">{{ memberSince }}</p>
+      </div>
+    </section>
+  </NuxtLink>
+  <section v-else class="o-listing-sidebar-agent | body-sm">
     <div class="o-listing-sidebar-agent__logo">
       <UAvatar
         :src="agent?.avatar || undefined"
         :name="agent?.username || undefined"
         :alt="agent?.username || 'Agent'"
-        :ui="{ root: agent?.avatar ? 'bg-transparent' : 'bg-(--background-300)', fallback: 'text-(--monochrome-900)' }"
+        :ui="{ root: 'bg-transparent', fallback: 'text-(--monochrome-900)' }"
         size="xl"
       />
     </div>
-
     <div
       role="presentation"
       class="o-listing-sidebar-agent__details | flow flow-3xs"
@@ -17,7 +45,6 @@
       <h3 class="o-listing-sidebar-agent__name | title-xs">
         {{ agent?.username }}
       </h3>
-      <!-- <p class="| body-xs">123 Agent Street, SM1 TWN</p> -->
       <p class="| body-xs">{{ memberSince }}</p>
     </div>
   </section>
@@ -60,20 +87,23 @@ const memberSince = computed(() => {
   border-radius: var(--border-radius-2xl);
   padding: var(--size-16);
   display: grid;
-  grid-template-columns: 5em auto;
-  gap: var(--size-16);
+  grid-template-columns: auto 1fr;
+  gap: var(--size-12);
   align-items: flex-start;
   text-align: left;
   flex: 1 0 auto;
 
+  &__link {
+    display: contents;
+    text-decoration: none;
+    color: inherit;
+  }
+
   &__logo {
-    height: 100%;
-    width: 100%;
-    border-radius: var(--border-radius-lg);
-    background: #{fn.faded-color(80%)};
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
   }
 
   &__logo-image {

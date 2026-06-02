@@ -150,6 +150,9 @@ importers:
       '@iconify-json/lucide':
         specifier: ^1.2.85
         version: 1.2.85
+      '@iconify-json/simple-icons':
+        specifier: ^1.2.83
+        version: 1.2.83
       '@nuxt/test-utils':
         specifier: ^3.23.0
         version: 3.23.0(@vue/test-utils@2.4.6)(jsdom@26.1.0)(magicast@0.5.1)(playwright-core@1.57.0)(typescript@5.9.3)(vitest@3.2.4(@types/node@25.0.8)(jiti@2.6.1)(jsdom@26.1.0)(lightningcss@1.32.0)(sass@1.97.2)(terser@5.45.0)(tsx@4.21.0)(yaml@2.8.2))
@@ -913,6 +916,9 @@ packages:
 
   '@iconify-json/lucide@1.2.85':
     resolution: {integrity: sha512-VXUWT6KRDiVK4Ty/7Ypu+U0KnSbHzDAOOiSgLLPhU8u3ES5IusP1X7ahZb1iwiVKGWRG6gkKywaRUIZLgYWXyA==}
+
+  '@iconify-json/simple-icons@1.2.83':
+    resolution: {integrity: sha512-6Pp9V++XisT9RKH7FB4RLPqUDzcmLtSma0ovOEIoEWGrXtHwBFsH7oN1z8vvCVCb95fb87QgR46/zRLyN9Y3kg==}
 
   '@iconify/collections@1.0.670':
     resolution: {integrity: sha512-32kW4oJ+QV1HCndcjwAprDyJJ0+T9ahP4y2lmLfekdGWNMwG1pVZah4biqT+HrZdEiBm8InJrbCvaitIusTE3g==}
@@ -9176,6 +9182,10 @@ snapshots:
       hono: 4.12.12
 
   '@iconify-json/lucide@1.2.85':
+    dependencies:
+      '@iconify/types': 2.0.0
+
+  '@iconify-json/simple-icons@1.2.83':
     dependencies:
       '@iconify/types': 2.0.0
 

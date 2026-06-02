@@ -16,7 +16,11 @@
         <div v-if="createListing" class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Sell Property</h3>
           <div class="o-footer__cta">
-            <a href="#" class="o-footer__button | button button-secondary button-xs">List your property</a>
+            <a
+              href="#"
+              class="o-footer__button | button button-secondary button-xs"
+              >List your property</a
+            >
           </div>
         </div>
 
@@ -24,7 +28,11 @@
         <div class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Property Tools</h3>
           <ul class="o-footer__links">
-            <li><nuxt-link to="/price-paid" class="o-footer__link | body-sm">Price Paid Data</nuxt-link></li>
+            <li>
+              <nuxt-link to="/price-paid" class="o-footer__link | body-sm"
+                >Price Paid Data</nuxt-link
+              >
+            </li>
             <!-- <li><nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm">Mortgage Calculator</nuxt-link></li> -->
           </ul>
         </div>
@@ -33,9 +41,16 @@
         <div class="o-footer__section">
           <h3 class="o-footer__section-title | title-3xs">Guides</h3>
           <ul class="o-footer__links">
-            <li><nuxt-link to="/guides" class="o-footer__link | body-sm">All Guides</nuxt-link></li>
+            <li>
+              <nuxt-link to="/guides" class="o-footer__link | body-sm"
+                >All Guides</nuxt-link
+              >
+            </li>
             <li v-for="category in categories" :key="category.slug.current">
-              <nuxt-link :to="`/guides/${category.slug.current}`" class="o-footer__link | body-sm">
+              <nuxt-link
+                :to="`/guides/${category.slug.current}`"
+                class="o-footer__link | body-sm"
+              >
                 {{ category.title }}
               </nuxt-link>
             </li>
@@ -47,11 +62,31 @@
           <h3 class="o-footer__section-title | title-3xs">Company</h3>
           <ul class="o-footer__links">
             <!-- <li><a href="#" class="o-footer__link | body-sm">About Us</a></li> -->
-            <li><nuxt-link to="/contact" class="o-footer__link | body-sm">Contact Us</nuxt-link></li>
-            <li><nuxt-link to="/support" class="o-footer__link | body-sm">Support</nuxt-link></li>
-            <li><nuxt-link to="/privacy" class="o-footer__link | body-sm">Privacy Policy</nuxt-link></li>
-            <li><nuxt-link to="/terms" class="o-footer__link | body-sm">Terms & Conditions</nuxt-link></li>
-            <li><nuxt-link to="/cookie" class="o-footer__link | body-sm">Cookie Policy</nuxt-link></li>
+            <li>
+              <nuxt-link to="/contact" class="o-footer__link | body-sm"
+                >Contact Us</nuxt-link
+              >
+            </li>
+            <li>
+              <nuxt-link to="/support" class="o-footer__link | body-sm"
+                >Support</nuxt-link
+              >
+            </li>
+            <li>
+              <nuxt-link to="/privacy" class="o-footer__link | body-sm"
+                >Privacy Policy</nuxt-link
+              >
+            </li>
+            <li>
+              <nuxt-link to="/terms" class="o-footer__link | body-sm"
+                >Terms & Conditions</nuxt-link
+              >
+            </li>
+            <li>
+              <nuxt-link to="/cookie" class="o-footer__link | body-sm"
+                >Cookie Policy</nuxt-link
+              >
+            </li>
           </ul>
         </div>
       </div>
@@ -60,11 +95,15 @@
       <div class="o-footer__bottom">
         <!-- Friendlier, Monzo-like disclaimer with protective legal backup on hover -->
         <p class="o-footer__copyright | body-xs">
-          We like to help — our guides are friendly tips, not legal advice.
+          We like to help — our guides are friendly tips, not professional
+          advice.
         </p>
-        <p class="o-footer__copyright | body-xs"
-          title="Our guides are for informational purposes only and do not constitute legal or professional advice.">
-          © {{ currentYear }} Virify Ltd. All rights reserved. Company No. 16255324.
+        <p
+          class="o-footer__copyright | body-xs"
+          title="Our guides are for informational purposes only and do not constitute legal or professional advice."
+        >
+          © {{ currentYear }} Virify Ltd. All rights reserved. Company No.
+          16255324.
         </p>
       </div>
     </div>
@@ -72,11 +111,11 @@
 </template>
 
 <script setup lang="ts">
-
-const { createListing } = useFeatureFlag()
+const { createListing } = useFeatureFlag();
 
 // Get guide categories for footer navigation
-const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery)
+const { data: categories } =
+  await useSanityQuery<GuideCategory[]>(categoriesQuery);
 
 const currentYear = new Date().getFullYear();
 </script>

@@ -9,6 +9,7 @@ const alwaysAllowedRoutes = [
   '/price-paid/**',
   '/cookie/**',
   '/support/**',
+  '/profile/**',
 ]
 
 const featureFlagRoutes = {

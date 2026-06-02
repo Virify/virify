@@ -8,6 +8,10 @@ import {
   parseRoomAssignment,
   getSelectedRoom,
 } from "../app/utils/step9";
+import {
+  createInitialStep9Values,
+  step9Validation,
+} from "../../../shared/utils/listing-step9-schema";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Fixtures
@@ -29,7 +33,11 @@ function makeGeneral(id: string): any {
 }
 
 function makeRoomImage(id: string, bedroomId: number): any {
-  return { ...createEmptyMediaAssignment(id, `${id}.jpg`), bedroomId, isGeneral: false };
+  return {
+    ...createEmptyMediaAssignment(id, `${id}.jpg`),
+    bedroomId,
+    isGeneral: false,
+  };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -102,7 +110,10 @@ describe("groupImagesByRoom", () => {
 
 describe("generateAccordionItems", () => {
   it("maps each group to an accordion item with count", () => {
-    const groups = groupImagesByRoom([makeGeneral("img1"), makeGeneral("img2")], emptyRooms);
+    const groups = groupImagesByRoom(
+      [makeGeneral("img1"), makeGeneral("img2")],
+      emptyRooms,
+    );
     const items = generateAccordionItems(groups);
     expect(items).toHaveLength(1);
     expect(items[0]!.count).toBe(2);
@@ -145,12 +156,18 @@ describe("generateRoomOptions", () => {
   });
 
   it("includes bedroom options", () => {
-    const opts = generateRoomOptions({ ...emptyRooms, bedrooms: [{ id: 1, name: "Master" }] });
+    const opts = generateRoomOptions({
+      ...emptyRooms,
+      bedrooms: [{ id: 1, name: "Master" }],
+    });
     expect(opts.some((o) => o.value === "bedroom-1")).toBe(true);
   });
 
   it("includes bathroom options", () => {
-    const opts = generateRoomOptions({ ...emptyRooms, bathrooms: [{ id: 2, name: "En Suite" }] });
+    const opts = generateRoomOptions({
+      ...emptyRooms,
+      bathrooms: [{ id: 2, name: "En Suite" }],
+    });
     expect(opts.some((o) => o.value === "bathroom-2")).toBe(true);
   });
 });
@@ -195,5 +212,61 @@ describe("getSelectedRoom", () => {
 
   it("returns 'bedroom-N' for a bedroom assignment", () => {
     expect(getSelectedRoom(makeRoomImage("img", 5))).toBe("bedroom-5");
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
+// createInitialStep9Values
+// ──────────────────────────────────────────────────────────────────────────────
+
+describe("createInitialStep9Values", () => {
+  it("description starts empty when no draft data provided", () => {
+    const state = createInitialStep9Values();
+    expect(state.property.description).toBe("");
+  });
+
+  it("description is populated from draft data", () => {
+    const state = createInitialStep9Values({
+      property: { description: "A lovely property.", media: [] },
+    });
+    expect(state.property.description).toBe("A lovely property.");
+  });
+
+  it("media starts empty when no draft data provided", () => {
+    const state = createInitialStep9Values();
+    expect(state.property.media).toEqual([]);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
+// step9Validation.isStep9Valid
+// ──────────────────────────────────────────────────────────────────────────────
+
+describe("isStep9Valid", () => {
+  const validState = {
+    property: {
+      description: "A lovely property in the city centre area.",
+      media: [],
+    },
+  };
+
+  it("returns true for a valid description", () => {
+    expect(step9Validation.isStep9Valid(validState)).toBe(true);
+  });
+
+  it("returns false when description is empty", () => {
+    expect(
+      step9Validation.isStep9Valid({
+        property: { ...validState.property, description: "" },
+      }),
+    ).toBe(false);
+  });
+
+  it("returns false when description is too short (< 10 chars)", () => {
+    expect(
+      step9Validation.isStep9Valid({
+        property: { ...validState.property, description: "Too short" },
+      }),
+    ).toBe(false);
   });
 });
