@@ -14,6 +14,8 @@ import { MembershipType } from "../../../database/server/database/prisma/generat
  * Seeding function to populate property types and classifications in the database.
  */
 async function seedPropertyTypes() {
+  const DEFAULT_SELECTED_TYPES = new Set(['House', 'Cottage', 'Flat'])
+
   const types = {
     House: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace', 'Mansion'],
     Cottage: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
@@ -34,7 +36,7 @@ async function seedPropertyTypes() {
       await prisma.propertyType.create({
         data: {
           name: typeName,
-          defaultSelected: true,
+          defaultSelected: DEFAULT_SELECTED_TYPES.has(typeName),
           classifications: {
             create: classification.map(name => ({ name })),
           },
