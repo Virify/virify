@@ -51,11 +51,7 @@
       :is-draft="isDraft"
     />
 
-    <NuxtLink v-if="agent?.username" :to="`/profile/${agent.username}`" target="_blank" class="o-listing-sidebar__agent-link">
-      <OrganismsListingAgent :agent="agent" />
-    </NuxtLink>
-
-    <OrganismsListingAgent v-else :agent="agent" />
+    <OrganismsListingAgent :agent="agent" />
   </section>
 </template>
 

@@ -75,7 +75,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-console.log("OrganismsListingOverview loaded with props:", props.address);
 
 const { loggedIn } = useUserSession();
 const {

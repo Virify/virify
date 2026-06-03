@@ -2,7 +2,7 @@
   <div class="o-listing-buttons" role="presentation" v-if="signup || isAdmin">
     <!-- @TODO we should move this v-if to the parent -->
     <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button" :listing-id="listingId" />
-    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button"
+    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button"
       :listing-id="listingId" />
 
     <AtomsEnquireButton v-if="!isDraft && agent?.id" :listing-id="listingId" :user-id="agent.id"
