@@ -7,6 +7,12 @@
     <div ref="turnstileEl"></div>
     <AtomsButton class="| button-full button-monochrome" type="submit" :pending="isPending"> Create account
     </AtomsButton>
+    <p class="o-signup-form__terms | body-xs">
+      By creating an account, you agree to our
+      <NuxtLink to="/terms">Terms &amp; Conditions</NuxtLink>,
+      <NuxtLink to="/acceptable-use">Acceptable Use Policy</NuxtLink>
+      and <NuxtLink to="/privacy">Privacy Policy</NuxtLink>.
+    </p>
   </MoleculesForm>
 </template>
 

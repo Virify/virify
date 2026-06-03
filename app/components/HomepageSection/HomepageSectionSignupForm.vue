@@ -18,6 +18,9 @@
         I agree to the
         <nuxt-link href="/terms">
           terms &amp; conditions
+        </nuxt-link>,
+        <nuxt-link href="/acceptable-use">
+          acceptable use policy
         </nuxt-link>
         and
         <nuxt-link href="/privacy">

@@ -82,6 +82,7 @@ export default defineNuxtConfig({
       "/support",
       "/listing/*",
       "/profile/*",
+      "/acceptable-use",
     ],
     disallow: [
       "/account",

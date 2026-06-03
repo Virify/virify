@@ -124,6 +124,13 @@ export const cookieQuery = `*[_type == "cookie"][0] {
   content
 }`
 
+export const acceptableUseQuery = `*[_type == "acceptableUse"][0] {
+  _id,
+  title,
+  lastUpdated,
+  content
+}`
+
 // CMS pages
 export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
   _id,

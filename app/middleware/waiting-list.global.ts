@@ -10,6 +10,7 @@ const alwaysAllowedRoutes = [
   '/mortgage-calculator/**',
   '/cookie/**',
   '/support/**',
+  '/acceptable-use/**',
   '/profile/**',
 ]
 
