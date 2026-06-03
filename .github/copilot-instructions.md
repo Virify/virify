@@ -87,7 +87,7 @@ Routes use middleware for guarding:
 - `draft-owner` - Requires draft ownership
 - `email-test` - Email preview functionality
 - `login` - For login page redirection
-- `waiting-list.global` - Global waiting list check
+- `feature-flags.global` - Global feature flag route guard (blocks access to feature-flagged routes)
 
 Usage: `definePageMeta({ middleware: ['authenticated'] })`
 
