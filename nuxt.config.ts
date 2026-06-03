@@ -32,7 +32,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       featureFlags: {
-        waitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
         createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
@@ -153,9 +152,6 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2025-07-09",
   routeRules: {
-    "/waiting-list": {
-      redirect: "/",
-    },
     // Authenticated user API routes — no rate limiting needed, session auth is the guard
     "/api/user/**": {
       security: { rateLimiter: false },

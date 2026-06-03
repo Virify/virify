@@ -27,18 +27,6 @@ const ppdClientSingleton = () => {
   });
 };
 
-const waitingListClientSingleton = () => {
-  // Get config at runtime, not module load time
-  const config = typeof useRuntimeConfig !== 'undefined' ? useRuntimeConfig() : {
-    DATABASE_URL: process.env.DATABASE_URL,
-    WAITING_LIST_DATABASE_URL: process.env.WAITING_LIST_DATABASE_URL,
-  };
-
-  return new WaitingListClient({
-    adapter: new PrismaPg({ connectionString: config.WAITING_LIST_DATABASE_URL }),
-  });
-};
-
 declare const globalThis: {
   prismaAppGlobal?: AppClient;
   prismaPpdGlobal?: PpdClient;
@@ -63,6 +51,18 @@ export const ppdPrisma = new Proxy({} as PpdClient, {
     return (globalThis.prismaPpdGlobal as any)[prop];
   }
 });
+
+const waitingListClientSingleton = () => {
+  // Get config at runtime, not module load time
+  const config = typeof useRuntimeConfig !== 'undefined' ? useRuntimeConfig() : {
+    DATABASE_URL: process.env.DATABASE_URL,
+    WAITING_LIST_DATABASE_URL: process.env.WAITING_LIST_DATABASE_URL,
+  };
+
+  return new WaitingListClient({
+    adapter: new PrismaPg({ connectionString: config.WAITING_LIST_DATABASE_URL }),
+  });
+};
 
 export const waitingListPrisma = new Proxy({} as WaitingListClient, {
   get(target, prop) {

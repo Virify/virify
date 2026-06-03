@@ -91,11 +91,6 @@ export async function invalidateRecentViewedCache(userId: number): Promise<void>
   await useStorage("cache").removeItem(`recent-viewed:${userId}`);
 }
 
-/** Bust the global waiting-list count cache. */
-export async function invalidateWaitingListCountCache(): Promise<void> {
-  await useStorage("cache").removeItem("waiting-list:count");
-}
-
 /** Bust the property detail cache for a specific property. */
 export async function invalidatePropertyCache(propertyId: number): Promise<void> {
   await useStorage("cache").removeItem(`property:${propertyId}`);
