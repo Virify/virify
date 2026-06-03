@@ -16,10 +16,6 @@
         <LazyHeaderActionsLoggedIn v-if="loggedIn" />
         <LazyHeaderActionsGuest v-else />
       </template>
-
-      <template v-else>
-        <LazyHeaderActionsWaitingList />
-      </template>
     </header>
   </div>
 
@@ -35,8 +31,7 @@ const { mainMenu } = useMainNavigation()
 const { loggedIn } = useUserSession();
 
 /**
- *  Check whether to skip the wait list - this doesn't need to be
- *  reactive so we don't need to use computed functions
+ *  Check whether signup / admin access is available
  */
 const { signup, isAdmin } = useFeatureFlag();
 
