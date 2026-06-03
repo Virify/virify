@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { ListingTier } from "../../../database/prisma/generated/enums";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
+import { useFeatureFlag } from "~~/server/utils/useFeatureFlag";
 
 const CreateSchema = z.object({
   tier: z.enum(ListingTier),
@@ -16,6 +17,14 @@ export default defineEventHandler(async (event) => {
       throw createError({
         statusCode: 401,
         statusMessage: "Unauthorized",
+      });
+    }
+
+    const { createListing } = await useFeatureFlag(event);
+    if (!createListing) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Forbidden: only agents and admins can create listings",
       });
     }
 
