@@ -322,7 +322,7 @@ const seoData = computed(() => {
   const cms = cmsData.seo;
   return {
     title: cms?.metaTitle || "Support & Help Center | Virify - Property Search Made Easy",
-    description: cms?.metaDescription || "Get help with Virify's property search platform. Access our comprehensive FAQs, guides, and support resources. Contact our support team for assistance with price paid data, waiting list, and more.",
+    description: cms?.metaDescription || "Get help with Virify's property search platform. Access our comprehensive FAQs, guides, and support resources. Contact our support team for assistance with property listings, price paid data, and more.",
     keywords: cms?.keywords || "property support, help center, FAQ, property guides, UK property data, real estate support",
     ogTitle: cms?.ogTitle || "Support & Help Center | Virify",
     ogDescription: cms?.ogDescription || "Find answers to your questions and get support from the Virify team. Access guides, FAQs, and contact support.",
