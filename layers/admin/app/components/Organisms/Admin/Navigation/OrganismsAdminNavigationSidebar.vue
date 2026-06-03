@@ -29,8 +29,7 @@
         </nuxt-link>
         <UDashboardSidebarCollapse
           v-if="!collapsed"
-          class="hover:bg-white/5 rounded-md transition-colors"
-          :ui="{ leadingIcon: 'text-foreground' }"
+          class="hover:bg-white/5 rounded-md transition-colors text-foreground"
         />
       </div>
     </template>
@@ -67,8 +66,7 @@
           <template #list-leading>
             <UDashboardSidebarCollapse
               v-if="collapsed"
-              class="hover:bg-background/90 rounded-md transition-colors"
-              :ui="{ leadingIcon: 'text-foreground' }"
+              class="hover:bg-background/90 rounded-md transition-colors text-foreground"
             />
           </template>
         </UNavigationMenu>
@@ -81,6 +79,22 @@
         <div :class="collapsed ? 'flex flex-col items-center gap-3' : 'grid grid-cols-3 items-end w-full'">
           <!-- col 1: Export Data / Clear Cache / User Dashboard / Logout -->
           <div class="flex flex-col items-start gap-1">
+            <UTooltip text="Export Waiting List">
+              <UButton
+                :icon="isExportingWaitingList ? 'i-lucide-loader-circle' : 'i-lucide-list'"
+                variant="link"
+                size="xs"
+                :disabled="isExportingWaitingList"
+                class="body-sm text-foreground hover:bg-white/5 rounded-md transition-colors"
+                :ui="{
+                  leadingIcon: 'text-secondary',
+                  label: 'text-foreground font-bold',
+                }"
+                :label="collapsed ? undefined : 'Export Waiting List'"
+                :square="collapsed"
+                @click="exportWaitingList"
+              />
+            </UTooltip>
             <UTooltip text="Export Data">
               <UButton
                 :icon="isExporting ? 'i-lucide-loader-circle' : 'i-lucide-download'"
@@ -163,7 +177,7 @@
 import { TooltipProvider } from "reka-ui";
 
 const { adminNavigationItems } = useAdminNavigation();
-const { isExporting, exportAll } = useAdminExport();
+const { isExporting, exportAll, isExportingWaitingList, exportWaitingList } = useAdminExport();
 const { clear } = useUserSession();
 const bustState = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
 

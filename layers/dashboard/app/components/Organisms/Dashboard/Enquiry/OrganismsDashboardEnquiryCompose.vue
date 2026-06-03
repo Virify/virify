@@ -17,7 +17,7 @@
       </div>
     </div>
     <!-- Input row — sits at the bottom, visually mirrors the chat footer -->
-    <div class="flex items-center gap-1 sm:px-2 px-2 border-t border-(--ui-border) min-h-[54px]">
+    <div class="flex items-start gap-1 sm:px-2 px-2 border-t border-default min-h-13.5 pt-2">
       <UPopover v-model:open="emojiOpen" :ui="{ content: 'p-0 overflow-hidden' }">
         <UButton
           icon="i-lucide-smile"
@@ -32,19 +32,20 @@
           </ClientOnly>
         </template>
       </UPopover>
-      <UInput
+      <UTextarea
         :ui="{
           root: 'body-sm flex-1',
-          base: 'bg-background/50! outline-0! p-0!',
-          trailingIcon: 'text-secondary p-0',
-          trailing: 'p-0',
+          base: 'bg-background/50! outline-0! p-0! resize-none!',
         }"
         placeholder="Type your message..."
         variant="none"
         v-model="composeMessage"
         autofocus
+        autoresize
+        :rows="1"
+        :maxrows="6"
         :disabled="sending"
-        @keydown.enter.prevent="handleSubmit"
+        @keydown.enter.exact.prevent="handleSubmit"
       />
       <UButton
         icon="i-lucide-send"

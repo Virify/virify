@@ -7,6 +7,7 @@ const alwaysAllowedRoutes = [
   '/guides/**',
   '/listing/**',
   '/price-paid/**',
+  '/mortgage-calculator/**',
   '/cookie/**',
   '/support/**',
   '/profile/**',

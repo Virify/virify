@@ -102,6 +102,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/pg": "^8.16.0",
     "@types/pg-copy-streams": "^1.2.5",
+    "@types/picomatch": "^4.0.3",
     "@types/sortablejs": "^1.15.9",
     "@unhead/vue": "^2.1.2",
     "@vue/test-utils": "^2.4.6",

@@ -10,7 +10,6 @@ export default defineEventHandler(async (event) => {
     search,
     signup,
     waitingList,
-    mortgageCalculator
   } = await useFeatureFlag(event)
 
   if (waitingList && !isAdmin) {
@@ -43,18 +42,13 @@ export default defineEventHandler(async (event) => {
       '/api/notifications',          // Dashboard notifications
       '/api/navigation',             // Main navigation
       'api/_nuxt_icon/lucide.json?icons=x',  // Nuxt UI icons
+      '/api/mortgage/',                // Mortgage calculator API
+      '/api/analytics/mortgage/track'     // Mortgage calculator analytics tracking
     ];
 
     /**
      *  Feature flag routes
      */
-    if (mortgageCalculator) {
-      // Mortgage calculator endpoints (calculate, rates, admin)
-      allowedApis.push('/api/mortgage/')
-      // Track mortgage calculator usage
-      allowedApis.push('/api/analytics/mortgage/track')
-    }
-
     if (search) {
       allowedApis.push('/api/search/')
     }

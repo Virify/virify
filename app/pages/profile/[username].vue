@@ -11,10 +11,10 @@
             <img
               v-if="profile.avatar"
               :src="profile.avatar"
-              :alt="profile.username"
+              :alt="profile.username ?? undefined"
               class="profile-page__avatar"
             />
-            <AvatarInitials v-else :name="profile.username" class="profile-page__avatar-initials" />
+            <AvatarInitials v-else :name="profile.username ?? undefined" class="profile-page__avatar-initials" />
           </div>
 
           <!-- Identity -->
@@ -176,11 +176,21 @@ useSeoMeta({
   ogTitle: seoTitle,
   description: seoDescription,
   ogDescription: seoDescription,
+  ogType: 'profile',
   ogImage: () => profile.value.avatar ?? null,
   twitterCard: 'summary',
   twitterTitle: seoTitle,
   twitterDescription: seoDescription,
   twitterImage: () => profile.value.avatar ?? null,
+});
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: () => `https://virify.co.uk/profile/${profile.value.username}`,
+    },
+  ],
 });
 </script>
 

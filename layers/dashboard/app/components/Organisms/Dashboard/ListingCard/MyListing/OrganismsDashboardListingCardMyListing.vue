@@ -32,12 +32,13 @@
           <span class="body-xs">No images yet</span>
         </div>
       </div>
-      <!-- price reduced badge -->
-      <AtomsPriceReducedBadge
-        v-if="!listing.isDraft"
-        :price-history="listing.ListingPriceHistory"
-        :current-price="listing.price ?? undefined"
-        class="absolute top-2 left-2 z-1 text-xs"
+      <!-- price reduced interactive badge -->
+      <PropertyCardHistory
+        v-if="!listing.isDraft && listing.ListingPriceHistory?.length"
+        :historic="listing.ListingPriceHistory"
+        :current="listing.price ?? undefined"
+        :inline="true"
+        class="absolute top-2 left-2 z-1"
       />
     </div>
 
@@ -53,11 +54,7 @@
               class="font-medium body-md text-muted-foreground italic"
               >No price set</span
             >
-            <AtomsPriceHistoryPopover
-              v-if="hasPrice && listing.ListingPriceHistory?.length"
-              :price-history="listing.ListingPriceHistory"
-              :current-price="listing.price!"
-            />
+
             <span v-if="priceType && hasPrice" class="text-muted-foreground">
               / {{ priceType }}</span
             >

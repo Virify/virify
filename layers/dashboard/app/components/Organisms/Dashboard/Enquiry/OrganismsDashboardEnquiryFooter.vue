@@ -44,9 +44,9 @@
     <span class="body-xs text-(--foreground-200)">Uploading...</span>
   </div>
 
-  <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-1 sm:px-2 w-full">
+  <div class="flex flex-col sm:flex-row items-start gap-1 sm:px-2 w-full pt-2">
     <!-- Icon buttons: own row on mobile, inline on sm+ -->
-    <div class="flex items-center gap-1 sm:contents">
+    <div class="flex items-start gap-1 sm:contents">
       <!-- Request viewing button -->
       <OrganismsDashboardEnquiryViewingPopover
         v-if="conversation?.listing"
@@ -88,31 +88,28 @@
     </div>
 
     <!-- Message input -->
-    <UInput
+    <UTextarea
       :ui="{
         root: 'body-sm flex-1',
-        base: 'bg-background/50! outline-0! p-0!',
-        trailingIcon: 'text-secondary p-0',
-        trailing: 'p-0',
+        base: 'bg-background/50! outline-0! p-0! resize-none!',
       }"
       placeholder="Type your message..."
-      trailing
       variant="none"
       v-model="messageContent"
       autofocus
-      @keydown.enter.prevent="$emit('send')"
-    >
-      <template #trailing>
-        <UButton
-          icon="i-lucide-send"
-          variant="ghost"
-          size="sm"
-          :disabled="messageContent.trim().length === 0 && !pendingMedia"
-          :ui="{ leadingIcon: 'text-secondary' }"
-          @click="$emit('send')"
-        />
-      </template>
-    </UInput>
+      autoresize
+      :rows="1"
+      :maxrows="6"
+      @keydown.enter.exact.prevent="$emit('send')"
+    />
+    <UButton
+      icon="i-lucide-send"
+      variant="ghost"
+      size="sm"
+      :disabled="messageContent.trim().length === 0 && !pendingMedia"
+      :ui="{ leadingIcon: 'text-secondary' }"
+      @click="$emit('send')"
+    />
   </div>
 </template>
 
