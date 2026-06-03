@@ -173,20 +173,30 @@
       title="Ready to market the new way?"
       description="Thousands are ready for intelligent property searching and better, equal marketing opportunities. Are you?"
       :ui="{ root: 'rounded-none ring-0' }"
-      :links="[{
-        label: 'Join the waiting list',
-        to: '/',
-        color: 'neutral',
-        icon: 'i-lucide-arrow-right',
-        size: 'lg',
-        variant: 'solid',
-        class: 'font-bold button button-secondary',
-      }]"
-    />
+    >
+      <template #links>
+        <UButton
+          color="neutral"
+          icon="i-lucide-user-plus"
+          size="lg"
+          variant="solid"
+          class="font-bold button button-secondary"
+          @click="showSignup"
+        >Sign Up</UButton>
+      </template>
+    </UPageCTA>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ViewsDialogSignup } from '#components'
+
+const { showDialog } = useDialog()
+
+function showSignup() {
+  showDialog({ component: ViewsDialogSignup })
+}
+
 useSeoMeta({
   title: 'Mortgage Calculator — Virify',
   description: 'Estimate your monthly mortgage payments in seconds. Enter your property price and deposit to compare typical UK mortgage rates and understand LTV, interest rates, and mortgage terms.',
