@@ -79,8 +79,6 @@ function formatGuides(category: GuideCategory, parentSlug = '/guides/') {
 }
 
 export default defineCachedEventHandler(async (event) => {
-  const { mortgageCalculator, isAdmin } = await useFeatureFlag(event)
-
   const baseNavigation: MenuItem[] = [
     {
       id: "home",
@@ -107,6 +105,13 @@ export default defineCachedEventHandler(async (event) => {
           icon: "account/billing",
           type: 'link'
         },
+        {
+          id: "mortgage-calculator",
+          label: "Mortgage Calculator",
+          href: "/mortgage-calculator/",
+          icon: "account/billing",
+          type: 'link'
+        },
       ]
     },
     {
@@ -122,21 +127,6 @@ export default defineCachedEventHandler(async (event) => {
       type: "link",
     },
   ];
-
-  // If is waiting list, add waiting list URL to nav
-  if (mortgageCalculator || isAdmin) {
-    for (let dropdown of baseNavigation) {
-      if (dropdown.id !== 'property-info') continue
-
-      dropdown.children?.push({
-        id: "mortgage-calculator",
-        label: "Mortgage Calculator",
-        href: "/mortgage-calculator/",
-        icon: "account/billing",
-        type: 'link'
-      })
-    }
-  }
 
   // Get active guide pages
   const guides = await useSanity().fetch(navigationQuery)
@@ -161,10 +151,5 @@ export default defineCachedEventHandler(async (event) => {
   return baseNavigation
 }, {
   maxAge: 300, // 5 minutes (60*5)
-  getKey: async (event) => {
-    const { mortgageCalculator, isAdmin } = await useFeatureFlag(event)
-    const showMortgageCalculator = isAdmin || mortgageCalculator
-
-    return showMortgageCalculator ? 'calculator' : 'no-calculator'
-  }
+  getKey: () => 'navigation'
 })

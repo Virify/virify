@@ -1,8 +1,8 @@
 <template>
   <div class="o-listing-buttons" role="presentation" v-if="signup || isAdmin">
     <!-- @TODO we should move this v-if to the parent -->
-    <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost" :listing-id="listingId" />
-    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button-ghost"
+    <AtomsNoteButton v-if="!isDraft" class="o-listing-buttons__fav | button" :listing-id="listingId" />
+    <AtomsFavouriteButton v-if="!isDraft" class="o-listing-buttons__fav | button button"
       :listing-id="listingId" />
 
     <AtomsEnquireButton v-if="!isDraft && agent?.id" :listing-id="listingId" :user-id="agent.id"
@@ -46,6 +46,12 @@ const props = defineProps<Props>()
     flex-shrink: 0;
     min-width: var(--size-24);
     min-height: var(--size-24);
+  }
+
+  &__fav {
+    &:hover {
+      opacity: 0.8;
+    }
   }
 }
 </style>

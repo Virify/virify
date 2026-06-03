@@ -36,7 +36,7 @@ export default defineNuxtConfig({
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
         createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
-        mortgageCalculator: envIfExistOrDefault("ALLOW_MORTGAGE_CALC", false),
+
       },
     },
   },
@@ -71,7 +71,7 @@ export default defineNuxtConfig({
   robots: {
     allow: [
       "/",
-      // '/mortgage-calculator',
+      '/mortgage-calculator',
       "/price-paid",
       "/contact",
       "/guides",
@@ -81,6 +81,7 @@ export default defineNuxtConfig({
       "/cookie",
       "/support",
       "/listing/*",
+      "/profile/*",
     ],
     disallow: [
       "/account",
