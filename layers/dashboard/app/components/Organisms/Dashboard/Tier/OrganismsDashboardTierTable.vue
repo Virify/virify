@@ -54,7 +54,7 @@
 
     <!-- Buttons -->
     <template #basic-button="{ tier }">
-      <UButton @click="$emit('create-listing', 'BASIC')" :label="tier.button.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" />
+      <UButton @click="$emit('create-listing', 'BASIC')" :label="tier.button.label" block class="body-sm cursor-pointer text-center" color="neutral" variant="outline" :disabled="!canCreateListing" />
     </template>
 
     <template #premium-button="{ tier }">
@@ -73,4 +73,6 @@ import type { ListingTier } from '~~/layers/database/server/database/prisma/gene
 defineEmits<{
   'create-listing': [tier: ListingTier]
 }>();
+
+const { createListing: canCreateListing } = useFeatureFlag();
 </script>
