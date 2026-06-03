@@ -4,11 +4,16 @@
  */
 import { defineEventHandler, createError } from "h3";
 
-export default defineEventHandler((event) => {
-  const config = useRuntimeConfig();
+export default defineEventHandler(async (event) => {
+  const {
+    isAdmin,
+    search,
+    signup,
+    waitingList,
+    mortgageCalculator
+  } = await useFeatureFlag(event)
 
-  // Only apply restrictions if in waiting-list mode
-  if (config.public.DEPLOYMENT_ENV === 'waiting-list') {
+  if (waitingList && !isAdmin) {
     const path = event.path;
 
     // Allow these API endpoints in waiting list mode
@@ -22,8 +27,6 @@ export default defineEventHandler((event) => {
       '/api/__sitemap__/',           // Nuxt SEO sitemap generation
       '/api/preview/enable',         // Sanity preview enable
       '/api/preview/disable',        // Sanity preview disable
-      // '/api/mortgage/',              // Mortgage calculator endpoints (calculate, rates, admin)
-      // '/api/analytics/mortgage/track', // Track mortgage calculator usage
       '/auth/update-admin-password', // Admin password update (protected by TASK_SECRET)
       '/auth/login',                 // Login endpoint
       '/auth/verify-otp',            // OTP verification
@@ -39,12 +42,30 @@ export default defineEventHandler((event) => {
       '/api/conversation',           // Dashboard conversations
       '/api/notifications',          // Dashboard notifications
       '/api/navigation',             // Main navigation
-      // BLOCKED: /auth/signup - No new signups in waiting list mode
-      // BLOCKED: /api/search/ - No property search in waiting list mode
       'api/_nuxt_icon/lucide.json?icons=x',  // Nuxt UI icons
     ];
 
-    // Check if the path is an API route or Auth route
+    /**
+     *  Feature flag routes
+     */
+    if (mortgageCalculator) {
+      // Mortgage calculator endpoints (calculate, rates, admin)
+      allowedApis.push('/api/mortgage/')
+      // Track mortgage calculator usage
+      allowedApis.push('/api/analytics/mortgage/track')
+    }
+
+    if (search) {
+      allowedApis.push('/api/search/')
+    }
+
+    if (signup) {
+      allowedApis.push('/auth/signup')
+    }
+
+    /**
+     *  Block any other /api and /auth routes
+     */
     if (path.startsWith('/api/') || path.startsWith('/auth/')) {
       // Check if it's an allowed API
       const isAllowed = allowedApis.some(allowed => path.startsWith(allowed));

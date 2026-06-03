@@ -31,8 +31,8 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      isWaitingList: process.env.DEPLOYMENT_ENV === "waiting-list",
       featureFlags: {
+        waitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
         createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
@@ -233,15 +233,15 @@ export default defineNuxtConfig({
       cache:
         process.env.REDIS_URL || process.env.REDISHOST
           ? {
-              driver: "redis",
-              url: process.env.REDIS_URL,
-              host: process.env.REDISHOST,
-              password: process.env.REDISPASSWORD,
-              port: process.env.REDISPORT
-                ? parseInt(process.env.REDISPORT)
-                : undefined,
-              username: process.env.REDISUSER,
-            }
+            driver: "redis",
+            url: process.env.REDIS_URL,
+            host: process.env.REDISHOST,
+            password: process.env.REDISPASSWORD,
+            port: process.env.REDISPORT
+              ? parseInt(process.env.REDISPORT)
+              : undefined,
+            username: process.env.REDISUSER,
+          }
           : { driver: "memory" },
     },
     devStorage: {

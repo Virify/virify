@@ -132,7 +132,6 @@ runtimeConfig: {
   public: {
     redirectCookieName: "redirect",             // Cookie name for post-login redirect
     loginUrl: "/login",
-    DEPLOYMENT_ENV: process.env.DEPLOYMENT_ENV,
   }
 }
 ```

@@ -7,6 +7,7 @@ import { createSharedComposable } from "@vueuse/core";
  */
 export const useDashboardNavigation = createSharedComposable(() => {
   const { aggregates } = useNotifications();
+  const { isAgent, isAdmin, createListing } = useFeatureFlag()
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
     {
@@ -65,15 +66,17 @@ export const useDashboardNavigation = createSharedComposable(() => {
           },
           badge: aggregates.value.archivedListings ? String(aggregates.value.archivedListings) : undefined,
         },
-        {
-          label: "Create Listing",
-          type: "link",
-          to: "/dashboard/create-listing",
-          icon: "i-lucide-square-plus",
-          tooltip: {
-            text: "Create a new listing",
-          },
-        },
+        ...[
+          !!(isAdmin || (createListing && isAgent)) && {
+            label: "Create Listing",
+            type: "link",
+            to: "/dashboard/create-listing",
+            icon: "i-lucide-square-plus",
+            tooltip: {
+              text: "Create a new listing",
+            },
+          }
+        ].filter(Boolean),
         // {
         //   label: "Offers",
         //   type: "link",
