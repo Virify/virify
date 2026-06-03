@@ -83,6 +83,11 @@
               >
             </li>
             <li>
+              <nuxt-link to="/acceptable-use" class="o-footer__link | body-sm"
+                >Acceptable Use Policy</nuxt-link
+              >
+            </li>
+            <li>
               <nuxt-link to="/cookie" class="o-footer__link | body-sm"
                 >Cookie Policy</nuxt-link
               >
