@@ -17,7 +17,7 @@
     </template>
 
     <template #body>
-      <OrganismsDashboardTierTable @create-listing="handleCreateListing" />
+      <MoleculesDashboardPriceTier @select-tier="handleCreateListing" />
 
       <!-- Shared Listing Editor Modal -->
       <LazyOrganismsDashboardCreateListingModal ref="listingModal" />
