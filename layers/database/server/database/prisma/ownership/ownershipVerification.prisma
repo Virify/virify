@@ -1,0 +1,26 @@
+enum OwnershipVerificationStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+model OwnershipVerification {
+  id                  Int                         @id @default(autoincrement())
+  draftListingId      Int                         @unique
+  draftListing        DraftListing                @relation(fields: [draftListingId], references: [id], onDelete: Cascade)
+  userId              Int
+  docOneKey           String?
+  docOneName          String?
+  docTwoKey           String?
+  docTwoName          String?
+  status              OwnershipVerificationStatus @default(PENDING)
+  reviewToken         String                      @unique @default(cuid())
+  reviewTokenExpiry   DateTime                    @default(dbgenerated("NOW() + INTERVAL '30 days'"))
+  reviewedAt          DateTime?
+  createdAt           DateTime                    @default(now())
+  updatedAt           DateTime                    @updatedAt
+
+  @@index([draftListingId])
+  @@index([userId])
+  @@index([reviewToken])
+}

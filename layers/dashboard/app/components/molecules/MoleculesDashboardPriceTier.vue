@@ -15,7 +15,8 @@
         description: 'body-sm text-foreground',
         features: 'mt-2 mb-0! gap-2',
         featureIcon: 'text-(--foreground-50)',
-        badge: 'bg-foreground-100/10 text-foreground-100 border-foreground-100!',
+        badge:
+          'bg-foreground-100/10 text-foreground-100 border-foreground-100!',
         price: 'title-md mt-0! mb-0!',
         priceWrapper: 'mt-2 mb-2',
       }"
@@ -26,7 +27,7 @@
         variant: 'subtle',
         size: 'xs',
         class: ' body-sm cursor-pointer',
-        disabled: !(isAdmin || (createListing && isAgent)),
+        disabled: !(isAdmin || (createListing && (isAgent || isUser))),
         onClick: () => emit('select-tier', ListingTier.BASIC),
       }"
     />
@@ -42,7 +43,8 @@
         description: 'body-sm text-foreground',
         features: 'mt-2 mb-0! gap-2',
         featureIcon: 'text-(--foreground-50)',
-        badge: 'bg-foreground-100/10 text-foreground-100 border-foreground-100!',
+        badge:
+          'bg-foreground-100/10 text-foreground-100 border-foreground-100!',
         price: 'title-md mt-0! mb-0!',
         priceWrapper: 'mt-2 mb-2',
       }"
@@ -56,22 +58,29 @@
         disabled: true,
       }"
     >
-    <template #description>
-      <p>Our subscription offers additional and enhanced tooling for property marketing.</p>
-      <span class="body-xs">Please note, not all of the above features may be available immediately and we are always adding to our features.</span>
-    </template>
+      <template #description>
+        <p>
+          Our subscription offers additional and enhanced tooling for property
+          marketing.
+        </p>
+        <span class="body-xs"
+          >Please note, not all of the above features may be available
+          immediately and we are always adding to our features.</span
+        >
+      </template>
     </UPricingPlan>
   </UPricingPlans>
   <!-- </UPageColumns> -->
 </template>
 
 <script setup lang="ts">
-import { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums';
+import { ListingTier } from "~~/layers/database/server/database/prisma/generated/enums";
 
-const { isAgent, isAdmin, createListing } = useFeatureFlag()
+const { isAgent, isAdmin, createListing, role } = useFeatureFlag();
+const isUser = computed(() => role.value === "USER");
 
 const emit = defineEmits<{
-  'select-tier': [tier: ListingTier]
+  "select-tier": [tier: ListingTier];
 }>();
 
 // Format features from tiers.ts config for UPricingPlan

@@ -1,10 +1,12 @@
 <template>
   <UDashboardPanel>
     <template #header>
-      <UDashboardNavbar :ui="{
-        title: 'title-sm m-0!',
-        right: 'flex items-center gap-1',
-      }">
+      <UDashboardNavbar
+        :ui="{
+          title: 'title-sm m-0!',
+          right: 'flex items-center gap-1',
+        }"
+      >
         <template #title>
           <MoleculesDashboardBreadcrumb />
         </template>
@@ -26,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ListingTier } from '~~/layers/database/server/database/prisma/generated/enums'
+import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/enums";
 
 definePageMeta({
   middleware: ["authenticated"],
@@ -35,9 +37,11 @@ definePageMeta({
     icon: "i-lucide-home",
   },
   layout: "dashboard",
-})
+});
 
-const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(null);
+const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(
+  null,
+);
 
 function handleCreateListing(tier: ListingTier) {
   listingModal.value?.openForNewListing(tier);

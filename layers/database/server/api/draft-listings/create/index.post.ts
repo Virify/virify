@@ -2,6 +2,10 @@ import * as z from "zod";
 import { ListingTier } from "../../../database/prisma/generated/enums";
 import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 import { useFeatureFlag } from "~~/server/utils/useFeatureFlag";
+import {
+  invalidateDraftListingsCache,
+  invalidateAggregatesCache,
+} from "~~/layers/database/server/utils/cache";
 
 const CreateSchema = z.object({
   tier: z.enum(ListingTier),
@@ -24,20 +28,23 @@ export default defineEventHandler(async (event) => {
     if (!createListing) {
       throw createError({
         statusCode: 403,
-        statusMessage: "Forbidden: only agents and admins can create listings",
+        statusMessage:
+          "Forbidden: please contact support if you believe this is an error.",
       });
     }
 
     const createdListing = await createDraftListing(user.id, tier);
-    const { invalidateDraftListingsCache, invalidateAggregatesCache } = await import("~~/layers/database/server/utils/cache");
     await Promise.all([
       invalidateDraftListingsCache(user.id as number),
       invalidateAggregatesCache(user.id as number),
     ]);
     // Notify client to update draft count badge
     try {
-      const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
-      sendMessage(createAggregateUpdateMessage("draftListings", "add", user.id as number));
+      const { sendMessage, createAggregateUpdateMessage } =
+        useWebSocketServer();
+      sendMessage(
+        createAggregateUpdateMessage("draftListings", "add", user.id as number),
+      );
     } catch {
       // Non-critical
     }

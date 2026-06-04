@@ -179,7 +179,7 @@
         </div>
 
         <!-- Draft progress indicator -->
-        <div v-if="listing.isDraft" class="flex items-center gap-2">
+        <div v-if="listing.isDraft" class="flex flex-wrap items-center gap-2">
           <UBadge
             v-if="isAllStepsCompleted"
             icon="i-lucide-check-circle"
@@ -197,6 +197,48 @@
             variant="outline"
             >{{ completedStepsCount }}/9 Steps</UBadge
           >
+
+          <!-- Ownership verification status (USER role only) -->
+          <template v-if="!isExempt">
+            <UBadge
+              v-if="isVerificationApproved"
+              icon="i-lucide-shield-check"
+              size="md"
+              color="success"
+              variant="outline"
+              >Ownership Verified</UBadge
+            >
+            <UBadge
+              v-else-if="isVerificationPending"
+              icon="i-lucide-clock"
+              size="md"
+              color="warning"
+              variant="outline"
+              class="cursor-pointer"
+              @click="openStatusModal"
+              >Verification Pending</UBadge
+            >
+            <UBadge
+              v-else-if="isVerificationDenied"
+              icon="i-lucide-shield-x"
+              size="md"
+              color="error"
+              variant="outline"
+              class="cursor-pointer"
+              @click="openStatusModal"
+              >Verification Denied</UBadge
+            >
+            <UBadge
+              v-else-if="verificationRecord === null"
+              icon="i-lucide-shield-alert"
+              size="md"
+              color="neutral"
+              variant="outline"
+              class="cursor-pointer"
+              @click="openVerificationModal"
+              >Verify Ownership</UBadge
+            >
+          </template>
         </div>
 
         <!-- Publish toggle + availability status (only for completed non-archived listings) -->
@@ -275,7 +317,11 @@
               class="font-semibold flex-1 justify-center text-white!"
               icon="i-lucide-rocket"
               label="Publish"
-              :disabled="!isAllStepsCompleted || isPublishing"
+              :disabled="
+                !isAllStepsCompleted ||
+                isPublishing ||
+                (!isExempt && !isVerificationApproved)
+              "
               :loading="isPublishing"
               @click="handlePublish"
             />
@@ -359,6 +405,20 @@
       :loading="isRestoring"
       @confirm="handleRestoreConfirm"
     />
+
+    <!-- Ownership verification modals (draft listings, USER role only) -->
+    <template v-if="listing.isDraft && !isExempt">
+      <LazyOrganismsOwnershipVerificationModal
+        ref="verificationModal"
+        :draft-listing-id="draftListingId"
+        @submitted="refreshVerification"
+      />
+      <LazyOrganismsOwnershipStatusModal
+        ref="statusModal"
+        :draft-listing-id="draftListingId"
+        @resubmit="openVerificationModal"
+      />
+    </template>
   </UPageCard>
 </template>
 
@@ -384,6 +444,39 @@ const emit = defineEmits<{
 const { archiveListing, restoreListing, setPublished, setAvailabilityStatus } =
   useMyListings();
 const toast = useToast();
+
+// Ownership verification (draft listings, non-exempt users only)
+const draftListingId = computed(() =>
+  props.listing.isDraft
+    ? ((props.listing as any).draftId ?? props.listing.id)
+    : null,
+);
+const {
+  record: verificationRecord,
+  isExempt,
+  isApproved: isVerificationApproved,
+  isPending: isVerificationPending,
+  isDenied: isVerificationDenied,
+  refresh: refreshVerification,
+} = useOwnershipVerification(draftListingId);
+
+const verificationModal = ref<{ open: () => void } | null>(null);
+const statusModal = ref<{ open: () => void } | null>(null);
+
+// Load verification status on mount for draft cards
+onMounted(() => {
+  if (props.listing.isDraft && !isExempt.value) {
+    refreshVerification();
+  }
+});
+
+function openVerificationModal() {
+  verificationModal.value?.open();
+}
+
+function openStatusModal() {
+  statusModal.value?.open();
+}
 
 // Dialog refs
 const archiveDialog = ref<InstanceType<

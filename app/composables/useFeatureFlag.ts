@@ -1,13 +1,13 @@
 export function useFeatureFlag() {
-  const flags = getFeatureFlagConfig()
-  const { role, roleActive, isAdmin, isAgent } = useRole()
+  const flags = getFeatureFlagConfig();
+  const { role, roleActive, isAdmin, isAgent } = useRole();
 
-  // Only ADMIN or AGENT (Estate Agent) roles can create a listing
+  // ADMIN, AGENT, and USER (subject to ownership verification) can create a listing
   const createListing = computed(() => {
-    if (role.value === 'ADMIN') return true
-
-    return !!(flags.createListing && role.value === 'AGENT')
-  })
+    if (role.value === "ADMIN") return true;
+    if (!flags.createListing) return false;
+    return role.value === "AGENT" || role.value === "USER";
+  });
 
   return {
     ...flags,
@@ -16,6 +16,6 @@ export function useFeatureFlag() {
     roleActive,
     isAdmin,
     isAgent,
-    checkFeatureFlag
-  }
+    checkFeatureFlag,
+  };
 }

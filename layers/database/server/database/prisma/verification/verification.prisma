@@ -3,6 +3,7 @@ model Verification {
   userId                Int?             @unique
   estateAgentId         Int?             @unique
   identity              Boolean?
+  name                  Boolean?
   address               Boolean?
   bank                  Boolean?
   payslip               Boolean?
