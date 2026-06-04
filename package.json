@@ -74,6 +74,7 @@
     "emoji-mart": "^5.6.0",
     "focus-trap": "^8.0.1",
     "maptiler-sdk.css": "link:@maptiler/sdk/dist/maptiler-sdk.css",
+    "newrelic": "^14.1.0",
     "nuxi": "^3.32.0",
     "nuxt": "^4.2.2",
     "nuxt-auth-utils": "^0.5.27",
