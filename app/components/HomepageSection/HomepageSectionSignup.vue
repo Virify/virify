@@ -15,8 +15,7 @@
     </template>
 
     <template v-else>
-      <p class="homepage-section-signup__content">We are still working hard to get the platform fully operational, but
-        in the meantime please browse the properties we have available</p>
+      <p class="homepage-section-signup__content">We’re excited to welcome professional property agents into early access testing. A few key features are still being switched on (including our advanced property search and private listings) - but we’re moving quickly and updates are landing regularly. Keep checking back!</p>
     </template>
 
   </OrganismsBannerHero>
