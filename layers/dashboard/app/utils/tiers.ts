@@ -1,7 +1,6 @@
 export const basicFeatures: string[] = [
   "Listing creator tools",
   "Up to " + getMaxImagesForTier("BASIC") + " images",
-  "Verified identification and property ownership",
   "Analytics",
   "Support for all",
   "Carousel listing cards",
