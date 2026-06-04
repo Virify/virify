@@ -3,7 +3,7 @@
   <div>
     <UPricingPlan
       v-if="isAdmin || (createListing && isAgent)"
-      title="Personal Tier"
+      title="Standard Listing"
       badge="Free to use"
       variant="subtle"
       price="Free"
