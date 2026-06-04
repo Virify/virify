@@ -32,6 +32,9 @@
               <nuxt-link to="/price-paid" class="o-footer__link | body-sm"
                 >Price Paid Data</nuxt-link
               >
+              <nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm"
+                >Mortgage Calculator</nuxt-link
+              >
             </li>
             <!-- <li><nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm">Mortgage Calculator</nuxt-link></li> -->
           </ul>
