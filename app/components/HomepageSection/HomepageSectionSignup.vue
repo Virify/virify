@@ -7,9 +7,7 @@
     <HomepageSectionSignupForm v-if="!signup" />
 
     <template v-else-if="!signupAndLoggedIn">
-      <p class="homepage-section-signup__content">Create an account or log in to enquiry about listings from independent
-        Estate Agents. And coming soon,
-        create your listing and search for other properties to buy and rent</p>
+      <p class="homepage-section-signup__content">Create an account or log in to enquire about properties listed by property agents. And coming soon, create your listing and search for other properties to buy and rent</p>
 
       <HeaderActionsGuest class="homepage-section-signup__buttons" />
     </template>
