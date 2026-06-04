@@ -13,7 +13,12 @@
     </template>
 
     <template #body>
-      <MoleculesDashboardPriceTier @select-tier="handleCreateListing" />
+      <h2 class="title-xs mb-0! flex items-center gap-2">
+        Quick Listing Actions
+        <UIcon name="i-lucide-layers-plus" class="text-secondary" />
+      </h2>
+
+      <MoleculesDashboardPriceTier @select-tier="handleCreateListing" v-if="isAdmin || (createListing && isAgent)" />
 
       <!-- Quick Actions Grid -->
       <h2 class="title-xs mb-0! flex items-center gap-2">
@@ -24,7 +29,7 @@
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard title="My Favourites" description="View and manage your saved properties" icon="i-lucide-heart"
           to="/dashboard/favourites"
-          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
           :ui="{
             root: 'bg-[#2b3945]! ring-0',
             container: 'shadow-xl',
@@ -35,7 +40,7 @@
           }" />
         <UPageCard title="My Notes" description="Review your property notes and annotations" icon="i-lucide-sticky-note"
           to="/dashboard/notes"
-          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
           :ui="{
             root: 'bg-[#2b3945]! ring-0',
             container: 'shadow-xl',
@@ -46,7 +51,7 @@
           }" />
         <UPageCard title="My Viewings" description="Manage your upcoming property viewings" icon="i-lucide-calendar-check"
           to="/dashboard/viewings"
-          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
           :ui="{
             root: 'bg-[#2b3945]! ring-0',
             container: 'shadow-xl',
@@ -57,7 +62,7 @@
           }" />
         <UPageCard title="My Enquiries" description="Track your property enquiries and responses" icon="i-lucide-mail"
           to="/dashboard/enquiries"
-          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat [background-position:right_0px_bottom_-50px]"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
           :ui="{
             root: 'bg-[#2b3945]! ring-0',
             container: 'shadow-xl',
@@ -117,6 +122,7 @@ definePageMeta({
 });
 
 const { user } = useUserSession();
+const { isAgent, isAdmin, createListing } = useFeatureFlag()
 
 // Modal ref for creating listings
 const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(null);
