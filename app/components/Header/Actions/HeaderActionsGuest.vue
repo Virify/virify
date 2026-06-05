@@ -82,16 +82,6 @@ function showSignup(e: PointerEvent) {
     &__text--desktop {
       display: none;
     }
-
-    &__login-button {
-      background: transparent;
-      color: currentColor;
-
-      &:hover {
-        background: transparent;
-        color: currentColor;
-      }
-    }
   }
 }
 </style>
