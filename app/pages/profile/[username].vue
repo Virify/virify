@@ -1,11 +1,9 @@
 <template>
   <div class="profile-page">
-
     <!-- ═══════════════ BANNER ═══════════════ -->
     <div class="profile-page__banner">
       <div class="container">
         <div class="profile-page__banner-inner">
-
           <!-- Avatar -->
           <div class="profile-page__avatar-wrap">
             <img
@@ -14,38 +12,66 @@
               :alt="profile.username ?? undefined"
               class="profile-page__avatar"
             />
-            <AvatarInitials v-else :name="profile.username ?? undefined" class="profile-page__avatar-initials" />
+            <AvatarInitials
+              v-else
+              :name="profile.username ?? undefined"
+              class="profile-page__avatar-initials"
+            />
           </div>
 
           <!-- Identity -->
           <div class="profile-page__identity">
-
             <!-- Name + badges -->
             <div class="profile-page__name-row">
-              <h1 class="profile-page__username title-xl">{{ profile.username }}</h1>
+              <h1 class="profile-page__username title-xl">
+                {{ profile.username }}
+              </h1>
 
               <!-- Virify Team badge (with logo mark) -->
               <span v-if="isVirifyTeam" class="profile-page__team-badge">
-                <svg width="18" height="18" viewBox="0 0 33 32" aria-hidden="true" fill="currentColor">
-                  <path d="M3.23211 0.937979C6.36228 -0.946274 10.4023 0.106514 12.255 3.29008L16.9742 11.3965L11.3801 21.0068C10.1903 23.0503 10.1829 25.4722 11.1498 27.4518L0.919484 10.1149C-0.933153 6.93127 0.101955 2.82226 3.23211 0.937979Z"/>
-                  <path d="M22.5699 21.0069L16.975 11.3954L11.3801 21.0069C9.51309 24.2135 10.5565 28.3518 13.7093 30.2507C14.7362 30.869 15.8618 31.1719 16.975 31.1907C18.0883 31.1719 19.2138 30.869 20.2408 30.2507C23.3936 28.3518 24.437 24.2135 22.5699 21.0069Z" fill="#FC7239"/>
-                  <path d="M21.5922 10.1984L27.1933 19.8224L32.7944 10.1984C34.6634 6.98767 33.62 2.8452 30.4632 0.942134C29.4341 0.323793 28.3086 0.0188009 27.1933 0C26.078 0.0188009 24.9525 0.321704 23.9234 0.942134C20.7665 2.84311 19.7211 6.98767 21.5922 10.1984Z" fill="#FC7239"/>
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 33 32"
+                  aria-hidden="true"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M3.23211 0.937979C6.36228 -0.946274 10.4023 0.106514 12.255 3.29008L16.9742 11.3965L11.3801 21.0068C10.1903 23.0503 10.1829 25.4722 11.1498 27.4518L0.919484 10.1149C-0.933153 6.93127 0.101955 2.82226 3.23211 0.937979Z"
+                  />
+                  <path
+                    d="M22.5699 21.0069L16.975 11.3954L11.3801 21.0069C9.51309 24.2135 10.5565 28.3518 13.7093 30.2507C14.7362 30.869 15.8618 31.1719 16.975 31.1907C18.0883 31.1719 19.2138 30.869 20.2408 30.2507C23.3936 28.3518 24.437 24.2135 22.5699 21.0069Z"
+                    fill="#FC7239"
+                  />
+                  <path
+                    d="M21.5922 10.1984L27.1933 19.8224L32.7944 10.1984C34.6634 6.98767 33.62 2.8452 30.4632 0.942134C29.4341 0.323793 28.3086 0.0188009 27.1933 0C26.078 0.0188009 24.9525 0.321704 23.9234 0.942134C20.7665 2.84311 19.7211 6.98767 21.5922 10.1984Z"
+                    fill="#FC7239"
+                  />
                 </svg>
                 Virify team
               </span>
 
               <!-- Role badge -->
-              <UBadge v-else-if="roleLabel" size="md" color="primary">{{ roleLabel }}</UBadge>
+              <UBadge v-else-if="roleLabel" size="md" color="primary">{{
+                roleLabel
+              }}</UBadge>
+
+              <!-- Verified badge -->
+              <AtomsVerifiedBadge :verification="profile.verification" />
             </div>
 
             <!-- Meta line -->
             <p class="profile-page__meta body-sm">
-              Joined {{ memberSince }}<template v-if="listingCount > 0"> &middot; {{ listingCount }} listing{{ listingCount !== 1 ? 's' : '' }}</template>
+              Joined {{ memberSince
+              }}<template v-if="listingCount > 0">
+                &middot; {{ listingCount }} listing{{
+                  listingCount !== 1 ? "s" : ""
+                }}</template
+              >
             </p>
 
             <!-- Details row: intents · bio · interests -->
             <div class="profile-page__details-row">
-
               <!-- Bio -->
               <div v-if="profile.bio" class="profile-page__bio-wrap">
                 <span class="profile-page__details-label body-xs">About</span>
@@ -54,20 +80,28 @@
 
               <!-- Intents -->
               <div v-if="profile.intents?.length" class="profile-page__intents">
-                <span class="profile-page__details-label body-xs">Looking for</span>
+                <span class="profile-page__details-label body-xs"
+                  >Looking for</span
+                >
                 <div class="profile-page__intents-badges">
                   <UBadge
                     v-for="intent in profile.intents"
                     :key="intent"
                     variant="solid"
                     size="md"
-                  >{{ intentLabel(intent) }}</UBadge>
+                    >{{ intentLabel(intent) }}</UBadge
+                  >
                 </div>
               </div>
 
               <!-- Interests -->
-              <div v-if="profile.interests?.length" class="profile-page__interests">
-                <span class="profile-page__details-label body-xs">Interests</span>
+              <div
+                v-if="profile.interests?.length"
+                class="profile-page__interests"
+              >
+                <span class="profile-page__details-label body-xs"
+                  >Interests</span
+                >
                 <div class="profile-page__interests-badges">
                   <UBadge
                     v-for="interest in profile.interests"
@@ -75,12 +109,11 @@
                     color="secondary"
                     variant="solid"
                     size="md"
-                  >{{ interest }}</UBadge>
+                    >{{ interest }}</UBadge
+                  >
                 </div>
               </div>
-
             </div>
-
           </div>
         </div>
       </div>
@@ -100,37 +133,45 @@
         </div>
 
         <div v-else class="profile-page__empty">
-          <AtomsIcon icon="property/bedrooms" class="profile-page__empty-icon" aria-hidden="true" />
+          <AtomsIcon
+            icon="property/bedrooms"
+            class="profile-page__empty-icon"
+            aria-hidden="true"
+          />
           <p class="body-sm">{{ profile.username }} has no active listings.</p>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import type { PublicProfile } from '~~/layers/database/server/utils/user';
+import type { PublicProfile } from "~~/layers/database/server/utils/user";
 
 const route = useRoute();
 
 const { data: profileData, error } = await useAsyncData(
   `profile-${route.params.username}`,
-  () => $fetch<{ profile: PublicProfile }>(`/api/profile/${route.params.username}`),
-  { watch: [() => route.params.username] }
+  () =>
+    $fetch<{ profile: PublicProfile }>(`/api/profile/${route.params.username}`),
+  { watch: [() => route.params.username] },
 );
 
 if (error.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Profile not found', fatal: true });
+  throw createError({
+    statusCode: 404,
+    statusMessage: "Profile not found",
+    fatal: true,
+  });
 }
 
 const profile = computed(() => profileData.value!.profile);
 
 const INTENT_LABELS: Record<string, string> = {
-  BUYING: 'Buying',
-  SELLING: 'Selling',
-  RENTING: 'Renting',
-  LANDLORD: 'Landlord',
+  BUYING: "Buying",
+  SELLING: "Selling",
+  RENTING: "Renting",
+  LANDLORD: "Landlord",
 };
 
 function intentLabel(intent: string) {
@@ -139,33 +180,35 @@ function intentLabel(intent: string) {
 
 const roleLabel = computed(() => {
   const role = profile.value.verification?.role;
-  if (role === 'AGENT') return 'Estate Agent';
-  if (role === 'ADMIN') return null; // shown as Virify Team badge instead
+  if (role === "AGENT") return "Estate Agent";
+  if (role === "ADMIN") return null; // shown as Virify Team badge instead
   return null;
 });
 
-const isVirifyTeam = computed(() => profile.value.verification?.role === 'ADMIN');
+const isVirifyTeam = computed(
+  () => profile.value.verification?.role === "ADMIN",
+);
 
 const memberSince = computed(() =>
-  new Date(profile.value.createdAt).toLocaleDateString('en-GB', {
-    year: 'numeric',
-    month: 'long',
-  })
+  new Date(profile.value.createdAt).toLocaleDateString("en-GB", {
+    year: "numeric",
+    month: "long",
+  }),
 );
 
 const listingCount = computed(() => profile.value.listings.length);
 
 const listingCards = computed(() =>
   profile.value.listings
-    .filter(l => l.property?.address)
-    .map(l => mapToCardProps(l as any))
+    .filter((l) => l.property?.address)
+    .map((l) => mapToCardProps(l as any)),
 );
 
 const seoTitle = computed(() => `${profile.value.username} on Virify`);
 const seoDescription = computed(() => {
   if (profile.value.bio) {
     return profile.value.bio.length > 155
-      ? profile.value.bio.slice(0, 155) + '...'
+      ? profile.value.bio.slice(0, 155) + "..."
       : profile.value.bio;
   }
   return `View ${profile.value.username}'s profile and listings on Virify.`;
@@ -176,9 +219,9 @@ useSeoMeta({
   ogTitle: seoTitle,
   description: seoDescription,
   ogDescription: seoDescription,
-  ogType: 'profile',
+  ogType: "profile",
   ogImage: () => profile.value.avatar ?? null,
-  twitterCard: 'summary',
+  twitterCard: "summary",
   twitterTitle: seoTitle,
   twitterDescription: seoDescription,
   twitterImage: () => profile.value.avatar ?? null,
@@ -187,7 +230,7 @@ useSeoMeta({
 useHead({
   link: [
     {
-      rel: 'canonical',
+      rel: "canonical",
       href: () => `https://virify.co.uk/profile/${profile.value.username}`,
     },
   ],
@@ -198,7 +241,6 @@ useHead({
 @use "#styles/_utils/media" as mq;
 
 .profile-page {
-
   &__banner {
     background-color: light-dark(var(--blue-200), var(--blue-100));
     color: var(--monochrome-900);

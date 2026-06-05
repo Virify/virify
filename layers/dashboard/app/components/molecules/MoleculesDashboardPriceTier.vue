@@ -3,7 +3,6 @@
   <UPricingPlans orientation="vertical">
     <UPricingPlan
       title="Standard Listing"
-      description="Only professional accounts can create listings during early access, if you want to upgrade your account for free please head to your account settings."
       badge="Free to use"
       variant="subtle"
       price="Free"
@@ -30,7 +29,23 @@
         disabled: !(isAdmin || (createListing && (isAgent || isUser))),
         onClick: () => emit('select-tier', ListingTier.BASIC),
       }"
-    />
+    >
+      <template #description>
+        <p>
+          Our standard listing is free to use and includes all the essential
+          features you need to create and manage your property listings.
+        </p>
+        <span class="body-xs italic">
+          Please note, you must complete
+          <UTooltip
+            text="Owner verification involves sumbitting two documents to confirm identify and verify ownership status"
+          >
+            <span class="underline">owner verification</span>
+          </UTooltip>
+          checks to publish your listing.
+        </span>
+      </template>
+    </UPricingPlan>
     <UPricingPlan
       title="Subscriptions"
       badge="Coming Soon"
@@ -63,10 +78,10 @@
           Our subscription offers additional and enhanced tooling for property
           marketing.
         </p>
-        <span class="body-xs"
-          >Please note, not all of the above features may be available
-          immediately and we are always adding to our features.</span
-        >
+        <span class="body-xs italic">
+          Please note, not all of the above features may be available
+          immediately and we are always adding to our features.
+        </span>
       </template>
     </UPricingPlan>
   </UPricingPlans>

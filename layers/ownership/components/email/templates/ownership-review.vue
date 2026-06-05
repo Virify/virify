@@ -43,21 +43,12 @@
               color: #2d3748;
               font-weight: bold;
               font-size: 13px;
-              margin-bottom: 4px;
+              margin-bottom: 2px;
             "
-            >Documents</Text
+            >Listing</Text
           >
-          <Text style="color: #4a5568; font-size: 14px; margin: 0 0 4px">
-            1.
-            <Link :href="docOneUrl" style="color: #2563eb">{{
-              docOneName
-            }}</Link>
-          </Text>
-          <Text style="color: #4a5568; font-size: 14px; margin: 0">
-            2.
-            <Link :href="docTwoUrl" style="color: #2563eb">{{
-              docTwoName
-            }}</Link>
+          <Text style="color: #4a5568; font-size: 15px; margin: 0">
+            <strong>#{{ draftListingId }}</strong>
           </Text>
         </Section>
 
@@ -67,7 +58,7 @@
 
         <Section style="margin-top: 8px">
           <Button
-            :href="approveUrl"
+            :href="reviewUrl"
             style="
               background-color: #16a34a;
               color: #ffffff;
@@ -77,25 +68,9 @@
               font-weight: bold;
               text-decoration: none;
               display: inline-block;
-              margin-right: 12px;
             "
           >
-            Approve
-          </Button>
-          <Button
-            :href="denyUrl"
-            style="
-              background-color: #dc2626;
-              color: #ffffff;
-              padding: 10px 24px;
-              border-radius: 6px;
-              font-size: 14px;
-              font-weight: bold;
-              text-decoration: none;
-              display: inline-block;
-            "
-          >
-            Deny
+            Review Submission
           </Button>
         </Section>
 
@@ -118,18 +93,12 @@ import {
   Heading,
   Hr,
   Button,
-  Link,
 } from "@vue-email/components";
 defineProps<{
   firstName: string | null;
   lastName: string | null;
   userEmail: string;
   draftListingId: number;
-  docOneUrl: string;
-  docOneName: string;
-  docTwoUrl: string;
-  docTwoName: string;
-  approveUrl: string;
-  denyUrl: string;
+  reviewUrl: string;
 }>();
 </script>

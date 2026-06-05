@@ -45,7 +45,7 @@
     "schema": "./layers/database/server/database/prisma/"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1025.0",
+    "@aws-sdk/client-s3": "^3.1062.0",
     "@aws-sdk/client-ses": "^3.969.0",
     "@emoji-mart/data": "^1.2.1",
     "@getaddress/autocomplete": "^3.1.6",
@@ -119,7 +119,8 @@
   },
   "pnpm": {
     "overrides": {
-      "ipx": "^3.0.0"
+      "ipx": "^3.0.0",
+      "@smithy/types": "4.14.3"
     }
   }
 }

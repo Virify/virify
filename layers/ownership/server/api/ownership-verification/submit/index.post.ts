@@ -78,7 +78,6 @@ export default defineEventHandler(async (event) => {
     (config.public as any).siteUrl ??
     (config.public as any).EMAIL_BASE_URL ??
     "https://virify.co.uk";
-  const r2Url = config.public.CF_R2_URL as string;
   const adminEmail = (config.ADMIN_EMAIL as string) || "all@virify.co.uk";
 
   await sendOwnershipReview({
@@ -87,12 +86,7 @@ export default defineEventHandler(async (event) => {
     lastName: user.lastName ?? null,
     userEmail: user.email ?? "",
     draftListingId,
-    docOneUrl: `${r2Url}/${docOneKey}`,
-    docOneName,
-    docTwoUrl: `${r2Url}/${docTwoKey}`,
-    docTwoName,
-    approveUrl: `${baseUrl}/ownership/review/${record.reviewToken}?action=approve`,
-    denyUrl: `${baseUrl}/ownership/review/${record.reviewToken}?action=deny`,
+    reviewUrl: `${baseUrl}/ownership/review/${record.reviewToken}`,
   });
 
   return { success: true };

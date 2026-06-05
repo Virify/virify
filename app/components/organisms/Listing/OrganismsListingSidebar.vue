@@ -51,6 +51,8 @@
       :is-draft="isDraft"
     />
 
+    <div class="o-listing-sidebar__agent-spacer" />
+
     <OrganismsListingAgent :agent="agent" />
   </section>
 </template>
@@ -147,6 +149,22 @@ const newBuild = computed(() => {
   &__address {
     margin: 0;
     color: var(--primary-400);
+  }
+
+  &__agent-spacer {
+    display: none;
+
+    // Only show when buttons are absent (logged-out / no-enquire state)
+    // This ensures the agent card always has consistent spacing above it
+    &:not(:has(+ *)) {
+      display: block;
+    }
+  }
+
+  // Always give the agent card a consistent gap above it regardless of
+  // which optional components (status badges, enquire button) are present
+  .o-listing-sidebar-agent {
+    margin-top: var(--size-16);
   }
 
   &__agent-link {

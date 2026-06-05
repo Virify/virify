@@ -9,34 +9,70 @@
 
     <template #body>
       <div class="flex flex-col gap-4">
-        <UAlert
-          v-if="isPending"
-          icon="i-lucide-clock"
-          color="warning"
-          variant="soft"
-          title="Review in progress"
-          description="Your ownership documents have been submitted and are being reviewed by our team. You can still work on your draft listings and publish once approved."
-        />
+        <div v-if="loading" class="flex justify-center py-4">
+          <UIcon
+            name="i-lucide-loader"
+            class="w-5 h-5 animate-spin text-muted"
+          />
+        </div>
 
-        <UAlert
-          v-if="isDenied"
-          icon="i-lucide-x-circle"
-          color="error"
-          variant="soft"
-          title="Verification not approved"
-          description="Unfortunately your ownership documents were not approved. You can re-submit new documents for review."
-        />
+        <template v-else>
+          <UAlert
+            v-if="isApproved"
+            icon="i-lucide-shield-check"
+            color="success"
+            variant="soft"
+            title="Ownership verified"
+            description="Your ownership has been confirmed by our team. You are now able to publish this listing."
+          />
+
+          <UAlert
+            v-else-if="isPending"
+            icon="i-lucide-clock"
+            color="warning"
+            variant="soft"
+            title="Review in progress"
+            description="Your ownership documents have been submitted and are being reviewed by our team. You can still work on your draft listings and publish once approved."
+          />
+
+          <UAlert
+            v-else-if="isDenied"
+            icon="i-lucide-x-circle"
+            color="error"
+            variant="soft"
+            title="Verification not approved"
+            description="Unfortunately your ownership documents were not approved. You can re-submit new documents for review."
+          />
+        </template>
       </div>
     </template>
 
     <template #footer>
       <div class="flex justify-between gap-2 w-full">
-        <UButton color="neutral" variant="ghost" @click="close">Close</UButton>
+        <UButton
+          color="neutral"
+          variant="ghost"
+          class="body-sm"
+          size="xs"
+          @click="close"
+          >Close</UButton
+        >
         <div class="flex gap-2">
-          <UButton color="neutral" variant="outline" @click="goToDrafts"
+          <UButton
+            color="neutral"
+            variant="outline"
+            @click="goToDrafts"
+            size="xs"
+            class="body-sm"
             >View my drafts</UButton
           >
-          <UButton v-if="isDenied" color="primary" @click="reSubmit"
+          <UButton
+            v-if="isDenied"
+            color="neutral"
+            variant="outline"
+            @click="reSubmit"
+            size="xs"
+            class="body-sm"
             >Re-submit documents</UButton
           >
         </div>
@@ -48,23 +84,27 @@
 <script setup lang="ts">
 const props = defineProps<{ draftListingId: number }>();
 const isOpen = ref(false);
-const { isPending, isDenied } = useOwnershipVerification(
-  computed(() => props.draftListingId),
-);
+const { isPending, isDenied, isApproved, loading, refresh } =
+  useOwnershipVerification(computed(() => props.draftListingId));
 
 const emit = defineEmits<{
   resubmit: [];
 }>();
 
-const statusIcon = computed(() =>
-  isPending.value ? "i-lucide-clock" : "i-lucide-x-circle",
-);
-const statusIconColor = computed(() =>
-  isPending.value ? "text-amber-500" : "text-red-500",
-);
+const statusIcon = computed(() => {
+  if (isApproved.value) return "i-lucide-shield-check";
+  if (isPending.value) return "i-lucide-clock";
+  return "i-lucide-x-circle";
+});
+const statusIconColor = computed(() => {
+  if (isApproved.value) return "text-green-600";
+  if (isPending.value) return "text-amber-500";
+  return "text-red-500";
+});
 
-function open() {
+async function open() {
   isOpen.value = true;
+  await refresh();
 }
 
 function close() {

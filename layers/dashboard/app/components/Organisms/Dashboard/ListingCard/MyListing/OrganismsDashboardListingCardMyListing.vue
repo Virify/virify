@@ -206,6 +206,8 @@
               size="md"
               color="success"
               variant="outline"
+              class="cursor-pointer"
+              @click="openStatusModal"
               >Ownership Verified</UBadge
             >
             <UBadge

@@ -12,6 +12,12 @@ const querySchema = z.object({
  * /ownership/review/[token] is responsible for rendering the result.
  */
 export default defineEventHandler(async (event) => {
+  // Must be logged in and be an ADMIN
+  const { user } = await requireUserSession(event);
+  if (user.role !== "ADMIN") {
+    throw createError({ statusCode: 403, statusMessage: "Forbidden" });
+  }
+
   let action: "approve" | "deny";
   let token: string;
 

@@ -18,11 +18,14 @@
 
       <div
         role="presentation"
-        class="o-listing-sidebar-agent__details | flow flow-3xs"
+        class="o-listing-sidebar-agent__details | flow flow-xs"
       >
-        <h3 class="o-listing-sidebar-agent__name | title-xs">
-          {{ agent?.username }}
-        </h3>
+        <div class="o-listing-sidebar-agent__name-row">
+          <h3 class="o-listing-sidebar-agent__name | title-xs">
+            {{ agent?.username }}
+          </h3>
+          <AtomsVerifiedBadge :verification="agent?.verification" />
+        </div>
         <!-- <p class="| body-xs">123 Agent Street, SM1 TWN</p> -->
         <p class="| body-xs">{{ memberSince }}</p>
       </div>
@@ -40,11 +43,14 @@
     </div>
     <div
       role="presentation"
-      class="o-listing-sidebar-agent__details | flow flow-3xs"
+      class="o-listing-sidebar-agent__details | flow flow-xs"
     >
-      <h3 class="o-listing-sidebar-agent__name | title-xs">
-        {{ agent?.username }}
-      </h3>
+      <div class="o-listing-sidebar-agent__name-row">
+        <h3 class="o-listing-sidebar-agent__name | title-xs">
+          {{ agent?.username }}
+        </h3>
+        <AtomsVerifiedBadge :verification="agent?.verification" />
+      </div>
       <p class="| body-xs">{{ memberSince }}</p>
     </div>
   </section>
@@ -58,6 +64,11 @@ interface Props {
     id?: number | null;
     createdAt?: Date | String | null;
     avatar?: string | null;
+    verification?: {
+      name: boolean | null;
+      identity: boolean | null;
+      role: string | null;
+    } | null;
   };
 }
 const props = defineProps<Props>();
@@ -65,7 +76,7 @@ const props = defineProps<Props>();
 const memberSince = computed(() => {
   if (!props.agent?.createdAt) return undefined;
   const formattedDate = new Date(
-    props.agent?.createdAt?.toString()
+    props.agent?.createdAt?.toString(),
   ).toLocaleDateString("en-GB", {
     year: "numeric",
     month: "long",
@@ -116,7 +127,13 @@ const memberSince = computed(() => {
   &__logo-icon {
     color: var(--blue-400);
     height: 100%;
-    
+  }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    gap: var(--size-8);
+    margin-bottom: var(--size-4);
   }
 
   &__name {
