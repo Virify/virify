@@ -48,6 +48,25 @@
             </p>
           </div>
 
+          <!-- Submitter info -->
+          <div class="space-y-3">
+            <p class="text-sm font-semibold">Submitted By</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-0.5">
+                <p class="text-xs text-muted">First Name</p>
+                <p class="text-sm font-medium">{{ details.submitter.firstName ?? '—' }}</p>
+              </div>
+              <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-0.5">
+                <p class="text-xs text-muted">Last Name</p>
+                <p class="text-sm font-medium">{{ details.submitter.lastName ?? '—' }}</p>
+              </div>
+              <div class="p-3 rounded-xl border border-gray-200 dark:border-gray-700 space-y-0.5">
+                <p class="text-xs text-muted">Email</p>
+                <p class="text-sm font-medium truncate">{{ details.submitter.email ?? '—' }}</p>
+              </div>
+            </div>
+          </div>
+
           <!-- Documents -->
           <div class="space-y-3">
             <p class="text-sm font-semibold">Submitted Documents</p>
@@ -180,29 +199,6 @@
           />
         </div>
       </template>
-
-      <!-- Error -->
-      <template v-else>
-        <div class="text-center space-y-5">
-          <div
-            class="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto"
-          >
-            <UIcon
-              name="i-lucide-alert-triangle"
-              class="w-10 h-10 text-amber-600 dark:text-amber-400"
-            />
-          </div>
-          <div class="space-y-2">
-            <h1 class="text-2xl font-bold">Unable to load</h1>
-            <p class="text-muted">
-              {{
-                (detailsError as any)?.statusMessage ||
-                "This link may have expired or already been used."
-              }}
-            </p>
-          </div>
-        </div>
-      </template>
     </div>
   </div>
 </template>
@@ -212,8 +208,8 @@ definePageMeta({ middleware: ["authenticated"] });
 
 const { isAdmin } = useFeatureFlag();
 
-if (import.meta.client && !isAdmin.value) {
-  await navigateTo("/");
+if (!isAdmin.value) {
+  throw createError({ statusCode: 403, statusMessage: 'Forbidden' });
 }
 
 const route = useRoute();
@@ -227,6 +223,7 @@ type ReviewDetails =
       alreadyReviewed: false;
       draftListingId: number;
       submittedAt: string;
+      submitter: { firstName: string | null; lastName: string | null; email: string | null };
       docOne: { name: string | null; hasFile: boolean };
       docTwo: { name: string | null; hasFile: boolean };
     };
@@ -240,6 +237,13 @@ const {
     query: { token },
   }),
 );
+
+if (detailsError.value) {
+  throw createError({
+    statusCode: (detailsError.value as any)?.statusCode ?? 500,
+    statusMessage: (detailsError.value as any)?.statusMessage ?? 'Unable to load',
+  });
+}
 
 // Proxy URLs — served through the authenticated server, no expiry
 const docOneUrl = computed(

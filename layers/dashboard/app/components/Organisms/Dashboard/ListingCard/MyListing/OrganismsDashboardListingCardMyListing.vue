@@ -311,22 +311,28 @@
               label="View"
               :disabled="!canView"
             />
-            <UButton
+            <UTooltip
               v-if="listing.isDraft"
-              variant="solid"
-              size="xs"
-              color="secondary"
-              class="font-semibold flex-1 justify-center text-white!"
-              icon="i-lucide-rocket"
-              label="Publish"
-              :disabled="
-                !isAllStepsCompleted ||
-                isPublishing ||
-                (!isExempt && !isVerificationApproved)
-              "
-              :loading="isPublishing"
-              @click="handlePublish"
-            />
+              :text="publishBlockedReason"
+              :disabled="!publishBlockedReason"
+              class="flex-1"
+            >
+              <UButton
+                variant="solid"
+                size="xs"
+                color="secondary"
+                class="font-semibold w-full justify-center text-white!"
+                icon="i-lucide-rocket"
+                label="Publish"
+                :disabled="
+                  !isAllStepsCompleted ||
+                  isPublishing ||
+                  (!isExempt && !isVerificationApproved)
+                "
+                :loading="isPublishing"
+                @click="handlePublish"
+              />
+            </UTooltip>
             <UButton
               v-if="!listing.isDraft"
               variant="subtle"
@@ -523,6 +529,17 @@ const mediaCount = computed(
 const isAllStepsCompleted = computed(
   () => completedStepsCount.value >= 9 && mediaCount.value > 0,
 );
+
+const publishBlockedReason = computed(() => {
+  if (!props.listing.isDraft) return undefined;
+  if (!isExempt.value) {
+    if (isVerificationPending.value) return 'Ownership verification is under review — you\'ll be able to publish once approved';
+    if (isVerificationDenied.value) return 'Ownership verification was denied — please resubmit your documents';
+    if (!isVerificationApproved.value) return 'You must verify ownership of this property before publishing';
+  }
+  if (!isAllStepsCompleted.value) return `Complete all listing steps first (${completedStepsCount.value}/9 done)`;
+  return undefined;
+});
 
 // Computed properties for checking if data exists
 const hasImage = computed(() => !!getMainImage(props.listing?.property));

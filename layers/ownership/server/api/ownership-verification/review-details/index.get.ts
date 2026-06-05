@@ -36,6 +36,7 @@ export default defineEventHandler(async (event) => {
       docOneKey: true,
       docTwoKey: true,
       createdAt: true,
+      userId: true,
     },
   });
 
@@ -61,10 +62,20 @@ export default defineEventHandler(async (event) => {
     };
   }
 
+  const submitter = await prisma.user.findUnique({
+    where: { id: record.userId },
+    select: { firstName: true, lastName: true, email: true },
+  });
+
   return {
     alreadyReviewed: false,
     draftListingId: record.draftListingId,
     submittedAt: record.createdAt,
+    submitter: {
+      firstName: submitter?.firstName ?? null,
+      lastName: submitter?.lastName ?? null,
+      email: submitter?.email ?? null,
+    },
     docOne: { name: record.docOneName, hasFile: !!record.docOneKey },
     docTwo: { name: record.docTwoName, hasFile: !!record.docTwoKey },
   };

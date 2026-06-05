@@ -22,6 +22,8 @@ onMounted(() => {
 
 const errorTitle = computed(() => {
   switch (error.value?.statusCode) {
+    case 403:
+      return 'Access Denied'
     case 404:
       return 'Page Not Found'
     case 500:
@@ -33,6 +35,8 @@ const errorTitle = computed(() => {
 
 const errorMessage = computed(() => {
   switch (error.value?.statusCode) {
+    case 403:
+      return "You don't have permission to access this page."
     case 404:
       return "Sorry, the page you're looking for doesn't exist or has been moved."
     case 500:
