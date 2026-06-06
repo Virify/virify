@@ -1,13 +1,13 @@
 <template>
   <div class="p-browse | container">
-    <BrowseHeader class="p-browse__search-form" :count="results.length" />
+    <BrowseToggleOnlyHeader class="p-browse__search-form" v-model="buyOrRent" />
 
     <h2 class="p-browse__title | title-sm">
-      Showing {{ results.length }} result{{ results.length === 1 ? '' : 's' }}
+      Showing {{ filteredResults.length }} result{{ filteredResults.length === 1 ? '' : 's' }}
     </h2>
 
-    <OrganismsResults v-if="results.length" :results :is-loading="isPending" :show-context="false"
-      class="p-browse__results" />
+    <OrganismsResults v-if="filteredResults.length" :results="filteredResults" :is-loading="isPending"
+      :show-context="false" class="p-browse__results" />
 
     <div v-else class="p-browse__no-results">
       <h2 class="p-browse__no-results-title | title-xl">
@@ -27,6 +27,22 @@
  */
 const { results, isPending } = useViewAllListings()
 
+/**
+ *  Toggle whether to show buy or sell
+ */
+const buyOrRent = ref<'buy' | 'rent'>('buy')
+
+const filteredResults = computed(() => {
+  if (!Array.isArray(results.value)) return []
+
+  const isBuy: boolean = buyOrRent.value === 'buy'
+
+  return results.value.filter(property => {
+    if (isBuy) return !!property.saleListing
+
+    return !!property.rentalListing
+  })
+})
 </script>
 
 <style lang="scss">
@@ -55,7 +71,7 @@ const { results, isPending } = useViewAllListings()
   }
 
   &__search-form {
-    z-index: 99;
+    z-index: 3;
   }
 }
 </style>
