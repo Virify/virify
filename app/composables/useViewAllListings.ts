@@ -4,8 +4,14 @@
  *          listings, which can be used whilst the full search is not 
  *          enabled
  */
-export function useViewAllListings() {
-  const { data, status } = useFetch<ListingCardData[]>('/api/listings')
+export function useViewAllListings(options: { limit?: number } = {}) {
+  const { limit } = asObject(options)
+
+  const { data, status } = useFetch<ListingCardData[]>('/api/listings',
+    {
+      query: { limit }
+    }
+  )
 
   const results = computed<ListingCardData[]>(() => {
     if (!Array.isArray(data.value)) {
