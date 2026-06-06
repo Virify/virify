@@ -5,15 +5,18 @@
     </div>
 
     <div class="banner-hero__images" aria-hidden="true">
-      <img src="/img/home/sign-up-banner-left.svg" class="banner-hero__image banner-hero__image--left"
+      <img src="/img/home/sign-up-banner-left.svg"
+        class="banner-hero__image banner-hero__image--left"
         aria-label="Peace lily and a moving box" />
 
       <picture>
         <source srcset="/img/home/window.svg" media="(max-width: 1023px)" />
-        <img src="/img/home/window-partial.svg" class="banner-hero__image banner-hero__image--window" />
+        <img src="/img/home/window-partial.svg"
+          class="banner-hero__image banner-hero__image--window" />
       </picture>
 
-      <img src="/img/home/person-with-ruler.svg" class="banner-hero__image banner-hero__image--person"
+      <img src="/img/home/person-with-ruler.svg"
+        class="banner-hero__image banner-hero__image--person"
         aria-label="A lady holding a ruler against a wall and measuring" />
     </div>
 
@@ -22,14 +25,11 @@
       <slot name="title" />
     </h1>
 
-    <p class="banner-hero__description | body-lg" style="margin-bottom: var(--size-32)">
-      Browse our list of curated properties now!
+    <p v-if="description" class="banner-hero__description | body-lg">
+      {{ description }}
     </p>
 
-    <nuxt-link to="/browse/" class="button button-lg">
-      Browse properties
-    </nuxt-link>
-    <!-- <slot /> -->
+    <slot />
   </div>
 </template>
 
