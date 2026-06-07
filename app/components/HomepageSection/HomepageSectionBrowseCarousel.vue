@@ -5,7 +5,7 @@
     <MoleculesCarousel :slides="formattedResults" slide-size="min(360px, calc(100vw - var(--container-padding)))"
       gap="var(--size-16)" show-arrows :options="{
         dragFree: false,
-        draggable: false
+        watchDrag: false
       }">
       <template #default="{ slide }">
         <PropertyCardSkeleton v-if="slide.isPending" />
