@@ -2,11 +2,11 @@
   <div role="presentation">
     <h2 class="homepage-section-browse-carousel__title | title-xl">Featured properties</h2>
 
-    <MoleculesCarousel :slides="formattedResults" slide-size="min(360px, calc(100vw - var(--container-padding)))"
-      gap="var(--size-16)" show-arrows :options="{
+    <MoleculesCarousel :slides="formattedResults" slide-size="min(360px, 100%)" gap="var(--size-16)" show-arrows
+      :options="{
         dragFree: false,
         watchDrag: false
-      }">
+      }" class="homepage-section-browse-carousel__carousel">
       <template #default="{ slide }">
         <PropertyCardSkeleton v-if="slide.isPending" />
 
@@ -41,11 +41,56 @@ const formattedResults = computed(() => {
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
+
 .homepage-section-browse-carousel {
 
   &__title {
     text-align: center;
     margin: 0 auto var(--size-32);
+  }
+
+  &__carousel {
+    padding: 0 var(--size-32);
+
+    @include mq.tablet {
+      padding: 0 var(--size-48);
+    }
+
+    &>.embla-prev,
+    &>.embla-next {
+      background: var(--background-300);
+      color: currentColor;
+      width: auto;
+      height: auto;
+      padding: var(--size-4);
+
+      .a-icon {
+        width: var(--size-36);
+        height: var(--size-36);
+      }
+
+      &:hover:not(:disabled) {
+        background: var(--background-400);
+        color: currentColor;
+      }
+    }
+
+    &>.embla-prev {
+      left: calc(0px - var(--size-14));
+
+      @include mq.tablet {
+        left: calc(0px - var(--size-24));
+      }
+    }
+
+    &>.embla-next {
+      right: calc(0px - var(--size-14));
+
+      @include mq.tablet {
+        right: calc(0px - var(--size-24));
+      }
+    }
   }
 }
 </style>
