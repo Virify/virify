@@ -6,11 +6,12 @@
       <HomepageSectionSignup class="| container" />
     </div>
 
-
     <!-- Features -->
     <HomepageSectionComingSoon class="| container" />
 
     <a id="homepage-content" class="| inline-scroll-margin"></a>
+
+    <HomepageSectionBrowseCarousel class="p-index__featured-properties | container" />
 
     <HomepageSectionAiScroller class="| container" />
 
@@ -223,6 +224,7 @@ function showSignupForm() {
     component: ViewsDialogWaitingList
   })
 }
+
 </script>
 
 <style lang="scss">
@@ -254,6 +256,10 @@ function showSignupForm() {
   &__bg-change {
     background-color: var(--blue-200);
     padding: var(--size-120) 0;
+  }
+
+  &__featured-properties {
+    margin: var(--size-16) auto var(--size-72);
   }
 }
 </style>
