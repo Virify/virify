@@ -6,10 +6,7 @@
       Showing {{ filteredResults.length }} result{{ filteredResults.length === 1 ? '' : 's' }}
     </h2>
 
-    <OrganismsResults v-if="filteredResults.length" :results="filteredResults" :is-loading="isPending"
-      :show-context="false" class="p-browse__results" />
-
-    <div v-else class="p-browse__no-results">
+    <div v-if="!isPending && !filteredResults.length" class="p-browse__no-results">
       <h2 class="p-browse__no-results-title | title-xl">
         No results found
       </h2>
@@ -18,6 +15,9 @@
         We couldn't find any properties matching your search
       </p>
     </div>
+
+    <OrganismsResults v-else :results="filteredResults" :is-loading="isPending" :show-context="false"
+      class="p-browse__results" />
   </div>
 </template>
 

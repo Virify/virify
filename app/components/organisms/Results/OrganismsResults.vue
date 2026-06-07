@@ -1,7 +1,7 @@
 <template>
   <div class="o-results">
     <template v-if="isLoading">
-      <MoleculesResultsContextSkeleton />
+      <MoleculesResultsContextSkeleton v-if="showContext" />
 
       <div class="o-results__grid">
         <PropertyCardSkeleton v-for="key of 10" :key />
