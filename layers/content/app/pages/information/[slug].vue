@@ -1,21 +1,23 @@
 <template>
   <div class="container">
     <!-- hero -->
-    <OrganismsBannerHero :caption="caption" :description="description">
+    <OrganismsBannerHero :caption="page?.caption" :description="page?.description">
       <template #title>
-        <span>{{ title }}</span>
+        <span>{{ page?.title}}</span>
       </template>
       <UButton
-        v-if="!loggedIn"
+        v-for="(button, index) in page?.heroButtons || []"
+        :key="index"
+        :label="button.label"
+        :icon="button.icon"
+        @click="button.signup ? showSignup() : button.login ? showLogin() : null"
+        :to="button.url || undefined"
         class="button button-secondary mt-6!"
-        icon="i-lucide-user-plus"
-        @click="showSignup"
-      >
-        Sign Up
-      </UButton>
+      />
     </OrganismsBannerHero>
+
     <!-- sign up cta -->
-    <OrganismsSanityCtaSection :links="ctaSectionLinks" :description="ctaSectionDescription" :title="ctaSectionTitle" />
+    <OrganismsSanityCtaSection :links="page?.sections?.[0]?.buttons" :description="page?.sections?.[0]?.description" :title="page?.sections?.[0]?.title" />
 
     <!-- page sections -->
     <OrganismsSanityPageSection
@@ -40,9 +42,13 @@
   </div>
 </template>
 <script setup lang="ts">
+import { ViewsDialogSignup, ViewsDialogLogin } from "#components";
 import type { ButtonProps, PageFeatureProps } from "@nuxt/ui";
-import { ViewsDialogSignup } from "#components";
-const { loggedIn } = useUserSession();
+
+const route = useRoute();
+const pageSlug = route.params.slug as string;
+
+const { data: page } = await useSanityQuery(generalPageQuery, { slug: pageSlug });
 
 const { showDialog } = useDialog();
 
@@ -50,26 +56,9 @@ function showSignup() {
   showDialog({ component: ViewsDialogSignup });
 }
 
-const title = "Virify early Access is live!";
-const description =
-  "A smarter property platform built around clearer listings, useful tools and a better experience for buyers, sellers, renters and agents.";
-const caption = "Free to use, and always will be";
-
-const ctaSectionTitle = "Live for sign-ups and selected testing";
-
-const ctaSectionDescription = "Property listing creation is currently available to selected property owners and agents. Property search is also running in a limited mode while we test and refine the core workflows.";
-
-const ctaSectionLinks = ref<ButtonProps[]>([
-  {
-    label: "Sign Up",
-    onClick: showSignup,
-    color: "secondary",
-    icon: "i-lucide-user-plus",
-    size: "lg",
-    variant: "subtle",
-    class: "button button-secondary",
-  },
-]);
+function showLogin() {
+  showDialog({ component: ViewsDialogLogin });
+}
 
 const whatYouCanDoFeatures = ref<PageFeatureProps[]>([
   {

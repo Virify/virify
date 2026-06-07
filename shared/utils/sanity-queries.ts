@@ -371,16 +371,23 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
   "slug": slug.current,
   caption,
   description,
+  
+  // 1. TOP OF PAGE: Hero CTA Buttons
   heroButtons[] {
+    _key,
     label,
     icon,
     url,
     signup,
     login
   },
+  
+  // 2. MIDDLE OF PAGE: Dynamic Orderable Sections Array
   sections[] {
     _key,
     _type,
+    
+    // Standard Info Layout
     _type == "pageSection" => {
       headline,
       title,
@@ -396,6 +403,8 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
         iconColor
       }
     },
+
+    // Dedicated Page Call-To-Action (CTA) Block
     _type == "pageCta" => {
       title,
       description,
@@ -407,6 +416,8 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
         icon
       }
     },
+
+    // Referenced FAQs List
     _type == "reference" => @-> {
       "id": _id,
       "_type": "faq",
@@ -415,6 +426,8 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
       active
     }
   },
+
+  // 3. Technical SEO Configurations
   "seo": {
     "title": coalesce(seoTitle, title),
     "description": coalesce(seoDescription, description),

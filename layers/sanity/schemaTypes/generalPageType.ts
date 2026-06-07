@@ -51,6 +51,21 @@ export const generalPageType = defineType({
       of: [
         {
           type: 'object',
+          // Giving the object a preview makes reordering much easier in the array list
+          preview: {
+            select: {
+              title: 'label',
+              signup: 'signup',
+              login: 'login',
+              url: 'url',
+            },
+            prepare({title, signup, login, url}) {
+              let subtitle = url || ''
+              if (signup) subtitle = '⚡ Action: Open Signup Modal'
+              if (login) subtitle = '🔒 Action: Open Login Modal'
+              return {title: title || 'Untitled Button', subtitle}
+            },
+          },
           fields: [
             defineField({
               name: 'label',
@@ -62,27 +77,49 @@ export const generalPageType = defineType({
               name: 'icon',
               title: 'Button Icon',
               type: 'string',
-              description:
-                'Name of the icon from our set of available icons. We use i-lucide icons, see https://lucide.dev/icons for available options.',
-                validation: (Rule) => Rule.max(50),
+              description: 'Lucide icon name (e.g., arrow-right, activity).',
+              validation: (Rule) => Rule.max(50),
+            }),
+            defineField({
+              name: 'signup',
+              title: 'Sign-up Button',
+              description: 'Opens the sign-up modal window',
+              type: 'boolean',
+              initialValue: false,
+              // Disable if login is active to prevent conflicting configurations
+              readOnly: ({parent}) => parent?.login === true,
+            }),
+            defineField({
+              name: 'login',
+              title: 'Login Button',
+              description: 'Opens the login modal window',
+              type: 'boolean',
+              initialValue: false,
+              // Disable if signup is active to prevent conflicting configurations
+              readOnly: ({parent}) => parent?.signup === true,
             }),
             defineField({
               name: 'url',
               title: 'Button URL',
               type: 'url',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'signup',
-              title: 'Is this a sign-up button? Should it open the modal',
-              type: 'boolean',
-              initialValue: false,
-            }),
-            defineField({
-              name: 'login',
-              title: 'Is this a login button?',
-              type: 'boolean',
-              initialValue: false,
+              // Visually hides the URL box if a modal action is already selected
+              hidden: ({parent}) => parent?.signup === true || parent?.login === true,
+              validation: (Rule) =>
+                Rule.uri({allowRelative: true}).custom((value, context) => {
+                  const {signup, login} = context.parent as any || {}
+
+                  // 1. If it's a modal action, the URL field must be empty
+                  if (signup === true || login === true) {
+                    return value ? 'Remove the URL path if this opens a modal.' : true
+                  }
+
+                  // 2. If no modal is selected, a redirect URL string is required
+                  if (!value) {
+                    return 'You must provide a URL link, or toggle a modal action above.'
+                  }
+
+                  return true
+                }),
             }),
           ],
         },
@@ -96,7 +133,7 @@ export const generalPageType = defineType({
       of: [
         {type: 'pageSection'},
         {type: 'pageCta'},
-        {type: 'reference', to: [{ type: 'faq' }], title: 'FAQ Item' },
+        {type: 'reference', to: [{type: 'faq'}], title: 'FAQ Item'},
       ],
       validation: (Rule) => Rule.required().min(1),
     }),
