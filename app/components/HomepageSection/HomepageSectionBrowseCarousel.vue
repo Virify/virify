@@ -13,6 +13,11 @@
         <PropertyCardRoot v-else v-bind="slide" />
       </template>
     </MoleculesCarousel>
+
+    <nuxt-link to="/browse/" class="homepage-section-browse-carousel__view-more | button">Browse all properties
+
+      <AtomsIcon icon="arrow-right" />
+    </nuxt-link>
   </div>
 </template>
 
@@ -90,6 +95,20 @@ const formattedResults = computed(() => {
       @include mq.tablet {
         right: calc(0px - var(--size-24));
       }
+    }
+  }
+
+  &__view-more {
+    display: flex;
+    width: fit-content;
+    color: var(--monochrome-900);
+    padding: var(--size-12) var(--size-32);
+    margin: var(--size-24) auto;
+    text-align: center;
+
+    .a-icon {
+      width: var(--size-20);
+      height: var(--size-20);
     }
   }
 }
