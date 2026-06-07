@@ -15,90 +15,28 @@
       </UButton>
     </OrganismsBannerHero>
     <!-- sign up cta -->
-    <UPageCTA
-      title="Live for sign-ups and selected testing"
-      variant="naked"
-      :links="links"
-      :ui="{
-        container: 'max-w-none',
-      }"
-    >
-      <template #description>
-        <p>
-          Property listing creation is currently available to selected property
-          owners and agents. Property search is also running in a limited mode
-          while we test and refine the core workflows.​
-        </p>
-      </template>
-    </UPageCTA>
+    <OrganismsSanityCtaSection :links="ctaSectionLinks" :description="ctaSectionDescription" :title="ctaSectionTitle" />
+
     <!-- page sections -->
-    <UPageSection
+    <OrganismsSanityPageSection
       :features="whatYouCanDoFeatures"
+      headline="Property search and some features are still being refined during early access."
+      title="What you can do during early access"
+      description="During early access, users can create and manage live property listings while helping us improve the listing journey."
       orientation="horizontal"
-      color="secondary"
-      :ui="{
-        container: 'max-w-none',
-      }"
-    >
-      <template #headline>
-        <p class="text-secondary/90 w-full font-bold">
-          Property search and some features are still being refined during early
-          access.
-        </p>
-      </template>
-      <template #title>
-        <span>What you can do during early access</span>
-      </template>
-      <template #description>
-        <p>
-          During early access, users can create and manage live property
-          listings while helping us improve the listing journey.
-        </p>
-      </template>
-      <template #default>
-        <NuxtImg
-          src="/img/create-listing.png"
-          alt="What you can do during early access"
-          class="w-full rounded-lg border object-cover"
-          quality="80"
-          densities="[1, 2]"
-        />
-      </template>
-    </UPageSection>
-    <!-- next section -->
-      <!-- page sections -->
-    <UPageSection
+      :image="{ src: '/img/create-listing.png', alt: 'What you can do during early access' }"
+    />
+
+    <!-- page sections -->
+    <OrganismsSanityPageSection
       :features="whatYouCanDoFeatures"
+      headline="Property search and some features are still being refined during early access."
+      title="What you can do during early access"
+      description="During early access, users can create and manage live property listings while helping us improve the listing journey."
       orientation="horizontal"
-      color="secondary"
-      :ui="{
-        container: 'max-w-none',
-      }"
-      reverse
-    >
-      <template #headline>
-        <p class="text-secondary/90 w-full font-bold">
-          Coming next
-        </p>
-      </template>
-      <template #title>
-        <span>Help shape what comes next</span>
-      </template>
-      <template #description>
-        <p>
-          Take a sneak peak at our upcoming and planned features.
-        </p>
-      </template>
-      <template #default>
-        <NuxtImg
-          src="/img/create-listing.png"
-          alt="What you can do during early access"
-          class="w-full rounded-lg border object-cover"
-          quality="80"
-          densities="[1, 2]"
-        />
-      </template>
-    </UPageSection>
+      :image="{ src: '/img/create-listing.png', alt: 'What you can do during early access' }"
+      reverse      
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -117,7 +55,11 @@ const description =
   "A smarter property platform built around clearer listings, useful tools and a better experience for buyers, sellers, renters and agents.";
 const caption = "Free to use, and always will be";
 
-const links = ref<ButtonProps[]>([
+const ctaSectionTitle = "Live for sign-ups and selected testing";
+
+const ctaSectionDescription = "Property listing creation is currently available to selected property owners and agents. Property search is also running in a limited mode while we test and refine the core workflows.";
+
+const ctaSectionLinks = ref<ButtonProps[]>([
   {
     label: "Sign Up",
     onClick: showSignup,

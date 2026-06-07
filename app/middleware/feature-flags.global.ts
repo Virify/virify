@@ -12,7 +12,7 @@ const alwaysAllowedRoutes = [
   "/support/**",
   "/acceptable-use/**",
   "/profile/**",
-  "/marketing/**",
+  "/information/**",
 ];
 
 const featureFlagRoutes = {

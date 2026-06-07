@@ -363,3 +363,61 @@ export const supportPageQuery = `*[_type == "supportPage"][0] {
     canonicalUrl
   }
 }`
+
+export const generalPageQuery = `*[_type == "generalPage" && slug.current == $slug][0] {
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  caption,
+  description,
+  heroButtons[] {
+    label,
+    icon,
+    url,
+    signup,
+    login
+  },
+  sections[] {
+    _key,
+    _type,
+    _type == "pageSection" => {
+      headline,
+      title,
+      description,
+      reverse,
+      orientation,
+      "image": image.asset->url,
+      features[] {
+        _key,
+        title,
+        description,
+        icon,
+        iconColor
+      }
+    },
+    _type == "pageCta" => {
+      title,
+      description,
+      buttons[] {
+        _key,
+        label,
+        url,
+        signup,
+        icon
+      }
+    },
+    _type == "reference" => @-> {
+      "id": _id,
+      "_type": "faq",
+      question,
+      answer,
+      active
+    }
+  },
+  "seo": {
+    "title": coalesce(seoTitle, title),
+    "description": coalesce(seoDescription, description),
+    noIndex
+  }
+}`

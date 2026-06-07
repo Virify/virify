@@ -10,6 +10,9 @@ import {featureSectionType} from './featureSectionType'
 import {faqType} from './faqType'
 import { supportPageType } from './supportPageType'
 import {acceptableUseType} from './acceptableUseType'
+import {pageSectionType} from './pageSectionType'
+import {generalPageType} from './generalPageType'
+import {pageCtaType} from './pageCtaType'
 
 export const schemaTypes = [
   // Reusable types
@@ -27,4 +30,7 @@ export const schemaTypes = [
   contactPageType,
   supportPageType,
   acceptableUseType,
+  pageSectionType,
+  generalPageType,
+  pageCtaType,
 ]
