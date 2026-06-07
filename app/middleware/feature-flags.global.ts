@@ -5,6 +5,7 @@ const alwaysAllowedRoutes = [
   '/terms/**',
   '/privacy/**',
   '/guides/**',
+  '/browse/**',
   '/listing/**',
   '/price-paid/**',
   '/mortgage-calculator/**',
@@ -16,7 +17,6 @@ const alwaysAllowedRoutes = [
 
 const featureFlagRoutes = {
   '/search/**': ['search'],
-  '/browse/': ['search'],
   '/login/**': ['signup'],
   '/account/**': ['signup'],
   '/dashboard/**': ['signup'],
