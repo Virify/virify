@@ -1,13 +1,13 @@
 import vue from "@vitejs/plugin-vue";
 
 function envIfExistOrDefault(key: string, defaultValue: boolean): boolean {
-  const matchedKey = process.env[key]
+  const matchedKey = process.env[key];
 
   // If a key exists, check if it is 'true'
-  if (matchedKey) return matchedKey === 'true'
+  if (matchedKey) return matchedKey === "true";
 
   // If no key exists, return default value
-  return defaultValue
+  return defaultValue;
 }
 
 export default defineNuxtConfig({
@@ -32,12 +32,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       featureFlags: {
-        waitingList: process.env.DEPLOYMENT_ENV === 'waiting-list',
-        search: envIfExistOrDefault('ALLOW_SEARCH', false),
-        signup: envIfExistOrDefault('ALLOW_SIGNUP', true),
-        createListing: envIfExistOrDefault('ALLOW_CREATE_LISTING', true),
-        mortgageCalculator: envIfExistOrDefault('ALLOW_MORTGAGE_CALC', false),
-      }
+        search: envIfExistOrDefault("ALLOW_SEARCH", false),
+        signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
+        createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
+
+      },
     },
   },
   modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
@@ -46,7 +45,8 @@ export default defineNuxtConfig({
   site: {
     url: "https://virify.co.uk",
     name: "Virify",
-    description: "The UK's first open property marketplace. AI-powered property search and verified private listings.",
+    description:
+      "The UK's first open property marketplace. AI-powered property search and verified private listings.",
     defaultLocale: "en-GB",
     indexable: process.env.SANITY_PREVIEW !== "true",
   },
@@ -70,7 +70,7 @@ export default defineNuxtConfig({
   robots: {
     allow: [
       "/",
-      // '/mortgage-calculator',
+      '/mortgage-calculator',
       "/price-paid",
       "/contact",
       "/guides",
@@ -80,12 +80,41 @@ export default defineNuxtConfig({
       "/cookie",
       "/support",
       "/listing/*",
+      "/profile/*",
+      "/acceptable-use",
     ],
-    disallow: ["/account", "/account/*", "/dashboard", "/dashboard/*", "/api", "/api/*", "/auth/update-admin-password", "/listing/preview", "/listing/preview/*", "/search", "/ai-search"],
+    disallow: [
+      "/account",
+      "/account/*",
+      "/dashboard",
+      "/dashboard/*",
+      "/api",
+      "/api/*",
+      "/auth/update-admin-password",
+      "/listing/preview",
+      "/listing/preview/*",
+      "/search",
+      "/ai-search",
+    ],
   },
   // Sitemap configuration
   sitemap: {
-    exclude: ["/email-preview-tool/**", "/password/**", "/signup/verify", "/map-search", "/pre-dock", "/sandbox", "/login", "/signup", "/account/**", "/listing/**", "/search/**", "/ai-search/**", "/review/**", "/auth/update-admin-password"],
+    exclude: [
+      "/email-preview-tool/**",
+      "/password/**",
+      "/signup/verify",
+      "/map-search",
+      "/pre-dock",
+      "/sandbox",
+      "/login",
+      "/signup",
+      "/account/**",
+      "/listing/**",
+      "/search/**",
+      "/ai-search/**",
+      "/review/**",
+      "/auth/update-admin-password",
+    ],
     sources: ["/api/__sitemap__/guides"],
   },
   image: {
@@ -123,9 +152,6 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2025-07-09",
   routeRules: {
-    "/waiting-list": {
-      redirect: "/",
-    },
     // Authenticated user API routes — no rate limiting needed, session auth is the guard
     "/api/user/**": {
       security: { rateLimiter: false },
@@ -136,21 +162,45 @@ export default defineNuxtConfig({
     "/api/viewing": {
       security: { rateLimiter: false },
     },
+    "/api/open-house/**": {
+      security: { rateLimiter: false },
+    },
     // Tight rate limits on high-value auth endpoints to prevent brute-force
     "/auth/login": {
-      security: { rateLimiter: { tokensPerInterval: 5, interval: 60000, throwError: false } },
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 5,
+          interval: 60000,
+          throwError: false,
+        },
+      },
     },
     "/auth/verify-otp": {
-      security: { rateLimiter: { tokensPerInterval: 5, interval: 300000, throwError: false } },
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 5,
+          interval: 300000,
+          throwError: false,
+        },
+      },
     },
     "/auth/password-reset": {
-      security: { rateLimiter: { tokensPerInterval: 3, interval: 300000, throwError: false } },
+      security: {
+        rateLimiter: {
+          tokensPerInterval: 3,
+          interval: 300000,
+          throwError: false,
+        },
+      },
     },
   },
   app: {
     head: {
       meta: [
-        { name: "facebook-domain-verification", content: "ulpkdjeqxu1yqezjns7k5jben6eyib" },
+        {
+          name: "facebook-domain-verification",
+          content: "ulpkdjeqxu1yqezjns7k5jben6eyib",
+        },
       ],
     },
   },
@@ -181,13 +231,15 @@ export default defineNuxtConfig({
       cache:
         process.env.REDIS_URL || process.env.REDISHOST
           ? {
-              driver: "redis",
-              url: process.env.REDIS_URL,
-              host: process.env.REDISHOST,
-              password: process.env.REDISPASSWORD,
-              port: process.env.REDISPORT ? parseInt(process.env.REDISPORT) : undefined,
-              username: process.env.REDISUSER,
-            }
+            driver: "redis",
+            url: process.env.REDIS_URL,
+            host: process.env.REDISHOST,
+            password: process.env.REDISPASSWORD,
+            port: process.env.REDISPORT
+              ? parseInt(process.env.REDISPORT)
+              : undefined,
+            username: process.env.REDISUSER,
+          }
           : { driver: "memory" },
     },
     devStorage: {

@@ -5,7 +5,6 @@ import { h } from "vue";
 import contactEnquiry from "../components/email/templates/contact-enquiry.vue";
 import supportRequest from "../components/email/templates/support-request.vue";
 import enquiryNotification from "../components/email/templates/enquiry-notification.vue";
-import waitingListConfirmation from "../components/email/templates/waiting-list-confirmation.vue";
 
 // ──────────────────────────────────────────────────────────────────────────────
 // contact-enquiry.vue
@@ -117,18 +116,3 @@ describe("Enquiry Notification Email Template", () => {
   });
 });
 
-// ──────────────────────────────────────────────────────────────────────────────
-// waiting-list-confirmation.vue
-// ──────────────────────────────────────────────────────────────────────────────
-
-describe("Waiting List Confirmation Email Template", () => {
-  it("renders confirmation language", async () => {
-    const html = await renderToString(h(waitingListConfirmation, { email: "user@example.com" }));
-    expect(html.toLowerCase()).toMatch(/waiting list|early access|you're on/i);
-  });
-
-  it("renders a reference to Virify", async () => {
-    const html = await renderToString(h(waitingListConfirmation, { email: "user@example.com" }));
-    expect(html).toContain("Virify");
-  });
-});

@@ -1,12 +1,14 @@
 <template>
   <!-- <UPageColumns> -->
-  <div>
+  <UPricingPlans orientation="vertical">
     <UPricingPlan
-      v-if="isAdmin || (createListing && isAgent)"
-      title="Personal Tier"
+      title="Standard Listing"
+      description="Only professional accounts can create listings during early access, if you want to upgrade your account for free please head to your account settings."
       badge="Free to use"
       variant="subtle"
       price="Free"
+      orientation="horizontal"
+      hightlight
       :ui="{
         title: 'title-sm mb-0!',
         featureTitle: 'text-xs',
@@ -24,63 +26,42 @@
         variant: 'subtle',
         size: 'xs',
         class: ' body-sm cursor-pointer',
+        disabled: !(isAdmin || (createListing && isAgent)),
         onClick: () => emit('select-tier', ListingTier.BASIC),
-      }"
-      class="w-full self-center max-w-200 mx-auto mb-8"
-    />
-    <!-- <UPricingPlan
-      title="Premium"
-      description="Enhanced visibility"
-      price="Free"
-      variant="subtle"
-      badge="Serious sellers"
-      :ui="{
-        title: 'title-sm mb-0! text-primary dark:text-(--blue-600)',
-        featureTitle: 'text-xs',
-        description: 'body-sm text-foreground',
-        features: 'mt-2 mb-0! gap-2',
-        featureIcon: 'text-(--blue-400) dark:text-(--blue-600)',
-        badge: 'bg-primary text-white border-primary',
-        price: 'title-md mt-0! mb-0! text-primary dark:text-(--blue-600)',
-        priceWrapper: 'mt-2 mb-2',
-      }"
-      :features="premiumFeaturesFormatted"
-      :button="{
-        label: 'Create Listing',
-        color: 'primary',
-        variant: 'solid',
-        size: 'xs',
-        class: ' body-sm text-white! cursor-pointer',
-        onClick: () => emit('select-tier', ListingTier.PREMIUM),
       }"
     />
     <UPricingPlan
-      title="Professional"
-      description="Professional features"
-      price="Free"
-      badge="Professionals"
-      variant="soft"
+      title="Subscriptions"
+      badge="Coming Soon"
+      orientation="horizontal"
+      variant="subtle"
+      price="TBC"
       :ui="{
-        title: 'title-sm mb-0! text-secondary',
+        title: 'title-sm mb-0!',
         featureTitle: 'text-xs',
         description: 'body-sm text-foreground',
         features: 'mt-2 mb-0! gap-2',
-        featureIcon: 'text-secondary',
-        badge: 'bg-secondary/10 text-secondary border-secondary',
-        price: 'title-md mt-0! mb-0! text-secondary',
+        featureIcon: 'text-(--foreground-50)',
+        badge: 'bg-foreground-100/10 text-foreground-100 border-foreground-100!',
+        price: 'title-md mt-0! mb-0!',
         priceWrapper: 'mt-2 mb-2',
       }"
-      :features="professionalFeaturesFormatted"
+      :features="subFeaturesFormatted"
       :button="{
-        label: 'Create Listing',
-        color: 'secondary',
-        variant: 'solid',
+        label: 'Coming Soon',
+        color: 'neutral',
+        variant: 'subtle',
         size: 'xs',
-        class: ' body-sm text-white! cursor-pointer',
-        onClick: () => emit('select-tier', ListingTier.FEATURED),
+        class: ' body-sm cursor-pointer',
+        disabled: true,
       }"
-    /> -->
-  </div>
+    >
+    <template #description>
+      <p>Our subscription offers additional and enhanced tooling for property marketing.</p>
+      <span class="body-xs">Please note, not all of the above features may be available immediately and we are always adding to our features.</span>
+    </template>
+    </UPricingPlan>
+  </UPricingPlans>
   <!-- </UPageColumns> -->
 </template>
 
@@ -95,6 +76,5 @@ const emit = defineEmits<{
 
 // Format features from tiers.ts config for UPricingPlan
 const basicFeaturesFormatted = basicFeatures.map((f: string) => ({ title: f }));
-// const premiumFeaturesFormatted = premiumFeatures.map((f: string) => ({ title: f }));
-// const professionalFeaturesFormatted = professionalFeatures.map((f: string) => ({ title: f }));
+const subFeaturesFormatted = subFeatures.map((f: string) => ({ title: f }));
 </script>

@@ -24,7 +24,7 @@ export const profileSchema = z.object({
     lon: z.number().nullable(),
   }).optional(),
   avatar: z.url("Must be a valid URL").optional().or(z.literal("")),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
+  bio: z.string().max(255, "Bio must be less than 255 characters").optional(),
   intents: z.array(z.nativeEnum(UserIntent)).optional(),
   interests: z.array(z.string()).optional(),
   phoneNumber: z.union([z.literal(""), z.string().trim().regex(ukPhoneRegex, 'Invalid phone number')]).optional(),

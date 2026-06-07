@@ -64,7 +64,20 @@ export const useAdminExport = createSharedComposable(() => {
     }
   }
 
-  return { isExporting, exportAll };
+  const isExportingWaitingList = ref(false);
+
+  async function exportWaitingList() {
+    isExportingWaitingList.value = true;
+    try {
+      const exportUrl: string = "/api/admin/waiting-list";
+      const csv = await useRequestFetch()<string>(exportUrl);
+      downloadCsv(csv, `waiting-list-${todayDateString()}.csv`);
+    } finally {
+      isExportingWaitingList.value = false;
+    }
+  }
+
+  return { isExporting, exportAll, isExportingWaitingList, exportWaitingList };
 });
 
 // ─── Section flatteners ────────────────────────────────────────────────────────

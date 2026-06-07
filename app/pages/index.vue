@@ -142,14 +142,15 @@
       header: 'text-(--monochrome-900)',
     }" :links="[
       {
-        label: cmsContent?.finalCta.buttonText || 'Contact Us',
+        label: cmsContent?.finalCta.buttonText || 'Sign Up',
+        to: '/signup',
         color: 'neutral',
-        icon: 'i-lucide-mail',
+        icon: 'i-lucide-user-plus',
         size: 'lg',
         variant: 'solid',
         class: 'font-bold button button-secondary',
       },
-    ]" @click="showSignupForm" />
+    ]" />
   </div>
 </template>
 
@@ -211,19 +212,6 @@ useSchemaOrg([
     ],
   },
 ]);
-
-import { ViewsDialogWaitingList } from '#components'
-
-/**
- *  Show waiting list form
- */
-const { showDialog } = useDialog()
-
-function showSignupForm() {
-  showDialog({
-    component: ViewsDialogWaitingList
-  })
-}
 
 </script>
 

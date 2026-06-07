@@ -175,15 +175,15 @@ export const useDashboardNavigation = createSharedComposable(() => {
           },
           badge: aggregates.value.locations ? String(aggregates.value.locations) : undefined,
         },
-        {
-          label: "Saved Searches",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-text-search",
-          tooltip: {
-            text: "Your saved searches",
-          },
-        },
+        // {
+        //   label: "Saved Searches",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-text-search",
+        //   tooltip: {
+        //     text: "Your saved searches",
+        //   },
+        // },
       ],
     },
     {
@@ -248,19 +248,19 @@ export const useDashboardNavigation = createSharedComposable(() => {
         text: "Get help",
       },
       children: [
-        {
-          label: "Documentation",
-          type: "link",
-          to: "#",
-          icon: "i-lucide-book-open",
-          tooltip: {
-            text: "View documentation",
-          },
-        },
+        // {
+        //   label: "Documentation",
+        //   type: "link",
+        //   to: "#",
+        //   icon: "i-lucide-book-open",
+        //   tooltip: {
+        //     text: "View documentation",
+        //   },
+        // },
         {
           label: "Contact Support",
           type: "link",
-          to: "#",
+          to: "mailto:support@virify.co.uk",
           icon: "i-lucide-headphones",
           tooltip: {
             text: "Contact support team",

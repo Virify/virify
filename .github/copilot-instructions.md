@@ -12,6 +12,15 @@ Virify is a Nuxt 3-based property management platform using a **modular layer ar
 - Database commands (`pnpm db:migrate-dev`, `pnpm db:reset`, `pnpm pgen`, etc.) - User runs these manually
 - Git operations (`git push`, `git merge`) - User controls version control
 
+## Ticket Source & Delivery Workflow
+
+- Use **Jira only** for ticket intake and status updates.
+- Do **not** use Notion as a source of work items when Jira tickets are requested.
+- Work only on tickets assigned to the requesting user.
+- Respect explicit ticket scope from the user (e.g., exclude tickets they mark as out of scope).
+- If the user sets a priority ticket (for example `VIRI-105`), complete that first.
+- For each ticket: create a dedicated branch, implement and test changes, open a PR, and add a Jira ticket comment with the PR link/status.
+
 ## Critical Development Workflows
 
 ### Database Operations
@@ -78,7 +87,7 @@ Routes use middleware for guarding:
 - `draft-owner` - Requires draft ownership
 - `email-test` - Email preview functionality
 - `login` - For login page redirection
-- `waiting-list.global` - Global waiting list check
+- `feature-flags.global` - Global feature flag route guard (blocks access to feature-flagged routes)
 
 Usage: `definePageMeta({ middleware: ['authenticated'] })`
 

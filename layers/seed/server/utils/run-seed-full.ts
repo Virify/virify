@@ -11,6 +11,7 @@ import { prisma } from '../../../database/server/utils/prisma-client'
 import { MembershipType, ListingTier } from "../../../database/server/database/prisma/generated/enums"
 import { updateLocationsByAddressListForSeed } from './location-for-seed'
 import { generateProperty } from './property-faker'
+import { seedPropertyTypes } from './seed-property-types'
 import { seedFakeUsers, distributeListingsToUsers } from './user-faker'
 import { generateDailyUserStats } from './listing-faker'
 import { rentalAddress, saleAddress, cityCenters } from './address-to-seed'
@@ -26,41 +27,6 @@ const generateWeightedTier = (): ListingTier => {
   if (random < 90) return ListingTier.FEATURED;
   return ListingTier.PREMIUM;
 };
-
-/**
- * Seeding function to populate property types and classifications in the database.
- */
-async function seedPropertyTypes() {
-  const types = {
-    House: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace', 'Mansion'],
-    Cottage: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
-    Bungalow: ['Terraced', 'Detached', 'Semi-detached', 'End of Terrace'],
-    Flat: ['Converted', 'Studio', 'Maisonette', 'High-rise', 'Within a Complex', 'Penthouse'],
-    Land: ['Residential', 'Commercial', 'Agricultural', 'Development Plot', 'Development Potential'],
-    Farms: ['Non-working', 'Working', 'Small Holding'],
-    Specialty: ['Retirement Home', 'New Build Home'],
-    'Student Accommodation': ['Flat', 'House', 'House-share'],
-  }
-
-  for (const [typeName, classification] of Object.entries(types)) {
-    const existingType = await prisma.propertyType.findFirst({
-      where: { name: typeName },
-    })
-
-    if (!existingType) {
-      await prisma.propertyType.create({
-        data: {
-          name: typeName,
-          defaultSelected: false,
-          classifications: {
-            create: classification.map(name => ({ name })),
-          },
-        },
-      })
-      console.log(`✅ Seeded property type '${typeName}'.`)
-    }
-  }
-}
 
 /**
  * Seeding function to create an admin user in the database.
@@ -146,7 +112,7 @@ async function seedFullDatabase() {
     // Base seed
     console.log('📦 Seeding base data...')
     await seedAdminUser()
-    await seedPropertyTypes()
+    await seedPropertyTypes(prisma)
 
     // Demo data
     console.log('🏙️  Seeding city centers...')

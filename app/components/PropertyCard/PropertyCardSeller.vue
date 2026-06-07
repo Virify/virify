@@ -19,11 +19,9 @@
           {{ name }}
         </span>
 
-        <p class="| body-xs">Private seller</p>
-
-        <p class="property-card-seller__popover-wip">
-          Extended user profiles coming soon...
-        </p>
+        <NuxtLink v-if="name" :to="`/profile/${name}`" class="property-card-seller__popover-link | body-xs">
+          View profile
+        </NuxtLink>
       </PopoverContent>
     </PopoverPortal>
   </PopoverRoot>
@@ -83,15 +81,16 @@ const props = withDefaults(defineProps<Props>(), {
     margin: 0;
   }
 
-  &__popover-wip {
-    background: var(--background-400);
-    color: var(--foreground-400);
-    border-radius: var(--border-radius-xl);
-    padding: var(--size-14) var(--size-18);
-    margin: var(--size-14) 0 0;
-    font-size: var(--font-xs);
-    line-height: var(--lineheight-sm);
-    font-weight: var(--font-semisemibold);
+  &__popover-link {
+    display: inline-block;
+    margin-top: var(--size-10);
+    color: var(--primary-500);
+    font-weight: var(--font-semibold);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--primary-400);
+    }
   }
 }
 </style>

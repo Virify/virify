@@ -34,11 +34,13 @@
           variant="solid"
           class="mb-1 absolute top-2 right-2 z-1 text-xs"
         />
-        <!-- price reduced badge -->
-        <AtomsPriceReducedBadge
-          :price-history="listing.ListingPriceHistory"
-          :current-price="listing.price ?? undefined"
-          class="absolute top-2 left-2 z-1 text-xs"
+        <!-- price reduced interactive badge -->
+        <PropertyCardHistory
+          v-if="listing.ListingPriceHistory?.length"
+          :historic="listing.ListingPriceHistory"
+          :current="listing.price ?? undefined"
+          :inline="true"
+          class="absolute top-2 left-2 z-1"
         />
 
       <template #header>
@@ -48,11 +50,7 @@
               <span class="font-bold body-md">
                 {{ formatCurrency(listing.price) }}
               </span>
-              <AtomsPriceHistoryPopover
-                v-if="listing.ListingPriceHistory?.length"
-                :price-history="listing.ListingPriceHistory"
-                :current-price="listing.price"
-              />
+
               / {{ convertEnumToCapalizedString(listing.saleListing?.priceType || listing.rentalListing?.rentFrequency
               || "") }}
             </p>

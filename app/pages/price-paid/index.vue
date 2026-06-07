@@ -116,12 +116,20 @@
       </template>
 
       <template #footer>
-        <UButton to="/" variant="solid" class="button button-secondary | font-bold" size="xl" icon="i-lucide-mail">Join the waiting list</UButton>
+        <UButton variant="solid" class="button button-secondary | font-bold" size="xl" icon="i-lucide-user-plus" @click="showSignup">Sign Up</UButton>
       </template>
     </UPageSection>
   </div>
 </template>
 <script lang="ts" setup>
+import { ViewsDialogSignup } from '#components'
+
+const { showDialog } = useDialog()
+
+function showSignup() {
+  showDialog({ component: ViewsDialogSignup })
+}
+
 import { z } from "zod";
 
 const searchQuery = ref<string>("");

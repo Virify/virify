@@ -4,29 +4,37 @@ import { updateLocationByAddressId } from "~~/layers/database/server/utils/locat
 
 /**
  * Step 2: Property Details API Endpoint
- * 
+ *
  * Works for BOTH draft listings (draftId) and live listings (listingId)
  */
 
-const stepDataSchema = step2Schema.extend({
-  draftId: z.number().int().positive().optional(),
-  listingId: z.number().int().positive().optional(),
-}).refine(
-  (data) => data.draftId !== undefined || data.listingId !== undefined,
-  { message: "Either draftId or listingId must be provided" }
-);
+const stepDataSchema = step2Schema
+  .extend({
+    draftId: z.number().int().positive().optional(),
+    listingId: z.number().int().positive().optional(),
+  })
+  .refine(
+    (data) => data.draftId !== undefined || data.listingId !== undefined,
+    { message: "Either draftId or listingId must be provided" },
+  );
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
-  
+
   try {
     const body = await readBody(event);
-    const { draftId, listingId, property, moveInDate } = stepDataSchema.parse(body);
+    const { draftId, listingId, property, moveInDate } =
+      stepDataSchema.parse(body);
 
     // First, handle address upsert if provided
     let addressId: number | undefined;
-    if (property.address && property.address.street && property.address.city && property.address.postcode) {
+    if (
+      property.address &&
+      property.address.street &&
+      property.address.city &&
+      property.address.postcode
+    ) {
       const addressData = {
         number: property.address.number,
         flat: property.address.flat,
@@ -34,7 +42,7 @@ export default defineEventHandler(async (event) => {
         street: property.address.street,
         city: property.address.city,
         postcode: property.address.postcode,
-        country: property.address.country || 'United Kingdom',
+        country: property.address.country || "United Kingdom",
         locality: property.address.locality,
         county: property.address.county,
         district: property.address.district,
@@ -47,11 +55,11 @@ export default defineEventHandler(async (event) => {
       const address = await prisma.address.upsert({
         where: {
           number_street_city_postcode_country: {
-            number: addressData.number || '',
+            number: addressData.number || "",
             street: addressData.street,
             city: addressData.city,
             postcode: addressData.postcode,
-            country: addressData.country || 'United Kingdom',
+            country: addressData.country || "United Kingdom",
           },
         },
         update: addressData,
@@ -61,7 +69,11 @@ export default defineEventHandler(async (event) => {
 
       // Populate the PostGIS geometry column so spatial (radius) search can find this property
       if (property.address.lat && property.address.lon) {
-        await updateLocationByAddressId(address.id, property.address.lon, property.address.lat);
+        await updateLocationByAddressId(
+          address.id,
+          property.address.lon,
+          property.address.lat,
+        );
       }
     }
 
@@ -71,9 +83,11 @@ export default defineEventHandler(async (event) => {
           type: { connect: { id: property.type } },
           classification: { connect: { id: property.classification } },
           constructionType: property.constructionType || null,
-          yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
+          yearBuilt:
+            property.yearBuilt && property.yearBuilt !== 0
+              ? String(property.yearBuilt)
+              : null,
           size: property.size || null,
-          description: property.description,
           totalFloors: property.totalFloors,
           ...(addressId ? { address: { connect: { id: addressId } } } : {}),
         },
@@ -81,9 +95,11 @@ export default defineEventHandler(async (event) => {
           type: { connect: { id: property.type } },
           classification: { connect: { id: property.classification } },
           constructionType: property.constructionType || null,
-          yearBuilt: property.yearBuilt && property.yearBuilt !== 0 ? String(property.yearBuilt) : null,
+          yearBuilt:
+            property.yearBuilt && property.yearBuilt !== 0
+              ? String(property.yearBuilt)
+              : null,
           size: property.size || null,
-          description: property.description,
           totalFloors: property.totalFloors,
           ...(addressId ? { address: { connect: { id: addressId } } } : {}),
         },
@@ -105,7 +121,7 @@ export default defineEventHandler(async (event) => {
       });
 
       // Invalidate listing detail cache and my-listings page cache
-      const storage = useStorage('cache:listing');
+      const storage = useStorage("cache:listing");
       await Promise.all([
         storage.removeItem(`listing:${listingId}`),
         invalidateMyListingsCache(user.id as number),
@@ -124,7 +140,9 @@ export default defineEventHandler(async (event) => {
       where: { id: draftId!, userId: user.id },
       data: {
         // Add step 2 to completedSteps if not already there
-        ...(currentDraft && !currentDraft.completedSteps.includes(2) ? { completedSteps: { push: 2 } } : {}),
+        ...(currentDraft && !currentDraft.completedSteps.includes(2)
+          ? { completedSteps: { push: 2 } }
+          : {}),
         moveInDate: moveInDate ?? null,
         property: propertyUpdate,
       },

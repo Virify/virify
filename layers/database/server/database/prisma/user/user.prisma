@@ -32,7 +32,8 @@ model User {
   conversationsAsReceiver  Conversation[]        @relation("ConversationsAsReceiver")
   userMedia                UserMedia[]
   membership               Membership?
-  DraftListing             DraftListing[]
+  DraftListing             DraftListing[]        @relation("DraftListingOwner")
+  sharedDraftListings      DraftListing[]        @relation("DraftListingSharedUsers")
   mortgageCalculations     MortgageCalculation[]
   // Analytics relations
   ListingImpression        ListingImpression[]

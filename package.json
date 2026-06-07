@@ -74,6 +74,7 @@
     "emoji-mart": "^5.6.0",
     "focus-trap": "^8.0.1",
     "maptiler-sdk.css": "link:@maptiler/sdk/dist/maptiler-sdk.css",
+    "newrelic": "^14.1.0",
     "nuxi": "^3.32.0",
     "nuxt": "^4.2.2",
     "nuxt-auth-utils": "^0.5.27",
@@ -94,6 +95,7 @@
   "devDependencies": {
     "@faker-js/faker": "^9.9.0",
     "@iconify-json/lucide": "^1.2.85",
+    "@iconify-json/simple-icons": "^1.2.83",
     "@nuxt/test-utils": "^3.23.0",
     "@prisma/client": "^7.7.0",
     "@types/mapbox__mapbox-gl-draw": "^1.4.9",
@@ -101,6 +103,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/pg": "^8.16.0",
     "@types/pg-copy-streams": "^1.2.5",
+    "@types/picomatch": "^4.0.3",
     "@types/sortablejs": "^1.15.9",
     "@unhead/vue": "^2.1.2",
     "@vue/test-utils": "^2.4.6",

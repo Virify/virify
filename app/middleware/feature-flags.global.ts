@@ -7,8 +7,11 @@ const alwaysAllowedRoutes = [
   '/guides/**',
   '/listing/**',
   '/price-paid/**',
+  '/mortgage-calculator/**',
   '/cookie/**',
   '/support/**',
+  '/acceptable-use/**',
+  '/profile/**',
 ]
 
 const featureFlagRoutes = {
@@ -17,6 +20,7 @@ const featureFlagRoutes = {
   '/login/**': ['signup'],
   '/account/**': ['signup'],
   '/dashboard/**': ['signup'],
+  '/dashboard/create-listing/**': ['createListing']
 }
 
 export default defineNuxtRouteMiddleware(({ path }) => {

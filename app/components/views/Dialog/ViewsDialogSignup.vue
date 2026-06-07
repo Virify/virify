@@ -6,11 +6,6 @@
 
     <OrganismsFormsSignup @form-success="formSuccess" />
 
-        
-    <div class="o-signup-form__terms body-sm">
-      <p>By creating an account, you agree to our <a href="/terms" class="underline link">Terms of Service</a> and <a href="/privacy" class="underline link">Privacy Policy</a>.</p>
-    </div>
-
     <AtomsDivider text="or" />
 
     <div class="| center-text flow flow-sm">
