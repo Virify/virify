@@ -1,3 +1,8 @@
+<!--
+  @TODO
+  This component is incomplete and currently inactive
+-->
+
 <template>
   <div class="browse-header | gradient-box">
 

@@ -1,3 +1,8 @@
+<!--
+  @TODO
+  This component is incomplete and currently inactive
+-->
+
 <template>
   <div class="browse-simple-header | gradient-box">
     <form class="browse-simple-header__form">

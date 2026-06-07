@@ -1,3 +1,8 @@
+<!--
+  @TODO
+  This component is incomplete and currently inactive
+-->
+
 <template>
   <PopoverRoot>
     <div v-if="legend" class="browse-range-popover__root | body-sm faded-text">
