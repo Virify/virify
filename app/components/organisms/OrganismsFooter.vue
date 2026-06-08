@@ -32,11 +32,28 @@
               <nuxt-link to="/price-paid" class="o-footer__link | body-sm"
                 >Price Paid Data</nuxt-link
               >
+            </li>
+            <li>
               <nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm"
                 >Mortgage Calculator</nuxt-link
               >
             </li>
             <!-- <li><nuxt-link to="/mortgage-calculator" class="o-footer__link | body-sm">Mortgage Calculator</nuxt-link></li> -->
+          </ul>
+        </div>
+
+        <!-- Content Section -->
+        <div class="o-footer__section">
+          <h3 class="o-footer__section-title | title-3xs">Information</h3>
+          <ul class="o-footer__links">
+            <li v-for="page in generalPages" :key="page.slug">
+              <nuxt-link
+                :to="`/information/${page.slug}`"
+                class="o-footer__link | body-sm"
+              >
+                {{ page.title }}
+              </nuxt-link>
+            </li>
           </ul>
         </div>
 
@@ -124,6 +141,8 @@ const { createListing } = useFeatureFlag();
 // Get guide categories for footer navigation
 const { data: categories } =
   await useSanityQuery<GuideCategory[]>(categoriesQuery);
+
+const { data: generalPages } = await useSanityQuery<GeneralPageNavigationItem[]>(allGeneralPagesNavigationQuery);
 
 const currentYear = new Date().getFullYear();
 </script>

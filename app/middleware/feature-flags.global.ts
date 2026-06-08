@@ -1,61 +1,62 @@
-import pm from 'picomatch'
+import pm from "picomatch";
 
 const alwaysAllowedRoutes = [
-  '/contact/**',
-  '/terms/**',
-  '/privacy/**',
-  '/guides/**',
-  '/listing/**',
-  '/price-paid/**',
-  '/mortgage-calculator/**',
-  '/cookie/**',
-  '/support/**',
-  '/acceptable-use/**',
-  '/profile/**',
-]
+  "/contact/**",
+  "/terms/**",
+  "/privacy/**",
+  "/guides/**",
+  "/listing/**",
+  "/price-paid/**",
+  "/mortgage-calculator/**",
+  "/cookie/**",
+  "/support/**",
+  "/acceptable-use/**",
+  "/profile/**",
+  "/information/**",
+];
 
 const featureFlagRoutes = {
-  '/search/**': ['search'],
-  '/login/**': ['signup'],
-  '/account/**': ['signup'],
-  '/dashboard/**': ['signup'],
-  '/dashboard/create-listing/**': ['createListing']
-}
+  "/search/**": ["search"],
+  "/login/**": ["signup"],
+  "/account/**": ["signup"],
+  "/dashboard/**": ["signup"],
+  "/dashboard/create-listing/**": ["createListing"],
+};
 
 export default defineNuxtRouteMiddleware(({ path }) => {
-  const { isAdmin, checkFeatureFlag } = useFeatureFlag()
+  const { isAdmin, checkFeatureFlag } = useFeatureFlag();
 
   // Admin can access any route
-  if (isAdmin.value) return
+  if (isAdmin.value) return;
 
   // Homepage is always accessible
-  if (path === '/') return
+  if (path === "/") return;
 
   // There is also a list of additional routes that should always
   // be accessible
   for (const route of alwaysAllowedRoutes) {
-    const getMatch = pm(route)
-    const isMatch = getMatch(path)
+    const getMatch = pm(route);
+    const isMatch = getMatch(path);
 
-    if (isMatch) return
+    if (isMatch) return;
   }
 
   // Then check for a list of feature-flagged routes
   for (const [route, flags] of Object.entries(featureFlagRoutes)) {
-    const getMatch = pm(route)
-    const isMatch = getMatch(path)
+    const getMatch = pm(route);
+    const isMatch = getMatch(path);
 
     // If no match, carry on to next route
-    if (!isMatch) continue
+    if (!isMatch) continue;
 
     // Otherwise loop through available flags and check they are allowed
     for (const flag of flags) {
-      const isAllowed = checkFeatureFlag(flag)
+      const isAllowed = checkFeatureFlag(flag);
 
-      if (isAllowed) return
+      if (isAllowed) return;
     }
   }
 
   // Navigate user to homepage
-  return navigateTo('/')
-})
+  return navigateTo("/");
+});
