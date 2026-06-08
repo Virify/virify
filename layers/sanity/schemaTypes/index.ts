@@ -10,13 +10,16 @@ import {featureSectionType} from './featureSectionType'
 import {faqType} from './faqType'
 import { supportPageType } from './supportPageType'
 import {acceptableUseType} from './acceptableUseType'
+import {generalPageType} from './generalPageType'
+import {pageSectionType} from './pageSectionType'
+import {pageFaq} from './faqSectionType'
+import {pageGuidesGridType} from './pageGuidesGridType'
 
 export const schemaTypes = [
   // Reusable types
   iconType,
   featureSectionType,
   faqType,
-  
   // Documents
   guideCategory,
   guide,
@@ -27,4 +30,8 @@ export const schemaTypes = [
   contactPageType,
   supportPageType,
   acceptableUseType,
+  pageSectionType,
+  generalPageType,
+  pageFaq,
+  pageGuidesGridType,
 ]
