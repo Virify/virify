@@ -462,3 +462,9 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
     noIndex
   }
 }`;
+
+export const allGeneralPagesNavigationQuery = `*[_type == "generalPage"] {
+  _id,
+  title,
+  "slug": slug.current
+}`;

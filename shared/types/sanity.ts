@@ -482,3 +482,9 @@ export interface SanityPageGuidesGrid {
     category: GuideCategory;
   })[];
 }
+
+export interface GeneralPageNavigationItem {
+  _id: string;
+  title: string;
+  slug: string;
+}
