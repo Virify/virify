@@ -415,7 +415,8 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
         url,
         signup,
         login,
-        icon
+        icon,
+        color,
       }
     },
 

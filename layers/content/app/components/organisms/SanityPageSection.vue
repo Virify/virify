@@ -7,7 +7,6 @@
     :ui="{
       container: 'max-w-none',
       wrapper: reverse ? 'lg:order-last' : 'md:order-first',
-      description: features ? 'max-w-2xl' : 'max-w-prose text-center mx-auto',
     }"
   >
     <template #headline>
@@ -21,9 +20,7 @@
       <span>{{ title }}</span>
     </template>
     <template #description>
-      <p class="max-w-prose" :class="{
-        'justify-center': !features
-      }">
+      <p>
         {{ description }}
       </p>
     </template>
@@ -59,13 +56,13 @@
     reverse: false,
   });
 
-  function getClickHandler(button: SanityCtaSectionButton) {
+  function getClickHandler(button: SanitySectionButton) {
     if (button.signup) return () => showDialog({ component: ViewsDialogSignup });
     if (button.login) return () => showDialog({ component: ViewsDialogLogin });
     return undefined;
   }
 
-  function getNavigationTarget(button: SanityCtaSectionButton) {
+  function getNavigationTarget(button: SanitySectionButton) {
     const isModalAction = button.signup || button.login;
     return isModalAction ? undefined : button.url;
   }
@@ -82,7 +79,7 @@
   const styledLinks = computed(() => {
     return props.buttons?.map((button) => ({
       ...button,
-      class: "button button-secondary",
+      class: 'rounded-full text-white! body-md',
       icon: button.icon || "i-lucide-arrow-right",
       onClick: getClickHandler(button),
       to: getNavigationTarget(button),

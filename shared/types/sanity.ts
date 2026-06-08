@@ -3,6 +3,8 @@
  * These types match our Sanity schema definitions
  */
 
+import type { ButtonProps } from "@nuxt/ui";
+
 // Base Sanity types
 export interface SanitySlug {
   _type: "slug";
@@ -464,7 +466,7 @@ export interface SanityPageFaqSection {
   }[];
 }
 
-export interface SanitySectionButton {
+export interface SanitySectionButton extends ButtonProps {
   label: string;
   url?: string;
   signup?: boolean;

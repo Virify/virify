@@ -123,6 +123,17 @@ export const pageSectionType = defineType({
                 "Name of the icon from our set of available icons. We use i-lucide icons, see https://lucide.dev/icons for available options.",
                 validation: (Rule) => Rule.max(50),
             }),
+            defineField({
+              name: "color",
+              title: "Button Color",
+              description: "primary, secondary, info, warning, error or neutral",
+              type: "string",
+              options: {
+                list: ["primary", "secondary", "info", "warning", "error", "neutral"],
+              },
+              initialValue: "secondary",
+              validation: (Rule) => Rule.required(),
+            })
           ],
         },
       ],
