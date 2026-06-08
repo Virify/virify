@@ -53,7 +53,7 @@ export default defineNuxtConfig({
   // seo configuration for sanity content pages
   seo: {
     meta: {
-      ogImage: "https://virify.co.uk/og-image.png",
+      ogImage: "https://virify.co.uk/logo.png",
       twitterImage: "https://virify.co.uk/logo.png",
     }
   },
