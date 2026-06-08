@@ -17,9 +17,9 @@
           :key="currentIndex"
           :src="currentImage.src"
           :alt="currentImage.alt"
-          variant="marketing"
-          class="aspect-3/4 w-full"
+          variant="gallery"
           :class="{ 'gallery-modal__image--zoomed': isZoomed }"
+          class="gallery-modal__image"
           eager
           @click.stop="toggleZoom"
         />
@@ -179,14 +179,14 @@ onUnmounted(() => {
   &__image {
     max-width: 100%;
     max-height: 100%;
-    border-radius: 0;
     aspect-ratio: auto;
     cursor: zoom-in;
     transition: transform 0.3s ease, cursor 0.2s ease;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    border-radius: var(--border-radius-sm);
 
     &--zoomed {
-      transform: scale(1.5);
+      transform: scale(2.0);
       cursor: zoom-out;
 
       @include mq.mobile-only {
