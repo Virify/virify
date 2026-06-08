@@ -132,7 +132,6 @@ export const generalPageType = defineType({
       group: 'content',
       of: [
         {type: 'pageSection'},
-        {type: 'pageCta'},
         {type: 'pageFaq'},
         {type: 'pageGuidesGrid'},
       ],

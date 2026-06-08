@@ -408,6 +408,14 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
         description,
         icon,
         iconColor
+      },
+      buttons[] {
+        _key,
+        label,
+        url,
+        signup,
+        login,
+        icon
       }
     },
 
@@ -421,18 +429,6 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
         question,
         answer,
         active
-      }
-    },
-
-    _type == "pageCta" => {
-      title,
-      description,
-      buttons[] {
-        _key,
-        label,
-        url,
-        signup,
-        icon
       }
     },
 

@@ -3,8 +3,10 @@
   <UPageSection
     :title="title"
     :description="description"
+    :headline="highlight"
     :ui="{
       description: 'max-w-200 mx-auto',
+      headline: 'text-secondary/90 font-bold',
     }"
   >
     <UAccordion
@@ -22,6 +24,7 @@
     title?: string;
     description?: string;
     faqs?: SanityPageFaqSection["faqs"];
+    highlight?: string;
   }
 
   const props = defineProps<Props>();

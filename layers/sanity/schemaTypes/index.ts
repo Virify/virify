@@ -10,9 +10,8 @@ import {featureSectionType} from './featureSectionType'
 import {faqType} from './faqType'
 import { supportPageType } from './supportPageType'
 import {acceptableUseType} from './acceptableUseType'
-import {pageSectionType} from './pageSectionType'
 import {generalPageType} from './generalPageType'
-import {pageCtaType} from './pageCtaType'
+import {pageSectionType} from './pageSectionType'
 import {pageFaq} from './faqSectionType'
 import {pageGuidesGridType} from './pageGuidesGridType'
 
@@ -33,7 +32,6 @@ export const schemaTypes = [
   acceptableUseType,
   pageSectionType,
   generalPageType,
-  pageCtaType,
   pageFaq,
   pageGuidesGridType,
 ]

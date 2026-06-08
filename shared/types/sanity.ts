@@ -430,20 +430,8 @@ export interface SanityGeneralPage {
     login: boolean;
     url?: string;
   }[];
-  sections: SanityPageCtaSection[] | SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
+  sections:  SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
   seo?: SeoMetadata;
-}
-
-export interface SanityPageCtaSection {
-  _type: "pageCta";
-  title: string;
-  description: string;
-  buttons: {
-    label: string;
-    url: string;
-    signup: boolean;
-    icon?: string;
-  }[];
 }
 
 export interface SanityPageSection {
@@ -457,6 +445,7 @@ export interface SanityPageSection {
     icon: string;
     iconColor: "text-primary" | "text-secondary" | "text-info" | "text-warning" | "text-error";
   }[];
+  buttons: SanitySectionButton[];
   reverse?: boolean;
   orientation: "horizontal" | "vertical";
   image: SanityImage;
@@ -475,7 +464,7 @@ export interface SanityPageFaqSection {
   }[];
 }
 
-export interface SanityCtaSectionButton {
+export interface SanitySectionButton {
   label: string;
   url?: string;
   signup?: boolean;

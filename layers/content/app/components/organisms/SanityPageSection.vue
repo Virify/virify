@@ -3,13 +3,17 @@
     :features="featuresMap"
     :orientation="orientation"
     color="secondary"
+    :links="styledLinks"
     :ui="{
       container: 'max-w-none',
+      wrapper: reverse ? 'lg:order-last' : 'md:order-first',
+      description: features ? 'max-w-2xl' : 'max-w-prose text-center mx-auto',
     }"
-    :reverse="reverse && isDesktop"
   >
     <template #headline>
-      <p class="text-secondary/90 w-full font-bold">
+      <p class="text-secondary/90 font-bold" :class="{
+        'text-center': !features
+      }">
         {{ headline }}
       </p>
     </template>
@@ -17,12 +21,15 @@
       <span>{{ title }}</span>
     </template>
     <template #description>
-      <p>
+      <p class="max-w-prose" :class="{
+        'justify-center': !features
+      }">
         {{ description }}
       </p>
     </template>
     <template #default>
       <NuxtImg
+        v-if="image?.asset._id"
         :src="image?.asset._id"
         class="w-full rounded-lg border object-cover"
         :alt="image?.alt || 'Page section image'"
@@ -33,18 +40,18 @@
   </UPageSection>
 </template>
 <script setup lang="ts">
-  import type { PageFeatureProps } from "@nuxt/ui";
-  // Detect if we're on desktop for layout purposes
-  const isDesktop = useDesktop();
+  import { ViewsDialogSignup, ViewsDialogLogin } from "#components";
+  const { showDialog } = useDialog();
 
   interface Props {
-    features?: SanityPageSection['features'];
-    orientation?: SanityPageSection['orientation'];
+    features?: SanityPageSection["features"];
+    orientation?: SanityPageSection["orientation"];
     reverse?: boolean;
     headline?: string;
     title?: string;
     description?: string;
     image?: SanityImage;
+    buttons?: SanityPageSection["buttons"];
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -52,12 +59,33 @@
     reverse: false,
   });
 
+  function getClickHandler(button: SanityCtaSectionButton) {
+    if (button.signup) return () => showDialog({ component: ViewsDialogSignup });
+    if (button.login) return () => showDialog({ component: ViewsDialogLogin });
+    return undefined;
+  }
+
+  function getNavigationTarget(button: SanityCtaSectionButton) {
+    const isModalAction = button.signup || button.login;
+    return isModalAction ? undefined : button.url;
+  }
+
   const featuresMap = computed(() => {
     return props.features?.map((feature) => ({
       ...feature,
       ui: {
-        leadingIcon: feature.iconColor
-      } ,
+        leadingIcon: feature.iconColor,
+      },
+    }));
+  });
+
+  const styledLinks = computed(() => {
+    return props.buttons?.map((button) => ({
+      ...button,
+      class: "button button-secondary",
+      icon: button.icon || "i-lucide-arrow-right",
+      onClick: getClickHandler(button),
+      to: getNavigationTarget(button),
     }));
   });
 </script>

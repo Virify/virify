@@ -35,7 +35,6 @@
   import { 
     ViewsDialogSignup, 
     ViewsDialogLogin, 
-    OrganismsSanityPageCtaSection, 
     OrganismsSanityPageSection, 
     OrganismsSanityPageFaqSection,
     OrganismsSanityPageGuidesGrid
@@ -57,7 +56,6 @@
   }
 
   const componentMap: Record<string, any> = {
-    pageCta: OrganismsSanityPageCtaSection,
     pageSection: OrganismsSanityPageSection,
     pageFaq: OrganismsSanityPageFaqSection,
     pageGuidesGrid: OrganismsSanityPageGuidesGrid,
