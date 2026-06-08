@@ -125,6 +125,21 @@ export async function getAllListings(): Promise<ListingCardType[]> {
 }
 
 /**
+ * Get all listings that are published and not archived
+ * 
+ * @returns ListingCardType[]
+ */
+export async function getAllPublishedListings(): Promise<ListingCardType[]> {
+  return await prisma.listing.findMany({
+    where: {
+      published: true,
+      archived: false,
+    },
+    select: listingCardFields,
+  });
+}
+
+/**
  * Get Listings by Property IDs
  *
  * @param propertyIds number[]

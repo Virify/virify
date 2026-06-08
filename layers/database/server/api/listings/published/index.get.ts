@@ -13,7 +13,7 @@ export default defineEventHandler(async (event): Promise<ListingCardType[]> => {
   const { limit } = await getValidatedQuery(event, limitsSchema.parse)
 
   try {
-    const listings = await getAllListings();
+    const listings = await getAllPublishedListings();
 
     if (!listings) {
       throw createError({

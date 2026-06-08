@@ -38,7 +38,7 @@ const props = defineProps<Props>();
 /**
  *  Events
  */
-const emits = defineEmits(['submit-search', 'reset-search']);
+const emits = defineEmits(['submit-search']);
 
 const { checkText, isChecking } = useModeration();
 const moderationError = ref<string | null>(null)
@@ -53,10 +53,15 @@ async function searchSubmit() {
   emits('submit-search', searchQuery.value);
 };
 
+/**
+ *  Reset AI search query
+ */
+const { setQuery } = useGlobalSearchState()
+
 function searchReset() {
   searchQuery.value = ''
 
-  emits('reset-search');
+  setQuery('')
 };
 
 /**

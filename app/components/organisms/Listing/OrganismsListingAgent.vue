@@ -92,6 +92,7 @@ const memberSince = computed(() => {
   align-items: flex-start;
   text-align: left;
   flex: 1 0 auto;
+  margin-top: var(--size-16);
 
   &__link {
     display: flex;

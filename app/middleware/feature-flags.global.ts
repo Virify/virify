@@ -5,6 +5,7 @@ const alwaysAllowedRoutes = [
   "/terms/**",
   "/privacy/**",
   "/guides/**",
+  "/browse/**",
   "/listing/**",
   "/price-paid/**",
   "/mortgage-calculator/**",
