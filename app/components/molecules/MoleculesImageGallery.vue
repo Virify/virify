@@ -132,10 +132,9 @@ onUnmounted(() => {
   &__image-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 4/3;
-    max-height: 70vh;
     border-radius: var(--border-radius-2xl);
     overflow: hidden;
+    aspect-ratio: auto;
 
     @include mq.notebook {
       aspect-ratio: 16/9;
@@ -146,8 +145,10 @@ onUnmounted(() => {
   &__image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    border-radius: var(--border-radius-2xl);
+    object-fit: contain;
+    object-position: center;
+    aspect-ratio: auto;
+    display: block;
   }
 
   &__prev,
@@ -231,6 +232,8 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
+    aspect-ratio: auto;
     display: block;
   }
 }
