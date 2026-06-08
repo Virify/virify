@@ -30,7 +30,7 @@ export const pageGuidesGridType = defineType({
   ],
   preview: {
     select: {
-      title: 'title', // 🌟 Much cleaner lookups
+      title: 'title',
       description: 'description',
       guides: 'guides',
     },
