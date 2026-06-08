@@ -94,7 +94,7 @@ const memberSince = computed(() => {
   flex: 1 0 auto;
 
   &__link {
-    display: contents;
+    display: flex;
     text-decoration: none;
     color: inherit;
   }
@@ -116,7 +116,6 @@ const memberSince = computed(() => {
   &__logo-icon {
     color: var(--blue-400);
     height: 100%;
-    
   }
 
   &__name {
