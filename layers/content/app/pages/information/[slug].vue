@@ -38,7 +38,7 @@
     OrganismsSanityPageCtaSection, 
     OrganismsSanityPageSection, 
     OrganismsSanityPageFaqSection,
-    OrganismsSanityPageGuidesCarousel
+    OrganismsSanityPageGuidesGrid
   } from "#components";
 
   const route = useRoute();
@@ -60,7 +60,7 @@
     pageCta: OrganismsSanityPageCtaSection,
     pageSection: OrganismsSanityPageSection,
     pageFaq: OrganismsSanityPageFaqSection,
-    pageGuidesCarousel: OrganismsSanityPageGuidesCarousel,
+    pageGuidesGrid: OrganismsSanityPageGuidesGrid,
   };
 
   function resolveComponent(section: any) {

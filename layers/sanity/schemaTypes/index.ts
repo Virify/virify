@@ -14,7 +14,7 @@ import {pageSectionType} from './pageSectionType'
 import {generalPageType} from './generalPageType'
 import {pageCtaType} from './pageCtaType'
 import {pageFaq} from './faqSectionType'
-import {pageGuidesCarouselType} from './pageGuidesCarouselType'
+import {pageGuidesGridType} from './pageGuidesGridType'
 
 export const schemaTypes = [
   // Reusable types
@@ -35,5 +35,5 @@ export const schemaTypes = [
   generalPageType,
   pageCtaType,
   pageFaq,
-  pageGuidesCarouselType,
+  pageGuidesGridType,
 ]

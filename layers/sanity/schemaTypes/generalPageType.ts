@@ -134,7 +134,7 @@ export const generalPageType = defineType({
         {type: 'pageSection'},
         {type: 'pageCta'},
         {type: 'pageFaq'},
-        {type: 'pageGuidesCarousel'},
+        {type: 'pageGuidesGrid'},
       ],
       validation: (Rule) => Rule.required().min(1),
     }),

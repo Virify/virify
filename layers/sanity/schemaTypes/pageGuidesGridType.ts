@@ -1,15 +1,15 @@
 import { defineType, defineField } from 'sanity'
 
-export const pageGuidesCarouselType = defineType({
-  name: 'pageGuidesCarousel',
-  title: 'Guides Carousel Section',
+export const pageGuidesGridType = defineType({
+  name: 'pageGuidesGrid',
+  title: 'Guides Grid Section',
   type: 'object',
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'Title of the guides carousel',
+      description: 'Title of the guides grid section.',
       initialValue: 'Continue your property journey',
     }),
     defineField({
@@ -37,7 +37,7 @@ export const pageGuidesCarouselType = defineType({
     prepare({ title, description, guides }) {
       const guideCount = guides ? guides.length : 0
       return {
-        title: title || 'Untitled Guides Carousel Section',
+        title: title || 'Untitled Guides Grid Section',
         subtitle: `${description ? description.substring(0, 50) + '...' : 'No description'} | ${guideCount} guide${guideCount !== 1 ? 's' : ''}`,
       }
     },

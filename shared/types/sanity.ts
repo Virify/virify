@@ -430,7 +430,7 @@ export interface SanityGeneralPage {
     login: boolean;
     url?: string;
   }[];
-  sections: SanityPageCtaSection[] | SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesCarousel[];
+  sections: SanityPageCtaSection[] | SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
   seo?: SeoMetadata;
 }
 
@@ -483,8 +483,8 @@ export interface SanityCtaSectionButton {
   icon?: string;
 }
 
-export interface SanityPageGuidesCarousel {
-  _type: "pageGuidesCarousel";
+export interface SanityPageGuidesGrid {
+  _type: "pageGuidesGrid";
   title: string;
   description?: string;
   guides: (Omit<Guide, "category"> & {

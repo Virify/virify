@@ -436,7 +436,7 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
       }
     },
 
-    _type == "pageGuidesCarousel" => {
+    _type == "pageGuidesGrid" => {
       title,
       description,
       guides[]-> {
