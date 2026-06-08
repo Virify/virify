@@ -13,13 +13,14 @@ import {acceptableUseType} from './acceptableUseType'
 import {pageSectionType} from './pageSectionType'
 import {generalPageType} from './generalPageType'
 import {pageCtaType} from './pageCtaType'
+import {pageFaq} from './faqSectionType'
+import {pageGuidesCarouselType} from './pageGuidesCarouselType'
 
 export const schemaTypes = [
   // Reusable types
   iconType,
   featureSectionType,
   faqType,
-  
   // Documents
   guideCategory,
   guide,
@@ -33,4 +34,6 @@ export const schemaTypes = [
   pageSectionType,
   generalPageType,
   pageCtaType,
+  pageFaq,
+  pageGuidesCarouselType,
 ]

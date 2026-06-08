@@ -89,6 +89,28 @@ export const pageSectionType = defineType({
       type: 'image',
       description:
         'Optional image to display alongside this section. Recommended dimensions 540x540px.',
+      options: {
+        hotspot: true, // 🌟 Highly recommended: allows content editors to select the focal point of the crop
+      },
+      fields: [
+        // Nested metadata fields attached directly to this specific image
+        defineField({
+          name: 'alt',
+          title: 'Alternative Text (Alt text)',
+          type: 'string',
+          description:
+            'Crucial for accessibility and SEO. Describe what is in the image for screen readers.',
+          validation: (Rule) =>
+            Rule.custom((value, context) => {
+              // If there is an image uploaded, make the alt text strictly required
+              const parent = context.parent as any
+              if (parent?.asset && !value) {
+                return 'Alternative text is required when an image is uploaded.'
+              }
+              return true
+            }),
+        }),
+      ],
     }),
   ],
   preview: {

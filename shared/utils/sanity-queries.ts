@@ -14,7 +14,7 @@ export const categoriesQuery = `*[_type == "guideCategory" && isActive == true] 
   orderIndex,
   isActive,
   "guideCount": count(*[_type == "guide" && isPublished == true && category._ref == ^._id])
-}[guideCount > 0]`
+}[guideCount > 0]`;
 
 export const categoryBySlugQuery = `*[_type == "guideCategory" && slug.current == $slug && isActive == true][0] {
   _id,
@@ -42,7 +42,7 @@ export const categoryBySlugQuery = `*[_type == "guideCategory" && slug.current =
     tags,
     orderIndex
   }
-}`
+}`;
 
 // Guide queries
 // Note: No isPublished filter - perspective setting controls draft vs published content
@@ -85,7 +85,7 @@ export const guideBySlugQuery = `*[_type == "guide" && slug.current == $slug][0]
     orderIndex,
     isActive
   }
-}`
+}`;
 
 // Navigation query
 export const navigationQuery = `*[_type == "guideCategory" && isActive == true] | order(orderIndex asc) {
@@ -100,7 +100,7 @@ export const navigationQuery = `*[_type == "guideCategory" && isActive == true] 
     slug,
     excerpt
   }
-}[count(guides) > 0]`
+}[count(guides) > 0]`;
 
 // Policy pages
 export const termsQuery = `*[_type == "terms"][0] {
@@ -108,28 +108,28 @@ export const termsQuery = `*[_type == "terms"][0] {
   title,
   lastUpdated,
   content
-}`
+}`;
 
 export const privacyQuery = `*[_type == "privacy"][0] {
   _id,
   title,
   lastUpdated,
   content
-}`
+}`;
 
 export const cookieQuery = `*[_type == "cookie"][0] {
   _id,
   title,
   lastUpdated,
   content
-}`
+}`;
 
 export const acceptableUseQuery = `*[_type == "acceptableUse"][0] {
   _id,
   title,
   lastUpdated,
   content
-}`
+}`;
 
 // CMS pages
 export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
@@ -236,7 +236,7 @@ export const waitingListPageQuery = `*[_type == "waitingListPage"][0] {
     twitterCard,
     canonicalUrl
   }
-}`
+}`;
 
 export const contactPageQuery = `*[_type == "contactPage"][0] {
   _id,
@@ -304,7 +304,7 @@ export const contactPageQuery = `*[_type == "contactPage"][0] {
     twitterCard,
     canonicalUrl
   }
-}`
+}`;
 
 export const supportPageQuery = `*[_type == "supportPage"][0] {
   _id,
@@ -362,7 +362,7 @@ export const supportPageQuery = `*[_type == "supportPage"][0] {
     twitterCard,
     canonicalUrl
   }
-}`
+}`;
 
 export const generalPageQuery = `*[_type == "generalPage" && slug.current == $slug][0] {
   _id,
@@ -372,7 +372,6 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
   caption,
   description,
   
-  // 1. TOP OF PAGE: Hero CTA Buttons
   heroButtons[] {
     _key,
     label,
@@ -382,19 +381,27 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
     login
   },
   
-  // 2. MIDDLE OF PAGE: Dynamic Orderable Sections Array
   sections[] {
     _key,
     _type,
     
-    // Standard Info Layout
     _type == "pageSection" => {
       headline,
       title,
       description,
       reverse,
       orientation,
-      "image": image.asset->url,
+      image {
+        asset-> {
+          _id,
+          url,
+          metadata {
+            lqip,
+            dimensions
+          }
+        },
+        alt,
+      },
       features[] {
         _key,
         title,
@@ -404,7 +411,19 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
       }
     },
 
-    // Dedicated Page Call-To-Action (CTA) Block
+    _type == "pageFaq" => {
+      title,
+      highlight,
+      description,
+      faqs[]-> {
+        _id,
+        _type,
+        question,
+        answer,
+        active
+      }
+    },
+
     _type == "pageCta" => {
       title,
       description,
@@ -417,20 +436,32 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
       }
     },
 
-    // Referenced FAQs List
-    _type == "reference" => @-> {
-      "id": _id,
-      "_type": "faq",
-      question,
-      answer,
-      active
+    _type == "pageGuidesCarousel" => {
+      title,
+      description,
+      guides[]-> {
+        _id,
+        _updatedAt,
+        title,
+        slug,
+        excerpt,
+        heroImage,
+        icon,
+        readTime,
+        publishedAt,
+        orderIndex,
+        category-> {
+          _id,
+          title,
+          slug
+        }
+      }
     }
   },
 
-  // 3. Technical SEO Configurations
   "seo": {
     "title": coalesce(seoTitle, title),
     "description": coalesce(seoDescription, description),
     noIndex
   }
-}`
+}`;

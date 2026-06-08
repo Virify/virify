@@ -133,7 +133,8 @@ export const generalPageType = defineType({
       of: [
         {type: 'pageSection'},
         {type: 'pageCta'},
-        {type: 'reference', to: [{type: 'faq'}], title: 'FAQ Item'},
+        {type: 'pageFaq'},
+        {type: 'pageGuidesCarousel'},
       ],
       validation: (Rule) => Rule.required().min(1),
     }),

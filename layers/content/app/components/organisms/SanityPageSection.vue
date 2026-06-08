@@ -1,6 +1,6 @@
 <template>
   <UPageSection
-    :features="features"
+    :features="featuresMap"
     :orientation="orientation"
     color="secondary"
     :ui="{
@@ -23,11 +23,11 @@
     </template>
     <template #default>
       <NuxtImg
-        :src="image?.src || '/img/create-listing.png'"
-        :alt="image?.alt || 'What you can do during early access'"
+        :src="image?.asset._id"
         class="w-full rounded-lg border object-cover"
-        quality="80"
-        densities="[1, 2]"
+        :alt="image?.alt || 'Page section image'"
+        :placeholder="image?.asset.metadata?.lqip"
+        provider="sanity"
       />
     </template>
   </UPageSection>
@@ -38,20 +38,26 @@
   const isDesktop = useDesktop();
 
   interface Props {
-    features?: PageFeatureProps[];
-    orientation?: "horizontal" | "vertical";
+    features?: SanityPageSection['features'];
+    orientation?: SanityPageSection['orientation'];
     reverse?: boolean;
     headline?: string;
     title?: string;
     description?: string;
-    image?: {
-      src: string;
-      alt: string;
-    };
+    image?: SanityImage;
   }
 
-  withDefaults(defineProps<Props>(), {
+  const props = withDefaults(defineProps<Props>(), {
     orientation: "vertical",
     reverse: false,
+  });
+
+  const featuresMap = computed(() => {
+    return props.features?.map((feature) => ({
+      ...feature,
+      ui: {
+        leadingIcon: feature.iconColor
+      } ,
+    }));
   });
 </script>
