@@ -457,8 +457,13 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
   },
 
   "seo": {
-    "title": coalesce(seoTitle, title),
-    "description": coalesce(seoDescription, description),
+    "metaTitle": coalesce(seoTitle, title),
+    "metaDescription": coalesce(seoDescription, description),
+    "keywords": seoKeywords,
+    "ogTitle": coalesce(ogTitle, seoTitle, title),
+    "ogDescription": coalesce(ogDescription, seoDescription, description),
+    "twitterCard": coalesce(twitterCard, "summary_large_image"),
+    "canonicalUrl": canonicalUrl,
     noIndex
   }
 }`;

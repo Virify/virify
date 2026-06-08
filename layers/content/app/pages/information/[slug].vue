@@ -45,6 +45,32 @@
 
   const { data: page } = await useSanityQuery<SanityGeneralPage>(generalPageQuery, { slug: pageSlug });
 
+  useSeoMeta({
+    title: () => page.value?.seo?.metaTitle,
+    description: () => page.value?.seo?.metaDescription,
+    keywords: () => page.value?.seo?.keywords,
+    robots: () => page.value?.seo?.noIndex ? 'noindex, nofollow' : 'index, follow',
+
+    // Open Graph Social Preview Tags
+    ogTitle: () => page.value?.seo?.ogTitle,
+    ogDescription: () => page.value?.seo?.ogDescription,
+    ogType: 'website',
+
+    // Twitter / X Layout Rule Overrides
+    twitterCard: () => page.value?.seo?.twitterCard,
+    twitterTitle: () => page.value?.seo?.ogTitle,
+    twitterDescription: () => page.value?.seo?.ogDescription,
+  });
+
+  useHead({
+    link: [
+      {
+        rel: 'canonical',
+        href: () => page.value?.seo?.canonicalUrl || undefined,
+      },
+    ],
+  });
+
   const { showDialog } = useDialog();
 
   function showSignup() {

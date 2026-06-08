@@ -36,4 +36,13 @@
       content: faq.answer,
     })) || [];
   });
+
+  useSchemaOrg(
+    props.faqs?.map(faq => 
+      defineQuestion({
+        name: faq.question,
+        acceptedAnswer: faq.answer,
+      })
+    ) || []
+  );
 </script>

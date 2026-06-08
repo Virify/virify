@@ -50,7 +50,13 @@ export default defineNuxtConfig({
     defaultLocale: "en-GB",
     indexable: process.env.SANITY_PREVIEW !== "true",
   },
-
+  // seo configuration for sanity content pages
+  seo: {
+    meta: {
+      ogImage: "https://virify.co.uk/og-image.png",
+      twitterImage: "https://virify.co.uk/logo.png",
+    }
+  },
   // Schema.org structured data
   schemaOrg: {
     identity: {

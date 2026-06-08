@@ -433,7 +433,7 @@ export interface SanityGeneralPage {
     url?: string;
   }[];
   sections:  SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
-  seo?: SeoMetadata;
+  seo?: SanityGeneralPageSeo;
 }
 
 export interface SanityPageSection {
@@ -487,4 +487,15 @@ export interface GeneralPageNavigationItem {
   _id: string;
   title: string;
   slug: string;
+}
+
+export interface SanityGeneralPageSeo {
+  metaTitle?: string;
+  metaDescription?: string;
+  keywords?: string;
+  ogTitle?: string;
+  ogDescription?: string;
+  twitterCard?: 'summary' | 'summary_large_image';
+  canonicalUrl?: string;
+  noIndex?: boolean;
 }

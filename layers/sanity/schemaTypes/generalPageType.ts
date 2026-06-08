@@ -106,7 +106,7 @@ export const generalPageType = defineType({
               hidden: ({parent}) => parent?.signup === true || parent?.login === true,
               validation: (Rule) =>
                 Rule.uri({allowRelative: true}).custom((value, context) => {
-                  const {signup, login} = context.parent as any || {}
+                  const {signup, login} = (context.parent as any) || {}
 
                   // 1. If it's a modal action, the URL field must be empty
                   if (signup === true || login === true) {
@@ -130,11 +130,7 @@ export const generalPageType = defineType({
       title: 'Page Sections',
       type: 'array',
       group: 'content',
-      of: [
-        {type: 'pageSection'},
-        {type: 'pageFaq'},
-        {type: 'pageGuidesGrid'},
-      ],
+      of: [{type: 'pageSection'}, {type: 'pageFaq'}, {type: 'pageGuidesGrid'}],
       validation: (Rule) => Rule.required().min(1),
     }),
 
@@ -155,6 +151,54 @@ export const generalPageType = defineType({
       rows: 3,
       group: 'seo',
       validation: (Rule) => Rule.max(160),
+    }),
+    defineField({
+      name: 'seoKeywords',
+      title: 'Keywords',
+      description:
+        'Comma-separated keywords targeting specific search queries (e.g. property platform, private listings).',
+      type: 'string',
+      group: 'seo',
+    }),
+    defineField({
+      name: 'ogTitle',
+      title: 'Open Graph Title',
+      description:
+        'Custom title for social media shares (LinkedIn, Slack, Facebook). Falls back to SEO Title if empty.',
+      type: 'string',
+      group: 'seo',
+    }),
+    defineField({
+      name: 'ogDescription',
+      title: 'Open Graph Description',
+      description:
+        'Custom description for social media shares. Falls back to Meta Description if empty.',
+      type: 'text',
+      rows: 3,
+      group: 'seo',
+    }),
+    defineField({
+      name: 'twitterCard',
+      title: 'Twitter / X Card Type',
+      description: 'Controls layout presentation on X. Default is a large summary image preview.',
+      type: 'string',
+      group: 'seo',
+      options: {
+        list: [
+          {title: 'Large Preview Image', value: 'summary_large_image'},
+          {title: 'Standard Small Square', value: 'summary'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'summary_large_image',
+    }),
+    defineField({
+      name: 'canonicalUrl',
+      title: 'Canonical URL',
+      description:
+        'Explicitly state primary resource location to avoid duplicate content flags. Usually safe to leave blank.',
+      type: 'url',
+      group: 'seo',
     }),
     defineField({
       name: 'noIndex',
