@@ -7,7 +7,7 @@
 export function useViewAllListings(options: { limit?: number } = {}) {
   const { limit } = asObject(options)
 
-  const { data, status } = useFetch<ListingCardData[]>('/api/listings',
+  const { data, status } = useFetch<ListingCardData[]>('/api/listings/published',
     {
       query: { limit }
     }
