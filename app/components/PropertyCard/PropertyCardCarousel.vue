@@ -166,7 +166,7 @@ const unwatch = watch(emblaApi, (api) => {
     opacity: 0;
   }
 
-  .embla-wrapper:hover .embla-desktop-hover {
+  .embla-wrapper:hover>.embla-desktop-hover {
     opacity: 1;
   }
 }

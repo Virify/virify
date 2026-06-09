@@ -11,8 +11,7 @@
       </template>
 
       <template v-slot:ai>
-        <MoleculesAiSearchFormFilters :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit"
-          @reset-search="searchReset" />
+        <MoleculesAiSearchFormFilters :disabled="!hasLocation" hideReset @submit-search="aiSearchSubmit" />
       </template>
     </OrganismsFilterSwitcher>
   </div>
@@ -34,6 +33,7 @@ const emit = defineEmits(['animate-to-dock'])
 
 /**
  *  Manage lazy hydration
+ *  @TODO [OrganismsTraditionalSearchForm] this is duplicated
  */
 const isTraditionalFormLoading = ref(true)
 
@@ -44,7 +44,7 @@ function hideTraditionalFormLoader() {
 /**
  *  Fetch filters
  */
-const { location, setQuery, setFormData } = useGlobalSearchState()
+const { location, setFormData } = useGlobalSearchState()
 const { setPending } = useFetchResults()
 const toast = useToast()
 
@@ -93,10 +93,6 @@ async function aiSearchSubmit(query: string) {
     setPending(false)
   }
 };
-
-function searchReset() {
-  setQuery('')
-}
 
 /**
  *  Disable filters button if no location is added - to avoid hydration

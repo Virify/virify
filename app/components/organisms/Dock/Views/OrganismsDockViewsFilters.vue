@@ -9,8 +9,7 @@
         </template>
 
         <template v-slot:ai>
-          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="searhSubmitAi"
-            @reset-search="searchReset" />
+          <MoleculesAiSearchFormFilters hide-suggestions :initial-query @submit-search="searchSubmitAi" />
         </template>
       </OrganismsFilterSwitcher>
     </template>
@@ -37,7 +36,7 @@ const emits = defineEmits(['search-started'])
 const { pending, fetchResults } = useFetchResults()
 const { setFormData } = useGlobalSearchState()
 
-function searhSubmitAi(query: string) {
+function searchSubmitAi(query: string) {
   setFormData(query, 'ai')
   emits('search-started')
 
@@ -49,10 +48,6 @@ function searchSubmitTraditional(formData: Partial<FormState>) {
   emits('search-started')
 
   fetchResults()
-}
-
-function searchReset() {
-  setFormData('')
 }
 
 </script>
