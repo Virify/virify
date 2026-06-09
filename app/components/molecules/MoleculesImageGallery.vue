@@ -133,22 +133,26 @@ onUnmounted(() => {
     position: relative;
     width: 100%;
     border-radius: var(--border-radius-2xl);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     overflow: hidden;
-    aspect-ratio: auto;
+    background: var(--blue-300);
 
     @include mq.notebook {
-      aspect-ratio: 16/9;
-      max-height: none;
+      border-radius: var(--border-radius-2xl);
     }
   }
 
   &__image {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    aspect-ratio: 3/2;
+    object-fit: cover;
     object-position: center;
-    aspect-ratio: auto;
     display: block;
+
+    @include mq.notebook {
+      aspect-ratio: 16/9;
+    }
   }
 
   &__prev,
