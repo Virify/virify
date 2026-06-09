@@ -45,15 +45,24 @@ export const propertySchema = z.object({
     .refine((val) => val !== null, {
       message: "Please select a classification",
     }),
-  totalFloors: z
-    .number()
-    .int()
-    .min(1, {
-      message: "Property must have at least 1 floor",
-    })
-    .max(100, {
-      message: "Total floors cannot exceed 100",
-    }),
+  totalFloors: z.preprocess(
+    (val) => {
+      if (val === null || val === undefined || val === "") return null;
+      const n = Number(val);
+      return isNaN(n) ? null : n;
+    },
+    z
+      .number({
+        message: "You must enter the total number of floors",
+      })
+      .int()
+      .min(1, { message: "Property must have at least 1 floor" })
+      .max(100, { message: "Total floors cannot exceed 100" })
+      .nullable()
+      .refine((val) => val !== null, {
+        message: "You must enter the total number of floors",
+      }),
+  ),
   constructionType: z.enum(constructionTypes).nullable().optional(),
   size: z.number().positive().nullable().optional(),
   yearBuilt: z.coerce
