@@ -1,5 +1,5 @@
 <template>
-  <div role="presentation" v-if="results">
+  <div role="presentation" v-if="results.length">
     <h2 class="homepage-section-browse-carousel__title | title-xl">Featured properties</h2>
 
     <MoleculesCarousel :slides="formattedResults" slide-size="min(360px, 100%)" gap="var(--size-16)" show-arrows
