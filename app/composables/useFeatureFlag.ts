@@ -1,6 +1,6 @@
 export function useFeatureFlag() {
   const flags = getFeatureFlagConfig();
-  const { role, roleActive, isAdmin, isAgent } = useRole();
+  const { role, roleActive, isAdmin, isAgent, isUser } = useRole();
 
   // ADMIN, AGENT, and USER (subject to ownership verification) can create a listing
   const createListing = computed(() => {
@@ -16,6 +16,7 @@ export function useFeatureFlag() {
     roleActive,
     isAdmin,
     isAgent,
+    isUser,
     checkFeatureFlag,
   };
 }

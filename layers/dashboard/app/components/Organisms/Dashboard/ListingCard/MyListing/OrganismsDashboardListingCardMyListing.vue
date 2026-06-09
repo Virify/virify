@@ -15,6 +15,17 @@
   >
     <!-- Image with placeholder for drafts without images -->
     <div class="relative">
+      <UAlert 
+        v-if="!verificationRecord && !isExempt && listing.isDraft"
+        variant="soft"
+        icon="i-lucide-shield-alert"
+        color="error"
+        class="absolute z-1 opacity-90"
+      >
+        <template #description>
+          <p class="body-xs">You have not completed the verification process. Click verify ownership below</p>
+        </template>
+      </UAlert>
       <AtomsCloudFlareImage
         v-if="hasImage"
         :src="getMainImage(listing?.property)!"
