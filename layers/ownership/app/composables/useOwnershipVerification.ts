@@ -79,9 +79,7 @@ export function useOwnershipVerification(draftListingId: Ref<number | null>) {
       toast.add({
         title: "Upload failed",
         description:
-          err?.data?.message ??
-          err?.statusMessage ??
-          "Could not upload document",
+          err?.data?.message ?? err?.statusMessage ?? "Could not upload document",
         color: "error",
         icon: "i-lucide-circle-x",
       });
@@ -113,9 +111,7 @@ export function useOwnershipVerification(draftListingId: Ref<number | null>) {
       toast.add({
         title: "Submission failed",
         description:
-          err?.data?.message ??
-          err?.statusMessage ??
-          "Could not submit verification",
+          err?.data?.message ?? err?.statusMessage ?? "Could not submit verification",
         color: "error",
         icon: "i-lucide-circle-x",
       });

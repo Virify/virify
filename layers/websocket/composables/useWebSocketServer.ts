@@ -1,19 +1,19 @@
 /**
  * @fileoverview Server-side WebSocket connection and routing manager.
- * 
- * **Purpose:** 
+ *
+ * **Purpose:**
  * Acts as an in-memory pub/sub message broker. It manages server-side socket connections
  * and routes messages strictly to the intended peers based on their user ID.
- * 
+ *
  * **State Management:**
- * - Uses singleton Maps (`globalPeers` and `globalActiveConversationByUser`) outside the 
+ * - Uses singleton Maps (`globalPeers` and `globalActiveConversationByUser`) outside the
  *   composable scope to ensure that all instances share the exact same state in memory.
- * - Handles connection lifecycles (add/remove peers) and cleans up presence state 
+ * - Handles connection lifecycles (add/remove peers) and cleans up presence state
  *   when a user fully disconnects.
- * 
+ *
  * **Message Routing:**
- * - Receives raw websocket payloads and strongly types them before dispatch. 
- * - Determines whether to broadcast to a specific subset of user connections or standardizes 
+ * - Receives raw websocket payloads and strongly types them before dispatch.
+ * - Determines whether to broadcast to a specific subset of user connections or standardizes
  *   global announcements.
  */
 
@@ -21,18 +21,37 @@
  * Client-side event handlers interface
  */
 export interface WebSocketEvents {
-  onNewMessage?: (data: { conversationId: number; message: any; conversation?: any }) => void;
+  onNewMessage?: (data: {
+    conversationId: number;
+    message: any;
+    conversation?: any;
+  }) => void;
   onNewConversation?: (data: { conversation: any }) => void;
   onTyping?: (data: { from: number; conversationId: number; isTyping: boolean }) => void;
-  onMessageRead?: (data: { conversationId: number; messageId: number; from: number }) => void;
-  onAggregateUpdate?: (data: { aggregateType: keyof UserItemsAggregates; operation: "add" | "remove" | "update" }) => void;
+  onMessageRead?: (data: {
+    conversationId: number;
+    messageId: number;
+    from: number;
+  }) => void;
+  onAggregateUpdate?: (data: {
+    aggregateType: keyof UserItemsAggregates;
+    operation: "add" | "remove" | "update";
+  }) => void;
   onNotificationNew?: (data: { notification: UserNotification }) => void;
+  onOwnershipVerificationResult?: (data: {
+    notification: UserNotification;
+    draftListingId: number;
+    approved: boolean;
+  }) => void;
 }
 
 /**
  * Global singleton peers Map - shared across all composable instances
  */
-const globalPeers = new Map<number, Set<{ send: (data: string) => void; close: () => void }>>();
+const globalPeers = new Map<
+  number,
+  Set<{ send: (data: string) => void; close: () => void }>
+>();
 
 /**
  * Global singleton presence map - shared across all composable instances
@@ -55,7 +74,10 @@ export const useWebSocketServer = () => {
    * @param userId - The ID of the user
    * @param peer - The WebSocket peer connection object
    */
-  const addPeer = (userId: number, peer: { send: (data: string) => void; close: () => void }) => {
+  const addPeer = (
+    userId: number,
+    peer: { send: (data: string) => void; close: () => void },
+  ) => {
     if (!peers.has(userId)) {
       peers.set(userId, new Set());
     }
@@ -67,7 +89,10 @@ export const useWebSocketServer = () => {
    * @param userId - The ID of the user
    * @param peer - The WebSocket peer connection object to remove
    */
-  const removePeer = (userId: number, peer: { send: (data: string) => void; close: () => void }) => {
+  const removePeer = (
+    userId: number,
+    peer: { send: (data: string) => void; close: () => void },
+  ) => {
     const userPeers = peers.get(userId);
     if (userPeers) {
       userPeers.delete(peer);
@@ -209,7 +234,8 @@ export const useWebSocketServer = () => {
         }
 
         case "conversation_presence": {
-          const convId: number | null = typeof message.conversationId === 'number' ? message.conversationId : null;
+          const convId: number | null =
+            typeof message.conversationId === "number" ? message.conversationId : null;
           const isOpen: boolean = !!message.open;
           if (isOpen) {
             activeConversationByUser.set(fromUserId, convId);
@@ -324,6 +350,20 @@ export const useWebSocketServer = () => {
           });
           break;
 
+        /**
+         * Ownership verification result - admin approved or denied documents
+         * Triggers: badge update on listing card, toast notification
+         */
+        case "ownership_verification_result": {
+          const ovMsg = wsMessage as OwnershipVerificationResultMessage;
+          events.onOwnershipVerificationResult?.({
+            notification: ovMsg.notification,
+            draftListingId: ovMsg.draftListingId,
+            approved: ovMsg.approved,
+          });
+          break;
+        }
+
         default:
           console.warn("Unknown message type:", wsMessage.type);
       }
@@ -339,7 +379,11 @@ export const useWebSocketServer = () => {
    * @param isTyping - Whether the user is currently typing
    * @returns Formatted typing message object
    */
-  const createTypingMessage = (conversationId: number, to: number, isTyping: boolean): TypingMessage => ({
+  const createTypingMessage = (
+    conversationId: number,
+    to: number,
+    isTyping: boolean,
+  ): TypingMessage => ({
     type: "typing",
     conversationId,
     to,
@@ -354,7 +398,11 @@ export const useWebSocketServer = () => {
    * @param to - The user ID to notify about the read status
    * @returns Formatted message read notification object
    */
-  const createMessageReadMessage = (conversationId: number, messageId: number, to: number): MessageReadMessage => ({
+  const createMessageReadMessage = (
+    conversationId: number,
+    messageId: number,
+    to: number,
+  ): MessageReadMessage => ({
     type: "message_read",
     conversationId,
     messageId,
@@ -371,7 +419,13 @@ export const useWebSocketServer = () => {
    * @param from - The user ID who sent the message (optional, will be set by server)
    * @returns Formatted new message notification object
    */
-  const createNewMessageMessage = (conversationId: number, message: any, to: number | number[], from?: number, conversation?: any): NewMessageMessage => ({
+  const createNewMessageMessage = (
+    conversationId: number,
+    message: any,
+    to: number | number[],
+    from?: number,
+    conversation?: any,
+  ): NewMessageMessage => ({
     type: "new_message",
     conversationId,
     message,
@@ -389,7 +443,11 @@ export const useWebSocketServer = () => {
    * @param from - The user ID who created the conversation (optional, will be set by server)
    * @returns Formatted new conversation notification object
    */
-  const createNewConversationMessage = (conversation: any, to: number | number[], from?: number): NewConversationMessage => ({
+  const createNewConversationMessage = (
+    conversation: any,
+    to: number | number[],
+    from?: number,
+  ): NewConversationMessage => ({
     type: "new_conversation",
     conversation,
     to,
@@ -405,7 +463,11 @@ export const useWebSocketServer = () => {
    * @param to - Who to notify (defaults to "all" for global status updates)
    * @returns Formatted connection status message object
    */
-  const createConnectionStatusMessage = (userId: number, isOnline: boolean, to: number | number[] | "all" = "all"): ConnectionStatusMessage => ({
+  const createConnectionStatusMessage = (
+    userId: number,
+    isOnline: boolean,
+    to: number | number[] | "all" = "all",
+  ): ConnectionStatusMessage => ({
     type: "connection_status",
     userId,
     isOnline,
@@ -419,7 +481,11 @@ export const useWebSocketServer = () => {
    * @param operation - "add" or "remove" for optimized UI updates
    * @param to - User to notify about the aggregate change
    */
-  const createAggregateUpdateMessage = (aggregateType: keyof UserItemsAggregates, operation: "add" | "remove" | "update", to: number): AggregateUpdateMessage => ({
+  const createAggregateUpdateMessage = (
+    aggregateType: keyof UserItemsAggregates,
+    operation: "add" | "remove" | "update",
+    to: number,
+  ): AggregateUpdateMessage => ({
     type: "aggregate_update",
     aggregateType,
     operation,
@@ -432,9 +498,33 @@ export const useWebSocketServer = () => {
    * @param notification - The created UserNotification record
    * @param to - The user ID(s) to notify
    */
-  const createNotificationNewMessage = (notification: UserNotification, to: number | number[]): NotificationNewMessage => ({
+  const createNotificationNewMessage = (
+    notification: UserNotification,
+    to: number | number[],
+  ): NotificationNewMessage => ({
     type: "notification_new",
     notification,
+    to,
+    timestamp: new Date().toISOString(),
+  });
+
+  /**
+   * Creates an ownership_verification_result message for WebSocket transmission
+   * @param notification - The persisted UserNotification record
+   * @param draftListingId - The draft listing that was reviewed
+   * @param approved - Whether the documents were approved
+   * @param to - The owner's user ID
+   */
+  const createOwnershipVerificationResultMessage = (
+    notification: UserNotification,
+    draftListingId: number,
+    approved: boolean,
+    to: number,
+  ): OwnershipVerificationResultMessage => ({
+    type: "ownership_verification_result",
+    notification,
+    draftListingId,
+    approved,
     to,
     timestamp: new Date().toISOString(),
   });
@@ -448,7 +538,8 @@ export const useWebSocketServer = () => {
     handleIncomingMessages,
     isUserOnline,
     // Presence helper
-    isUserViewingConversation: (userId: number, conversationId: number) => activeConversationByUser.get(userId) === conversationId,
+    isUserViewingConversation: (userId: number, conversationId: number) =>
+      activeConversationByUser.get(userId) === conversationId,
     // Type-safe message creators
     createTypingMessage,
     createMessageReadMessage,
@@ -457,6 +548,7 @@ export const useWebSocketServer = () => {
     createConnectionStatusMessage,
     createAggregateUpdateMessage,
     createNotificationNewMessage,
+    createOwnershipVerificationResultMessage,
     // Client-side handling
     handleOutgoingMessages,
   };

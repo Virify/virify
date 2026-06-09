@@ -48,13 +48,12 @@
           <p class="nav-notifications__item-message">{{ notification.message }}</p>
           <div class="nav-notifications__item-meta">
             <UAvatar
-              v-if="notification.senderAvatar || notification.senderUsername"
               :src="notification.senderAvatar || undefined"
-              :alt="notification.senderUsername || 'User'"
+              :alt="notification.senderUsername || 'Virify'"
               size="2xs"
               class="nav-notifications__item-avatar"
             />
-            <span v-if="notification.senderUsername" class="nav-notifications__item-sender">{{ notification.senderUsername }}</span>
+            <span class="nav-notifications__item-sender">{{ notification.senderUsername || 'Virify' }}</span>
             <span class="nav-notifications__item-time">{{ formatMessageTimestamp(notification.createdAt) }}</span>
           </div>
         </div>
@@ -122,6 +121,11 @@ async function handleSelect(notification: UserNotification) {
       : notification.type === 'VIEWING_ACCEPTED' ? 'confirmed'
       : 'all'
     await navigateTo(`/dashboard/viewings?tab=${tab}`)
+    return
+  }
+
+  if (notification.type === 'OWNERSHIP_VERIFIED' || notification.type === 'OWNERSHIP_DENIED') {
+    await navigateTo('/dashboard/draft-listings')
     return
   }
 

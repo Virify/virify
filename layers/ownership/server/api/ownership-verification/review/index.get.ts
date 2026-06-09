@@ -1,5 +1,7 @@
 import * as z from "zod";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { createNotification } from "~~/layers/database/server/utils/notification";
+import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocketServer";
 
 const querySchema = z.object({
   token: z.string().min(1),
@@ -60,8 +62,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const newStatus = action === "approve" ? "APPROVED" : "DENIED";
-  const newVerificationLevel =
-    action === "approve" ? "FULLY_VERIFIED" : "UNVERIFIED";
+  const newVerificationLevel = action === "approve" ? "FULLY_VERIFIED" : "UNVERIFIED";
 
   // Update verification status and draft listing in one transaction.
   // On approval, also mark name + identity as confirmed on the user's Verification record.
@@ -82,15 +83,15 @@ export default defineEventHandler(async (event) => {
       where: { id: record.draftListingId },
       data: { verificationLevel: newVerificationLevel },
     }),
-    ...(action === "approve" && record.userId
-      ? [
-          prisma.verification.upsert({
-            where: { userId: record.userId },
-            update: { name: true, identity: true },
-            create: { userId: record.userId, name: true, identity: true },
-          }),
-        ]
-      : []),
+    ...(action === "approve" && record.userId ?
+      [
+        prisma.verification.upsert({
+          where: { userId: record.userId },
+          update: { name: true, identity: true },
+          create: { userId: record.userId, name: true, identity: true },
+        }),
+      ]
+    : []),
   ]);
 
   // Delete both documents from R2 after DB is committed.
@@ -119,6 +120,47 @@ export default defineEventHandler(async (event) => {
     deleteKey(record.docOneKey, "docOne"),
     deleteKey(record.docTwoKey, "docTwo"),
   ]);
+
+  // Notify the listing owner about the review outcome.
+  // - Online: send WS event only (toast + badge refresh). No DB record — avoids panel clutter.
+  // - Offline: persist a DB notification so it appears in the panel when they next log in.
+  if (record.userId) {
+    const approved = action === "approve";
+    const title = approved ? "Ownership verified" : "Ownership denied";
+    const message =
+      approved ?
+        "Your ownership documents have been approved. Your listing is now fully verified."
+      : "Your ownership documents could not be verified. Please re-submit with valid documents.";
+
+    const { sendMessage, createOwnershipVerificationResultMessage, isUserOnline } =
+      useWebSocketServer();
+
+    if (isUserOnline(record.userId)) {
+      // User is online — WS toast is enough, skip the DB record
+      sendMessage(
+        createOwnershipVerificationResultMessage(
+          {
+            title,
+            message,
+            type: approved ? "OWNERSHIP_VERIFIED" : "OWNERSHIP_DENIED",
+            listingId: record.draftListingId,
+          } as any,
+          record.draftListingId,
+          approved,
+          record.userId,
+        ),
+      );
+    } else {
+      // User is offline — persist for the panel
+      await createNotification({
+        userId: record.userId,
+        type: approved ? "OWNERSHIP_VERIFIED" : "OWNERSHIP_DENIED",
+        title,
+        message,
+        listingId: record.draftListingId,
+      });
+    }
+  }
 
   return {
     action,

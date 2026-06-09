@@ -31,11 +31,15 @@
       }"
     >
       <template #description>
-        <p>Only professional accounts can create listings during early access, if you want to upgrade your account for free please head to your account settings.</p>
+        <p>
+          Only professional accounts can create listings during early access, if you want
+          to upgrade your account for free please head to your account settings.
+        </p>
         <span
           class="body-xs"
           v-if="isUser"
-          >Please note, you must complete personal ID and property ownership verification checks to publish your listing.</span
+          >Please note, you must complete personal ID and property ownership verification
+          checks to publish your listing.</span
         >
       </template>
     </UPricingPlan>
@@ -66,8 +70,13 @@
       }"
     >
       <template #description>
-        <p>Our subscription offers additional and enhanced tooling for property marketing.</p>
-        <span class="body-xs">Please note, not all of the above features may be available immediately and we are always adding to our features.</span>
+        <p>
+          Our subscription offers additional and enhanced tooling for property marketing.
+        </p>
+        <span class="body-xs"
+          >Please note, not all of the above features may be available immediately and we
+          are always adding to our features.</span
+        >
       </template>
     </UPricingPlan>
   </UPricingPlans>
@@ -87,7 +96,10 @@
         icon="i-lucide-circle-alert"
       >
         <template #description>
-          <p class="body-sm">You must complete personal ID and property ownership verification checks to publish your listing</p>
+          <p class="body-sm">
+            You must complete personal ID and property ownership verification checks to
+            publish your listing
+          </p>
         </template>
       </UAlert>
       <UAlert
@@ -96,17 +108,20 @@
         icon="i-lucide-book-open"
       >
         <template #description>
-          <p class="body-sm">You can do this by clicking on the 'Verify Ownership' badge on your draft listing card</p>
+          <p class="body-sm">
+            You can do this by clicking on the 'Verify Ownership' badge on your draft
+            listing card
+          </p>
         </template>
       </UAlert>
       <UButton
         color="neutral"
         variant="outline"
         size="xs"
-        class="body-sm max-w-fit"
+        class="body-sm max-w-fit self-end"
         @click="closeConfirmOwnershipModal(ListingTier.BASIC)"
       >
-        OK
+        Continue
       </UButton>
     </template>
   </UModal>

@@ -29,14 +29,14 @@
       <template #default>
         <UAvatar
           :src="notification.senderAvatar || undefined"
-          :alt="notification.senderUsername || 'User'"
+          :alt="notification.senderUsername || 'Virify'"
           size="sm"
           :ui="{
             root: 'border border-(--foreground-100)',
           }"
         />
         <p class="font-bold truncate mt-0.5!">
-          {{ notification.senderUsername || "Unknown" }}
+          {{ notification.senderUsername || "Virify" }}
         </p>
       </template>
       <template #footer>
