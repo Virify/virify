@@ -8,6 +8,7 @@
       <template #title>
         <span>{{ page?.title }}</span>
       </template>
+      
       <UButton
         v-for="(button, index) in page?.heroButtons || []"
         :key="index"
@@ -44,6 +45,14 @@
   const pageSlug = route.params.slug as string;
 
   const { data: page } = await useSanityQuery<SanityGeneralPage>(generalPageQuery, { slug: pageSlug });
+
+  if (!page.value) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'Page not found',
+      fatal: true,
+    });
+  }
 
   useSeoMeta({
     title: () => page.value?.seo?.metaTitle,
@@ -91,3 +100,8 @@
     return componentMap[section._type] || null;
   }
 </script>
+<style lang="scss">
+  .bg-change {
+    background-color: var(--blue-200);
+  }
+</style>
