@@ -132,22 +132,27 @@ onUnmounted(() => {
   &__image-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 4/3;
-    max-height: 70vh;
     border-radius: var(--border-radius-2xl);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
     overflow: hidden;
+    background: var(--blue-300);
 
     @include mq.notebook {
-      aspect-ratio: 16/9;
-      max-height: none;
+      border-radius: var(--border-radius-2xl);
     }
   }
 
   &__image {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 3/2;
     object-fit: cover;
-    border-radius: var(--border-radius-2xl);
+    object-position: center;
+    display: block;
+
+    @include mq.notebook {
+      aspect-ratio: 16/9;
+    }
   }
 
   &__prev,
@@ -231,6 +236,8 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
+    aspect-ratio: auto;
     display: block;
   }
 }

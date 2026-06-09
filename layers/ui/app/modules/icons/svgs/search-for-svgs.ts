@@ -7,30 +7,22 @@ export type FoundSVGs = {
 }
 
 /**
- *  Build a recursive map of all SVG files and their appropriate key
- * 
- *  @TODO
- *  We can maybe use fs.globSync(...) in the future, but this feature
- *  is still experimental, and we ideally want to recursively set the
- *  key for each nested directory anyway, so doing it manually for
- *  the time being
- * 
- *  Alternatively, there is also readdirSync('...', { recursive }) but
- *  this again doesn't solve the nested key issue very elegantly
- *
+ * Build a recursive map of all SVG files and their appropriate key
  */
 export function searchForSVGs(dir: string, svgs: FoundSVGs, key: string) {
+  // Read the directory using types
   const entries = readdirSync(dir, { withFileTypes: true })
 
   // Loop through each entry
   entries.forEach((entry: Dirent) => {
-    const { path, name } = entry
+    const { name } = entry
 
-    // Get full path of entry
-    const fullPath = join(path, name)
+    // This guarantees the absolute path chain is never broken across Linux/WSL/Mac
+    const fullPath = join(dir, name)
 
     // Check if entry is a directory
     if (entry.isDirectory()) {
+      // Pass the fully qualified fullPath to the recursive call
       return searchForSVGs(fullPath, svgs, `${key}-${name}`)
     }
 

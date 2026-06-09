@@ -7,15 +7,13 @@
     <HomepageSectionSignupForm v-if="!signup" />
 
     <template v-else-if="!signupAndLoggedIn">
-      <p class="homepage-section-signup__content">Create an account or log in to enquiry about listings from independent
-        Estate Agents. And coming soon,
-        create your listing and search for other properties to buy and rent</p>
+      <p class="homepage-section-signup__content">Create an account or log in to enquire about properties listed by property agents. And coming soon, create your listing and search for other properties to buy and rent</p>
 
       <HeaderActionsGuest class="homepage-section-signup__buttons" />
     </template>
 
     <template v-else>
-      <p class="homepage-section-signup__content">We’re excited to welcome professional property agents into early access testing. A few key features are still being switched on (including our advanced property search and private listings) - but we’re moving quickly and updates are landing regularly. Keep checking back!</p>
+      <p class="homepage-section-signup__content homepage-section-signup__content--no-button">We’re excited to welcome property agents into early access. A few key features are still being switched on - but we’re moving quickly and updates are landing regularly.</p>
     </template>
 
   </OrganismsBannerHero>
@@ -55,11 +53,20 @@ const title = computed(() => {
 </script>
 
 <style lang="scss">
+@use "#styles/_utils/media" as mq;
 .homepage-section-signup {
 
   &__content {
     max-width: 55ch;
     color: var(--monochrome-900);
+
+    &--no-button {
+      padding-bottom: var(--size-72);
+
+      @include mq.desktop {
+        padding-bottom: 0;
+      }
+    } 
   }
 
   &__buttons {

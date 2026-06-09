@@ -18,6 +18,7 @@ layers/content/
 │       ├── guides/                    # /guides and /guides/:slug
 │       ├── privacy/                   # /privacy-policy
 │       └── terms/                     # /terms
+│       └── information/               # /information/:slug
 └── nuxt.config.ts
 ```
 
@@ -30,6 +31,7 @@ layers/content/
 | `/guides/:slug` | Individual guide page — fetches single guide by slug |
 | `/privacy-policy` | Privacy policy — content from `privacyType` Sanity schema |
 | `/terms` | Terms and conditions — content from `termsType` Sanity schema |
+| `/information/{slug}` | General Sanity Pages, Ads/annoucemeents etc — content from `TODO` Sanity schema |
 
 ## `SanityContent.vue`
 

@@ -255,10 +255,17 @@ onUnmounted(() => {
   &__image {
     width: 100%;
     height: 100%;
-    aspect-ratio: 4/3;
     object-fit: cover;
+    object-position: center;
+    aspect-ratio: auto;
     display: block;
     border-radius: var(--border-radius-lg);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
   }
 
   &__image-caption {
