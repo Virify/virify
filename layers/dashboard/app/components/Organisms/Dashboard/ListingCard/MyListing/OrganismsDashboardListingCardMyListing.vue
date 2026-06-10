@@ -234,7 +234,7 @@
               icon="i-lucide-shield-check"
               size="md"
               color="success"
-              variant="outline"
+              variant="solid"
               >Ownership Verified</UBadge
             >
             <UBadge
@@ -242,7 +242,7 @@
               icon="i-lucide-clock"
               size="md"
               color="warning"
-              variant="outline"
+              variant="solid"
               class="cursor-pointer"
               @click="openStatusModal"
               >Verification Pending</UBadge
@@ -252,7 +252,7 @@
               icon="i-lucide-shield-x"
               size="md"
               color="error"
-              variant="outline"
+              variant="solid"
               class="cursor-pointer"
               @click="openStatusModal"
               >Verification Denied</UBadge
@@ -261,8 +261,8 @@
               v-else-if="verificationRecord === null"
               icon="i-lucide-shield-alert"
               size="md"
-              color="neutral"
-              variant="outline"
+              color="primary"
+              variant="solid"
               class="cursor-pointer"
               @click="openVerificationModal"
               >Verify Ownership</UBadge

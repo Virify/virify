@@ -1,5 +1,9 @@
 import * as z from "zod";
 import sendOwnershipReview from "~~/layers/ownership/server/email/send-ownership-review";
+import {
+  getVerificationByDraftId,
+  upsertOwnershipSubmission,
+} from "~~/layers/database/server/utils/ownership-verification";
 
 const submitSchema = z.object({
   draftListingId: z.number().int().positive(),
@@ -35,10 +39,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // Block re-submission if already PENDING or APPROVED
-  const existing = await prisma.ownershipVerification.findUnique({
-    where: { draftListingId },
-    select: { status: true },
-  });
+  const existing = await getVerificationByDraftId(draftListingId);
 
   if (existing?.status === "PENDING") {
     throw createError({
@@ -54,31 +55,19 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const record = await prisma.ownershipVerification.upsert({
-    where: { draftListingId },
-    update: {
-      docOneKey,
-      docOneName,
-      docTwoKey,
-      docTwoName,
-      status: "PENDING",
-      reviewedAt: null,
-    },
-    create: {
-      draftListingId,
-      userId: user.id,
-      docOneKey,
-      docOneName,
-      docTwoKey,
-      docTwoName,
-    },
+  const record = await upsertOwnershipSubmission({
+    draftListingId,
+    userId: user.id,
+    docOneKey,
+    docOneName,
+    docTwoKey,
+    docTwoName,
   });
 
   const baseUrl =
     (config.public as any).siteUrl ??
     (config.public as any).EMAIL_BASE_URL ??
     "https://virify.co.uk";
-  const r2Url = config.public.CF_R2_URL as string;
   const adminEmail = (config.ADMIN_EMAIL as string) || "all@virify.co.uk";
 
   await sendOwnershipReview({
@@ -87,12 +76,7 @@ export default defineEventHandler(async (event) => {
     lastName: user.lastName ?? null,
     userEmail: user.email ?? "",
     draftListingId,
-    docOneUrl: `${r2Url}/${docOneKey}`,
-    docOneName,
-    docTwoUrl: `${r2Url}/${docTwoKey}`,
-    docTwoName,
-    approveUrl: `${baseUrl}/ownership/review/${record.reviewToken}?action=approve`,
-    denyUrl: `${baseUrl}/ownership/review/${record.reviewToken}?action=deny`,
+    reviewUrl: `${baseUrl}/ownership/review/${record.reviewToken}`,
   });
 
   return { success: true };

@@ -8,12 +8,7 @@ interface SendOwnershipReviewOptions {
   lastName: string | null;
   userEmail: string;
   draftListingId: number;
-  docOneUrl: string;
-  docOneName: string;
-  docTwoUrl: string;
-  docTwoName: string;
-  approveUrl: string;
-  denyUrl: string;
+  reviewUrl: string;
 }
 
 export default async function sendOwnershipReview(

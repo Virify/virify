@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { getVerificationByDraftId } from "~~/layers/database/server/utils/ownership-verification";
 
 const querySchema = z.object({
   draftId: z.coerce.number().int().positive(),
@@ -25,15 +26,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const record = await prisma.ownershipVerification.findUnique({
-    where: { draftListingId: draftId },
-    select: {
-      id: true,
-      status: true,
-      createdAt: true,
-      reviewedAt: true,
-    },
-  });
+  const record = await getVerificationByDraftId(draftId);
 
   return { record };
 });
