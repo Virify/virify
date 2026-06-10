@@ -5,5 +5,17 @@ export default defineNuxtConfig({
   modules: ["nuxt-gtag"],
   gtag: {
     id: process.env.G_TAG,
+    initCommands: [
+      // Set default consent to denied before GA loads
+      [
+        "consent",
+        "default",
+        {
+          analytics_storage: "denied",
+          ad_storage: "denied",
+          wait_for_update: 500,
+        },
+      ],
+    ],
   },
 });
