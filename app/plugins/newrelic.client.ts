@@ -1,13 +1,15 @@
 // plugins/newrelic.client.ts
 export default defineNuxtPlugin(() => {
-  useHead({
-    script: [
-      {
-        src: '/newrelic-agent.js',
-        type: 'text/javascript',
-        // Instructs Nuxt to load the browser telemetry script right away
-        tagPosition: 'head'
-      }
-    ]
-  })
-})
+  // Only inject the browser agent in production
+  if (import.meta.env.PROD) {
+    useHead({
+      script: [
+        {
+          src: "/newrelic-agent.js",
+          type: "text/javascript",
+          tagPosition: "head",
+        },
+      ],
+    });
+  }
+});
