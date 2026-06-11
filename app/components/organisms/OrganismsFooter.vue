@@ -148,6 +148,14 @@
                 >Cookie Policy</nuxt-link
               >
             </li>
+            <li>
+              <button
+                class="o-footer__link | body-sm"
+                @click="resetConsent"
+              >
+                Cookie Settings
+              </button>
+            </li>
           </ul>
         </div>
       </div>
@@ -171,6 +179,7 @@
 
 <script setup lang="ts">
   const { createListing } = useFeatureFlag();
+  const { resetConsent } = useCookieConsent();
 
   const { data: navData } = await useSanityQuery<{
     guides: GuideCategory[];
