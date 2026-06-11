@@ -4,7 +4,27 @@
     <OrganismsBannerHero
       :caption="page?.caption"
       :description="page?.description"
+      compact
     >
+      <template #top>
+        <UBreadcrumb
+          :items="[
+            { label: 'Content', to: '/content', icon: 'i-lucide-home' },
+            {
+              label: pageCategory.charAt(0).toUpperCase() + pageCategory.slice(1),
+              to: `/content/${pageCategory}`,
+              icon: 'i-lucide-folder',
+            },
+            { label: page?.title || '', to: undefined, icon: 'i-lucide-file-text' },
+          ]"
+          :ui="{
+            linkLeadingIcon: 'text-secondary',
+            link: 'text-white truncate',
+          }"
+          class="text-white pt-4"
+        />
+      </template>
+
       <template #title>
         <span>{{ page?.title }}</span>
       </template>
@@ -43,9 +63,11 @@
 
   const route = useRoute();
   const pageSlug = route.params.slug as string;
+  const pageCategory = route.params.category as string;
 
-  const { data: page } = await useSanityQuery<SanityGeneralPage>(informationPageQuery, {
+  const { data: page } = await useSanityQuery<SanityGeneralPage>(generalPageQuery, {
     slug: pageSlug,
+    category: pageCategory,
   });
 
   if (!page.value) {

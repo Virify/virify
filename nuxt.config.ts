@@ -35,7 +35,6 @@ export default defineNuxtConfig({
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
         createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
-
       },
     },
   },
@@ -55,7 +54,7 @@ export default defineNuxtConfig({
     meta: {
       ogImage: "https://virify.co.uk/logo.png",
       twitterImage: "https://virify.co.uk/logo.png",
-    }
+    },
   },
   // Schema.org structured data
   schemaOrg: {
@@ -76,7 +75,7 @@ export default defineNuxtConfig({
   robots: {
     allow: [
       "/",
-      '/mortgage-calculator',
+      "/mortgage-calculator",
       "/price-paid",
       "/contact",
       "/guides",
@@ -88,7 +87,8 @@ export default defineNuxtConfig({
       "/listing/*",
       "/profile/*",
       "/acceptable-use",
-      '/information/**',
+      "/information/**",
+      "/content/**",
     ],
     disallow: [
       "/account",
@@ -122,7 +122,7 @@ export default defineNuxtConfig({
       "/review/**",
       "/auth/update-admin-password",
     ],
-    sources: ["/api/__sitemap__/guides"],
+    sources: ["/api/__sitemap__/guides", "/api/__sitemap__/content"],
   },
   image: {
     cloudflare: {
@@ -236,18 +236,16 @@ export default defineNuxtConfig({
     // Falls back to memory driver if no Redis credentials are available (staging2/3/4, local dev).
     storage: {
       cache:
-        process.env.REDIS_URL || process.env.REDISHOST
-          ? {
+        process.env.REDIS_URL || process.env.REDISHOST ?
+          {
             driver: "redis",
             url: process.env.REDIS_URL,
             host: process.env.REDISHOST,
             password: process.env.REDISPASSWORD,
-            port: process.env.REDISPORT
-              ? parseInt(process.env.REDISPORT)
-              : undefined,
+            port: process.env.REDISPORT ? parseInt(process.env.REDISPORT) : undefined,
             username: process.env.REDISUSER,
           }
-          : { driver: "memory" },
+        : { driver: "memory" },
     },
     devStorage: {
       cache: { driver: "memory" },

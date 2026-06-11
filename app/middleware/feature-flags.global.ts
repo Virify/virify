@@ -14,6 +14,7 @@ const alwaysAllowedRoutes = [
   "/acceptable-use/**",
   "/profile/**",
   "/information/**",
+  "/content/**",
 ];
 
 const featureFlagRoutes = {

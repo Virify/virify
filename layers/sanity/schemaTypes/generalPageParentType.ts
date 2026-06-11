@@ -1,40 +1,21 @@
+// schemas/pageCategoryType.ts
 import {defineType, defineField} from 'sanity'
 
-export const generalPageType = defineType({
-  name: 'generalPage',
-  title: 'General Page',
+export const generalPageParent = defineType({
+  name: 'generalPageParent',
+  title: 'General Page Parent',
+  description: 'Used to group all content pages under a parent page - this page is content/',
   type: 'document',
-  // 1. Define groups to separate Page Content from SEO settings in the CMS
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'seo', title: 'SEO / Meta'},
   ],
   fields: [
     defineField({
-      name: 'category',
-      title: 'Page Category',
-      type: 'reference',
-      to: [{type: 'pageCategory'}],
-      group: 'content',
-      validation: (Rule) => Rule.required(),
-    }),
-    /* ================= CONTENT GROUP ================= */
-    defineField({
       name: 'title',
-      title: 'Page Title',
+      title: 'Category Title',
       type: 'string',
       group: 'content',
-      validation: (Rule) => Rule.required().max(100),
-    }),
-    defineField({
-      name: 'slug',
-      title: 'Slug',
-      type: 'slug',
-      group: 'content',
-      options: {
-        source: 'title', // Auto-generates the slug from your title field
-        maxLength: 96,
-      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -133,15 +114,6 @@ export const generalPageType = defineType({
         },
       ],
     }),
-    defineField({
-      name: 'sections',
-      title: 'Page Sections',
-      type: 'array',
-      group: 'content',
-      of: [{type: 'pageSection'}, {type: 'pageFaq'}, {type: 'pageGuidesGrid'}],
-      validation: (Rule) => Rule.required().min(1),
-    }),
-
     /* ================= SEO GROUP ================= */
     defineField({
       name: 'seoTitle',
@@ -224,7 +196,7 @@ export const generalPageType = defineType({
     prepare(selection) {
       const {title} = selection
       return {
-        title: title || 'Untitled General Page',
+        title: title || 'Untitled General Page Parent',
       }
     },
   },

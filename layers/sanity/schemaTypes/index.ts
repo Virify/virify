@@ -8,12 +8,13 @@ import {contactPageType} from './contactPageType'
 import {iconType} from './iconType'
 import {featureSectionType} from './featureSectionType'
 import {faqType} from './faqType'
-import { supportPageType } from './supportPageType'
+import {supportPageType} from './supportPageType'
 import {acceptableUseType} from './acceptableUseType'
 import {generalPageType} from './generalPageType'
 import {pageSectionType} from './pageSectionType'
 import {pageFaq} from './faqSectionType'
 import {pageGuidesGridType} from './pageGuidesGridType'
+import {pageCategoryType} from './generalPageCategoryType'
 
 export const schemaTypes = [
   // Reusable types
@@ -34,4 +35,5 @@ export const schemaTypes = [
   generalPageType,
   pageFaq,
   pageGuidesGridType,
+  pageCategoryType,
 ]

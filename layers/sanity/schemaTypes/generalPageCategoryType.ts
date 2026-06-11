@@ -1,38 +1,30 @@
+// schemas/pageCategoryType.ts
 import {defineType, defineField} from 'sanity'
 
-export const generalPageType = defineType({
-  name: 'generalPage',
-  title: 'General Page',
+export const pageCategoryType = defineType({
+  name: 'pageCategory',
+  title: 'Page Category',
   type: 'document',
-  // 1. Define groups to separate Page Content from SEO settings in the CMS
   groups: [
     {name: 'content', title: 'Content', default: true},
     {name: 'seo', title: 'SEO / Meta'},
   ],
   fields: [
     defineField({
-      name: 'category',
-      title: 'Page Category',
-      type: 'reference',
-      to: [{type: 'pageCategory'}],
+      name: 'title',
+      title: 'Category Title',
+      type: 'string',
       group: 'content',
       validation: (Rule) => Rule.required(),
     }),
-    /* ================= CONTENT GROUP ================= */
-    defineField({
-      name: 'title',
-      title: 'Page Title',
-      type: 'string',
-      group: 'content',
-      validation: (Rule) => Rule.required().max(100),
-    }),
     defineField({
       name: 'slug',
-      title: 'Slug',
+      title: 'Category Slug',
       type: 'slug',
+      description: 'Used for the URL path (e.g., "accountment", "information")',
       group: 'content',
       options: {
-        source: 'title', // Auto-generates the slug from your title field
+        source: 'title',
         maxLength: 96,
       },
       validation: (Rule) => Rule.required(),
@@ -133,15 +125,6 @@ export const generalPageType = defineType({
         },
       ],
     }),
-    defineField({
-      name: 'sections',
-      title: 'Page Sections',
-      type: 'array',
-      group: 'content',
-      of: [{type: 'pageSection'}, {type: 'pageFaq'}, {type: 'pageGuidesGrid'}],
-      validation: (Rule) => Rule.required().min(1),
-    }),
-
     /* ================= SEO GROUP ================= */
     defineField({
       name: 'seoTitle',
@@ -224,7 +207,7 @@ export const generalPageType = defineType({
     prepare(selection) {
       const {title} = selection
       return {
-        title: title || 'Untitled General Page',
+        title: title || 'Untitled Page Category',
       }
     },
   },
