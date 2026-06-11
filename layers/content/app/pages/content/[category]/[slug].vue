@@ -43,9 +43,11 @@
 
   const route = useRoute();
   const pageSlug = route.params.slug as string;
+  const pageCategory = route.params.category as string;
 
-  const { data: page } = await useSanityQuery<SanityGeneralPage>(informationPageQuery, {
+  const { data: page } = await useSanityQuery<SanityGeneralPage>(generalPageQuery, {
     slug: pageSlug,
+    category: pageCategory,
   });
 
   if (!page.value) {
