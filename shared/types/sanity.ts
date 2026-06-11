@@ -86,7 +86,11 @@ export interface PortableTextCalloutBlock {
   content?: PortableTextContent[];
 }
 
-export type PortableTextContent = PortableTextBlock | PortableTextImageBlock | PortableTextTableBlock | PortableTextCalloutBlock;
+export type PortableTextContent =
+  | PortableTextBlock
+  | PortableTextImageBlock
+  | PortableTextTableBlock
+  | PortableTextCalloutBlock;
 
 // Guide Category
 export interface GuideCategory {
@@ -432,7 +436,7 @@ export interface SanityGeneralPage {
     login: boolean;
     url?: string;
   }[];
-  sections:  SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
+  sections: SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
   seo?: SanityGeneralPageSeo;
 }
 
@@ -445,7 +449,12 @@ export interface SanityPageSection {
     title: string;
     description?: string;
     icon: string;
-    iconColor: "text-primary" | "text-secondary" | "text-info" | "text-warning" | "text-error";
+    iconColor:
+      | "text-primary"
+      | "text-secondary"
+      | "text-info"
+      | "text-warning"
+      | "text-error";
   }[];
   buttons: SanitySectionButton[];
   reverse?: boolean;
@@ -489,13 +498,40 @@ export interface GeneralPageNavigationItem {
   slug: string;
 }
 
+export interface SanityPageCategoryHeroButton {
+  _key: string;
+  label: string;
+  icon?: string;
+  url?: string;
+  signup: boolean;
+  login: boolean;
+}
+
+export interface SanityPageCategory {
+  _id: string;
+  title: string;
+  slug: string;
+  caption?: string;
+  description?: string;
+  heroButtons?: SanityPageCategoryHeroButton[];
+  pages: GeneralPageNavigationItem[];
+  seo?: SanityGeneralPageSeo;
+}
+
+export interface SanityPageCategoryNavigationItem {
+  _id: string;
+  title: string;
+  slug: { current?: string };
+  pages: GeneralPageNavigationItem[];
+}
+
 export interface SanityGeneralPageSeo {
   metaTitle?: string;
   metaDescription?: string;
   keywords?: string;
   ogTitle?: string;
   ogDescription?: string;
-  twitterCard?: 'summary' | 'summary_large_image';
+  twitterCard?: "summary" | "summary_large_image";
   canonicalUrl?: string;
   noIndex?: boolean;
 }

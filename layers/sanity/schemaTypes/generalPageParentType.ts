@@ -1,9 +1,10 @@
 // schemas/pageCategoryType.ts
 import {defineType, defineField} from 'sanity'
 
-export const pageCategoryType = defineType({
-  name: 'pageCategory',
-  title: 'Page Category',
+export const generalPageParent = defineType({
+  name: 'generalPageParent',
+  title: 'General Page Parent',
+  description: 'Used to group all content pages under a parent page - this page is content/',
   type: 'document',
   groups: [
     {name: 'content', title: 'Content', default: true},
@@ -15,18 +16,6 @@ export const pageCategoryType = defineType({
       title: 'Category Title',
       type: 'string',
       group: 'content',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'slug',
-      title: 'Category Slug',
-      type: 'slug',
-      description: 'Used for the URL path (e.g., "accountment", "information")',
-      group: 'content',
-      options: {
-        source: 'title',
-        maxLength: 96,
-      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -207,7 +196,7 @@ export const pageCategoryType = defineType({
     prepare(selection) {
       const {title} = selection
       return {
-        title: title || 'Untitled Page Category',
+        title: title || 'Untitled General Page Parent',
       }
     },
   },

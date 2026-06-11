@@ -41,6 +41,7 @@
     <span
       v-if="caption"
       class="banner-hero__caption"
+      :class="{ 'banner-hero--top': $slots.top }"
       >{{ caption }}</span
     >
     <h1 class="banner-hero__title | title-2xl lineheight-xs">
@@ -106,6 +107,10 @@
       --banner-hero-person-width-tablet: 160px;
       --banner-hero-person-width-notebook: 260px;
       --banner-hero-person-width-desktop: 300px;
+    }
+
+    &--top {
+      padding-top: var(--size-24);
     }
 
     &__top {
