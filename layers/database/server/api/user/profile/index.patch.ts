@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
 
     // Bust listing caches so the updated avatar/name is reflected immediately
     const userListings = await prisma.listing.findMany({
-      where: { property: { userId: user.id } },
+      where: { userId: user.id },
       select: { id: true },
     });
     if (userListings.length > 0) {
