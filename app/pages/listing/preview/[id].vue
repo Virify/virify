@@ -36,114 +36,115 @@
             stroke-linejoin="round"
           >
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-            <circle cx="12" cy="12" r="3" />
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            />
           </svg>
           Preview Mode
         </div>
       </div>
     </div>
 
-    <OrganismsListingDetail :listing="draftListing" :is-draft="true" />
+    <OrganismsListingDetail
+      :listing="draftListing"
+      :is-draft="true"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: "draft-owner",
-});
-
-const route = useRoute();
-
-/**
- *  Fetch and validate draft listing - reactive to route changes
- */
-const { data: draftListingData, error } = await useAsyncData(
-  `draft-listing-${route.params.id}`,
-  async () => {
-    const draft = await useRequestFetch()<DraftListingWithFullPayload>(
-      `/api/draft-listings/${route.params.id}`,
-    );
-    if (!draft) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "Draft listing not found",
-      });
-    }
-    return draft;
-  },
-  {
-    watch: [() => route.params.id],
-  },
-);
-
-if (error.value) {
-  throw createError({
-    statusCode: 404,
-    statusMessage: "Draft listing not found",
-    fatal: true,
+  definePageMeta({
+    middleware: "draft-owner",
   });
-}
 
-const { user } = useUserSession();
-const isOwner = computed(
-  () => draftListingData.value?.userId === user.value?.id,
-);
+  const route = useRoute();
 
-const draftListing = computed(() => draftListingData.value);
+  /**
+   *  Fetch and validate draft listing - reactive to route changes
+   */
+  const { data: draftListingData, error } = await useAsyncData(
+    `draft-listing-${route.params.id}`,
+    async () => {
+      const draft = await useRequestFetch()<DraftListingWithFullPayload>(
+        `/api/draft-listings/${route.params.id}`,
+      );
+      if (!draft) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "Draft listing not found",
+        });
+      }
+      return draft;
+    },
+    {
+      watch: [() => route.params.id],
+    },
+  );
+
+  if (error.value) {
+    throw createError({
+      statusCode: error.value.statusCode || 404,
+      statusMessage: error.value.statusMessage || "Draft listing not found",
+      fatal: true,
+    });
+  }
+
+  const { user } = useUserSession();
+  const isOwner = computed(() => draftListingData.value?.userId === user.value?.id);
+
+  const draftListing = computed(() => draftListingData.value);
 </script>
 
 <style scoped lang="scss">
-@use "#styles/_utils/media" as mq;
+  @use "#styles/_utils/media" as mq;
 
-.preview-banner {
-  position: sticky;
-  top: 0;
-  z-index: 12;
-  background: linear-gradient(
-    135deg,
-    var(--blue-400) 50%,
-    var(--primary-400) 150%
-  );
-  padding: var(--size-16) 0;
-  box-shadow: 0 var(--size-2) var(--size-4) rgba(0, 0, 0, 0.1);
+  .preview-banner {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+    background: linear-gradient(135deg, var(--blue-400) 50%, var(--primary-400) 150%);
+    padding: var(--size-16) 0;
+    box-shadow: 0 var(--size-2) var(--size-4) rgba(0, 0, 0, 0.1);
 
-  &__content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--size-4);
-  }
-
-  &__back {
-    display: flex;
-    align-items: center;
-    gap: var(--size-4);
-    color: white;
-    text-decoration: none;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 0.8;
+    &__content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--size-4);
     }
 
-    svg {
-      flex-shrink: 0;
+    &__back {
+      display: flex;
+      align-items: center;
+      gap: var(--size-4);
+      color: white;
+      text-decoration: none;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      svg {
+        flex-shrink: 0;
+      }
+    }
+
+    &__badge {
+      display: flex;
+      align-items: center;
+      gap: var(--size-4);
+      color: var(--monochrome-900);
+      background: rgba(255, 255, 255, 0.2);
+      padding: var(--size-8);
+      border-radius: var(--size-8);
+      backdrop-filter: blur(10px);
+
+      svg {
+        flex-shrink: 0;
+      }
     }
   }
-
-  &__badge {
-    display: flex;
-    align-items: center;
-    gap: var(--size-4);
-    color: var(--monochrome-900);
-    background: rgba(255, 255, 255, 0.2);
-    padding: var(--size-8);
-    border-radius: var(--size-8);
-    backdrop-filter: blur(10px);
-
-    svg {
-      flex-shrink: 0;
-    }
-  }
-}
 </style>

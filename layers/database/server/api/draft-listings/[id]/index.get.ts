@@ -40,8 +40,8 @@ export default defineEventHandler(async (event) => {
 
     if (!isOwner && !isSharedUser) {
       throw createError({
-        statusCode: 404,
-        statusMessage: "Draft listing not found",
+        statusCode: 403,
+        statusMessage: "You do not have permission to view this draft listing",
       });
     }
 
