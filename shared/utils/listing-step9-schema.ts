@@ -12,7 +12,7 @@ export const mediaAssignmentSchema = z.object({
   filename: z.string().optional(),
   description: z
     .string()
-    .max(500, "Description must be 500 characters or less")
+    .max(100, "Description must be 100 characters or less")
     .nullable()
     .optional(),
   // Room IDs (only one should be set, or none for general property images)
@@ -109,9 +109,7 @@ export const step9Validation = {
    * Images are optional, so step is always valid
    */
   isStep9Valid: (data: Step9FormState): boolean => {
-    return !!(
-      data.property.description && data.property.description.length >= 10
-    );
+    return !!(data.property.description && data.property.description.length >= 10);
   },
 
   /**

@@ -225,6 +225,20 @@
         if (evt.oldIndex === undefined || evt.newIndex === undefined) return;
         if (evt.oldIndex === evt.newIndex) return;
 
+        // Revert Sortable DOM manipulation so Vue's reactivity handles the DOM update correctly
+        const itemEl = evt.item;
+        const parent = evt.from;
+
+        // Remove item from its new position
+        parent.removeChild(itemEl);
+
+        // Insert it back to its original position
+        if (evt.oldIndex === parent.children.length) {
+          parent.appendChild(itemEl);
+        } else {
+          parent.insertBefore(itemEl, parent.children[evt.oldIndex] || null);
+        }
+
         // Get the images for this group
         const groupImages = getImagesForGroup(groupKey);
         const movedImage = groupImages[evt.oldIndex];
