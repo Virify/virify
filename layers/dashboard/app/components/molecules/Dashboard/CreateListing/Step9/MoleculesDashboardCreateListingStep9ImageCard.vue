@@ -52,15 +52,15 @@
 
     <!-- Image Details -->
     <div class="p-2 space-y-2 pb-6">
-      <!-- Description -->
+      <!-- Image Title -->
       <UFormField
-        label="Description (Alt Text)"
+        label="Image title"
         :name="`property.media.${image.cloudflareId}.description`"
         hint="optional"
       >
         <UInput
           v-model="descriptionModel"
-          placeholder="Brief description for alt text..."
+          placeholder="Enter a title for this image"
           color="secondary"
           size="xs"
           class="w-full"
