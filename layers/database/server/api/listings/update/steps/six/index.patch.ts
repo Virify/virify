@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 import { step6Schema } from "~~/shared/utils/listing-step6-schema";
 import { GardenFacing, GardenPosition, OutdoorSpaceFeature, LandFeature } from "~~/layers/database/server/database/prisma/generated/enums";
@@ -104,7 +105,7 @@ export default defineEventHandler(async (event) => {
     // LIVE LISTING - update Listing table
     if (listingId) {
       const result = await prisma.listing.update({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         data: {
           property: {
             update: {
@@ -144,7 +145,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const result = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: {
         // Add step 6 to completedSteps if not already there
         ...(currentDraft && !currentDraft.completedSteps.includes(6) ? { completedSteps: { push: 6 } } : {}),

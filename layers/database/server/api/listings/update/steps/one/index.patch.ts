@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 import { step1Schema } from "~~/shared/utils/listing-step1-schema";
 
@@ -69,7 +70,7 @@ export default defineEventHandler(async (event) => {
     // LIVE LISTING - update Listing table
     if (listingId) {
       const existingListing = await prisma.listing.findUnique({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         include: { saleListing: true, rentalListing: true },
       });
 
@@ -93,7 +94,7 @@ export default defineEventHandler(async (event) => {
       }
 
       const result = await prisma.listing.update({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         data: updateData,
         include: {
           saleListing: true,
@@ -113,7 +114,7 @@ export default defineEventHandler(async (event) => {
 
     // DRAFT LISTING - update DraftListing table with completedSteps
     const existingDraft = await prisma.draftListing.findUnique({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId, ...getOwnershipFilter(user) },
       include: { saleListing: true, rentalListing: true },
     });
 
@@ -149,7 +150,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const draftResult = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: updateData,
       include: {
         saleListing: true,

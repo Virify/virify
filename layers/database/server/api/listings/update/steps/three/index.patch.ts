@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 import { step3Schema } from "~~/shared/utils/listing-step3-schema";
 
@@ -46,7 +47,7 @@ export default defineEventHandler(async (event) => {
     if (listingId) {
       // Read current price before update to archive it if it changed
       const currentListing = await prisma.listing.findUnique({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         select: { price: true },
       });
 
@@ -66,7 +67,7 @@ export default defineEventHandler(async (event) => {
       }
 
       const result = await prisma.listing.update({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         data: {
           ...updateData,
           // If price changed, archive the old price
@@ -109,7 +110,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const updatedDraftListing = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: {
         // Add step 3 to completedSteps if not already there
         ...(currentDraft && !currentDraft.completedSteps.includes(3) ? { completedSteps: { push: 3 } } : {}),
