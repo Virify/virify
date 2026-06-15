@@ -28,13 +28,13 @@ export default defineEventHandler(async (event) => {
     const availability = query.availability ?? "all";
 
     // Skip cache when a free-text search term is provided — unique per keystroke
-    if (!search && session.user.role !== "ADMIN") {
+    if (!search) {
       const cacheKey = `my-listings:${userId}:${status}:${sort}:${page}:${take}:${saleRent}:${availability}`;
       const storage = useStorage("cache");
       const cached = await storage.getItem(cacheKey);
       if (cached) return cached;
 
-      const result = await getUserOwnedListingsWithAnalytics(session.user as any, {
+      const result = await getUserOwnedListingsWithAnalytics(userId as number, {
         status: status as any,
         search,
         take,
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const { listings, total } = await getUserOwnedListingsWithAnalytics(
-      session.user as any,
+      userId as number,
       {
         status: status as any,
         search,

@@ -3,14 +3,12 @@ import type {
   RentalAvailabilityStatus,
   SaleAvailabilityStatus,
 } from "~~/layers/database/server/database/prisma/generated/client";
-import { getOwnershipFilter } from "~~/server/utils/ownership";
-import type { User } from "#auth-utils";
 
 /**
  * Count listings owned by the provided user matching filters
  */
 export async function getUserOwnedListingsCountWithFilters(
-  user: User,
+  userId: number,
   opts?: {
     status?: "all" | "active" | "inactive" | "draft" | "archived";
     search?: string;
@@ -18,7 +16,7 @@ export async function getUserOwnedListingsCountWithFilters(
 ): Promise<number> {
   const { status = "all", search = "" } = opts || {};
 
-  const where: Prisma.ListingWhereInput = { ...getOwnershipFilter(user) };
+  const where: Prisma.ListingWhereInput = { userId };
 
   // Apply status filters
   switch (status) {
@@ -70,7 +68,7 @@ export async function getUserOwnedListingsCountWithFilters(
  * Get listings owned by the provided user with lightweight analytics counts
  */
 export async function getUserOwnedListingsWithAnalytics(
-  user: User,
+  userId: number,
   opts?: {
     status?: "all" | "active" | "inactive" | "draft" | "archived";
     search?: string;
@@ -91,7 +89,7 @@ export async function getUserOwnedListingsWithAnalytics(
     availability = "all",
   } = opts || {};
 
-  const where: Prisma.ListingWhereInput = { ...getOwnershipFilter(user) };
+  const where: Prisma.ListingWhereInput = { userId };
 
   // Apply status filters
   switch (status) {
