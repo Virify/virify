@@ -1,3 +1,5 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
+
 /**
  * Handler for GET /api/user/draft-listings/
  * Returns paginated draft listings for the authenticated user.
@@ -19,7 +21,8 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Skip cache for free-text search (too many unique keys)
-    if (!search.trim()) {
+    // Also skip cache for ADMIN to prevent caching global data under their session key
+    if (!search.trim() && user.role !== "ADMIN") {
       const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
       const storage = useStorage("cache");
       const cached = await storage.getItem(cacheKey);
@@ -27,7 +30,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Build where clause
-    const where: any = { userId: user.id };
+    const where: any = { ...getOwnershipFilter(user) };
 
     // Apply search if provided
     if (search.trim()) {
@@ -107,7 +110,7 @@ export default defineEventHandler(async (event) => {
     ]);
 
     const result = { drafts, total };
-    if (!search.trim()) {
+    if (!search.trim() && user.role !== "ADMIN") {
       const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
       useStorage("cache")
         .setItem(cacheKey, result, { ttl: 30 * 60 })
