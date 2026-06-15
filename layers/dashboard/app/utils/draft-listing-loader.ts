@@ -25,8 +25,7 @@ export function loadStep1FromDraft(draft: DraftListingWithFullPayload) {
         furnishedStatus: draft.rentalListing.furnishedStatus,
         isBillsIncluded: draft.rentalListing.isBillsIncluded ?? false,
         rentalLength: draft.rentalListing.rentalLength,
-        availabilityStatus:
-          draft.rentalListing.availabilityStatus ?? "AVAILABLE",
+        availabilityStatus: draft.rentalListing.availabilityStatus ?? "AVAILABLE",
       },
     };
   }
@@ -37,8 +36,9 @@ export function loadStep2FromDraft(draft: DraftListingWithFullPayload) {
   if (draft.property) {
     return {
       property: {
-        address: draft.property.address
-          ? { ...draft.property.address }
+        address:
+          draft.property.address ?
+            { ...draft.property.address }
           : {
               number: null,
               flat: null,
@@ -70,13 +70,15 @@ export function loadStep3FromDraft(draft: DraftListingWithFullPayload) {
   if (draft.price !== null && draft.price !== undefined) {
     return {
       price: draft.price,
-      saleListing: draft.saleListing
-        ? {
+      saleListing:
+        draft.saleListing ?
+          {
             priceType: draft.saleListing.priceType ?? undefined,
           }
         : null,
-      rentalListing: draft.rentalListing
-        ? {
+      rentalListing:
+        draft.rentalListing ?
+          {
             rentFrequency: draft.rentalListing.rentFrequency ?? undefined,
             deposit: draft.rentalListing.deposit ?? null,
             holdingDeposit: draft.rentalListing.holdingDeposit ?? null,
@@ -104,9 +106,7 @@ export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
             size: b.size ?? null,
           })) ?? [],
         numberBedrooms:
-          draft.property.numberBedrooms ??
-          draft.property.bedroomFeatures?.length ??
-          0,
+          draft.property.numberBedrooms ?? draft.property.bedroomFeatures?.length ?? 0,
         bathroomFeatures:
           draft.property.bathroomFeatures?.map((b) => ({
             id: b.id,
@@ -118,9 +118,7 @@ export function loadStep4FromDraft(draft: DraftListingWithFullPayload) {
             size: b.size ?? null,
           })) ?? [],
         numberBathrooms:
-          draft.property.numberBathrooms ??
-          draft.property.bathroomFeatures?.length ??
-          0,
+          draft.property.numberBathrooms ?? draft.property.bathroomFeatures?.length ?? 0,
       },
     };
   }
@@ -147,9 +145,7 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
             size: k.size ?? null,
           })) ?? [],
         numberKitchens:
-          draft.property.numberKitchens ??
-          draft.property.kitchenFeatures?.length ??
-          0,
+          draft.property.numberKitchens ?? draft.property.kitchenFeatures?.length ?? 0,
         reception:
           draft.property.reception?.map((r) => ({
             id: r.id,
@@ -162,9 +158,7 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
             size: r.size ?? null,
           })) ?? [],
         numberReceptions:
-          draft.property.numberReceptions ??
-          draft.property.reception?.length ??
-          0,
+          draft.property.numberReceptions ?? draft.property.reception?.length ?? 0,
         otherRoom:
           draft.property.otherRoom?.map((o) => ({
             id: o.id,
@@ -177,9 +171,7 @@ export function loadStep5FromDraft(draft: DraftListingWithFullPayload) {
             size: o.size ?? null,
           })) ?? [],
         numberOtherRooms:
-          draft.property.numberOtherRooms ??
-          draft.property.otherRoom?.length ??
-          0,
+          draft.property.numberOtherRooms ?? draft.property.otherRoom?.length ?? 0,
       },
     };
   }
@@ -242,39 +234,45 @@ export function loadStep7FromDraft(draft: DraftListingWithFullPayload) {
   ) {
     return {
       property: {
-        parking: property.parking
-          ? {
+        parking:
+          property.parking ?
+            {
               description: property.parking.description ?? null,
               features: property.parking.features ?? [],
             }
           : { description: null, features: [] },
-        accessibilityFeatures: property.accessibilityFeatures
-          ? {
+        accessibilityFeatures:
+          property.accessibilityFeatures ?
+            {
               description: property.accessibilityFeatures.description ?? null,
               features: property.accessibilityFeatures.features ?? [],
             }
           : { description: null, features: [] },
-        securityFeatures: property.securityFeatures
-          ? {
+        securityFeatures:
+          property.securityFeatures ?
+            {
               description: property.securityFeatures.description ?? null,
               features: property.securityFeatures.features ?? [],
             }
           : { description: null, features: [] },
-        storageFeatures: property.storageFeatures
-          ? {
+        storageFeatures:
+          property.storageFeatures ?
+            {
               description: property.storageFeatures.description ?? null,
               features: property.storageFeatures.features ?? [],
             }
           : { description: null, features: [] },
-        utility: property.utility
-          ? {
+        utility:
+          property.utility ?
+            {
               description: property.utility.description ?? null,
               features: property.utility.features ?? [],
               size: property.utility.size ?? null,
             }
           : { description: null, features: [], size: null },
-        additionalFeatures: property.additionalFeatures
-          ? {
+        additionalFeatures:
+          property.additionalFeatures ?
+            {
               description: property.additionalFeatures.description ?? null,
               petFriendly: property.additionalFeatures.petFriendly ?? true,
               features: property.additionalFeatures.features ?? [],
@@ -291,22 +289,19 @@ export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
   if (property?.energyAndUtilities || property?.runningCosts) {
     return {
       property: {
-        energyAndUtilities: property.energyAndUtilities
-          ? {
+        energyAndUtilities:
+          property.energyAndUtilities ?
+            {
               description: property.energyAndUtilities.description ?? null,
               epcRating: property.energyAndUtilities.epcRating ?? "G",
-              epcCertificateUrl:
-                property.energyAndUtilities.epcCertificateUrl ?? null,
-              primaryHeatingType:
-                property.energyAndUtilities.primaryHeatingType ?? [],
+              epcCertificateUrl: property.energyAndUtilities.epcCertificateUrl ?? null,
+              primaryHeatingType: property.energyAndUtilities.primaryHeatingType ?? [],
               secondaryHeatingType:
                 property.energyAndUtilities.secondaryHeatingType ?? [],
               boilerType: property.energyAndUtilities.boilerType ?? null,
-              hotWaterSource:
-                property.energyAndUtilities.hotWaterSource ?? null,
+              hotWaterSource: property.energyAndUtilities.hotWaterSource ?? null,
               renewables: property.energyAndUtilities.renewables ?? [],
-              connectedUtilities:
-                property.energyAndUtilities.connectedUtilities ?? [],
+              connectedUtilities: property.energyAndUtilities.connectedUtilities ?? [],
             }
           : {
               description: null,
@@ -319,8 +314,9 @@ export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
               renewables: [],
               connectedUtilities: [],
             },
-        runningCosts: property.runningCosts
-          ? {
+        runningCosts:
+          property.runningCosts ?
+            {
               description: property.runningCosts.description ?? null,
               councilTaxBand: property.runningCosts.councilTaxBand ?? "A",
               serviceCharges: property.runningCosts.serviceCharges ?? null,
@@ -358,7 +354,7 @@ export function loadStep9FromDraft(draft: DraftListingWithFullPayload) {
     return {
       cloudflareId: m.image || "",
       filename: metadata.cloudflareImageId || m.image || "",
-      description: metadata.description || null,
+      description: (metadata.description || null)?.substring(0, 100),
       bedroomId: m.bedroomId || null,
       bathroomId: m.bathroomId || null,
       kitchenId: m.kitchenId || null,
