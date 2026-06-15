@@ -70,7 +70,7 @@ export function createInitialStep9Values(draftData?: any): Step9FormState {
     return {
       cloudflareId: m.image || "",
       filename: metadata.cloudflareImageId || m.image || "",
-      description: metadata.description || null,
+      description: (metadata.description || null)?.substring(0, 100),
       bedroomId: m.bedroomId || null,
       bathroomId: m.bathroomId || null,
       kitchenId: m.kitchenId || null,

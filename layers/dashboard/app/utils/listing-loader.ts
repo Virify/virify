@@ -12,8 +12,7 @@ export function loadStep1(listing: EditableListing) {
         tenureType: listing.saleListing.tenureType,
         chain: listing.saleListing.chain ?? false,
         sharedOwnership: listing.saleListing.sharedOwnership ?? false,
-        availabilityStatus:
-          listing.saleListing.availabilityStatus ?? "AVAILABLE",
+        availabilityStatus: listing.saleListing.availabilityStatus ?? "AVAILABLE",
       },
       rentalListing: null,
     };
@@ -25,8 +24,7 @@ export function loadStep1(listing: EditableListing) {
         furnishedStatus: listing.rentalListing.furnishedStatus,
         isBillsIncluded: listing.rentalListing.isBillsIncluded ?? false,
         rentalLength: listing.rentalListing.rentalLength,
-        availabilityStatus:
-          listing.rentalListing.availabilityStatus ?? "AVAILABLE",
+        availabilityStatus: listing.rentalListing.availabilityStatus ?? "AVAILABLE",
       },
     };
   }
@@ -37,8 +35,9 @@ export function loadStep2(listing: EditableListing) {
   if (listing.property) {
     return {
       property: {
-        address: listing.property.address
-          ? { ...listing.property.address }
+        address:
+          listing.property.address ?
+            { ...listing.property.address }
           : {
               number: null,
               flat: null,
@@ -71,13 +70,15 @@ export function loadStep3(listing: EditableListing) {
   if (listing.price !== null && listing.price !== undefined) {
     return {
       price: listing.price,
-      saleListing: listing.saleListing
-        ? {
+      saleListing:
+        listing.saleListing ?
+          {
             priceType: listing.saleListing.priceType ?? undefined,
           }
         : null,
-      rentalListing: listing.rentalListing
-        ? {
+      rentalListing:
+        listing.rentalListing ?
+          {
             rentFrequency: listing.rentalListing.rentFrequency ?? undefined,
             deposit: listing.rentalListing.deposit ?? null,
             holdingDeposit: listing.rentalListing.holdingDeposit ?? null,
@@ -163,9 +164,7 @@ export function loadStep5(listing: EditableListing) {
             size: r.size ?? null,
           })) ?? [],
         numberReceptions:
-          listing.property.numberReceptions ??
-          listing.property.reception?.length ??
-          0,
+          listing.property.numberReceptions ?? listing.property.reception?.length ?? 0,
         otherRoom:
           listing.property.otherRoom?.map((o) => ({
             id: o.id,
@@ -178,9 +177,7 @@ export function loadStep5(listing: EditableListing) {
             size: o.size ?? null,
           })) ?? [],
         numberOtherRooms:
-          listing.property.numberOtherRooms ??
-          listing.property.otherRoom?.length ??
-          0,
+          listing.property.numberOtherRooms ?? listing.property.otherRoom?.length ?? 0,
       },
     };
   }
@@ -243,39 +240,45 @@ export function loadStep7(listing: EditableListing) {
   ) {
     return {
       property: {
-        parking: property.parking
-          ? {
+        parking:
+          property.parking ?
+            {
               description: property.parking.description ?? null,
               features: property.parking.features ?? [],
             }
           : { description: null, features: [] },
-        accessibilityFeatures: property.accessibilityFeatures
-          ? {
+        accessibilityFeatures:
+          property.accessibilityFeatures ?
+            {
               description: property.accessibilityFeatures.description ?? null,
               features: property.accessibilityFeatures.features ?? [],
             }
           : { description: null, features: [] },
-        securityFeatures: property.securityFeatures
-          ? {
+        securityFeatures:
+          property.securityFeatures ?
+            {
               description: property.securityFeatures.description ?? null,
               features: property.securityFeatures.features ?? [],
             }
           : { description: null, features: [] },
-        storageFeatures: property.storageFeatures
-          ? {
+        storageFeatures:
+          property.storageFeatures ?
+            {
               description: property.storageFeatures.description ?? null,
               features: property.storageFeatures.features ?? [],
             }
           : { description: null, features: [] },
-        utility: property.utility
-          ? {
+        utility:
+          property.utility ?
+            {
               description: property.utility.description ?? null,
               features: property.utility.features ?? [],
               size: property.utility.size ?? null,
             }
           : { description: null, features: [], size: null },
-        additionalFeatures: property.additionalFeatures
-          ? {
+        additionalFeatures:
+          property.additionalFeatures ?
+            {
               description: property.additionalFeatures.description ?? null,
               petFriendly: property.additionalFeatures.petFriendly ?? true,
               features: property.additionalFeatures.features ?? [],
@@ -292,22 +295,19 @@ export function loadStep8(listing: EditableListing) {
   if (property?.energyAndUtilities || property?.runningCosts) {
     return {
       property: {
-        energyAndUtilities: property.energyAndUtilities
-          ? {
+        energyAndUtilities:
+          property.energyAndUtilities ?
+            {
               description: property.energyAndUtilities.description ?? null,
               epcRating: property.energyAndUtilities.epcRating ?? "G",
-              epcCertificateUrl:
-                property.energyAndUtilities.epcCertificateUrl ?? null,
-              primaryHeatingType:
-                property.energyAndUtilities.primaryHeatingType ?? [],
+              epcCertificateUrl: property.energyAndUtilities.epcCertificateUrl ?? null,
+              primaryHeatingType: property.energyAndUtilities.primaryHeatingType ?? [],
               secondaryHeatingType:
                 property.energyAndUtilities.secondaryHeatingType ?? [],
               boilerType: property.energyAndUtilities.boilerType ?? null,
-              hotWaterSource:
-                property.energyAndUtilities.hotWaterSource ?? null,
+              hotWaterSource: property.energyAndUtilities.hotWaterSource ?? null,
               renewables: property.energyAndUtilities.renewables ?? [],
-              connectedUtilities:
-                property.energyAndUtilities.connectedUtilities ?? [],
+              connectedUtilities: property.energyAndUtilities.connectedUtilities ?? [],
             }
           : {
               description: null,
@@ -320,8 +320,9 @@ export function loadStep8(listing: EditableListing) {
               renewables: [],
               connectedUtilities: [],
             },
-        runningCosts: property.runningCosts
-          ? {
+        runningCosts:
+          property.runningCosts ?
+            {
               description: property.runningCosts.description ?? null,
               councilTaxBand: property.runningCosts.councilTaxBand ?? "A",
               serviceCharges: property.runningCosts.serviceCharges ?? null,
@@ -344,34 +345,36 @@ export function loadStep9(listing: EditableListing) {
   const existingMedia = property?.media || [];
 
   // Map existing media to our format, filtering out records without a Cloudflare image ID
-  const media = existingMedia.filter((m: any) => m.image).map((m: any) => {
-    const metadata = m.metadata ? JSON.parse(m.metadata) : {};
-    const isGeneral =
-      !m.bedroomId &&
-      !m.bathroomId &&
-      !m.kitchenId &&
-      !m.receptionId &&
-      !m.otherRoomId &&
-      !m.gardenId &&
-      !m.yardId &&
-      !m.landId;
+  const media = existingMedia
+    .filter((m: any) => m.image)
+    .map((m: any) => {
+      const metadata = m.metadata ? JSON.parse(m.metadata) : {};
+      const isGeneral =
+        !m.bedroomId &&
+        !m.bathroomId &&
+        !m.kitchenId &&
+        !m.receptionId &&
+        !m.otherRoomId &&
+        !m.gardenId &&
+        !m.yardId &&
+        !m.landId;
 
-    return {
-      cloudflareId: m.image || "",
-      filename: metadata.cloudflareImageId || m.image || "",
-      description: metadata.description || null,
-      bedroomId: m.bedroomId || null,
-      bathroomId: m.bathroomId || null,
-      kitchenId: m.kitchenId || null,
-      receptionId: m.receptionId || null,
-      otherRoomId: m.otherRoomId || null,
-      gardenId: m.gardenId || null,
-      yardId: m.yardId || null,
-      landId: m.landId || null,
-      outdoorSpaceId: m.outdoorSpaceId || null,
-      isGeneral,
-    };
-  });
+      return {
+        cloudflareId: m.image || "",
+        filename: metadata.cloudflareImageId || m.image || "",
+        description: (metadata.description || null)?.substring(0, 100),
+        bedroomId: m.bedroomId || null,
+        bathroomId: m.bathroomId || null,
+        kitchenId: m.kitchenId || null,
+        receptionId: m.receptionId || null,
+        otherRoomId: m.otherRoomId || null,
+        gardenId: m.gardenId || null,
+        yardId: m.yardId || null,
+        landId: m.landId || null,
+        outdoorSpaceId: m.outdoorSpaceId || null,
+        isGeneral,
+      };
+    });
 
   return {
     property: {
@@ -385,9 +388,7 @@ export function loadStep9(listing: EditableListing) {
  * Populate all step data from a draft listing
  * Returns a record of step data indexed by step number
  */
-export function populateAllSteps(
-  listing: EditableListing,
-): Record<number, any> {
+export function populateAllSteps(listing: EditableListing): Record<number, any> {
   const stepData: Record<number, any> = {};
 
   const step1Data = loadStep1(listing);

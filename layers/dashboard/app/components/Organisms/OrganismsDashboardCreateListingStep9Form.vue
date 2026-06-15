@@ -362,7 +362,7 @@
   function getSubmissionData() {
     return {
       property: {
-        description: state.property.description,
+        description: state.property.description ?? "",
         media: formatMediaForSubmission(state.property.media),
       },
     };

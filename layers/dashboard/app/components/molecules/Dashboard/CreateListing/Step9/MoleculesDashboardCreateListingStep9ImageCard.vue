@@ -55,7 +55,7 @@
       <!-- Image Title -->
       <UFormField
         label="Image title"
-        :name="`property.media.${image.cloudflareId}.description`"
+        :name="`property.media.${actualIndex}.description`"
         hint="optional"
       >
         <UInput
@@ -110,6 +110,7 @@
     image: MediaAssignment;
     position: number;
     totalInGroup: number;
+    actualIndex: number;
     isMain?: boolean;
     isDeleting?: boolean;
     disabled?: boolean;
