@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event);
+    console.log("---- STEP 9 PAYLOAD ----\n", JSON.stringify(body, null, 2));
     const { draftId, listingId, property } = stepDataSchema.parse(body);
 
     const { media, description } = property;
