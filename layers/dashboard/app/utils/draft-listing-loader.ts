@@ -336,7 +336,9 @@ export function loadStep8FromDraft(draft: DraftListingWithFullPayload) {
 
 export function loadStep9FromDraft(draft: DraftListingWithFullPayload) {
   const property = draft.property;
-  const existingMedia = property?.media || [];
+  const existingMedia = [...(property?.media || [])].sort(
+    (a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+  );
 
   // Map existing media to our format
   const media = existingMedia.map((m: any) => {
