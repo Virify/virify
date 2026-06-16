@@ -12,8 +12,9 @@ export const mediaAssignmentSchema = z.object({
   filename: z.string().optional(),
   description: z
     .string()
-    .min(1, "Image title is required")
-    .max(500, "Description must be 500 characters or less"),
+    .max(100, "Description must be 100 characters or less")
+    .nullable()
+    .optional(),
   // Room IDs (only one should be set, or none for general property images)
   bedroomId: z.number().int().positive().nullable().optional(),
   bathroomId: z.number().int().positive().nullable().optional(),
