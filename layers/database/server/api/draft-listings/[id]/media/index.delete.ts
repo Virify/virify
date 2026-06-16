@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 
 /**
@@ -42,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (listingId) {
       // LIVE LISTING
       const existingListing = await prisma.listing.findUnique({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         include: { property: true },
       });
 
@@ -57,7 +58,7 @@ export default defineEventHandler(async (event) => {
     } else {
       // DRAFT LISTING
       const existingDraft = await prisma.draftListing.findUnique({
-        where: { id: draftId, userId: user.id },
+        where: { id: draftId, ...getOwnershipFilter(user) },
         include: { property: true },
       });
 
