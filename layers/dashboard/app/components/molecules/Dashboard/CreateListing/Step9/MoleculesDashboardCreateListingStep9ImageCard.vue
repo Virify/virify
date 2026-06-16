@@ -60,12 +60,13 @@
         eagerValidation
       >
         <UInput
-          v-model="descriptionModel"
+          :model-value="image.description ?? ''"
           placeholder="Enter a title for this image"
           color="secondary"
           size="xs"
           class="w-full"
           maxlength="100"
+          @update:model-value="$emit('update-title', image.cloudflareId, String($event))"
         />
       </UFormField>
 
@@ -123,16 +124,10 @@
 
   defineEmits<{
     delete: [cloudflareId: string];
+    "update-title": [cloudflareId: string, title: string];
     "assign-room": [cloudflareId: string, roomValue: string];
     "change-position": [cloudflareId: string, newPosition: number];
   }>();
-
-  const descriptionModel = computed({
-    get: () => props.image.description ?? undefined,
-    set: (val: string | undefined) => {
-      props.image.description = val ?? null;
-    },
-  });
 
   // Generate position options based on total images in group
   const positionOptions = computed(() => {

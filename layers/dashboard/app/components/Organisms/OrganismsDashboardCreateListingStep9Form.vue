@@ -74,6 +74,7 @@
         :disabled="isUploading || isProcessing"
         @remove-all="removeAllImages"
         @delete-image="removeImageById"
+        @update-title="updateImageTitle"
         @assign-room="assignToRoomById"
         @set-sortable-ref="setSortableRef"
         @change-position="changePositionInGroup"
@@ -176,6 +177,19 @@
   );
 
   const roomOptions = computed(() => generateRoomOptions(availableRooms.value));
+
+  /**
+   * Update an image title. Writes directly to the single source of truth
+   * (state.property.media) keyed by cloudflareId so the value is never tied to
+   * fragile object-reference identity across reorders/re-renders.
+   */
+  function updateImageTitle(cloudflareId: string, title: string) {
+    const image = state.property.media.find((img) => img.cloudflareId === cloudflareId);
+    if (!image) return;
+
+    const trimmed = title.slice(0, 100);
+    image.description = trimmed.length > 0 ? trimmed : null;
+  }
 
   /**
    * Assign image to room
@@ -357,10 +371,27 @@
   }
 
   function getFieldsToModerate() {
+    // Build a lookup of the last-saved image titles, keyed by cloudflareId.
+    // The wrapper's generic change-detection can't resolve an array keyed by
+    // cloudflareId, so we diff here and only return titles that actually
+    // changed. Image *content* is already moderated once at upload time
+    // (see useStep9Media → checkImages); we never re-moderate images on save.
+    const lastSaved = getStepData(9) as
+      | { property?: { media?: { cloudflareId: string; description?: string | null }[] } }
+      | undefined;
+    const savedTitles = new Map<string, string>();
+    for (const img of lastSaved?.property?.media ?? []) {
+      savedTitles.set(img.cloudflareId, (img.description ?? "").trim());
+    }
+
     return [
       { name: "property.description", value: state.property.description },
       ...state.property.media
-        .filter((img) => img.description)
+        .filter((img) => {
+          const current = (img.description ?? "").trim();
+          // Only moderate titles that have content AND differ from last save.
+          return current.length > 0 && current !== savedTitles.get(img.cloudflareId);
+        })
         .map((img) => ({
           name: `media.${img.cloudflareId}.description`,
           value: img.description ?? "",
@@ -372,7 +403,5 @@
     navigateTo("/dashboard/draft-listings");
   }
 
-  function onStepSaved() {
-    console.log("Step 9 saved");
-  }
+  function onStepSaved() {}
 </script>

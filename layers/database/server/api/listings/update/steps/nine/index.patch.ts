@@ -14,10 +14,9 @@ const stepDataSchema = step9Schema
     draftId: z.number().int().positive().optional(),
     listingId: z.number().int().positive().optional(),
   })
-  .refine(
-    (data) => data.draftId !== undefined || data.listingId !== undefined,
-    { message: "Either draftId or listingId must be provided" },
-  );
+  .refine((data) => data.draftId !== undefined || data.listingId !== undefined, {
+    message: "Either draftId or listingId must be provided",
+  });
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -25,7 +24,6 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event);
-    console.log("---- STEP 9 PAYLOAD ----\n", JSON.stringify(body, null, 2));
     const { draftId, listingId, property } = stepDataSchema.parse(body);
 
     const { media, description } = property;
