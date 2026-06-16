@@ -84,7 +84,7 @@
 
 <script setup lang="ts">
   import Sortable, { type SortableEvent } from "sortablejs";
-  import { useDebounceFn, useMediaQuery } from "@vueuse/core";
+  import { useMediaQuery } from "@vueuse/core";
 
   // Detect mobile for disabling drag
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -260,9 +260,6 @@
 
         // Reorder images within the main media array
         reorderImageWithinGroup(groupKey, evt.oldIndex, evt.newIndex);
-
-        // Auto-save the new order (lightweight - just sortOrder update)
-        autoSaveMediaOrder();
       },
     });
 
@@ -332,32 +329,7 @@
 
     // Reorder using existing function
     reorderImageWithinGroup(groupKey, currentIndex, targetIndex);
-
-    // Auto-save
-    autoSaveMediaOrder();
   }
-
-  /**
-   * Auto-save media order after drag (lightweight - no toast)
-   */
-  const autoSaveMediaOrder = useDebounceFn(async () => {
-    if (!draftListingId.value) return;
-
-    try {
-      await useRequestFetch()("/api/listings/update/steps/nine/", {
-        method: "PATCH",
-        body: {
-          draftId: draftListingId.value,
-          property: {
-            description: state.property.description ?? "",
-            media: formatMediaForSubmission(state.property.media),
-          },
-        },
-      });
-    } catch (error) {
-      console.error("Failed to auto-save media order:", error);
-    }
-  }, 500);
 
   // Watch for screen size changes to enable/disable sortable
   watch(isDesktop, (desktop) => {
