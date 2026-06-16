@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 import { step5Schema } from "~~/shared/utils/listing-step5-schema";
 import { OtherRoomType, ReceptionType, KitchenFeature, RoomFeature } from "~~/layers/database/server/database/prisma/generated/enums";
@@ -74,7 +75,7 @@ export default defineEventHandler(async (event) => {
     // LIVE LISTING - update Listing table
     if (listingId) {
       const result = await prisma.listing.update({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         data: { property: propertyUpdate },
         include: {
           property: {
@@ -111,7 +112,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const draftResult = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: {
         // Add step 5 to completedSteps if not already there
         ...(currentDraft && !currentDraft.completedSteps.includes(5) ? { completedSteps: { push: 5 } } : {}),

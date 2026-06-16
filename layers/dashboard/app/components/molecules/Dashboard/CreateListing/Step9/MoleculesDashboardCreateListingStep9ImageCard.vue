@@ -56,7 +56,8 @@
       <UFormField
         label="Image title"
         :name="`property.media.${actualIndex}.description`"
-        hint="optional"
+        required
+        eagerValidation
       >
         <UInput
           v-model="descriptionModel"

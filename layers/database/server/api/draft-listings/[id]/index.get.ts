@@ -34,11 +34,12 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Allow access if the user is the owner or a shared user
+    // Allow access if the user is the owner, a shared user, or an ADMIN
     const isOwner = draft.userId === user.id;
     const isSharedUser = draft.sharedUsers.some((u) => u.id === user.id);
+    const isAdmin = user.role === "ADMIN";
 
-    if (!isOwner && !isSharedUser) {
+    if (!isOwner && !isSharedUser && !isAdmin) {
       throw createError({
         statusCode: 403,
         statusMessage: "You do not have permission to view this draft listing",

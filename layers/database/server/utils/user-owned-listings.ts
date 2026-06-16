@@ -1,142 +1,190 @@
-import type { Prisma, RentalAvailabilityStatus, SaleAvailabilityStatus } from "~~/layers/database/server/database/prisma/generated/client"
+import type {
+  Prisma,
+  RentalAvailabilityStatus,
+  SaleAvailabilityStatus,
+} from "~~/layers/database/server/database/prisma/generated/client";
 
 /**
  * Count listings owned by the provided user matching filters
  */
 export async function getUserOwnedListingsCountWithFilters(
   userId: number,
-  opts?: { 
-    status?: "all" | "active" | "inactive" | "draft" | "archived"
-    search?: string
-  }
+  opts?: {
+    status?: "all" | "active" | "inactive" | "draft" | "archived";
+    search?: string;
+  },
 ): Promise<number> {
-  const { status = "all", search = "" } = opts || {}
+  const { status = "all", search = "" } = opts || {};
 
-  const where: Prisma.ListingWhereInput = { userId }
+  const where: Prisma.ListingWhereInput = { userId };
 
   // Apply status filters
   switch (status) {
     case "active":
-      where.published = true
-      where.archived = false
-      break
+      where.published = true;
+      where.archived = false;
+      break;
     case "inactive":
-      where.AND = [{ published: false }, { NOT: { publishedAt: null } }, { archived: false }]
-      break
+      where.AND = [
+        { published: false },
+        { NOT: { publishedAt: null } },
+        { archived: false },
+      ];
+      break;
     case "draft":
-      where.published = false
-      where.publishedAt = null
-      where.archived = false
-      break
+      where.published = false;
+      where.publishedAt = null;
+      where.archived = false;
+      break;
     case "archived":
-      where.archived = true
-      break
+      where.archived = true;
+      break;
     default:
       // "all" - show everything except archived
-      where.archived = false
+      where.archived = false;
   }
 
   // Apply search filters
-  const searchTerm = search.trim()
+  const searchTerm = search.trim();
   if (searchTerm) {
     where.OR = [
-      { property: { address: { fullAddress: { contains: searchTerm, mode: "insensitive" } } } },
-    ]
-    
-    const numericSearch = Number(searchTerm)
+      {
+        property: {
+          address: { fullAddress: { contains: searchTerm, mode: "insensitive" } },
+        },
+      },
+    ];
+
+    const numericSearch = Number(searchTerm);
     if (!Number.isNaN(numericSearch)) {
-      (where.OR as Prisma.ListingWhereInput[]).push({ price: numericSearch })
+      (where.OR as Prisma.ListingWhereInput[]).push({ price: numericSearch });
     }
   }
 
-  return prisma.listing.count({ where })
+  return prisma.listing.count({ where });
 }
 
 /**
- * Get listings owned by the provided user with lightweight analytics counts
+ * Get listings owned by the provided user with lightweight analytics counts.
+ * Pass `userId` as `undefined` to return listings for ALL users (admin use only).
  */
 export async function getUserOwnedListingsWithAnalytics(
-  userId: number,
-  opts?: { 
-    status?: "all" | "active" | "inactive" | "draft" | "archived"
-    search?: string
-    take?: number
-    skip?: number
-    sort?: "new" | "old" | "premium" | "featured" | "basic"
-    saleRent?: "all" | "sale" | "rent"
-    availability?: "all" | "AVAILABLE" | "UNDER_OFFER" | "SOLD"
-  }
+  userId: number | undefined,
+  opts?: {
+    status?: "all" | "active" | "inactive" | "draft" | "archived";
+    search?: string;
+    take?: number;
+    skip?: number;
+    sort?: "new" | "old" | "premium" | "featured" | "basic";
+    saleRent?: "all" | "sale" | "rent";
+    availability?: "all" | "AVAILABLE" | "UNDER_OFFER" | "SOLD";
+    /** When set, exclude listings owned by this userId (admin 'other' filter) */
+    excludeUserId?: number;
+  },
 ): Promise<{ listings: OwnedListingWithAnalytics[]; total: number }> {
-  const { status = "all", search = "", take = 50, skip = 0, sort = "new", saleRent = "all", availability = "all" } = opts || {}
+  const {
+    status = "all",
+    search = "",
+    take = 50,
+    skip = 0,
+    sort = "new",
+    saleRent = "all",
+    availability = "all",
+    excludeUserId,
+  } = opts || {};
 
-  const where: Prisma.ListingWhereInput = { userId }
+  // When userId is undefined (admin all-access), omit the userId constraint
+  const where: Prisma.ListingWhereInput = userId !== undefined ? { userId } : {};
+
+  // Admin "other" filter: exclude the admin's own listings
+  if (excludeUserId !== undefined) {
+    where.userId = { not: excludeUserId };
+  }
 
   // Apply status filters
   switch (status) {
     case "active":
-      where.published = true
-      where.archived = false
-      break
+      where.published = true;
+      where.archived = false;
+      break;
     case "inactive":
-      where.AND = [{ published: false }, { NOT: { publishedAt: null } }, { archived: false }]
-      break
+      where.AND = [
+        { published: false },
+        { NOT: { publishedAt: null } },
+        { archived: false },
+      ];
+      break;
     case "draft":
-      where.published = false
-      where.publishedAt = null
-      where.archived = false
-      break
+      where.published = false;
+      where.publishedAt = null;
+      where.archived = false;
+      break;
     case "archived":
-      where.archived = true
-      break
+      where.archived = true;
+      break;
     default:
       // "all" - show everything except archived
-      where.archived = false
+      where.archived = false;
   }
 
   // Apply sale/rent filter
   if (saleRent === "sale") {
-    where.saleListing = { isNot: null }
-    where.rentalListing = null
+    where.saleListing = { isNot: null };
+    where.rentalListing = null;
   } else if (saleRent === "rent") {
-    where.rentalListing = { isNot: null }
+    where.rentalListing = { isNot: null };
   }
 
   // Apply availability filter
   if (availability === "AVAILABLE") {
     where.OR = [
-      { saleListing: { availabilityStatus: 'AVAILABLE' } },
-      { rentalListing: { availabilityStatus: 'AVAILABLE' } },
-    ]
+      { saleListing: { availabilityStatus: "AVAILABLE" } },
+      { rentalListing: { availabilityStatus: "AVAILABLE" } },
+    ];
   } else if (availability === "UNDER_OFFER") {
     where.OR = [
-      { saleListing: { availabilityStatus: 'UNDER_OFFER' } },
-      { rentalListing: { availabilityStatus: 'LET_AGREED' } },
-    ]
+      { saleListing: { availabilityStatus: "UNDER_OFFER" } },
+      { rentalListing: { availabilityStatus: "LET_AGREED" } },
+    ];
   } else if (availability === "SOLD") {
     where.OR = [
-      { saleListing: { availabilityStatus: 'SOLD' } },
-      { rentalListing: { availabilityStatus: 'LET' } },
-    ]
+      { saleListing: { availabilityStatus: "SOLD" } },
+      { rentalListing: { availabilityStatus: "LET" } },
+    ];
   }
 
   // Apply search filters
-  const searchTerm = search.trim()
+  const searchTerm = search.trim();
   if (searchTerm) {
-    where.OR = [
-      { property: { address: { fullAddress: { contains: searchTerm, mode: "insensitive" } } } },
-    ]
-    
-    const numericSearch = Number(searchTerm)
-    if (!Number.isNaN(numericSearch)) {
-      (where.OR as Prisma.ListingWhereInput[]).push({ price: numericSearch })
+    const searchConditions: Prisma.ListingWhereInput[] = [
+      {
+        property: {
+          address: { fullAddress: { contains: searchTerm, mode: "insensitive" } },
+        },
+      },
+    ];
+
+    // When showing all users (admin), also search by username/email
+    if (userId === undefined) {
+      searchConditions.push(
+        { user: { username: { contains: searchTerm, mode: "insensitive" } } },
+        { user: { email: { contains: searchTerm, mode: "insensitive" } } },
+      );
     }
+
+    const numericSearch = Number(searchTerm);
+    if (!Number.isNaN(numericSearch)) {
+      searchConditions.push({ price: numericSearch });
+    }
+
+    where.OR = searchConditions;
   }
 
   // Get total count for pagination
-  const total = await prisma.listing.count({ where })
+  const total = await prisma.listing.count({ where });
 
   // Fetch listings
-  const listings = await prisma.listing.findMany({
+  const listings = (await prisma.listing.findMany({
     where,
     select: {
       ...listingCardFields,
@@ -148,12 +196,16 @@ export async function getUserOwnedListingsWithAnalytics(
     },
     take,
     skip,
-    orderBy: { updatedAt: sort === 'old' ? 'asc' : 'desc' },
-  }) as (ListingCardType & { published: boolean; publishedAt: Date | null; archived: boolean })[]
+    orderBy: { updatedAt: sort === "old" ? "asc" : "desc" },
+  })) as (ListingCardType & {
+    published: boolean;
+    publishedAt: Date | null;
+    archived: boolean;
+  })[];
 
-  if (listings.length === 0) return { listings: [], total }
+  if (listings.length === 0) return { listings: [], total };
 
-  const listingIds = listings.map(listing => listing.id)
+  const listingIds = listings.map((listing) => listing.id);
 
   // Fetch analytics data in parallel
   const [viewsData, favouritesData, enquiriesData] = await Promise.all([
@@ -166,7 +218,7 @@ export async function getUserOwnedListingsWithAnalytics(
       by: ["listingId"],
       where: {
         listingId: { in: listingIds },
-        userPreferences: { userId: { not: userId } },
+        ...(userId !== undefined ? { userPreferences: { userId: { not: userId } } } : {}),
       },
       _count: { listingId: true },
     }),
@@ -175,15 +227,19 @@ export async function getUserOwnedListingsWithAnalytics(
       where: { listingId: { in: listingIds } },
       _count: { listingId: true },
     }),
-  ])
+  ]);
 
   // Create lookup maps for analytics
-  const viewsMap = new Map(viewsData.map(v => [v.listingId!, v._count.listingId]))
-  const favouritesMap = new Map(favouritesData.map(v => [v.listingId!, v._count.listingId]))
-  const enquiriesMap = new Map(enquiriesData.map(v => [v.listingId!, v._count.listingId]))
+  const viewsMap = new Map(viewsData.map((v) => [v.listingId!, v._count.listingId]));
+  const favouritesMap = new Map(
+    favouritesData.map((v) => [v.listingId!, v._count.listingId]),
+  );
+  const enquiriesMap = new Map(
+    enquiriesData.map((v) => [v.listingId!, v._count.listingId]),
+  );
 
   // Apply tier-based sorting if requested
-  const sortedListings = applyTierSorting(listings, sort)
+  const sortedListings = applyTierSorting(listings, sort);
 
   const enrichedListings = sortedListings.map((listing) => ({
     ...listing,
@@ -195,32 +251,36 @@ export async function getUserOwnedListingsWithAnalytics(
     published: listing.published,
     archived: listing.archived,
     isDraft: !listing.published && !listing.publishedAt,
-  }))
+  }));
 
-  return { listings: enrichedListings, total }
+  return { listings: enrichedListings, total };
 }
 
 function applyTierSorting(listings: any[], sort: string) {
-  if (!['premium', 'featured', 'basic'].includes(sort)) {
-    return listings
+  if (!["premium", "featured", "basic"].includes(sort)) {
+    return listings;
   }
 
-  const targetTier = sort.toUpperCase()
+  const targetTier = sort.toUpperCase();
   // Filter to show ONLY the selected tier
-  return listings.filter((listing: any) => 
-    (listing.listingTier || '').toUpperCase() === targetTier
-  )
+  return listings.filter(
+    (listing: any) => (listing.listingTier || "").toUpperCase() === targetTier,
+  );
 }
 
 import { invalidateListingCache } from "./cache";
 
-export async function toggleListingPublished(userId: number, listingId: number, published: boolean) {
-  const listing = await prisma.listing.findFirst({ 
-    where: { id: listingId, userId } 
-  })
-  
+export async function toggleListingPublished(
+  userId: number,
+  listingId: number,
+  published: boolean,
+) {
+  const listing = await prisma.listing.findFirst({
+    where: { id: listingId, userId },
+  });
+
   if (!listing) {
-    throw createError({ statusCode: 404, statusMessage: "Listing not found" })
+    throw createError({ statusCode: 404, statusMessage: "Listing not found" });
   }
 
   const result = await prisma.listing.update({
@@ -234,22 +294,22 @@ export async function toggleListingPublished(userId: number, listingId: number, 
       published: true,
       publishedAt: true,
     },
-  })
+  });
 
   // Invalidate cache after update
   await invalidateListingCache(listingId);
 
   // Send websocket update for listings count change (if this changes draft status)
-  const wasDraft = !listing.published && !listing.publishedAt
-  const isDraft = !result.published && !result.publishedAt
-  
-  return { result, wasDraft, isDraft }
+  const wasDraft = !listing.published && !listing.publishedAt;
+  const isDraft = !result.published && !result.publishedAt;
+
+  return { result, wasDraft, isDraft };
 }
 
 export async function updateListingAvailabilityStatus(
   userId: number,
   listingId: number,
-  availabilityStatus: SaleAvailabilityStatus | RentalAvailabilityStatus
+  availabilityStatus: SaleAvailabilityStatus | RentalAvailabilityStatus,
 ) {
   const listing = await prisma.listing.findFirst({
     where: { id: listingId, userId },
@@ -258,45 +318,50 @@ export async function updateListingAvailabilityStatus(
       saleListing: { select: { id: true } },
       rentalListing: { select: { id: true } },
     },
-  })
+  });
 
   if (!listing) {
-    throw createError({ statusCode: 404, statusMessage: 'Listing not found' })
+    throw createError({ statusCode: 404, statusMessage: "Listing not found" });
   }
 
   if (listing.saleListing) {
     await prisma.saleListing.update({
       where: { listingId },
       data: { availabilityStatus: availabilityStatus as SaleAvailabilityStatus },
-    })
+    });
   } else if (listing.rentalListing) {
     await prisma.rentalListing.update({
       where: { listingId },
       data: { availabilityStatus: availabilityStatus as RentalAvailabilityStatus },
-    })
+    });
   } else {
-    throw createError({ statusCode: 422, statusMessage: 'Listing has no sale or rental type' })
+    throw createError({
+      statusCode: 422,
+      statusMessage: "Listing has no sale or rental type",
+    });
   }
 
-  await invalidateListingCache(listingId)
+  await invalidateListingCache(listingId);
 }
 
 export async function archiveListing(userId: number, listingId: number) {
-  console.log(`[archiveListing] Starting archive for listing ${listingId}, user ${userId}`)
-  
-  const listing = await prisma.listing.findFirst({ 
-    where: { id: listingId, userId } 
-  })
-  
+  console.log(
+    `[archiveListing] Starting archive for listing ${listingId}, user ${userId}`,
+  );
+
+  const listing = await prisma.listing.findFirst({
+    where: { id: listingId, userId },
+  });
+
   if (!listing) {
-    console.error(`[archiveListing] Listing ${listingId} not found for user ${userId}`)
-    throw createError({ statusCode: 404, statusMessage: "Listing not found" })
+    console.error(`[archiveListing] Listing ${listingId} not found for user ${userId}`);
+    throw createError({ statusCode: 404, statusMessage: "Listing not found" });
   }
 
   console.log(`[archiveListing] Found listing ${listingId}, current state:`, {
     published: listing.published,
     archived: listing.archived,
-  })
+  });
 
   const result = await prisma.listing.update({
     where: { id: listingId },
@@ -311,12 +376,12 @@ export async function archiveListing(userId: number, listingId: number) {
       archived: true,
       archivedAt: true,
     },
-  })
+  });
 
   // Invalidate cache after update
   await invalidateListingCache(listingId);
 
-  console.log(`[archiveListing] Successfully updated listing ${listingId}:`, result)
+  console.log(`[archiveListing] Successfully updated listing ${listingId}:`, result);
 
-  return result
+  return result;
 }

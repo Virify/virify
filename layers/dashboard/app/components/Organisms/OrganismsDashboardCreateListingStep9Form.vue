@@ -130,12 +130,25 @@
     },
   });
 
-  const isFormValid = computed(
-    () => state.property.description.length >= 10 && state.property.media.length > 0,
+  const allImagesHaveDescriptions = computed(
+    () =>
+      state.property.media.length > 0 &&
+      state.property.media.every((img) => (img.description ?? "").trim().length > 0),
   );
 
-  // Save progress only requires a valid description — photos are required for completion/publish
-  const isSaveValid = computed(() => state.property.description.length >= 10);
+  const isFormValid = computed(
+    () =>
+      state.property.description.length >= 10 &&
+      state.property.media.length > 0 &&
+      allImagesHaveDescriptions.value,
+  );
+
+  // Save progress requires description + all uploaded images to have descriptions (schema enforces this server-side)
+  const isSaveValid = computed(
+    () =>
+      state.property.description.length >= 10 &&
+      (state.property.media.length === 0 || allImagesHaveDescriptions.value),
+  );
 
   const {
     uploadProgress,

@@ -15,23 +15,23 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    const listingId = getRouterParam(event, 'id');
-    
+    const listingId = getRouterParam(event, "id");
+
     if (!listingId || isNaN(Number(listingId))) {
       throw createError({
         statusCode: 400,
-        statusMessage: "Invalid listing ID"
+        statusMessage: "Invalid listing ID",
       });
     }
 
     const listingIdNum = Number(listingId);
-    const listing = await getListingByIdForEdit(listingIdNum, user.id);
+    const listing = await getListingByIdForEdit(listingIdNum, user as any);
 
     // Return 404 if listing doesn't exist or doesn't belong to the user
     if (!listing) {
       throw createError({
         statusCode: 404,
-        statusMessage: "Listing not found"
+        statusMessage: "Listing not found",
       });
     }
 

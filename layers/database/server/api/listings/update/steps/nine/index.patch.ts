@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 /**
  * Step 9: Property Images API Endpoint
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event) => {
     // LIVE LISTING - update Listing table
     if (listingId) {
       const existingListing = await prisma.listing.findUnique({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         include: {
           property: {
             include: {
@@ -83,7 +84,7 @@ export default defineEventHandler(async (event) => {
 
       return await prisma.listing
         .findUnique({
-          where: { id: listingId, userId: user.id },
+          where: { id: listingId, ...getOwnershipFilter(user) },
           include: {
             property: {
               include: {
@@ -116,7 +117,7 @@ export default defineEventHandler(async (event) => {
 
     // DRAFT LISTING - update DraftListing table with completedSteps
     const existingDraft = await prisma.draftListing.findUnique({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId, ...getOwnershipFilter(user) },
       include: {
         property: {
           include: {
@@ -171,7 +172,7 @@ export default defineEventHandler(async (event) => {
 
     // Update draft with step completion
     const result = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: {
         // Add step 9 to completedSteps if not already there
         ...(!completedSteps.includes(9) ? { completedSteps: { push: 9 } } : {}),

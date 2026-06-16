@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 import { step7Schema } from "~~/shared/utils/listing-step7-schema";
 import {
@@ -127,7 +128,7 @@ export default defineEventHandler(async (event) => {
     // LIVE LISTING - update Listing table
     if (listingId) {
       const result = await prisma.listing.update({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         data: { property: { update: propertyUpdate } },
         include: {
           property: {
@@ -160,7 +161,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const result = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: {
         // Add step 7 to completedSteps if not already there
         ...(currentDraft && !currentDraft.completedSteps.includes(7) ? { completedSteps: { push: 7 } } : {}),

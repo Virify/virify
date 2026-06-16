@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import { z } from "zod";
 import { step2Schema } from "~~/shared/utils/listing-step2-schema";
 import { updateLocationByAddressId } from "~~/layers/database/server/utils/location";
@@ -109,7 +110,7 @@ export default defineEventHandler(async (event) => {
     // LIVE LISTING - update Listing table
     if (listingId) {
       const result = await prisma.listing.update({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         data: { property: propertyUpdate, moveInDate: moveInDate ?? null },
         include: {
           property: {
@@ -137,7 +138,7 @@ export default defineEventHandler(async (event) => {
     });
 
     const draftResult = await prisma.draftListing.update({
-      where: { id: draftId!, userId: user.id },
+      where: { id: draftId!, ...getOwnershipFilter(user) },
       data: {
         // Add step 2 to completedSteps if not already there
         ...(currentDraft && !currentDraft.completedSteps.includes(2)

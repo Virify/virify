@@ -1,4 +1,7 @@
-import { getFullListingById, getListingByIdForEdit } from "~~/layers/database/server/utils/listing";
+import {
+  getFullListingById,
+  getListingByIdForEdit,
+} from "~~/layers/database/server/utils/listing";
 
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
@@ -35,8 +38,8 @@ export default defineEventHandler(async (event) => {
     // unpublished/restored version of this listing and return it for editing.
     if (!listing) {
       const session = await getUserSession(event);
-      if (session?.user?.id) {
-        listing = await getListingByIdForEdit(Number(id), session.user.id);
+      if (session?.user) {
+        listing = await getListingByIdForEdit(Number(id), session.user as any);
       }
     }
 
