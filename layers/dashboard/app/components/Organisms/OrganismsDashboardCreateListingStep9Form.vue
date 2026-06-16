@@ -348,7 +348,10 @@
         method: "PATCH",
         body: {
           draftId: draftListingId.value,
-          property: { media: formatMediaForSubmission(state.property.media) },
+          property: {
+            description: state.property.description ?? "",
+            media: formatMediaForSubmission(state.property.media),
+          },
         },
       });
     } catch (error) {

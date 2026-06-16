@@ -342,7 +342,9 @@ export function loadStep8(listing: EditableListing) {
 
 export function loadStep9(listing: EditableListing) {
   const property = listing.property;
-  const existingMedia = property?.media || [];
+  const existingMedia = [...(property?.media || [])].sort(
+    (a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+  );
 
   // Map existing media to our format, filtering out records without a Cloudflare image ID
   const media = existingMedia
