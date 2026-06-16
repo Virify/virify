@@ -91,6 +91,7 @@
               :room-options="roomOptions"
               :selected-room="getSelectedRoom(image)"
               @delete="$emit('delete-image', $event)"
+              @update-title="(id, title) => $emit('update-title', id, title)"
               @assign-room="(id, room) => $emit('assign-room', id, room)"
               @change-position="
                 (id, pos) => $emit('change-position', item.value, id, pos)
@@ -119,6 +120,7 @@
   defineEmits<{
     "remove-all": [];
     "delete-image": [cloudflareId: string];
+    "update-title": [cloudflareId: string, title: string];
     "assign-room": [cloudflareId: string, roomValue: string];
     "set-sortable-ref": [groupKey: string, el: HTMLElement | null];
     "change-position": [groupKey: string, cloudflareId: string, newPosition: number];

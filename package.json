@@ -33,6 +33,7 @@
     "db:setup:prod": "tsx layers/seed/server/utils/run-setup.ts --prod",
     "db:fetch-rates": "tsx layers/seed/server/utils/run-fetch-rates.ts",
     "db:update-admin-password": "tsx layers/seed/server/utils/run-admin-update.ts",
+    "db:copy": "bash ./scripts/db-copy.sh",
     "redis:flush": "tsx layers/seed/server/utils/run-redis-flush.ts",
     "seed:address": "tsx layers/seed/server/utils/extract-and-geocode-addresses.ts",
     "seed:upload-images": "tsx layers/seed/server/utils/upload-seed-images.ts",
