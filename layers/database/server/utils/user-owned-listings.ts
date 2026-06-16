@@ -65,10 +65,11 @@ export async function getUserOwnedListingsCountWithFilters(
 }
 
 /**
- * Get listings owned by the provided user with lightweight analytics counts
+ * Get listings owned by the provided user with lightweight analytics counts.
+ * Pass `userId` as `undefined` to return listings for ALL users (admin use only).
  */
 export async function getUserOwnedListingsWithAnalytics(
-  userId: number,
+  userId: number | undefined,
   opts?: {
     status?: "all" | "active" | "inactive" | "draft" | "archived";
     search?: string;
@@ -77,6 +78,8 @@ export async function getUserOwnedListingsWithAnalytics(
     sort?: "new" | "old" | "premium" | "featured" | "basic";
     saleRent?: "all" | "sale" | "rent";
     availability?: "all" | "AVAILABLE" | "UNDER_OFFER" | "SOLD";
+    /** When set, exclude listings owned by this userId (admin 'other' filter) */
+    excludeUserId?: number;
   },
 ): Promise<{ listings: OwnedListingWithAnalytics[]; total: number }> {
   const {
@@ -87,9 +90,16 @@ export async function getUserOwnedListingsWithAnalytics(
     sort = "new",
     saleRent = "all",
     availability = "all",
+    excludeUserId,
   } = opts || {};
 
-  const where: Prisma.ListingWhereInput = { userId };
+  // When userId is undefined (admin all-access), omit the userId constraint
+  const where: Prisma.ListingWhereInput = userId !== undefined ? { userId } : {};
+
+  // Admin "other" filter: exclude the admin's own listings
+  if (excludeUserId !== undefined) {
+    where.userId = { not: excludeUserId };
+  }
 
   // Apply status filters
   switch (status) {
@@ -146,7 +156,7 @@ export async function getUserOwnedListingsWithAnalytics(
   // Apply search filters
   const searchTerm = search.trim();
   if (searchTerm) {
-    where.OR = [
+    const searchConditions: Prisma.ListingWhereInput[] = [
       {
         property: {
           address: { fullAddress: { contains: searchTerm, mode: "insensitive" } },
@@ -154,10 +164,20 @@ export async function getUserOwnedListingsWithAnalytics(
       },
     ];
 
+    // When showing all users (admin), also search by username/email
+    if (userId === undefined) {
+      searchConditions.push(
+        { user: { username: { contains: searchTerm, mode: "insensitive" } } },
+        { user: { email: { contains: searchTerm, mode: "insensitive" } } },
+      );
+    }
+
     const numericSearch = Number(searchTerm);
     if (!Number.isNaN(numericSearch)) {
-      (where.OR as Prisma.ListingWhereInput[]).push({ price: numericSearch });
+      searchConditions.push({ price: numericSearch });
     }
+
+    where.OR = searchConditions;
   }
 
   // Get total count for pagination
@@ -198,7 +218,7 @@ export async function getUserOwnedListingsWithAnalytics(
       by: ["listingId"],
       where: {
         listingId: { in: listingIds },
-        userPreferences: { userId: { not: userId } },
+        ...(userId !== undefined ? { userPreferences: { userId: { not: userId } } } : {}),
       },
       _count: { listingId: true },
     }),
