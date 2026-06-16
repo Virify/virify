@@ -12,9 +12,8 @@ export const mediaAssignmentSchema = z.object({
   filename: z.string().optional(),
   description: z
     .string()
-    .max(100, "Description must be 100 characters or less")
-    .nullable()
-    .optional(),
+    .min(1, "Image title is required")
+    .max(500, "Description must be 500 characters or less"),
   // Room IDs (only one should be set, or none for general property images)
   bedroomId: z.number().int().positive().nullable().optional(),
   bathroomId: z.number().int().positive().nullable().optional(),
@@ -70,7 +69,7 @@ export function createInitialStep9Values(draftData?: any): Step9FormState {
     return {
       cloudflareId: m.image || "",
       filename: metadata.cloudflareImageId || m.image || "",
-      description: (metadata.description || null)?.substring(0, 100),
+      description: metadata.description?.substring(0, 100) || "",
       bedroomId: m.bedroomId || null,
       bathroomId: m.bathroomId || null,
       kitchenId: m.kitchenId || null,
