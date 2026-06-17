@@ -86,7 +86,7 @@
   // Draft Data & Tier
   // ============================================================================
 
-  const { getStepData, draftListingId, editingListingId, selectedTier } =
+  const { getStepData, draftListingId, editingListingId, selectedTier, isStepDirty } =
     useCreateListingSteps();
   const draftData = getStepData(9);
 
@@ -97,13 +97,37 @@
     getMaxImagesForTier(listingTier.value as "PREMIUM" | "FEATURED" | "BASIC"),
   );
 
-  // Build room data from already-loaded step data (steps 4, 5, 6)
-  // This avoids re-fetching the entire listing on every step visit
+  // Fetch real room data fresh from the DB when step 9 mounts so we always
+  // have the actual DB IDs (not in-memory placeholders from steps 4/5/6).
+  const { data: freshPropertyRooms } = useAsyncData(
+    () => `step9-rooms-${draftListingId.value ?? editingListingId?.value}`,
+    async () => {
+      const id = draftListingId.value ?? editingListingId?.value;
+      if (!id) return null;
+      const endpoint =
+        editingListingId?.value ?
+          `/api/listings/${id}/rooms`
+        : `/api/draft-listings/${id}/rooms`;
+      return useRequestFetch()<{
+        property: {
+          bedroomFeatures: any[];
+          bathroomFeatures: any[];
+          kitchenFeatures: any[];
+          reception: any[];
+          otherRoom: any[];
+          outdoorSpace: any;
+        };
+      }>(endpoint).catch(() => null);
+    },
+    { immediate: true },
+  );
+
+  // Fall back to in-memory step data if the fetch hasn't resolved yet
   const propertyDataFromSteps = computed(() => {
+    if (freshPropertyRooms.value) return freshPropertyRooms.value;
     const step4 = getStepData(4);
     const step5 = getStepData(5);
     const step6 = getStepData(6);
-
     return {
       property: {
         bedroomFeatures: step4?.property?.bedroomFeatures || [],
@@ -136,11 +160,12 @@
       allImagesHaveDescriptions.value,
   );
 
-  // Save progress requires description + all uploaded images to have descriptions (schema enforces this server-side)
+  // Save progress requires valid form state AND unsaved changes
   const isSaveValid = computed(
     () =>
       state.property.description.length >= 10 &&
-      (state.property.media.length === 0 || allImagesHaveDescriptions.value),
+      (state.property.media.length === 0 || allImagesHaveDescriptions.value) &&
+      isStepDirty(9, getSubmissionData()),
   );
 
   const {

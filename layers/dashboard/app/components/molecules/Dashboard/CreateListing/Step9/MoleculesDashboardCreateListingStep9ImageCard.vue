@@ -40,7 +40,7 @@
     </div>
 
     <!-- Image Details -->
-    <div class="p-2 space-y-2 pb-6">
+    <div class="p-2 space-y-2 pb-6 relative">
       <!-- Image Title -->
       <UFormField
         label="Image title"
@@ -75,6 +75,16 @@
           @update:model-value="$emit('assign-room', image.cloudflareId, String($event))"
         />
       </UFormField>
+    </div>
+
+    <!-- Drag affordance bar -->
+    <div
+      class="flex items-center justify-center py-1.5 border-t border-default bg-elevated/50 pointer-events-none"
+    >
+      <UIcon
+        name="i-lucide-grip-horizontal"
+        class="w-5 h-5 text-muted"
+      />
     </div>
   </div>
 </template>

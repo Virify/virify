@@ -36,12 +36,70 @@ const mediaItemWithIdSchema = z.object({
   isGeneral: z.boolean().optional(),
 });
 
+/** All room ID sets for one property, keyed by type */
+interface PropertyRooms {
+  bedroomIds: Set<number>;
+  bathroomIds: Set<number>;
+  kitchenIds: Set<number>;
+  receptionIds: Set<number>;
+  otherRoomIds: Set<number>;
+  gardenIds: Set<number>;
+  yardIds: Set<number>;
+  landIds: Set<number>;
+}
+
+/** Load the real DB room IDs for a property so we can validate client-sent FKs */
+async function loadPropertyRooms(propertyId: number): Promise<PropertyRooms> {
+  const property = await prisma.property.findUnique({
+    where: { id: propertyId },
+    include: {
+      bedroomFeatures: { select: { id: true } },
+      bathroomFeatures: { select: { id: true } },
+      kitchenFeatures: { select: { id: true } },
+      reception: { select: { id: true } },
+      otherRoom: { select: { id: true } },
+      outdoorSpace: {
+        include: {
+          garden: { select: { id: true } },
+          yard: { select: { id: true } },
+          land: { select: { id: true } },
+        },
+      },
+    },
+  });
+
+  return {
+    bedroomIds: new Set(property?.bedroomFeatures.map((r) => r.id) ?? []),
+    bathroomIds: new Set(property?.bathroomFeatures.map((r) => r.id) ?? []),
+    kitchenIds: new Set(property?.kitchenFeatures.map((r) => r.id) ?? []),
+    receptionIds: new Set(property?.reception.map((r) => r.id) ?? []),
+    otherRoomIds: new Set(property?.otherRoom.map((r) => r.id) ?? []),
+    gardenIds: new Set(property?.outdoorSpace?.garden.map((r) => r.id) ?? []),
+    yardIds: new Set(property?.outdoorSpace?.yard.map((r) => r.id) ?? []),
+    landIds: new Set(property?.outdoorSpace?.land.map((r) => r.id) ?? []),
+  };
+}
+
 /**
- * Build the Prisma data payload for a media update
+ * Resolve a client-supplied room FK against the real DB IDs for this property.
+ * Returns null if the ID doesn't exist in the DB (e.g. a fallback roomNumber was sent).
+ */
+function resolveRoomId(
+  id: number | null | undefined,
+  validIds: Set<number>,
+): number | null {
+  if (!id) return null;
+  return validIds.has(id) ? id : null;
+}
+
+/**
+ * Build the Prisma data payload for a media update.
+ * Validates all room FKs against the real DB IDs to prevent P2003 errors.
  */
 function buildMediaData(
   mediaItem: z.infer<typeof mediaItemWithIdSchema>,
   sortOrder: number,
+  rooms: PropertyRooms,
 ) {
   return {
     sortOrder,
@@ -51,15 +109,15 @@ function buildMediaData(
       cloudflareImageId: mediaItem.cloudflareId,
       filename: mediaItem.filename || null,
     }),
-    bedroomId: mediaItem.bedroomId || null,
-    bathroomId: mediaItem.bathroomId || null,
-    kitchenId: mediaItem.kitchenId || null,
-    receptionId: mediaItem.receptionId || null,
-    otherRoomId: mediaItem.otherRoomId || null,
-    gardenId: mediaItem.gardenId || null,
-    yardId: mediaItem.yardId || null,
-    landId: mediaItem.landId || null,
-    outdoorSpaceId: mediaItem.outdoorSpaceId || null,
+    bedroomId: resolveRoomId(mediaItem.bedroomId, rooms.bedroomIds),
+    bathroomId: resolveRoomId(mediaItem.bathroomId, rooms.bathroomIds),
+    kitchenId: resolveRoomId(mediaItem.kitchenId, rooms.kitchenIds),
+    receptionId: resolveRoomId(mediaItem.receptionId, rooms.receptionIds),
+    otherRoomId: resolveRoomId(mediaItem.otherRoomId, rooms.otherRoomIds),
+    gardenId: resolveRoomId(mediaItem.gardenId, rooms.gardenIds),
+    yardId: resolveRoomId(mediaItem.yardId, rooms.yardIds),
+    landId: resolveRoomId(mediaItem.landId, rooms.landIds),
+    outdoorSpaceId: null,
   };
 }
 
@@ -95,6 +153,9 @@ export default defineEventHandler(async (event) => {
 
       const propertyId = existingListing.property.id;
 
+      // Load real DB room IDs so we can validate client-sent FKs (prevents P2003)
+      const rooms = await loadPropertyRooms(propertyId);
+
       // Batch description + media updates in a single transaction.
       // Use update-by-id when the DB id is known (always the case after our
       // loader/upload fixes). Fall back to updateMany by cloudflareId for any
@@ -105,7 +166,7 @@ export default defineEventHandler(async (event) => {
           data: { description },
         }),
         ...media.map((mediaItem, i) => {
-          const data = buildMediaData(mediaItem as any, i);
+          const data = buildMediaData(mediaItem as any, i, rooms);
           const id = (mediaItem as any).id as number | undefined;
           if (id) {
             return prisma.media.update({ where: { id }, data });
@@ -171,6 +232,9 @@ export default defineEventHandler(async (event) => {
 
     const propertyId = existingDraft.property.id;
 
+    // Load real DB room IDs so we can validate client-sent FKs (prevents P2003)
+    const rooms = await loadPropertyRooms(propertyId);
+
     // Batch description + media updates in a single transaction.
     // Use update-by-id when the DB id is known (always the case after our
     // loader/upload fixes). Fall back to updateMany by cloudflareId for any
@@ -181,7 +245,7 @@ export default defineEventHandler(async (event) => {
         data: { description },
       }),
       ...media.map((mediaItem, i) => {
-        const data = buildMediaData(mediaItem as any, i);
+        const data = buildMediaData(mediaItem as any, i, rooms);
         const id = (mediaItem as any).id as number | undefined;
         if (id) {
           return prisma.media.update({ where: { id }, data });
