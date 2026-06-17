@@ -1,15 +1,41 @@
 <template>
   <li class="listing-garden-yard-land-card">
     <div
-      v-if="item.media && item.media.length > 0 && item.media[0]"
+      v-if="item.media && item.media.length > 0"
       class="listing-garden-yard-land-card__image"
     >
       <AtomsCloudFlareImage
-        :src="item.media[0]?.image!"
-        :alt="item.media[0]?.metadata!"
+        :src="item.media[activeIndex]?.image!"
+        :alt="item.media[activeIndex]?.metadata!"
         variant="card"
         class="| image-sm"
       />
+      <template v-if="item.media.length > 1">
+        <button
+          class="listing-garden-yard-land-card__carousel-btn listing-garden-yard-land-card__carousel-btn--prev"
+          aria-label="Previous image"
+          @click.stop="prev"
+        >
+          <UIcon name="i-lucide-chevron-left" />
+        </button>
+        <button
+          class="listing-garden-yard-land-card__carousel-btn listing-garden-yard-land-card__carousel-btn--next"
+          aria-label="Next image"
+          @click.stop="next"
+        >
+          <UIcon name="i-lucide-chevron-right" />
+        </button>
+        <div class="listing-garden-yard-land-card__carousel-dots">
+          <span
+            v-for="(_, i) in item.media"
+            :key="i"
+            class="listing-garden-yard-land-card__carousel-dot"
+            :class="{
+              'listing-garden-yard-land-card__carousel-dot--active': i === activeIndex,
+            }"
+          />
+        </div>
+      </template>
     </div>
     <div
       v-else
@@ -99,6 +125,17 @@
 
   const props = defineProps<Props>();
 
+  const activeIndex = ref(0);
+
+  function prev() {
+    activeIndex.value =
+      activeIndex.value === 0 ? props.item.media.length - 1 : activeIndex.value - 1;
+  }
+  function next() {
+    activeIndex.value =
+      activeIndex.value === props.item.media.length - 1 ? 0 : activeIndex.value + 1;
+  }
+
   // Icon based on type
   const icon = computed(() => {
     if (props.type === "land") return "property/land";
@@ -150,6 +187,7 @@
       border-bottom-left-radius: 0;
       overflow: hidden;
       aspect-ratio: 16 / 9;
+      position: relative;
 
       img {
         width: 100%;
@@ -160,6 +198,54 @@
         align-items: center;
         justify-content: center;
         background: var(--background-300);
+      }
+    }
+
+    &__carousel-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1;
+
+      &--prev {
+        left: var(--size-8);
+      }
+      &--next {
+        right: var(--size-8);
+      }
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.65);
+      }
+    }
+
+    &__carousel-dots {
+      position: absolute;
+      bottom: var(--size-8);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: var(--size-4);
+    }
+
+    &__carousel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+
+      &--active {
+        background: #fff;
       }
     }
 
