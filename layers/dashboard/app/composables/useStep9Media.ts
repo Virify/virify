@@ -73,22 +73,24 @@ export function useStep9Media(options: UseStep9MediaOptions) {
       return;
     }
 
-    // Upload to Cloudflare
+    // Upload to Cloudflare — all files in parallel for speed
     isProcessing.value = true;
     uploadingCount.value = validFiles.length;
     uploadProgress.value = 0;
 
     const uploadedImages: MediaAssignment[] = [];
-    let uploaded = 0;
+    let completed = 0;
 
-    for (const file of validFiles) {
-      const result = await uploadImage(file);
-      if (result) {
-        uploadedImages.push(createEmptyMediaAssignment(result.id, file.name));
-      }
-      uploaded++;
-      uploadProgress.value = (uploaded / validFiles.length) * 100;
-    }
+    await Promise.all(
+      validFiles.map(async (file) => {
+        const result = await uploadImage(file);
+        completed++;
+        uploadProgress.value = (completed / validFiles.length) * 100;
+        if (result) {
+          uploadedImages.push(createEmptyMediaAssignment(result.id, file.name));
+        }
+      }),
+    );
 
     if (uploadedImages.length === 0) {
       uploadingCount.value = 0;
@@ -106,7 +108,8 @@ export function useStep9Media(options: UseStep9MediaOptions) {
       // Since we pass all IDs together, checkImages deletes ALL of them.
       toast.add({
         title: "Images rejected",
-        description: "One or more of your images contained inappropriate content. All uploaded images have been removed. Please ensure your images are appropriate before uploading.",
+        description:
+          "One or more of your images contained inappropriate content. All uploaded images have been removed. Please ensure your images are appropriate before uploading.",
         color: "error",
         icon: "i-lucide-image-off",
       });
@@ -120,7 +123,9 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     const targetListingId = editingListingId?.value;
 
     if (!targetDraftId && !targetListingId) {
-      console.error("[useStep9Media] Cannot save images: neither draftListingId nor editingListingId is set");
+      console.error(
+        "[useStep9Media] Cannot save images: neither draftListingId nor editingListingId is set",
+      );
       toast.add({
         title: "Error",
         description: "Could not save images: listing not found. Please try again.",
@@ -137,13 +142,28 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     }
 
     try {
-      await useRequestFetch()("/api/draft-listings/0/media", {
+      const response = await useRequestFetch()<{
+        success: boolean;
+        media: { id: number; image: string | null }[];
+      }>("/api/draft-listings/0/media", {
         method: "POST",
         body: {
           media: uploadedImages,
-          ...(targetDraftId ? { draftId: targetDraftId } : { listingId: targetListingId }),
+          ...(targetDraftId ?
+            { draftId: targetDraftId }
+          : { listingId: targetListingId }),
         },
       });
+
+      // Store the DB-assigned id on each uploaded image so the PATCH can use
+      // update-by-id instead of updateMany, which silently no-ops on mismatches.
+      if (response?.media) {
+        for (const dbRecord of response.media) {
+          if (!dbRecord.image) continue;
+          const match = uploadedImages.find((img) => img.cloudflareId === dbRecord.image);
+          if (match) match.id = dbRecord.id;
+        }
+      }
 
       media.push(...uploadedImages);
 
@@ -185,7 +205,8 @@ export function useStep9Media(options: UseStep9MediaOptions) {
     if (!image?.isGeneral) {
       toast.add({
         title: "Cannot set as main image",
-        description: "Only general property images can be set as the main image. Remove the room assignment first.",
+        description:
+          "Only general property images can be set as the main image. Remove the room assignment first.",
         color: "warning",
         icon: "i-lucide-triangle-alert",
       });

@@ -199,10 +199,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
    * Check if step data has changed since last save.
    * Compares current data with last saved snapshot.
    */
-  const isStepDirty = (
-    stepNumber: number,
-    currentData: Record<string, any>,
-  ): boolean => {
+  const isStepDirty = (stepNumber: number, currentData: Record<string, any>): boolean => {
     const lastSaved = lastSavedStepData.value[stepNumber];
     if (!lastSaved || Object.keys(lastSaved).length === 0) {
       // Never saved before - always dirty
@@ -268,8 +265,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
         steps.value.forEach((step) => {
           step.completed = completedSteps.includes(step.id);
           // Unlock step if previous step is completed OR it's step 1
-          step.locked =
-            step.id === 1 ? false : !completedSteps.includes(step.id - 1);
+          step.locked = step.id === 1 ? false : !completedSteps.includes(step.id - 1);
         });
 
         // Populate step data from the draft
@@ -284,9 +280,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
         });
 
         // Set current step: if all complete, go to last step (9); otherwise first incomplete
-        currentStep.value = allStepsCompleted.value
-          ? 9
-          : firstIncompleteStep.value;
+        currentStep.value = allStepsCompleted.value ? 9 : firstIncompleteStep.value;
       }
     } catch (error: any) {
       console.error("Failed to load draft listing:", error);
@@ -306,10 +300,9 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
     try {
       // GET /api/listing/:id returns { listing: FullListing }
-      const response = await useRequestFetch()<{ listing: any }>(
-        `/api/listing/${id}/`,
-        { method: "GET" },
-      );
+      const response = await useRequestFetch()<{ listing: any }>(`/api/listing/${id}/`, {
+        method: "GET",
+      });
 
       if (response?.listing) {
         const listing = response.listing;
@@ -376,8 +369,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       return null;
     } catch (error: any) {
       console.error("Failed to create draft listing:", error);
-      loadError.value =
-        error?.data?.message || "Failed to create draft listing";
+      loadError.value = error?.data?.message || "Failed to create draft listing";
       return null;
     }
   };
@@ -419,8 +411,9 @@ export const useCreateListingSteps = createSharedComposable(() => {
           toast.add({
             title: isLiveListing ? "Listing Updated" : "Draft Complete!",
             icon: "i-lucide-check-circle-2",
-            description: isLiveListing
-              ? "Your changes have been saved"
+            description:
+              isLiveListing ?
+                "Your changes have been saved"
               : "Your draft listing is ready to publish",
             color: "success",
             duration: 3000,
@@ -436,8 +429,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
         });
       } else {
         const stepTitle =
-          steps.value.find((s) => s.id === stepNumber)?.title ||
-          `Step ${stepNumber}`;
+          steps.value.find((s) => s.id === stepNumber)?.title || `Step ${stepNumber}`;
         toast.add({
           title: `${stepTitle} saved`,
           icon: "i-lucide-check-circle-2",
@@ -490,9 +482,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
       // Step 3: Save to local state and snapshot for dirty checking
       saveStepData(stepNumber, stepFormData);
-      lastSavedStepData.value[stepNumber] = JSON.parse(
-        JSON.stringify(stepFormData),
-      );
+      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData));
 
       // Step 4: Mark step complete and unlock next (regardless of advance flag)
       // This allows users to navigate to next step after saving progress
@@ -500,8 +490,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
       // Get step title for toast
       const stepTitle =
-        steps.value.find((s) => s.id === stepNumber)?.title ||
-        `Step ${stepNumber}`;
+        steps.value.find((s) => s.id === stepNumber)?.title || `Step ${stepNumber}`;
 
       // Step 5: Handle advancement (navigate to next step or complete draft)
       if (advance) {
@@ -510,8 +499,9 @@ export const useCreateListingSteps = createSharedComposable(() => {
           toast.add({
             title: isEditingLiveListing ? "Listing Updated" : "Draft Complete!",
             icon: "i-lucide-check-circle-2",
-            description: isEditingLiveListing
-              ? "Your changes have been saved"
+            description:
+              isEditingLiveListing ?
+                "Your changes have been saved"
               : "Your draft listing is ready to publish",
             color: "success",
             duration: 3000,
@@ -543,8 +533,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       console.error(`Failed to save step ${stepNumber}:`, error);
       toast.add({
         title: "Error",
-        description:
-          error?.data?.message || error?.message || "Failed to save progress",
+        description: error?.data?.message || error?.message || "Failed to save progress",
         color: "error",
         duration: 3000,
         icon: "i-lucide-circle-x",
@@ -607,9 +596,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
       // Save to local state
       saveStepData(stepNumber, stepFormData);
-      lastSavedStepData.value[stepNumber] = JSON.parse(
-        JSON.stringify(stepFormData),
-      );
+      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData));
 
       if (successMessage) {
         toast.add({
@@ -626,8 +613,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       // Still show error toast for failures
       toast.add({
         title: "Error",
-        description:
-          error?.data?.message || error?.message || "Failed to save room",
+        description: error?.data?.message || error?.message || "Failed to save room",
         color: "error",
         duration: 3000,
         icon: "i-lucide-circle-x",
@@ -659,8 +645,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       return null;
     } catch (error: any) {
       console.error("Failed to create draft listing:", error);
-      loadError.value =
-        error?.data?.message || "Failed to create draft listing";
+      loadError.value = error?.data?.message || "Failed to create draft listing";
       return null;
     } finally {
       isLoading.value = false;

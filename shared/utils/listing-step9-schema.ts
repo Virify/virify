@@ -8,6 +8,8 @@ import type { MediaAssignment, Step9FormState } from "../types/step9-media";
 
 // Media assignment schema - for assigning images to rooms
 export const mediaAssignmentSchema = z.object({
+  // Database primary key — present for existing images; used for reliable updates.
+  id: z.number().int().positive().optional(),
   cloudflareId: z.string().min(1, "Image ID is required"),
   filename: z.string().optional(),
   description: z
@@ -70,7 +72,7 @@ export function createInitialStep9Values(draftData?: any): Step9FormState {
     return {
       cloudflareId: m.image || "",
       filename: metadata.cloudflareImageId || m.image || "",
-      description: metadata.description?.substring(0, 100) || "",
+      description: (metadata.description ?? metadata.alt ?? "").substring(0, 100),
       bedroomId: m.bedroomId || null,
       bathroomId: m.bathroomId || null,
       kitchenId: m.kitchenId || null,

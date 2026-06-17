@@ -1,9 +1,10 @@
 <template>
   <div
-    class="relative border rounded-lg overflow-hidden bg-elevated lg:cursor-grab lg:active:cursor-grabbing"
+    class="relative border rounded-lg overflow-hidden bg-elevated cursor-grab active:cursor-grabbing"
     :class="[
       isMain ? 'border-secondary ring-2 ring-secondary/30' : 'border-default',
       'transition-all duration-200',
+      disabled ? 'cursor-default' : '',
     ]"
     :data-id="image.cloudflareId"
   >
@@ -15,21 +16,11 @@
       Main
     </div>
 
-    <!-- Drag Handle (hidden on mobile) -->
-    <div
-      class="absolute -bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/40 text-white rounded p-1 drag-handle hidden lg:block"
-    >
-      <UIcon
-        name="i-lucide-grip-horizontal"
-        size="xl"
-      />
-    </div>
-
     <!-- Image Preview -->
     <div class="relative aspect-5/4">
       <AtomsCloudFlareImage
         :src="image.cloudflareId"
-        :alt="image.description || 'Property image'"
+        :alt="localTitle || 'Property image'"
         variant="marker"
         :modifiers="{ fit: 'cover' }"
         class="w-full h-full object-cover"
@@ -43,37 +34,35 @@
         class="absolute top-1 right-1 text-white!"
         :loading="isDeleting"
         :disabled="disabled || isDeleting"
+        :ui="{ base: 'bg-secondary/100' }"
         @click="$emit('delete', image.cloudflareId)"
-        :ui="{
-          base: 'bg-secondary/100',
-        }"
       />
     </div>
 
     <!-- Image Details -->
-    <div class="p-2 space-y-2 pb-6">
+    <div class="p-2 space-y-2 pb-6 relative">
       <!-- Image Title -->
       <UFormField
         label="Image title"
-        :name="`property.media.${actualIndex}.description`"
+        :name="`media.${image.cloudflareId}.description`"
         required
         eagerValidation
       >
         <UInput
-          :model-value="image.description ?? ''"
+          :model-value="localTitle"
           placeholder="Enter a title for this image"
           color="secondary"
           size="xs"
           class="w-full"
           maxlength="100"
-          @update:model-value="$emit('update-title', image.cloudflareId, String($event))"
+          @update:model-value="onTitleInput"
         />
       </UFormField>
 
       <!-- Room Assignment -->
       <UFormField
         label="Assign to Room"
-        :name="`property.media.${image.cloudflareId}.room`"
+        :name="`media.${image.cloudflareId}.room`"
         hint="optional"
       >
         <USelect
@@ -86,23 +75,16 @@
           @update:model-value="$emit('assign-room', image.cloudflareId, String($event))"
         />
       </UFormField>
+    </div>
 
-      <!-- Position Select -->
-      <UFormField
-        label="Position"
-        :name="`property.media.${image.cloudflareId}.position`"
-      >
-        <USelect
-          :model-value="position"
-          :items="positionOptions"
-          color="secondary"
-          size="xs"
-          class="w-full"
-          @update:model-value="
-            $emit('change-position', image.cloudflareId, Number($event))
-          "
-        />
-      </UFormField>
+    <!-- Drag affordance bar -->
+    <div
+      class="flex items-center justify-center py-1.5 border-t border-default bg-elevated/50 pointer-events-none"
+    >
+      <UIcon
+        name="i-lucide-grip-horizontal"
+        class="w-5 h-5 text-muted"
+      />
     </div>
   </div>
 </template>
@@ -112,7 +94,6 @@
     image: MediaAssignment;
     position: number;
     totalInGroup: number;
-    actualIndex: number;
     isMain?: boolean;
     isDeleting?: boolean;
     disabled?: boolean;
@@ -122,28 +103,40 @@
 
   const props = defineProps<Props>();
 
-  defineEmits<{
+  const emit = defineEmits<{
     delete: [cloudflareId: string];
     "update-title": [cloudflareId: string, title: string];
     "assign-room": [cloudflareId: string, roomValue: string];
-    "change-position": [cloudflareId: string, newPosition: number];
   }>();
 
-  // Generate position options based on total images in group
-  const positionOptions = computed(() => {
-    return Array.from({ length: props.totalInGroup }, (_, i) => ({
-      label: String(i + 1),
-      value: i + 1,
-    }));
-  });
+  // Local title ref — persists across parent re-renders and drag reorders.
+  // Only syncs from props when the image itself changes (different cloudflareId)
+  // or when the parent pushes a fresh description from the server after save.
+  const localTitle = ref(props.image.description ?? "");
+
+  // When a completely different image slot arrives (shouldn't happen with :key but be safe)
+  watch(
+    () => props.image.cloudflareId,
+    () => {
+      localTitle.value = props.image.description ?? "";
+    },
+  );
+
+  // Sync server-side updates (e.g. after reload) without clobbering user typing.
+  // Only update if the incoming value actually differs from what we're showing.
+  watch(
+    () => props.image.description,
+    (incoming) => {
+      const val = incoming ?? "";
+      if (val !== localTitle.value) {
+        localTitle.value = val;
+      }
+    },
+  );
+
+  function onTitleInput(val: string | number) {
+    const str = String(val).slice(0, 100);
+    localTitle.value = str;
+    emit("update-title", props.image.cloudflareId, str);
+  }
 </script>
-
-<style scoped>
-  .drag-handle {
-    cursor: grab;
-  }
-
-  .drag-handle:active {
-    cursor: grabbing;
-  }
-</style>

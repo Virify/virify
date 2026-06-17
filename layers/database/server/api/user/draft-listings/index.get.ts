@@ -130,9 +130,9 @@ export default defineEventHandler(async (event) => {
 
     const result = { drafts, total };
     if (!search.trim()) {
-      const cacheKey = `draft-listings:${isAdmin ? "admin-all" : user.id}:${sort}:${page}:${take}`;
+      const writeCacheKey = `draft-listings:${isAdmin ? `admin-${owner}` : user.id}:${sort}:${page}:${take}`;
       useStorage("cache")
-        .setItem(cacheKey, result, { ttl: 30 * 60 })
+        .setItem(writeCacheKey, result, { ttl: 2 * 60 })
         .catch(() => {});
     }
     return result;

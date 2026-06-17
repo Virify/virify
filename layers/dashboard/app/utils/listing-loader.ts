@@ -362,9 +362,10 @@ export function loadStep9(listing: EditableListing) {
         !m.landId;
 
       return {
+        id: m.id as number | undefined,
         cloudflareId: m.image || "",
         filename: metadata.cloudflareImageId || m.image || "",
-        description: (metadata.description || null)?.substring(0, 100),
+        description: (metadata.description ?? metadata.alt ?? "").substring(0, 100),
         bedroomId: m.bedroomId || null,
         bathroomId: m.bathroomId || null,
         kitchenId: m.kitchenId || null,
