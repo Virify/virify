@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
       image: m.cloudflareId,
       metadata: JSON.stringify({
         alt: m.description || "Property image",
-        description: m.description || null,
+        description: m.description ?? "Property image",
         cloudflareImageId: m.cloudflareId,
         filename: m.filename || null,
       }),

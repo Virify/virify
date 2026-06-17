@@ -134,12 +134,12 @@ importers:
       reka-ui:
         specifier: ^2.9.5
         version: 2.9.5(vue@3.5.26(typescript@5.9.3))
-      sortablejs:
-        specifier: ^1.15.6
-        version: 1.15.6
       vue:
         specifier: latest
         version: 3.5.26(typescript@5.9.3)
+      vue-draggable-plus:
+        specifier: ^0.6.1
+        version: 0.6.1(@types/sortablejs@1.15.9)
       vue-router:
         specifier: ^4.6.4
         version: 4.6.4(vue@3.5.26(typescript@5.9.3))
@@ -180,9 +180,6 @@ importers:
       '@types/picomatch':
         specifier: ^4.0.3
         version: 4.0.3
-      '@types/sortablejs':
-        specifier: ^1.15.9
-        version: 1.15.9
       '@unhead/vue':
         specifier: ^2.1.2
         version: 2.1.2(vue@3.5.26(typescript@5.9.3))
@@ -8186,6 +8183,15 @@ packages:
 
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
+
+  vue-draggable-plus@0.6.1:
+    resolution: {integrity: sha512-FbtQ/fuoixiOfTZzG3yoPl4JAo9HJXRHmBQZFB9x2NYCh6pq0TomHf7g5MUmpaDYv+LU2n6BPq2YN9sBO+FbIg==}
+    peerDependencies:
+      '@types/sortablejs': ^1.15.0
+      '@vue/composition-api': '*'
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
 
   vue-router@4.6.4:
     resolution: {integrity: sha512-Hz9q5sa33Yhduglwz6g9skT8OBPii+4bFn88w6J+J4MfEo4KRRpmiNG/hHHkdbRFlLBOqxN8y8gf2Fb0MTUgVg==}
@@ -18107,7 +18113,8 @@ snapshots:
 
   smob@1.5.0: {}
 
-  sortablejs@1.15.6: {}
+  sortablejs@1.15.6:
+    optional: true
 
   source-map-js@1.2.1: {}
 
@@ -18912,6 +18919,10 @@ snapshots:
       vue: 3.5.26(typescript@5.9.3)
 
   vue-devtools-stub@0.1.0: {}
+
+  vue-draggable-plus@0.6.1(@types/sortablejs@1.15.9):
+    dependencies:
+      '@types/sortablejs': 1.15.9
 
   vue-router@4.6.4(vue@3.5.26(typescript@5.9.3)):
     dependencies:

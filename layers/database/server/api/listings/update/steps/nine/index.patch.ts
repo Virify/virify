@@ -18,6 +18,51 @@ const stepDataSchema = step9Schema
     message: "Either draftId or listingId must be provided",
   });
 
+// Media item with optional DB id for precise updates
+const mediaItemWithIdSchema = z.object({
+  id: z.number().int().positive().optional(),
+  cloudflareId: z.string(),
+  description: z.string().nullable().optional(),
+  filename: z.string().nullable().optional(),
+  bedroomId: z.number().nullable().optional(),
+  bathroomId: z.number().nullable().optional(),
+  kitchenId: z.number().nullable().optional(),
+  receptionId: z.number().nullable().optional(),
+  otherRoomId: z.number().nullable().optional(),
+  gardenId: z.number().nullable().optional(),
+  yardId: z.number().nullable().optional(),
+  landId: z.number().nullable().optional(),
+  outdoorSpaceId: z.number().nullable().optional(),
+  isGeneral: z.boolean().optional(),
+});
+
+/**
+ * Build the Prisma data payload for a media update
+ */
+function buildMediaData(
+  mediaItem: z.infer<typeof mediaItemWithIdSchema>,
+  sortOrder: number,
+) {
+  return {
+    sortOrder,
+    metadata: JSON.stringify({
+      alt: mediaItem.description || "Property image",
+      description: mediaItem.description ?? "",
+      cloudflareImageId: mediaItem.cloudflareId,
+      filename: mediaItem.filename || null,
+    }),
+    bedroomId: mediaItem.bedroomId || null,
+    bathroomId: mediaItem.bathroomId || null,
+    kitchenId: mediaItem.kitchenId || null,
+    receptionId: mediaItem.receptionId || null,
+    otherRoomId: mediaItem.otherRoomId || null,
+    gardenId: mediaItem.gardenId || null,
+    yardId: mediaItem.yardId || null,
+    landId: mediaItem.landId || null,
+    outdoorSpaceId: mediaItem.outdoorSpaceId || null,
+  };
+}
+
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
@@ -50,35 +95,26 @@ export default defineEventHandler(async (event) => {
 
       const propertyId = existingListing.property.id;
 
-      // Batch description + media updates in a single transaction
+      // Batch description + media updates in a single transaction.
+      // Use update-by-id when the DB id is known (always the case after our
+      // loader/upload fixes). Fall back to updateMany by cloudflareId for any
+      // legacy records that don't carry an id.
       await prisma.$transaction([
         prisma.property.update({
           where: { id: propertyId },
           data: { description },
         }),
-        ...media.map((mediaItem, i) =>
-          prisma.media.updateMany({
+        ...media.map((mediaItem, i) => {
+          const data = buildMediaData(mediaItem as any, i);
+          const id = (mediaItem as any).id as number | undefined;
+          if (id) {
+            return prisma.media.update({ where: { id }, data });
+          }
+          return prisma.media.updateMany({
             where: { propertyId, image: mediaItem.cloudflareId },
-            data: {
-              sortOrder: i,
-              metadata: JSON.stringify({
-                alt: mediaItem.description || "Property image",
-                description: mediaItem.description || null,
-                cloudflareImageId: mediaItem.cloudflareId,
-                filename: mediaItem.filename || null,
-              }),
-              bedroomId: mediaItem.bedroomId || null,
-              bathroomId: mediaItem.bathroomId || null,
-              kitchenId: mediaItem.kitchenId || null,
-              receptionId: mediaItem.receptionId || null,
-              otherRoomId: mediaItem.otherRoomId || null,
-              gardenId: mediaItem.gardenId || null,
-              yardId: mediaItem.yardId || null,
-              landId: mediaItem.landId || null,
-              outdoorSpaceId: mediaItem.outdoorSpaceId || null,
-            },
-          }),
-        ),
+            data,
+          });
+        }),
       ]);
 
       return await prisma.listing
@@ -135,35 +171,26 @@ export default defineEventHandler(async (event) => {
 
     const propertyId = existingDraft.property.id;
 
-    // Batch description + media updates in a single transaction
+    // Batch description + media updates in a single transaction.
+    // Use update-by-id when the DB id is known (always the case after our
+    // loader/upload fixes). Fall back to updateMany by cloudflareId for any
+    // legacy records that don't carry an id.
     await prisma.$transaction([
       prisma.property.update({
         where: { id: propertyId },
         data: { description },
       }),
-      ...media.map((mediaItem, i) =>
-        prisma.media.updateMany({
+      ...media.map((mediaItem, i) => {
+        const data = buildMediaData(mediaItem as any, i);
+        const id = (mediaItem as any).id as number | undefined;
+        if (id) {
+          return prisma.media.update({ where: { id }, data });
+        }
+        return prisma.media.updateMany({
           where: { propertyId, image: mediaItem.cloudflareId },
-          data: {
-            sortOrder: i,
-            metadata: JSON.stringify({
-              alt: mediaItem.description || "Property image",
-              description: mediaItem.description || null,
-              cloudflareImageId: mediaItem.cloudflareId,
-              filename: mediaItem.filename || null,
-            }),
-            bedroomId: mediaItem.bedroomId || null,
-            bathroomId: mediaItem.bathroomId || null,
-            kitchenId: mediaItem.kitchenId || null,
-            receptionId: mediaItem.receptionId || null,
-            otherRoomId: mediaItem.otherRoomId || null,
-            gardenId: mediaItem.gardenId || null,
-            yardId: mediaItem.yardId || null,
-            landId: mediaItem.landId || null,
-            outdoorSpaceId: mediaItem.outdoorSpaceId || null,
-          },
-        }),
-      ),
+          data,
+        });
+      }),
     ]);
 
     // Get current completedSteps to check if step 9 already exists
