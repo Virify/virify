@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
         excludeUserId,
       });
 
-      storage.setItem(cacheKey, result, { ttl: 30 * 60 }).catch(() => {});
+      storage.setItem(cacheKey, result, { ttl: 2 * 60 }).catch(() => {});
       return result;
     }
 
