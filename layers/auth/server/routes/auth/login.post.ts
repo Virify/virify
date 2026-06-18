@@ -4,7 +4,8 @@ import * as z from "zod";
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  turnstileToken: z.string().min(1, 'Bot verification is required'),
+  rememberMe: z.boolean().optional().default(false),
+  turnstileToken: z.string().min(1, "Bot verification is required"),
 });
 
 /**
@@ -16,19 +17,28 @@ export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
 
   try {
-    const { email: rawEmail, password, turnstileToken } = await readValidatedBody(event, loginSchema.parse);
+    const {
+      email: rawEmail,
+      password,
+      rememberMe,
+      turnstileToken,
+    } = await readValidatedBody(event, loginSchema.parse);
     const email = rawEmail.toLowerCase();
 
-    const clientIp = getRequestIP(event, { xForwardedFor: true }) || '';
+    const clientIp = getRequestIP(event, { xForwardedFor: true }) || "";
     const isValidToken = await verifyTurnstileToken(turnstileToken, clientIp);
-    if (!isValidToken) throw createError({ statusCode: 403, statusMessage: 'Bot verification failed. Please try again.' });
+    if (!isValidToken)
+      throw createError({
+        statusCode: 403,
+        statusMessage: "Bot verification failed. Please try again.",
+      });
 
     const user = await authenticateUser(email, password);
-    await loginUser(event, user);
+    await loginUser(event, user, rememberMe);
 
     return {
-      user
-    }
+      user,
+    };
   } catch (err) {
     return errorResponse(err, event);
   }
