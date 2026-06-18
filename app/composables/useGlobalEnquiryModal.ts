@@ -1,7 +1,15 @@
 export const useGlobalEnquiryModal = () => {
-  const isModalOpen = useState<boolean>('globalEnquiryModalOpen', () => false);
-  const modalConversation = useState<ConversationWithMinimalListing | null>('globalEnquiryModalConversation', () => null);
-  const newEnquiryData = useState<{ listingId: number; receiverId: number; listingTitle?: string } | null>('globalEnquiryNewData', () => null);
+  const isModalOpen = useState<boolean>("globalEnquiryModalOpen", () => false);
+  const modalConversation = useState<ConversationWithMinimalListing | null>(
+    "globalEnquiryModalConversation",
+    () => null,
+  );
+  const newEnquiryData = useState<{
+    listingId: number;
+    receiverId: number;
+    listingType: "sale" | "rent";
+    listingTitle?: string;
+  } | null>("globalEnquiryNewData", () => null);
 
   /**
    * Opens a conversation in the global modal
@@ -10,16 +18,18 @@ export const useGlobalEnquiryModal = () => {
   async function openConversation(conversation: ConversationWithMinimalListing | number) {
     const { openEnquiry } = useEnquiries();
     newEnquiryData.value = null;
-    if (typeof conversation === 'number') {
+    if (typeof conversation === "number") {
       // Open modal immediately with null data (shows loading state)
       isModalOpen.value = true;
       modalConversation.value = null;
-      
+
       // Allow modal to render before fetching
       await nextTick();
-      
+
       try {
-        const data = await useRequestFetch()<ConversationWithMinimalListing>(`/api/conversation/${conversation}`);
+        const data = await useRequestFetch()<ConversationWithMinimalListing>(
+          `/api/conversation/${conversation}`,
+        );
         modalConversation.value = data;
         openEnquiry(data);
       } catch (error) {
@@ -39,23 +49,30 @@ export const useGlobalEnquiryModal = () => {
    * If the user has already contacted this listing, opens the existing conversation instead.
    * Waits for contactedListings hydration before deciding which mode to show — avoids flashing compose then immediately switching.
    */
-  async function openNewEnquiry(listingId: number, receiverId: number, listingTitle?: string) {
-    const { hasContactedListing, enquiries, contactedListingsLoading, openEnquiry } = useEnquiries();
+  async function openNewEnquiry(
+    listingId: number,
+    receiverId: number,
+    listingType: "sale" | "rent",
+    listingTitle?: string,
+  ) {
+    const { hasContactedListing, enquiries, contactedListingsLoading, openEnquiry } =
+      useEnquiries();
 
     // Wait for hydration so we make the right decision first time, no flicker
     if (contactedListingsLoading.value) {
       await new Promise<void>((resolve) => {
         const stop = watch(contactedListingsLoading, (loading) => {
-          if (!loading) { stop(); resolve(); }
+          if (!loading) {
+            stop();
+            resolve();
+          }
         });
       });
     }
 
     if (hasContactedListing(listingId)) {
       // Find the existing conversation in already-loaded enquiries first
-      const existing = enquiries.value.find(
-        (c) => c.listingId === listingId,
-      );
+      const existing = enquiries.value.find((c) => c.listingId === listingId);
       if (existing) {
         await openConversation(existing);
       } else {
@@ -81,7 +98,7 @@ export const useGlobalEnquiryModal = () => {
       return;
     }
 
-    newEnquiryData.value = { listingId, receiverId, listingTitle };
+    newEnquiryData.value = { listingId, receiverId, listingType, listingTitle };
     modalConversation.value = null;
     isModalOpen.value = true;
   }
@@ -115,6 +132,6 @@ export const useGlobalEnquiryModal = () => {
     openConversation,
     openNewEnquiry,
     closeConversation,
-    syncConversationIfOpen
+    syncConversationIfOpen,
   };
 };
