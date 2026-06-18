@@ -66,9 +66,7 @@
   const props = defineProps<Props>();
 
   const profileLink = computed(() =>
-    props.agent?.username ?
-      `/profile/${encodeURIComponent(props.agent.username)}`
-    : undefined,
+    props.agent?.username ? `/profile/${props.agent.username}` : undefined,
   );
 
   const memberSince = computed(() => {

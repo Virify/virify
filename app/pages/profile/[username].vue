@@ -161,7 +161,10 @@
 
   const { data: profileData, error } = await useAsyncData(
     `profile-${route.params.username}`,
-    () => $fetch<{ profile: PublicProfile }>(`/api/profile/${route.params.username}`),
+    () =>
+      $fetch<{ profile: PublicProfile }>(
+        `/api/profile/${encodeURIComponent(route.params.username as string)}`,
+      ),
     { watch: [() => route.params.username] },
   );
 
