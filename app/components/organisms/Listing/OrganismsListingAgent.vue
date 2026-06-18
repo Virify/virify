@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     v-if="agent?.username"
-    :to="`/profile/${profileSlug}`"
+    :to="profileLink"
     target="_blank"
     class="o-listing-sidebar-agent__link"
   >
@@ -65,7 +65,11 @@
   }
   const props = defineProps<Props>();
 
-  const profileSlug = computed(() => toProfileSlug(props.agent?.username));
+  const profileLink = computed(() =>
+    props.agent?.username ?
+      `/profile/${encodeURIComponent(props.agent.username)}`
+    : undefined,
+  );
 
   const memberSince = computed(() => {
     if (!props.agent?.createdAt) return undefined;
