@@ -1,6 +1,9 @@
 <template>
   <main class="p-listing">
-    <div class="p-listing" role="presentation">
+    <div
+      class="p-listing"
+      role="presentation"
+    >
       <div
         ref="$mobile-carousel"
         class="p-listing__main-carousel p-listing__main-carousel--mobile"
@@ -23,7 +26,10 @@
         </ClientOnly>
       </div>
 
-      <div class="p-listing__grid | container" role="presentation">
+      <div
+        class="p-listing__grid | container"
+        role="presentation"
+      >
         <div class="p-listing__content | flow flow-sm">
           <div
             ref="$desktop-carousel"
@@ -64,59 +70,57 @@
             :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
-            :chain-free="
-              listing?.saleListing ? !listing?.saleListing?.chain : null
-            "
+            :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null"
             :listing-id="listing?.id"
             :price-history="listing?.ListingPriceHistory ?? undefined"
             :current-price-number="listing?.price ?? undefined"
             :open-house-badge-label="openHouseBadgeLabel"
             :available="
-              listing?.saleListing
-                ? listing?.saleListing?.availabilityStatus
-                : listing?.rentalListing?.availabilityStatus
+              listing?.saleListing ?
+                listing?.saleListing?.availabilityStatus
+              : listing?.rentalListing?.availabilityStatus
             "
           />
 
           <!-- General Property Information (Non-collapsible) -->
-          <div v-if="property" class="p-listing__section">
-            <AtomsListingGeneralInfo
-              :description="property?.description || undefined"
-            />
+          <div
+            v-if="property"
+            class="p-listing__section"
+          >
+            <AtomsListingGeneralInfo :description="property?.description || undefined" />
           </div>
 
-          <div v-if="listing && property" class="p-listing__section">
+          <div
+            v-if="listing && property"
+            class="p-listing__section"
+          >
             <MoleculesListingEssentials
               :listing="listing"
               :property="property"
             />
           </div>
 
-          <div v-if="hasRooms" class="p-listing__section">
+          <div
+            v-if="hasRooms"
+            class="p-listing__section"
+          >
             <h2 class="title-md">Rooms</h2>
             <MoleculesListingItemDetails
-              v-if="
-                property?.bedroomFeatures && property.bedroomFeatures.length > 0
-              "
+              v-if="property?.bedroomFeatures && property.bedroomFeatures.length > 0"
               :items="property?.bedroomFeatures"
               type="room"
               subtype="Bedroom"
               title="Bedrooms"
             />
             <MoleculesListingItemDetails
-              v-if="
-                property?.bathroomFeatures &&
-                property.bathroomFeatures.length > 0
-              "
+              v-if="property?.bathroomFeatures && property.bathroomFeatures.length > 0"
               :items="property?.bathroomFeatures"
               type="room"
               subtype="Bathroom"
               title="Bathrooms"
             />
             <MoleculesListingItemDetails
-              v-if="
-                property?.kitchenFeatures && property.kitchenFeatures.length > 0
-              "
+              v-if="property?.kitchenFeatures && property.kitchenFeatures.length > 0"
               :items="property?.kitchenFeatures"
               type="room"
               subtype="Kitchen"
@@ -154,14 +158,20 @@
           </div>
 
           <!-- Energy & Utilities -->
-          <div v-if="property?.energyAndUtilities" class="p-listing__section">
+          <div
+            v-if="property?.energyAndUtilities"
+            class="p-listing__section"
+          >
             <MoleculesListingEnergyUtilities
               :energy-data="property.energyAndUtilities"
               :postcode="property?.address?.postcode"
             />
           </div>
 
-          <div v-if="hasAdditionalDetails" class="p-listing__section">
+          <div
+            v-if="hasAdditionalDetails"
+            class="p-listing__section"
+          >
             <h2 class="title-md">Additional Details</h2>
             <div class="p-listing__features-grid">
               <MoleculesListingFeatures
@@ -185,9 +195,7 @@
                 :max-download-speed-mbps="
                   property.energyAndUtilities.maxDownloadSpeedMbps
                 "
-                :full-fibre-available="
-                  property.energyAndUtilities.fullFibreAvailable
-                "
+                :full-fibre-available="property.energyAndUtilities.fullFibreAvailable"
               />
               <MoleculesListingFeatures
                 v-if="property?.additionalFeatures?.features?.length"
@@ -243,7 +251,10 @@
           </div>
 
           <!-- Location & Amenities (Non-collapsible) -->
-          <div v-if="property" class="p-listing__section">
+          <div
+            v-if="property"
+            class="p-listing__section"
+          >
             <OrganismsListingSectionLocation
               :lat="property?.address?.lat!"
               :lon="property?.address?.lon!"
@@ -253,9 +264,7 @@
           </div>
 
           <div
-            v-if="
-              property?.address?.lat && property?.address?.lon && listing?.id
-            "
+            v-if="property?.address?.lat && property?.address?.lon && listing?.id"
             class="p-listing__section"
           >
             <OrganismsListingCrimeScore
@@ -265,9 +274,7 @@
           </div>
 
           <div
-            v-if="
-              property?.address?.lat && property?.address?.lon && listing?.id
-            "
+            v-if="property?.address?.lat && property?.address?.lon && listing?.id"
             class="p-listing__section"
           >
             <MoleculesListingFloodRisk
@@ -276,7 +283,10 @@
             />
           </div>
 
-          <div class="p-listing__section" v-if="!loggedIn">
+          <div
+            class="p-listing__section"
+            v-if="!loggedIn"
+          >
             <MoleculesListingAdvert
               :title="advertTitle"
               :description="advertDescription"
@@ -286,9 +296,15 @@
           </div>
         </div>
 
-        <div class="p-listing__sidebar" role="presentation">
+        <div
+          class="p-listing__sidebar"
+          role="presentation"
+        >
           <Transition name="p-listing-images">
-            <div class="p-listing__sidebar-expand" v-show="!isImagesVisible">
+            <div
+              class="p-listing__sidebar-expand"
+              v-show="!isImagesVisible"
+            >
               <div class="p-listing__sidebar-carousel">
                 <MoleculesImageGallery
                   :images="galleryImages"
@@ -312,6 +328,7 @@
           <OrganismsListingSidebar
             :price="priceFormatted"
             :listing-id="listing?.id || 0"
+            :listing-type="listing?.saleListing ? 'sale' : 'rent'"
             :address="address"
             :price-type="priceType"
             :property-type="property?.type?.name"
@@ -326,18 +343,16 @@
             :classification="property?.classification?.name"
             :year-built="property?.yearBuilt || undefined"
             :construction-type="property?.constructionType || undefined"
-            :chain-free="
-              listing?.saleListing ? !listing?.saleListing?.chain : null
-            "
+            :chain-free="listing?.saleListing ? !listing?.saleListing?.chain : null"
             :has-image-slide="!isImagesVisible"
             :agent="listing?.user || {}"
             :price-history="listing?.ListingPriceHistory ?? undefined"
             :current-price-number="listing?.price ?? undefined"
             :open-house-badge-label="openHouseBadgeLabel"
             :available="
-              listing?.saleListing
-                ? listing?.saleListing?.availabilityStatus
-                : listing?.rentalListing?.availabilityStatus
+              listing?.saleListing ?
+                listing?.saleListing?.availabilityStatus
+              : listing?.rentalListing?.availabilityStatus
             "
             :is-draft="isDraft"
           />
@@ -360,6 +375,7 @@
       <OrganismsListingMobileBanner
         v-if="!isDesktop && !isBeyondListing"
         :price="priceFormatted"
+        :listing-type="listing?.saleListing ? 'sale' : 'rent'"
         :overview-visible="isOverviewVisible"
         :gallery-visible="isMobileGalleryVisible"
         :modal-open="showImageModal"
@@ -383,9 +399,9 @@
         :current-price-number="listing?.price ?? undefined"
         :open-house-badge-label="openHouseBadgeLabel"
         :available="
-          listing?.saleListing
-            ? listing?.saleListing?.availabilityStatus
-            : listing?.rentalListing?.availabilityStatus
+          listing?.saleListing ?
+            listing?.saleListing?.availabilityStatus
+          : listing?.rentalListing?.availabilityStatus
         "
         :is-draft="isDraft"
       />
@@ -394,141 +410,167 @@
 </template>
 
 <script setup lang="ts">
-import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
-import breakpoints from "#styles/_utils/breakpoints.module.scss";
+  import { useIntersectionObserver, useMediaQuery } from "@vueuse/core";
+  import breakpoints from "#styles/_utils/breakpoints.module.scss";
 
-const props = defineProps<{
-  listing: any;
-  isDraft?: boolean;
-}>();
+  const props = defineProps<{
+    listing: any;
+    isDraft?: boolean;
+  }>();
 
-const { trackView } = useAnalyticsTracking();
+  const { trackView } = useAnalyticsTracking();
 
-/**
- *  Content
- */
-const property = computed(() => props.listing?.property);
+  /**
+   *  Content
+   */
+  const property = computed(() => props.listing?.property);
 
-const priceFormatted = computed(() => {
-  const price = props.listing?.price;
-  return isNumber(price) ? numberToCurrency(price) : "";
-});
+  const priceFormatted = computed(() => {
+    const price = props.listing?.price;
+    return isNumber(price) ? numberToCurrency(price) : "";
+  });
 
-/** omit street number */
-const address = computed(() => {
-  return (
-    property.value?.address.street +
-    ", " +
-    property.value?.address.city +
-    ", " +
-    property.value?.address.postcode.split(" ")[0]
+  /** omit street number */
+  const address = computed(() => {
+    return (
+      property.value?.address.street +
+      ", " +
+      property.value?.address.city +
+      ", " +
+      property.value?.address.postcode.split(" ")[0]
+    );
+  });
+
+  const priceType = computed(() => {
+    return props.listing?.saleListing ?
+        props.listing.saleListing.priceType
+      : props.listing?.rentalListing?.rentFrequency;
+  });
+
+  const hasRooms = computed(() => {
+    const prop = property.value;
+    if (!prop) return false;
+
+    return (
+      (prop.bedroomFeatures && prop.bedroomFeatures.length > 0) ||
+      (prop.bathroomFeatures && prop.bathroomFeatures.length > 0) ||
+      (prop.kitchenFeatures && prop.kitchenFeatures.length > 0) ||
+      (prop.reception && prop.reception.length > 0) ||
+      (prop.otherRoom && prop.otherRoom.length > 0)
+    );
+  });
+
+  const advertTitle = computed(() => "List your property with Virify!");
+
+  const advertDescription = computed(
+    () =>
+      "Ready to sell or rent? Get your home in front of the right buyers and renters with Virify's smart, modern platform.",
   );
-});
 
-const priceType = computed(() => {
-  return props.listing?.saleListing
-    ? props.listing.saleListing.priceType
-    : props.listing?.rentalListing?.rentFrequency;
-});
+  const advertLinkText = computed(() => "List Your Property");
 
-const hasRooms = computed(() => {
-  const prop = property.value;
-  if (!prop) return false;
+  const advertLink = computed(() => "/dashboard/create-listing");
 
-  return (
-    (prop.bedroomFeatures && prop.bedroomFeatures.length > 0) ||
-    (prop.bathroomFeatures && prop.bathroomFeatures.length > 0) ||
-    (prop.kitchenFeatures && prop.kitchenFeatures.length > 0) ||
-    (prop.reception && prop.reception.length > 0) ||
-    (prop.otherRoom && prop.otherRoom.length > 0)
-  );
-});
+  // Handle amenities array/object conversion
+  const amenitiesArray = computed(() => {
+    const amenities = property.value?.amenities;
+    if (!amenities) return null;
+    return Array.isArray(amenities) ? amenities : [amenities];
+  });
 
-const advertTitle = computed(() => "List your property with Virify!");
+  // Check if property has any garden (regardless of additionalDetails)
+  const hasGarden = computed(() => {
+    const gardens = property.value?.outdoorSpace?.garden;
+    return gardens && Array.isArray(gardens) && gardens.length > 0;
+  });
 
-const advertDescription = computed(
-  () =>
-    "Ready to sell or rent? Get your home in front of the right buyers and renters with Virify's smart, modern platform.",
-);
+  // Check if property has any yard (regardless of additionalDetails)
+  const hasYard = computed(() => {
+    const yards = property.value?.outdoorSpace?.yard;
+    return yards && Array.isArray(yards) && yards.length > 0;
+  });
 
-const advertLinkText = computed(() => "List Your Property");
+  // Check if property has any land (regardless of additionalDetails)
+  const hasLand = computed(() => {
+    const land = property.value?.outdoorSpace?.land;
+    return land && Array.isArray(land) && land.length > 0;
+  });
 
-const advertLink = computed(() => "/dashboard/create-listing");
+  // Filter gardens/yards/lands that have additional details (for rendering individual cards)
+  const gardensWithDetails = computed(() => {
+    const gardens = property.value?.outdoorSpace?.garden;
+    if (!gardens || !Array.isArray(gardens)) return [];
+    return gardens.filter((g) => g.additionalDetails === true);
+  });
 
-// Handle amenities array/object conversion
-const amenitiesArray = computed(() => {
-  const amenities = property.value?.amenities;
-  if (!amenities) return null;
-  return Array.isArray(amenities) ? amenities : [amenities];
-});
+  const yardsWithDetails = computed(() => {
+    const yards = property.value?.outdoorSpace?.yard;
+    if (!yards || !Array.isArray(yards)) return [];
+    return yards.filter((y) => y.additionalDetails === true);
+  });
 
-// Check if property has any garden (regardless of additionalDetails)
-const hasGarden = computed(() => {
-  const gardens = property.value?.outdoorSpace?.garden;
-  return gardens && Array.isArray(gardens) && gardens.length > 0;
-});
+  const landsWithDetails = computed(() => {
+    const lands = property.value?.outdoorSpace?.land;
+    if (!lands || !Array.isArray(lands)) return [];
+    return lands.filter((l) => l.additionalDetails === true);
+  });
 
-// Check if property has any yard (regardless of additionalDetails)
-const hasYard = computed(() => {
-  const yards = property.value?.outdoorSpace?.yard;
-  return yards && Array.isArray(yards) && yards.length > 0;
-});
+  // Check if property has any additional details to display
+  const hasAdditionalDetails = computed(() => {
+    const prop = property.value;
+    if (!prop) return false;
 
-// Check if property has any land (regardless of additionalDetails)
-const hasLand = computed(() => {
-  const land = property.value?.outdoorSpace?.land;
-  return land && Array.isArray(land) && land.length > 0;
-});
+    return (
+      prop.parking?.features?.length ||
+      prop.utility?.features?.length ||
+      prop.storageFeatures?.features?.length ||
+      prop.energyAndUtilities?.broadbandType ||
+      prop.additionalFeatures?.features?.length ||
+      prop.accessibilityFeatures?.features?.length ||
+      prop.securityFeatures?.features?.length ||
+      prop.energyAndUtilities
+    );
+  });
 
-// Filter gardens/yards/lands that have additional details (for rendering individual cards)
-const gardensWithDetails = computed(() => {
-  const gardens = property.value?.outdoorSpace?.garden;
-  if (!gardens || !Array.isArray(gardens)) return [];
-  return gardens.filter((g) => g.additionalDetails === true);
-});
+  /**
+   *  Media
+   */
+  const images = computed(() => {
+    const media = property.value?.media;
+    if (!Array.isArray(media)) return [];
 
-const yardsWithDetails = computed(() => {
-  const yards = property.value?.outdoorSpace?.yard;
-  if (!yards || !Array.isArray(yards)) return [];
-  return yards.filter((y) => y.additionalDetails === true);
-});
+    return media
+      .filter((item) => item.image !== null)
+      .map((item, index) => ({
+        image: item.image!,
+        metadata: item.metadata,
+        // Room relationship data for categorization
+        bedroomId: item.bedroomId,
+        bathroomId: item.bathroomId,
+        kitchenId: item.kitchenId,
+        receptionId: item.receptionId,
+        otherRoomId: item.otherRoomId,
+        gardenId: item.gardenId,
+        yardId: item.yardId,
+        landId: item.landId,
+        outdoorSpaceId: item.outdoorSpaceId,
+        globalIndex: index,
+      }));
+  });
 
-const landsWithDetails = computed(() => {
-  const lands = property.value?.outdoorSpace?.land;
-  if (!lands || !Array.isArray(lands)) return [];
-  return lands.filter((l) => l.additionalDetails === true);
-});
-
-// Check if property has any additional details to display
-const hasAdditionalDetails = computed(() => {
-  const prop = property.value;
-  if (!prop) return false;
-
-  return (
-    prop.parking?.features?.length ||
-    prop.utility?.features?.length ||
-    prop.storageFeatures?.features?.length ||
-    prop.energyAndUtilities?.broadbandType ||
-    prop.additionalFeatures?.features?.length ||
-    prop.accessibilityFeatures?.features?.length ||
-    prop.securityFeatures?.features?.length ||
-    prop.energyAndUtilities
-  );
-});
-
-/**
- *  Media
- */
-const images = computed(() => {
-  const media = property.value?.media;
-  if (!Array.isArray(media)) return [];
-
-  return media
-    .filter((item) => item.image !== null)
-    .map((item, index) => ({
-      image: item.image!,
-      metadata: item.metadata,
-      // Room relationship data for categorization
+  const galleryImages = computed(() => {
+    return images.value.map((item, index) => ({
+      src: item.image,
+      alt: (() => {
+        try {
+          const metadata =
+            typeof item.metadata === "string" ? JSON.parse(item.metadata) : item.metadata;
+          return metadata?.alt || `Property image ${index + 1}`;
+        } catch {
+          return `Property image ${index + 1}`;
+        }
+      })(),
+      // Pass room IDs for gallery to categorize
       bedroomId: item.bedroomId,
       bathroomId: item.bathroomId,
       kitchenId: item.kitchenId,
@@ -540,373 +582,339 @@ const images = computed(() => {
       outdoorSpaceId: item.outdoorSpaceId,
       globalIndex: index,
     }));
-});
+  });
 
-const galleryImages = computed(() => {
-  return images.value.map((item, index) => ({
-    src: item.image,
-    alt: (() => {
-      try {
-        const metadata =
-          typeof item.metadata === "string"
-            ? JSON.parse(item.metadata)
-            : item.metadata;
-        return metadata?.alt || `Property image ${index + 1}`;
-      } catch {
-        return `Property image ${index + 1}`;
-      }
-    })(),
-    // Pass room IDs for gallery to categorize
-    bedroomId: item.bedroomId,
-    bathroomId: item.bathroomId,
-    kitchenId: item.kitchenId,
-    receptionId: item.receptionId,
-    otherRoomId: item.otherRoomId,
-    gardenId: item.gardenId,
-    yardId: item.yardId,
-    landId: item.landId,
-    outdoorSpaceId: item.outdoorSpaceId,
-    globalIndex: index,
-  }));
-});
+  /**
+   *  Toggle media visibility
+   */
+  const $mobileCarousel = useTemplateRef("$mobile-carousel");
+  const $desktopCarousel = useTemplateRef("$desktop-carousel");
+  const isDesktop = useMediaQuery(`(min-width: ${breakpoints.notebook})`);
+  const isImagesVisible = shallowRef(true);
 
-/**
- *  Toggle media visibility
- */
-const $mobileCarousel = useTemplateRef("$mobile-carousel");
-const $desktopCarousel = useTemplateRef("$desktop-carousel");
-const isDesktop = useMediaQuery(`(min-width: ${breakpoints.notebook})`);
-const isImagesVisible = shallowRef(true);
+  function parallaxCarousel() {
+    if (isDesktop.value) return;
 
-function parallaxCarousel() {
-  if (isDesktop.value) return;
+    // Get elem to watch
+    const elem = unref($mobileCarousel);
 
-  // Get elem to watch
-  const elem = unref($mobileCarousel);
+    // Ensure element exists
+    if (!elem) return;
 
-  // Ensure element exists
-  if (!elem) return;
+    // Get top scroll position
+    const getScrollTop = window.scrollY;
+    const getScrollThreshold = elem.offsetHeight;
 
-  // Get top scroll position
-  const getScrollTop = window.scrollY;
-  const getScrollThreshold = elem.offsetHeight;
-
-  // Calculate as transform from the top, if below threshold
-  if (getScrollTop < getScrollThreshold) {
-    elem.style.transform = `translateY(${getScrollTop / 2}px)`;
+    // Calculate as transform from the top, if below threshold
+    if (getScrollTop < getScrollThreshold) {
+      elem.style.transform = `translateY(${getScrollTop / 2}px)`;
+    }
   }
-}
 
-useIntersectionObserver($desktopCarousel, ([entry]) => {
-  isImagesVisible.value = !!entry?.isIntersecting;
-});
+  useIntersectionObserver($desktopCarousel, ([entry]) => {
+    isImagesVisible.value = !!entry?.isIntersecting;
+  });
 
-const { loggedIn } = useUserSession();
-const {
-  viewings,
-  getActiveViewingForListing,
-  getViewingStatusLabel,
-  fetchViewings,
-} = useViewings();
+  const { loggedIn } = useUserSession();
+  const { viewings, getActiveViewingForListing, getViewingStatusLabel, fetchViewings } =
+    useViewings();
 
-const viewingLabel = computed(() => {
-  const id = props.listing?.id;
-  if (!id) return null;
-  const v = getActiveViewingForListing(id);
-  return v ? getViewingStatusLabel(v) : null;
-});
+  const viewingLabel = computed(() => {
+    const id = props.listing?.id;
+    if (!id) return null;
+    const v = getActiveViewingForListing(id);
+    return v ? getViewingStatusLabel(v) : null;
+  });
 
-const { data: openHouseSessionsData } = useAsyncData(
-  `open-house-${props.listing?.id}`,
-  () => $fetch<OpenHouseSession[]>(`/api/open-house/${props.listing?.id}`),
-  { server: false },
-);
+  const { data: openHouseSessionsData } = useAsyncData(
+    `open-house-${props.listing?.id}`,
+    () => $fetch<OpenHouseSession[]>(`/api/open-house/${props.listing?.id}`),
+    { server: false },
+  );
 
-const openHouseBadgeLabel = computed(() => {
-  const sessions = openHouseSessionsData.value;
-  if (!sessions?.length) return null;
-  return `Open House: ${formatOpenHouseDate(sessions[0]!.date)}`;
-});
+  const openHouseBadgeLabel = computed(() => {
+    const sessions = openHouseSessionsData.value;
+    if (!sessions?.length) return null;
+    return `Open House: ${formatOpenHouseDate(sessions[0]!.date)}`;
+  });
 
-onMounted(() => {
-  window.addEventListener("scroll", parallaxCarousel, { passive: true });
-  // Track listing view only for published listings, not drafts
-  if (!props.isDraft && props.listing && props.listing.id) {
-    trackView(props.listing.id);
+  onMounted(() => {
+    window.addEventListener("scroll", parallaxCarousel, { passive: true });
+    // Track listing view only for published listings, not drafts
+    if (!props.isDraft && props.listing && props.listing.id) {
+      trackView(props.listing.id);
+    }
+    if (loggedIn.value && viewings.value.length === 0) {
+      fetchViewings().catch(() => {});
+    }
+  });
+
+  onBeforeUnmount(() => {
+    window.removeEventListener("scroll", parallaxCarousel);
+  });
+
+  /**
+   *  Toggle overview scroll
+   */
+  const $overview = useTemplateRef("$overview");
+  const isOverviewVisible = shallowRef(true);
+
+  useIntersectionObserver($overview, ([entry]) => {
+    isOverviewVisible.value = !!entry?.isIntersecting;
+  });
+
+  /**
+   *  Toggle mobile gallery visibility
+   */
+  const isMobileGalleryVisible = shallowRef(false);
+
+  useIntersectionObserver($mobileCarousel, ([entry]) => {
+    isMobileGalleryVisible.value = !!entry?.isIntersecting;
+  });
+
+  /**
+   *  Hide mobile banner once the user scrolls past the listing into the footer
+   */
+  const $listingEnd = useTemplateRef("$listingEnd");
+  const isBeyondListing = shallowRef(false);
+
+  useIntersectionObserver($listingEnd, ([entry]) => {
+    if (!entry) return;
+    if (entry.isIntersecting) {
+      // Sentinel entered viewport — user is in the footer area
+      isBeyondListing.value = true;
+    } else if (entry.boundingClientRect.top > 0) {
+      // Sentinel is below viewport — user scrolled back up into the listing
+      isBeyondListing.value = false;
+    }
+    // If top <= 0 and not intersecting, sentinel scrolled above viewport (fully past it) — stay hidden
+  });
+
+  /**
+   *  Image Gallery Modal
+   */
+  const showImageModal = ref(false);
+  const modalImageIndex = ref(0);
+
+  function openImageModal(imageIndex: number) {
+    modalImageIndex.value = imageIndex;
+    showImageModal.value = true;
   }
-  if (loggedIn.value && viewings.value.length === 0) {
-    fetchViewings().catch(() => {});
+
+  function closeImageModal() {
+    showImageModal.value = false;
   }
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener("scroll", parallaxCarousel);
-});
-
-/**
- *  Toggle overview scroll
- */
-const $overview = useTemplateRef("$overview");
-const isOverviewVisible = shallowRef(true);
-
-useIntersectionObserver($overview, ([entry]) => {
-  isOverviewVisible.value = !!entry?.isIntersecting;
-});
-
-/**
- *  Toggle mobile gallery visibility
- */
-const isMobileGalleryVisible = shallowRef(false);
-
-useIntersectionObserver($mobileCarousel, ([entry]) => {
-  isMobileGalleryVisible.value = !!entry?.isIntersecting;
-});
-
-/**
- *  Hide mobile banner once the user scrolls past the listing into the footer
- */
-const $listingEnd = useTemplateRef("$listingEnd");
-const isBeyondListing = shallowRef(false);
-
-useIntersectionObserver($listingEnd, ([entry]) => {
-  if (!entry) return;
-  if (entry.isIntersecting) {
-    // Sentinel entered viewport — user is in the footer area
-    isBeyondListing.value = true;
-  } else if (entry.boundingClientRect.top > 0) {
-    // Sentinel is below viewport — user scrolled back up into the listing
-    isBeyondListing.value = false;
-  }
-  // If top <= 0 and not intersecting, sentinel scrolled above viewport (fully past it) — stay hidden
-});
-
-/**
- *  Image Gallery Modal
- */
-const showImageModal = ref(false);
-const modalImageIndex = ref(0);
-
-function openImageModal(imageIndex: number) {
-  modalImageIndex.value = imageIndex;
-  showImageModal.value = true;
-}
-
-function closeImageModal() {
-  showImageModal.value = false;
-}
 </script>
 
 <style lang="scss" scoped>
-@use "#styles/_utils/media" as mq;
-@use "#styles/_utils/functions" as fn;
+  @use "#styles/_utils/media" as mq;
+  @use "#styles/_utils/functions" as fn;
 
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.p-listing {
-  padding-top: var(--size-16);
-
-  &__grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: calc(var(--container-padding) / 2);
-    align-items: flex-start;
-
-    @include mq.not-notebook {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: none;
-      background: var(--background-200);
-      border-top-right-radius: var(--border-radius-3xl);
-      border-top-left-radius: var(--border-radius-3xl);
-      padding: var(--border-radius-3xl) 0 0;
-      margin: calc(0px - var(--border-radius-3xl)) 0 0;
-    }
-
-    @include mq.notebook {
-      grid-template-columns: 1fr 18em;
-    }
-
-    @include mq.desktop {
-      grid-template-columns: 1fr 20em;
-    }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 
-  /**
-   *  Content wrappers
-   */
-  &__mobile-overview {
-    @include mq.notebook {
-      display: none;
-    }
-  }
+  .p-listing {
+    padding-top: var(--size-16);
 
-  &__content {
-    overflow: hidden;
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: calc(var(--container-padding) / 2);
+      align-items: flex-start;
 
-    @include mq.not-notebook {
-      padding-inline: var(--size-24);
-    }
-  }
-
-  &__sidebar {
-    display: none;
-
-    @include mq.notebook {
-      display: block;
-      position: sticky;
-      top: calc(var(--header-height) + var(--size-32));
-      max-height: calc(
-        100dvh - var(--header-height) - var(--size-32) - var(--size-16)
-      );
-      overflow: auto;
-      overscroll-behavior: contain;
-      scrollbar-width: thin;
-      padding-bottom: var(--size-16);
-    }
-
-    &-expand {
-      overflow: hidden;
-      display: none;
+      @include mq.not-notebook {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: none;
+        background: var(--background-200);
+        border-top-right-radius: var(--border-radius-3xl);
+        border-top-left-radius: var(--border-radius-3xl);
+        padding: var(--border-radius-3xl) 0 0;
+        margin: calc(0px - var(--border-radius-3xl)) 0 0;
+      }
 
       @include mq.notebook {
-        display: block;
+        grid-template-columns: 1fr 18em;
+      }
+
+      @include mq.desktop {
+        grid-template-columns: 1fr 20em;
       }
     }
-  }
 
-  /**
-   *  Images
+    /**
+   *  Content wrappers
    */
-  &__main-carousel,
-  &__sidebar-carousel {
-    overflow: hidden;
-    position: relative;
-  }
-
-  &__main-carousel {
-    &--mobile {
-      display: block;
-
+    &__mobile-overview {
       @include mq.notebook {
         display: none;
       }
     }
 
-    &--desktop {
+    &__content {
+      overflow: hidden;
+
+      @include mq.not-notebook {
+        padding-inline: var(--size-24);
+      }
+    }
+
+    &__sidebar {
       display: none;
 
       @include mq.notebook {
         display: block;
-        margin-bottom: var(--size-24);
+        position: sticky;
+        top: calc(var(--header-height) + var(--size-32));
+        max-height: calc(100dvh - var(--header-height) - var(--size-32) - var(--size-16));
+        overflow: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        padding-bottom: var(--size-16);
+      }
+
+      &-expand {
+        overflow: hidden;
+        display: none;
+
+        @include mq.notebook {
+          display: block;
+        }
+      }
+    }
+
+    /**
+   *  Images
+   */
+    &__main-carousel,
+    &__sidebar-carousel {
+      overflow: hidden;
+      position: relative;
+    }
+
+    &__main-carousel {
+      &--mobile {
+        display: block;
+
+        @include mq.notebook {
+          display: none;
+        }
+      }
+
+      &--desktop {
+        display: none;
+
+        @include mq.notebook {
+          display: block;
+          margin-bottom: var(--size-24);
+        }
+      }
+    }
+
+    &__sidebar-carousel {
+      margin-bottom: var(--size-24);
+    }
+
+    &__image-badge {
+      position: absolute;
+      top: var(--size-12);
+      right: var(--size-12);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /**
+   *  Skeleton loaders
+   */
+    &__main-carousel-skeleton {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+
+      &--mobile {
+        aspect-ratio: 4 / 3;
+        max-height: 70vh;
       }
     }
   }
 
-  &__sidebar-carousel {
-    margin-bottom: var(--size-24);
-  }
-
-  &__image-badge {
-    position: absolute;
-    top: var(--size-12);
-    right: var(--size-12);
-    z-index: 10;
-    pointer-events: none;
-  }
-
   /**
-   *  Skeleton loaders
-   */
-  &__main-carousel-skeleton {
-    aspect-ratio: 16 / 9;
-    width: 100%;
-
-    &--mobile {
-      aspect-ratio: 4 / 3;
-      max-height: 70vh;
-    }
-  }
-}
-
-/**
  *  Animations
  */
-.p-listing-images-enter-active,
-.p-listing-images-leave-active {
-  interpolate-size: allow-keywords;
+  .p-listing-images-enter-active,
+  .p-listing-images-leave-active {
+    interpolate-size: allow-keywords;
 
-  height: calc-size(max-content, size);
-  transition-property: opacity, height, transform, margin;
-  transition-duration: var(--animation-medium);
-  transition-timing-function: var(--ease-in-out);
-  transform-origin: 100% 100%;
-}
-
-.p-listing-images-leave-to,
-.p-listing-images-enter-from {
-  height: 0;
-  margin: 0;
-  transform: translateY(-100%);
-}
-
-.p-listing__section {
-  padding: var(--size-16) 0;
-  margin-left: var(--size-2);
-
-  @include mq.notebook {
-    margin-right: var(--size-24);
-  }
-}
-
-.p-listing__features-list {
-  width: 100%;
-  display: grid;
-  gap: var(--size-16);
-  margin-top: var(--size-16);
-  grid-template-columns: 1fr;
-
-  @include mq.tablet {
-    grid-template-columns: repeat(2, 1fr);
+    height: calc-size(max-content, size);
+    transition-property: opacity, height, transform, margin;
+    transition-duration: var(--animation-medium);
+    transition-timing-function: var(--ease-in-out);
+    transform-origin: 100% 100%;
   }
 
-  @include mq.mobile-only {
-    gap: var(--size-12);
-  }
-}
-
-.p-listing__features-grid {
-  width: 100%;
-  margin-top: var(--size-16);
-  column-gap: var(--size-16);
-  row-gap: var(--size-16);
-
-  @include mq.tablet {
-    column-count: 2;
+  .p-listing-images-leave-to,
+  .p-listing-images-enter-from {
+    height: 0;
+    margin: 0;
+    transform: translateY(-100%);
   }
 
-  @include mq.notebook {
-    column-count: 3;
-  }
+  .p-listing__section {
+    padding: var(--size-16) 0;
+    margin-left: var(--size-2);
 
-  @include mq.mobile-only {
-    column-gap: var(--size-12);
-    row-gap: var(--size-12);
-  }
-
-  > * {
-    break-inside: avoid;
-    margin-bottom: var(--size-16);
-    display: inline-block;
-    width: 100%;
-
-    @include mq.mobile-only {
-      margin-bottom: var(--size-12);
+    @include mq.notebook {
+      margin-right: var(--size-24);
     }
   }
-}
+
+  .p-listing__features-list {
+    width: 100%;
+    display: grid;
+    gap: var(--size-16);
+    margin-top: var(--size-16);
+    grid-template-columns: 1fr;
+
+    @include mq.tablet {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include mq.mobile-only {
+      gap: var(--size-12);
+    }
+  }
+
+  .p-listing__features-grid {
+    width: 100%;
+    margin-top: var(--size-16);
+    column-gap: var(--size-16);
+    row-gap: var(--size-16);
+
+    @include mq.tablet {
+      column-count: 2;
+    }
+
+    @include mq.notebook {
+      column-count: 3;
+    }
+
+    @include mq.mobile-only {
+      column-gap: var(--size-12);
+      row-gap: var(--size-12);
+    }
+
+    > * {
+      break-inside: avoid;
+      margin-bottom: var(--size-16);
+      display: inline-block;
+      width: 100%;
+
+      @include mq.mobile-only {
+        margin-bottom: var(--size-12);
+      }
+    }
+  }
 </style>

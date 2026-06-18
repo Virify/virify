@@ -30,6 +30,7 @@ export function mapToCardProps(result: ListingCardData) {
   } = property;
 
   const saleOrRent: "buy" | "rent" = rentalListing ? "rent" : "buy";
+  const listingType: "sale" | "rent" = saleListing ? "sale" : "rent";
   const propertyDesc = [classification?.name, type?.name].filter(Boolean).join(", ");
   const overview =
     numberBedrooms ? `${numberBedrooms} Bed ${propertyDesc}` : propertyDesc;
@@ -72,6 +73,7 @@ export function mapToCardProps(result: ListingCardData) {
 
   return {
     saleOrRent,
+    listingType,
     propertyImage: media?.[0]?.image ?? undefined,
     carouselImages: media?.map((row) => row?.image).filter(Boolean) as string[],
     propertyImageAlt: overview,
