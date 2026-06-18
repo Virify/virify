@@ -100,7 +100,7 @@ defineProps<{
 
           <Text style="color: #6b7280; font-size: 13px; line-height: 1.5; margin: 0; text-align: center;">
             <strong style="color: #2D2D4F;">Virify</strong> - The UK's first private property marketplace<br/>
-            Skip the estate agent. Save thousands.
+            The property platform that works for everyone
           </Text>
         </Section>
 
