@@ -45,8 +45,8 @@
         </span>
 
         <NuxtLink
-          v-if="name"
-          :to="`/profile/${profileSlug}`"
+          v-if="profileLink"
+          :to="profileLink"
           class="property-card-seller__popover-link | body-xs"
         >
           View profile
@@ -68,7 +68,9 @@
     name: "Virify",
   });
 
-  const profileSlug = computed(() => toProfileSlug(props.name));
+  const profileLink = computed(() =>
+    props.name ? `/profile/${encodeURIComponent(props.name)}` : null,
+  );
 </script>
 
 <style lang="scss">

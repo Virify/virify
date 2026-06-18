@@ -13,7 +13,7 @@
         <template #right>
           <UButton
             v-if="state.username"
-            :to="`/profile/${toProfileSlug(state.username)}`"
+            :to="`/profile/${encodeURIComponent(state.username)}`"
             icon="i-lucide-external-link"
             label="View Public Profile"
             variant="ghost"
