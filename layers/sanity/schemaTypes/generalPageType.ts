@@ -10,6 +10,14 @@ export const generalPageType = defineType({
     {name: 'seo', title: 'SEO / Meta'},
   ],
   fields: [
+    defineField({
+      name: 'category',
+      title: 'Page Category',
+      type: 'reference',
+      to: [{type: 'pageCategory'}],
+      group: 'content',
+      validation: (Rule) => Rule.required(),
+    }),
     /* ================= CONTENT GROUP ================= */
     defineField({
       name: 'title',

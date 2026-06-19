@@ -1,3 +1,4 @@
+import { getOwnershipFilter } from "~~/server/utils/ownership";
 import * as z from "zod";
 
 /**
@@ -36,7 +37,7 @@ export default defineEventHandler(async (event) => {
 
     // Verify draft ownership
     const existingDraft = await prisma.draftListing.findUnique({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId, ...getOwnershipFilter(user) },
       include: {
         property: {
           include: {
@@ -82,7 +83,7 @@ export default defineEventHandler(async (event) => {
 
     // Update draft with new media
     const result = await prisma.draftListing.update({
-      where: { id: draftId, userId: user.id },
+      where: { id: draftId, ...getOwnershipFilter(user) },
       data: {
         property: {
           update: {

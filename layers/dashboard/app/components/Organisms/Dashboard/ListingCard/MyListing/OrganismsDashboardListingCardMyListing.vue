@@ -207,7 +207,7 @@
         <!-- Draft progress indicator -->
         <div
           v-if="listing.isDraft"
-          class="flex flex-wrap items-center gap-2"
+          class="flex items-center gap-2"
         >
           <UBadge
             v-if="isAllStepsCompleted"
@@ -387,7 +387,19 @@
     <template #footer>
       <USeparator class="my-3" />
       <div class="flex justify-between items-center w-full">
-        <p class="body-xs text-muted-foreground">{{ dateLabel }}</p>
+        <div class="flex flex-col gap-0.5">
+          <p class="body-xs text-muted-foreground">{{ dateLabel }}</p>
+          <p
+            v-if="listingOwnerUsername"
+            class="body-xs text-muted-foreground flex items-center gap-1"
+          >
+            <UIcon
+              name="i-lucide-user"
+              class="w-3 h-3 shrink-0"
+            />
+            {{ listingOwnerUsername }}
+          </p>
+        </div>
         <div class="flex gap-2 items-center ml-auto">
           <OrganismsDashboardOpenHousePopover
             v-if="canShare"
@@ -477,6 +489,7 @@
 
   const { archiveListing, restoreListing, setPublished, setAvailabilityStatus } =
     useMyListings();
+  const { user: currentUser } = useUserSession();
   const toast = useToast();
   const { createListing } = useFeatureFlag();
 
@@ -667,6 +680,14 @@
     });
 
     return `Updated on: ${formatted}`;
+  });
+
+  // Show the listing owner's username only when viewing someone else's listing (admin context)
+  const listingOwnerUsername = computed(() => {
+    const ownerUser = (props.listing as any).user;
+    if (!ownerUser?.username) return null;
+    if (ownerUser.id === currentUser.value?.id) return null;
+    return ownerUser.username;
   });
 
   /**

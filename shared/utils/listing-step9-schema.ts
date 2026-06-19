@@ -8,11 +8,13 @@ import type { MediaAssignment, Step9FormState } from "../types/step9-media";
 
 // Media assignment schema - for assigning images to rooms
 export const mediaAssignmentSchema = z.object({
+  // Database primary key — present for existing images; used for reliable updates.
+  id: z.number().int().positive().optional(),
   cloudflareId: z.string().min(1, "Image ID is required"),
   filename: z.string().optional(),
   description: z
     .string()
-    .max(500, "Description must be 500 characters or less")
+    .max(100, "Description must be 100 characters or less")
     .nullable()
     .optional(),
   // Room IDs (only one should be set, or none for general property images)
@@ -70,7 +72,7 @@ export function createInitialStep9Values(draftData?: any): Step9FormState {
     return {
       cloudflareId: m.image || "",
       filename: metadata.cloudflareImageId || m.image || "",
-      description: metadata.description || null,
+      description: (metadata.description ?? metadata.alt ?? "").substring(0, 100),
       bedroomId: m.bedroomId || null,
       bathroomId: m.bathroomId || null,
       kitchenId: m.kitchenId || null,
@@ -109,9 +111,7 @@ export const step9Validation = {
    * Images are optional, so step is always valid
    */
   isStep9Valid: (data: Step9FormState): boolean => {
-    return !!(
-      data.property.description && data.property.description.length >= 10
-    );
+    return !!(data.property.description && data.property.description.length >= 10);
   },
 
   /**

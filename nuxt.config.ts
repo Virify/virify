@@ -90,6 +90,7 @@ export default defineNuxtConfig({
       "/profile/*",
       "/acceptable-use",
       "/information/**",
+      "/content/**",
     ],
     disallow: [
       "/account",
@@ -117,13 +118,16 @@ export default defineNuxtConfig({
       "/login",
       "/signup",
       "/account/**",
-      "/listing/**",
       "/search/**",
       "/ai-search/**",
       "/review/**",
       "/auth/update-admin-password",
     ],
-    sources: ["/api/__sitemap__/guides"],
+    sources: [
+      "/api/__sitemap__/guides",
+      "/api/__sitemap__/content",
+      "/api/__sitemap__/listings",
+    ],
   },
   image: {
     cloudflare: {

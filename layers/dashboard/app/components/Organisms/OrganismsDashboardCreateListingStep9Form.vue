@@ -25,9 +25,9 @@
         <template #description>
           <p class="body-sm text-muted">
             Add a compelling description of your property, then upload up to
-            <strong class="text-default">{{ maxImages }} images</strong> for
-            your {{ listingTier || "basic" }} tier listing. JPG, PNG, WebP, or
-            GIF &bull; Max 10MB per file.
+            <strong class="text-default">{{ maxImages }} images</strong> for your
+            {{ listingTier || "basic" }} tier listing. JPG, PNG, WebP, or GIF &bull; Max
+            10MB per file.
           </p>
         </template>
       </UAlert>
@@ -38,14 +38,14 @@
       <UFormField
         label="Property Description"
         name="property.description"
-        description="Add a compelling description of your property (min 10 characters)"
+        description="Add a compelling description of your property (min 10 characters). Press Enter twice between paragraphs to add spacing."
         required
         eagerValidation
       >
         <UTextarea
           v-model="state.property.description"
           placeholder="e.g. 'This charming 2-bedroom apartment offers stunning views...'"
-          :rows="4"
+          :rows="10"
           color="secondary"
           class="w-full"
         />
@@ -65,8 +65,7 @@
 
       <!-- Uploaded Images Grid -->
       <MoleculesDashboardCreateListingStep9ImageGrid
-        :images="state.property.media"
-        :grouped-images="groupedImages"
+        :groups="groupedImages"
         :accordion-items="imageAccordionItems"
         :room-options="roomOptions"
         :deleting-ids="deletingIds"
@@ -74,314 +73,232 @@
         :disabled="isUploading || isProcessing"
         @remove-all="removeAllImages"
         @delete-image="removeImageById"
+        @update-title="updateImageTitle"
         @assign-room="assignToRoomById"
-        @set-sortable-ref="setSortableRef"
-        @change-position="changePositionInGroup"
+        @reorder-group="handleGroupReorder"
       />
     </div>
   </OrganismsDashboardCreateListingStepWrapper>
 </template>
 
 <script setup lang="ts">
-import Sortable, { type SortableEvent } from "sortablejs";
-import { useDebounceFn, useMediaQuery } from "@vueuse/core";
+  // ============================================================================
+  // Draft Data & Tier
+  // ============================================================================
 
-// Detect mobile for disabling drag
-const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const { getStepData, draftListingId, editingListingId, selectedTier, isStepDirty } =
+    useCreateListingSteps();
+  const draftData = getStepData(9);
 
-// ============================================================================
-// Draft Data & Tier
-// ============================================================================
+  // selectedTier is already set when loading draft or live listing
+  const listingTier = computed(() => (selectedTier.value || "BASIC").toLowerCase());
 
-const { getStepData, draftListingId, editingListingId, selectedTier } =
-  useCreateListingSteps();
-const draftData = getStepData(9);
-
-// selectedTier is already set when loading draft or live listing
-const listingTier = computed(() =>
-  (selectedTier.value || "BASIC").toLowerCase(),
-);
-
-const maxImages = computed(() =>
-  getMaxImagesForTier(listingTier.value as "PREMIUM" | "FEATURED" | "BASIC"),
-);
-
-// Build room data from already-loaded step data (steps 4, 5, 6)
-// This avoids re-fetching the entire listing on every step visit
-const propertyDataFromSteps = computed(() => {
-  const step4 = getStepData(4);
-  const step5 = getStepData(5);
-  const step6 = getStepData(6);
-
-  return {
-    property: {
-      bedroomFeatures: step4?.property?.bedroomFeatures || [],
-      bathroomFeatures: step4?.property?.bathroomFeatures || [],
-      kitchenFeatures: step5?.property?.kitchenFeatures || [],
-      reception: step5?.property?.reception || [],
-      otherRoom: step5?.property?.otherRoom || [],
-      outdoorSpace: step6?.property?.outdoorSpace || null,
-    },
-  };
-});
-
-const state = reactive<Step9FormState>({
-  property: {
-    description: draftData?.property?.description ?? "",
-    media: draftData?.property?.media || [],
-  },
-});
-
-const isFormValid = computed(
-  () =>
-    state.property.description.length >= 10 && state.property.media.length > 0,
-);
-
-// Save progress only requires a valid description — photos are required for completion/publish
-const isSaveValid = computed(() => state.property.description.length >= 10);
-
-const {
-  uploadProgress,
-  uploadingCount,
-  deletingIds,
-  isRemovingAll,
-  isUploading,
-  isProcessing,
-  atMaxImages,
-  uploadLabel,
-  handleFilesSelected,
-  removeImageById,
-  removeAllImages,
-} = useStep9Media({
-  draftListingId,
-  editingListingId,
-  media: state.property.media,
-  maxImages,
-  listingTier,
-});
-
-// Use step data for room assignment (no extra fetch needed)
-const availableRooms = computed(() =>
-  getAvailableRoomsFromDraft(propertyDataFromSteps.value),
-);
-
-const roomOptions = computed(() => generateRoomOptions(availableRooms.value));
-
-/**
- * Assign image to room
- */
-function assignToRoomById(cloudflareId: string, roomValue: string) {
-  const image = state.property.media.find(
-    (img) => img.cloudflareId === cloudflareId,
+  const maxImages = computed(() =>
+    getMaxImagesForTier(listingTier.value as "PREMIUM" | "FEATURED" | "BASIC"),
   );
-  if (!image) return;
 
-  // Apply the room assignment
-  Object.assign(image, parseRoomAssignment(roomValue));
-}
+  // Fetch real room data fresh from the DB when step 9 mounts so we always
+  // have the actual DB IDs (not in-memory placeholders from steps 4/5/6).
+  const { data: freshPropertyRooms } = useAsyncData(
+    () => `step9-rooms-${draftListingId.value ?? editingListingId?.value}`,
+    async () => {
+      const id = draftListingId.value ?? editingListingId?.value;
+      if (!id) return null;
+      const endpoint =
+        editingListingId?.value ?
+          `/api/listings/${id}/rooms`
+        : `/api/draft-listings/${id}/rooms`;
+      return useRequestFetch()<{
+        property: {
+          bedroomFeatures: any[];
+          bathroomFeatures: any[];
+          kitchenFeatures: any[];
+          reception: any[];
+          otherRoom: any[];
+          outdoorSpace: any;
+        };
+      }>(endpoint).catch(() => null);
+    },
+    { immediate: true },
+  );
 
-const groupedImages = computed(() =>
-  groupImagesByRoom(state.property.media, availableRooms.value),
-);
+  // Fall back to in-memory step data if the fetch hasn't resolved yet
+  const propertyDataFromSteps = computed(() => {
+    if (freshPropertyRooms.value) return freshPropertyRooms.value;
+    const step4 = getStepData(4);
+    const step5 = getStepData(5);
+    const step6 = getStepData(6);
+    return {
+      property: {
+        bedroomFeatures: step4?.property?.bedroomFeatures || [],
+        bathroomFeatures: step4?.property?.bathroomFeatures || [],
+        kitchenFeatures: step5?.property?.kitchenFeatures || [],
+        reception: step5?.property?.reception || [],
+        otherRoom: step5?.property?.otherRoom || [],
+        outdoorSpace: step6?.property?.outdoorSpace || null,
+      },
+    };
+  });
 
-const imageAccordionItems = computed(() =>
-  generateAccordionItems(groupedImages.value),
-);
-
-function getImagesForGroup(groupKey: string): MediaAssignment[] {
-  return groupedImages.value.find((g) => g.key === groupKey)?.images ?? [];
-}
-
-// ============================================================================
-// Sortable (Drag & Drop)
-// ============================================================================
-
-const sortableRefs = new Map<string, HTMLElement>();
-const sortableInstances = new Map<string, Sortable>();
-
-function setSortableRef(groupKey: string, el: HTMLElement | null) {
-  if (el) {
-    sortableRefs.set(groupKey, el);
-    initSortable(groupKey, el);
-  } else {
-    // Cleanup when element is removed
-    const instance = sortableInstances.get(groupKey);
-    if (instance) {
-      instance.destroy();
-      sortableInstances.delete(groupKey);
-    }
-    sortableRefs.delete(groupKey);
-  }
-}
-
-function initSortable(groupKey: string, el: HTMLElement) {
-  // Destroy existing instance if any
-  const existing = sortableInstances.get(groupKey);
-  if (existing) {
-    existing.destroy();
-  }
-
-  const instance = Sortable.create(el, {
-    animation: 200,
-    // Disable drag on mobile - use position select instead
-    disabled: !isDesktop.value,
-    ghostClass: "sortable-ghost",
-    chosenClass: "sortable-chosen",
-    dragClass: "sortable-drag",
-    onEnd: (evt: SortableEvent) => {
-      if (evt.oldIndex === undefined || evt.newIndex === undefined) return;
-      if (evt.oldIndex === evt.newIndex) return;
-
-      // Get the images for this group
-      const groupImages = getImagesForGroup(groupKey);
-      const movedImage = groupImages[evt.oldIndex];
-
-      if (!movedImage) return;
-
-      // Reorder images within the main media array
-      reorderImageWithinGroup(groupKey, evt.oldIndex, evt.newIndex);
-
-      // Auto-save the new order (lightweight - just sortOrder update)
-      autoSaveMediaOrder();
+  const state = reactive<Step9FormState>({
+    property: {
+      description: draftData?.property?.description ?? "",
+      media: draftData?.property?.media || [],
     },
   });
 
-  sortableInstances.set(groupKey, instance);
-}
-
-/**
- * Reorder image within its group and update the main media array
- */
-function reorderImageWithinGroup(
-  groupKey: string,
-  oldIndex: number,
-  newIndex: number,
-) {
-  const groupImages = getImagesForGroup(groupKey);
-
-  // Get the cloudflare IDs in the group's current order
-  const groupIds = groupImages.map((img) => img.cloudflareId);
-
-  // Move the item in the group order
-  const [movedId] = groupIds.splice(oldIndex, 1);
-  if (movedId) groupIds.splice(newIndex, 0, movedId);
-
-  // Now rebuild the entire media array with the new order
-  // General images first, then room images in their group order
-  const allGroups = groupedImages.value;
-  const newMediaOrder: MediaAssignment[] = [];
-
-  for (const group of allGroups) {
-    if (group.key === groupKey) {
-      // Use the new order for this group
-      for (const id of groupIds) {
-        const img = state.property.media.find((m) => m.cloudflareId === id);
-        if (img) newMediaOrder.push(img);
-      }
-    } else {
-      // Keep existing order for other groups
-      for (const img of group.images) {
-        const original = state.property.media.find(
-          (m) => m.cloudflareId === img.cloudflareId,
-        );
-        if (original) newMediaOrder.push(original);
-      }
-    }
-  }
-
-  // Update the state
-  state.property.media.splice(0, state.property.media.length, ...newMediaOrder);
-}
-
-/**
- * Change position of an image via dropdown select (for mobile)
- * newPosition is 1-indexed (1 = first position)
- */
-function changePositionInGroup(
-  groupKey: string,
-  cloudflareId: string,
-  newPosition: number,
-) {
-  const groupImages = getImagesForGroup(groupKey);
-  const currentIndex = groupImages.findIndex(
-    (img) => img.cloudflareId === cloudflareId,
+  const allImagesHaveDescriptions = computed(
+    () =>
+      state.property.media.length > 0 &&
+      state.property.media.every((img) => (img.description ?? "").trim().length > 0),
   );
 
-  if (currentIndex === -1) return;
+  const isFormValid = computed(
+    () =>
+      state.property.description.length >= 10 &&
+      state.property.media.length > 0 &&
+      allImagesHaveDescriptions.value,
+  );
 
-  // Convert 1-indexed position to 0-indexed
-  const targetIndex = newPosition - 1;
+  // Save progress requires valid form state AND unsaved changes
+  const isSaveValid = computed(
+    () =>
+      state.property.description.length >= 10 &&
+      (state.property.media.length === 0 || allImagesHaveDescriptions.value) &&
+      isStepDirty(9, getSubmissionData()),
+  );
 
-  if (currentIndex === targetIndex) return;
+  const {
+    uploadProgress,
+    uploadingCount,
+    deletingIds,
+    isRemovingAll,
+    isUploading,
+    isProcessing,
+    atMaxImages,
+    uploadLabel,
+    handleFilesSelected,
+    removeImageById,
+    removeAllImages,
+  } = useStep9Media({
+    draftListingId,
+    editingListingId,
+    media: state.property.media,
+    maxImages,
+    listingTier,
+  });
 
-  // Reorder using existing function
-  reorderImageWithinGroup(groupKey, currentIndex, targetIndex);
+  // Use step data for room assignment (no extra fetch needed)
+  const availableRooms = computed(() =>
+    getAvailableRoomsFromDraft(propertyDataFromSteps.value),
+  );
 
-  // Auto-save
-  autoSaveMediaOrder();
-}
+  const roomOptions = computed(() => generateRoomOptions(availableRooms.value));
 
-/**
- * Auto-save media order after drag (lightweight - no toast)
- */
-const autoSaveMediaOrder = useDebounceFn(async () => {
-  if (!draftListingId.value) return;
+  /**
+   * Update an image title. Writes directly to the single source of truth
+   * (state.property.media) keyed by cloudflareId so the value is never tied to
+   * fragile object-reference identity across reorders/re-renders.
+   */
+  function updateImageTitle(cloudflareId: string, title: string) {
+    const image = state.property.media.find((img) => img.cloudflareId === cloudflareId);
+    if (!image) return;
 
-  try {
-    await useRequestFetch()("/api/listings/update/steps/nine/", {
-      method: "PATCH",
-      body: {
-        draftId: draftListingId.value,
-        property: { media: formatMediaForSubmission(state.property.media) },
+    const trimmed = title.slice(0, 100);
+    image.description = trimmed.length > 0 ? trimmed : null;
+  }
+
+  /**
+   * Assign image to room
+   */
+  function assignToRoomById(cloudflareId: string, roomValue: string) {
+    const image = state.property.media.find((img) => img.cloudflareId === cloudflareId);
+    if (!image) return;
+
+    Object.assign(image, parseRoomAssignment(roomValue));
+  }
+
+  const groupedImages = computed(() =>
+    groupImagesByRoom(state.property.media, availableRooms.value),
+  );
+
+  const imageAccordionItems = computed(() => generateAccordionItems(groupedImages.value));
+
+  // ============================================================================
+  // Drag & Drop (vue-draggable-plus)
+  // ============================================================================
+
+  /**
+   * Called by ImageGrid when VueDraggable finishes a drag within a group.
+   * newImages is the group's images in their new order; we rebuild the full
+   * flat media array preserving the order of every other group.
+   */
+  function handleGroupReorder(groupKey: string, newImages: MediaAssignment[]) {
+    const newOrder: MediaAssignment[] = [];
+
+    for (const group of groupedImages.value) {
+      if (group.key === groupKey) {
+        // Use the dragged order; look up from state to keep object references intact
+        for (const img of newImages) {
+          const original = state.property.media.find(
+            (m) => m.cloudflareId === img.cloudflareId,
+          );
+          if (original) newOrder.push(original);
+        }
+      } else {
+        for (const img of group.images) {
+          const original = state.property.media.find(
+            (m) => m.cloudflareId === img.cloudflareId,
+          );
+          if (original) newOrder.push(original);
+        }
+      }
+    }
+
+    state.property.media.splice(0, state.property.media.length, ...newOrder);
+  }
+
+  function getSubmissionData() {
+    return {
+      property: {
+        description: state.property.description ?? "",
+        media: formatMediaForSubmission(state.property.media),
       },
-    });
-  } catch (error) {
-    console.error("Failed to auto-save media order:", error);
+    };
   }
-}, 500);
 
-// Watch for screen size changes to enable/disable sortable
-watch(isDesktop, (desktop) => {
-  for (const instance of sortableInstances.values()) {
-    instance.option("disabled", !desktop);
+  function getFieldsToModerate() {
+    // Build a lookup of the last-saved image titles, keyed by cloudflareId.
+    // The wrapper's generic change-detection can't resolve an array keyed by
+    // cloudflareId, so we diff here and only return titles that actually
+    // changed. Image *content* is already moderated once at upload time
+    // (see useStep9Media → checkImages); we never re-moderate images on save.
+    const lastSaved = getStepData(9) as
+      | { property?: { media?: { cloudflareId: string; description?: string | null }[] } }
+      | undefined;
+    const savedTitles = new Map<string, string>();
+    for (const img of lastSaved?.property?.media ?? []) {
+      savedTitles.set(img.cloudflareId, (img.description ?? "").trim());
+    }
+
+    return [
+      { name: "property.description", value: state.property.description },
+      ...state.property.media
+        .filter((img) => {
+          const current = (img.description ?? "").trim();
+          // Only moderate titles that have content AND differ from last save.
+          return current.length > 0 && current !== savedTitles.get(img.cloudflareId);
+        })
+        .map((img) => ({
+          name: `media.${img.cloudflareId}.description`,
+          value: img.description ?? "",
+        })),
+    ];
   }
-});
 
-// Cleanup on unmount
-onUnmounted(() => {
-  for (const instance of sortableInstances.values()) {
-    instance.destroy();
+  function onStepCompleted() {
+    navigateTo("/dashboard/draft-listings");
   }
-  sortableInstances.clear();
-  sortableRefs.clear();
-});
 
-function getSubmissionData() {
-  return {
-    property: {
-      description: state.property.description,
-      media: formatMediaForSubmission(state.property.media),
-    },
-  };
-}
-
-function getFieldsToModerate() {
-  return [
-    { name: "property.description", value: state.property.description },
-    ...state.property.media
-      .filter((img) => img.description)
-      .map((img) => ({
-        name: `media.${img.cloudflareId}.description`,
-        value: img.description ?? "",
-      })),
-  ];
-}
-
-function onStepCompleted() {
-  navigateTo("/dashboard/draft-listings");
-}
-
-function onStepSaved() {
-  console.log("Step 9 saved");
-}
+  function onStepSaved() {}
 </script>

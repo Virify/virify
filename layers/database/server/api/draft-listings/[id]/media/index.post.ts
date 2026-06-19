@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import { getOwnershipFilter } from "~~/server/utils/ownership";
+import { z } from "zod";
 
 /**
  * POST /api/draft-listings/[id]/media
@@ -33,7 +34,7 @@ export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
   try {
-    const routeId = parseInt(getRouterParam(event, 'id') || '0');
+    const routeId = parseInt(getRouterParam(event, "id") || "0");
     const body = await readBody(event);
     const { media, draftId: bodyDraftId, listingId } = requestSchema.parse(body);
 
@@ -43,7 +44,7 @@ export default defineEventHandler(async (event) => {
     if (!draftId && !listingId) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'Either draftId or listingId must be provided',
+        statusMessage: "Either draftId or listingId must be provided",
       });
     }
 
@@ -52,14 +53,14 @@ export default defineEventHandler(async (event) => {
     if (listingId) {
       // LIVE LISTING
       const existingListing = await prisma.listing.findUnique({
-        where: { id: listingId, userId: user.id },
+        where: { id: listingId, ...getOwnershipFilter(user) },
         include: { property: true },
       });
 
       if (!existingListing || !existingListing.property) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Listing or property not found',
+          statusMessage: "Listing or property not found",
         });
       }
 
@@ -67,14 +68,14 @@ export default defineEventHandler(async (event) => {
     } else {
       // DRAFT LISTING
       const existingDraft = await prisma.draftListing.findUnique({
-        where: { id: draftId, userId: user.id },
+        where: { id: draftId, ...getOwnershipFilter(user) },
         include: { property: true },
       });
 
       if (!existingDraft || !existingDraft.property) {
         throw createError({
           statusCode: 404,
-          statusMessage: 'Draft listing or property not found',
+          statusMessage: "Draft listing or property not found",
         });
       }
 
@@ -86,8 +87,8 @@ export default defineEventHandler(async (event) => {
       propertyId,
       image: m.cloudflareId,
       metadata: JSON.stringify({
-        alt: m.description || 'Property image',
-        description: m.description || null,
+        alt: m.description || "Property image",
+        description: m.description ?? "Property image",
         cloudflareImageId: m.cloudflareId,
         filename: m.filename || null,
       }),
@@ -116,7 +117,7 @@ export default defineEventHandler(async (event) => {
     const createdMedia = await prisma.media.findMany({
       where: {
         propertyId,
-        image: { in: media.map(m => m.cloudflareId) },
+        image: { in: media.map((m) => m.cloudflareId) },
       },
     });
 
@@ -125,7 +126,7 @@ export default defineEventHandler(async (event) => {
       media: createdMedia,
     };
   } catch (error) {
-    console.error('Media create error:', error);
+    console.error("Media create error:", error);
     return errorResponse(error, event);
   }
 });

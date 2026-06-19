@@ -9,25 +9,35 @@ import { H3Event } from "h3";
  * @param isAgentLogin - A boolean indicating if the login is for an agent
  * @returns - set User Session
  */
-export async function loginUser(event: H3Event, user: UserWithVerificationAndMembership): Promise<UserSession> {
+export async function loginUser(
+  event: H3Event,
+  user: UserWithVerificationAndMembership,
+  rememberMe = false,
+): Promise<UserSession> {
   // Clear any existing session
   await clearUserSession(event);
   // Set the new session with user details
-  return await setUserSession(event, {
-    user: {
-      id: user.id,
-      email: user.email,
-      username: user.username || "",
-      firstName: user.firstName || undefined,
-      lastName: user.lastName || undefined,
-      membership: user.membership?.type!,
-      membershipActive: user.membership?.status,
-      membershipEndDate: user.membership?.endDate,
-      role: user.verification?.role,
-      activated: user.verification?.activated,
-      avatar: user.avatar || undefined,
+  return await setUserSession(
+    event,
+    {
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username || "",
+        firstName: user.firstName || undefined,
+        lastName: user.lastName || undefined,
+        membership: user.membership?.type!,
+        membershipActive: user.membership?.status,
+        membershipEndDate: user.membership?.endDate,
+        role: user.verification?.role,
+        activated: user.verification?.activated,
+        avatar: user.avatar || undefined,
+      },
+      loggedIn: true,
+      loggedInAt: new Date(),
     },
-    loggedIn: true,
-    loggedInAt: new Date(),
-  });
+    {
+      maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined,
+    },
+  );
 }

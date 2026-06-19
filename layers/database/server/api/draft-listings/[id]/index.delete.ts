@@ -3,6 +3,8 @@
  * Removes the draft listing and all associated relations via cascade.
  * Also deletes any Cloudflare images uploaded for this draft.
  */
+import { getOwnershipFilter } from "~~/server/utils/ownership";
+
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
@@ -20,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
     // Fetch draft with media so we can clean up Cloudflare images
     const draft = await prisma.draftListing.findUnique({
-      where: { id: draftIdNum, userId: user.id },
+      where: { id: draftIdNum, ...getOwnershipFilter(user) },
       include: { property: { include: { media: true } } },
     });
 
@@ -33,16 +35,14 @@ export default defineEventHandler(async (event) => {
 
     // Delete Cloudflare images — failures are logged but never block the DB delete
     const cloudflareIds =
-      draft.property?.media
-        .map((m) => m.image)
-        .filter((id): id is string => !!id) ?? [];
+      draft.property?.media.map((m) => m.image).filter((id): id is string => !!id) ?? [];
     await deleteCloudflareImages(cloudflareIds);
 
     // Delete the draft listing — cascade handles all DB relations
     await prisma.draftListing.delete({
       where: {
         id: draftIdNum,
-        userId: user.id,
+        ...getOwnershipFilter(user),
       },
     });
 

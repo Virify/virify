@@ -10,28 +10,40 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
   }
 
+  const isAdmin = user.role === "ADMIN";
+
   const query = getQuery(event);
   const page = Number(query.page) || 1;
   const take = Math.min(Number(query.take) || 20, 100); // Cap at 100
   const skip = (page - 1) * take;
   const sort = (query.sort as string) === "old" ? "asc" : "desc";
   const search = (query.search as string) || "";
+  const owner = (query.owner as string) || "all";
 
   try {
     // Skip cache for free-text search (too many unique keys)
     if (!search.trim()) {
-      const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
+      const cacheKey = `draft-listings:${isAdmin ? `admin-${owner}` : user.id}:${sort}:${page}:${take}`;
       const storage = useStorage("cache");
       const cached = await storage.getItem(cacheKey);
       if (cached) return cached;
     }
 
-    // Build where clause
-    const where: any = { userId: user.id };
+    // Build where clause — admins can see all users' drafts, filtered by owner param
+    let where: any;
+    if (!isAdmin) {
+      where = { userId: user.id };
+    } else if (owner === "own") {
+      where = { userId: user.id };
+    } else if (owner === "other") {
+      where = { userId: { not: user.id } };
+    } else {
+      where = {}; // all
+    }
 
     // Apply search if provided
     if (search.trim()) {
-      where.OR = [
+      const searchConditions: any[] = [
         {
           property: {
             address: { fullAddress: { contains: search, mode: "insensitive" } },
@@ -39,10 +51,20 @@ export default defineEventHandler(async (event) => {
         },
       ];
 
+      // Admins can also search by username/email
+      if (isAdmin) {
+        searchConditions.push(
+          { user: { username: { contains: search, mode: "insensitive" } } },
+          { user: { email: { contains: search, mode: "insensitive" } } },
+        );
+      }
+
       const numericSearch = Number(search);
       if (!Number.isNaN(numericSearch)) {
-        where.OR.push({ price: numericSearch });
+        searchConditions.push({ price: numericSearch });
       }
+
+      where.OR = searchConditions;
     }
 
     // Fetch count and drafts in parallel
@@ -108,9 +130,9 @@ export default defineEventHandler(async (event) => {
 
     const result = { drafts, total };
     if (!search.trim()) {
-      const cacheKey = `draft-listings:${user.id}:${sort}:${page}:${take}`;
+      const writeCacheKey = `draft-listings:${isAdmin ? `admin-${owner}` : user.id}:${sort}:${page}:${take}`;
       useStorage("cache")
-        .setItem(cacheKey, result, { ttl: 30 * 60 })
+        .setItem(writeCacheKey, result, { ttl: 2 * 60 })
         .catch(() => {});
     }
     return result;

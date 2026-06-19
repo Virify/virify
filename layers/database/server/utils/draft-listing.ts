@@ -1,8 +1,5 @@
 import { prisma } from "./prisma-client";
-import type {
-  DraftListing,
-  ListingTier,
-} from "../database/prisma/generated/client";
+import type { DraftListing, ListingTier } from "../database/prisma/generated/client";
 import { propertyInclude } from "./property";
 /**
  * Get a draft listing by its ID.
@@ -28,6 +25,7 @@ export async function getDraftListingById(
           username: true,
           email: true,
           createdAt: true,
+          avatar: true,
         },
       },
       sharedUsers: {
@@ -67,6 +65,7 @@ export async function getDraftListingsByUserId(
           username: true,
           email: true,
           createdAt: true,
+          avatar: true,
         },
       },
       sharedUsers: {
@@ -108,10 +107,7 @@ export async function getDraftListingOwner(
  * Add a user to the sharedUsers of a draft listing.
  * Prisma's connect is idempotent — safe to call even if already connected.
  */
-export async function addSharedUserToDraftListing(
-  draftId: number,
-  targetUserId: number,
-) {
+export async function addSharedUserToDraftListing(draftId: number, targetUserId: number) {
   return prisma.draftListing.update({
     where: { id: draftId },
     data: {

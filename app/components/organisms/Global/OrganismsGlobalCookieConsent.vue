@@ -10,13 +10,13 @@
             name="i-lucide-cookie"
             class="w-5 h-5 text-primary-500"
           />
-          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+          <h3 class="text-base font-semibold leading-6 text-black dark:text-white">
             Cookie Consent
           </h3>
         </div>
       </template>
 
-      <div class="text-sm text-gray-500 dark:text-gray-400">
+      <div class="text-sm text-gray-900 dark:text-gray-400">
         <p class="mb-2">We use cookies and analytics to improve your experience:</p>
         <ul class="list-disc list-inside body-xs mt-2">
           <li><strong>Accept:</strong> Detailed analytics to improve our service</li>

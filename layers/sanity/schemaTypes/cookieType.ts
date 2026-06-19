@@ -1,4 +1,4 @@
-import { defineField, defineType } from "sanity";
+import {defineField, defineType} from 'sanity'
 
 export const cookieType = defineType({
   name: 'cookie',
@@ -41,7 +41,7 @@ export const cookieType = defineType({
           ],
           lists: [
             {title: 'Bullet', value: 'bullet'},
-            {title: 'Numbered', value: 'number'}
+            {title: 'Numbered', value: 'number'},
           ],
           marks: {
             decorators: [
@@ -59,9 +59,10 @@ export const cookieType = defineType({
                     name: 'href',
                     type: 'url',
                     title: 'URL',
-                    validation: (rule) => rule.required().uri({
-                      scheme: ['http', 'https', 'mailto', 'tel'],
-                    }),
+                    validation: (rule) =>
+                      rule.required().uri({
+                        scheme: ['http', 'https', 'mailto', 'tel'],
+                      }),
                   },
                   {
                     name: 'blank',
@@ -93,6 +94,72 @@ export const cookieType = defineType({
               title: 'Caption',
             },
           ],
+        },
+        {
+          name: 'table',
+          title: 'Table',
+          type: 'object',
+          fields: [
+            {
+              name: 'caption',
+              title: 'Table Caption (optional)',
+              type: 'string',
+              description: 'A brief description of the table content',
+            },
+            {
+              name: 'rows',
+              title: 'Table Rows',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  name: 'tableRow',
+                  title: 'Table Row',
+                  fields: [
+                    {
+                      name: 'cells',
+                      title: 'Cells',
+                      type: 'array',
+                      of: [{type: 'string'}],
+                      validation: (rule) => rule.required().min(1),
+                    },
+                    {
+                      name: 'isHeader',
+                      title: 'Header Row',
+                      type: 'boolean',
+                      initialValue: false,
+                      description: 'Check this for the first row (column headings)',
+                    },
+                  ],
+                  preview: {
+                    select: {
+                      cells: 'cells',
+                      isHeader: 'isHeader',
+                    },
+                    prepare({cells, isHeader}) {
+                      return {
+                        title: isHeader ? '📋 Header Row' : 'Row',
+                        subtitle: cells?.join(' | ') || 'Empty row',
+                      }
+                    },
+                  },
+                },
+              ],
+              validation: (rule) => rule.required().min(1),
+            },
+          ],
+          preview: {
+            select: {
+              caption: 'caption',
+              rows: 'rows',
+            },
+            prepare({caption, rows}) {
+              return {
+                title: '📊 Table',
+                subtitle: caption || `${rows?.length || 0} rows`,
+              }
+            },
+          },
         },
       ],
       validation: (rule) => rule.required(),

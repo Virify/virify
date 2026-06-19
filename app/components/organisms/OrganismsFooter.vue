@@ -58,19 +58,21 @@
 
         <!-- Content Section -->
         <div class="o-footer__section">
-          <h3 class="o-footer__section-title | title-3xs">Information</h3>
+          <h3 class="o-footer__section-title | title-3xs">Content</h3>
           <ul class="o-footer__links">
-            <li
-              v-for="page in generalPages"
-              :key="page.slug"
+            <template
+              v-for="category in contentCategories"
+              :key="category._id"
             >
-              <nuxt-link
-                :to="`/information/${page.slug}`"
-                class="o-footer__link | body-sm"
-              >
-                {{ page.title }}
-              </nuxt-link>
-            </li>
+              <li>
+                <nuxt-link
+                  :to="`/content/${category.slug.current}`"
+                  class="o-footer__link o-footer__link--category | body-sm"
+                >
+                  {{ category.title }}
+                </nuxt-link>
+              </li>
+            </template>
           </ul>
         </div>
 
@@ -179,12 +181,13 @@
   const { createListing } = useFeatureFlag();
   const { resetConsent } = useCookieConsent();
 
-  // Get guide categories for footer navigation
-  const { data: categories } = await useSanityQuery<GuideCategory[]>(categoriesQuery);
+  const { data: navData } = await useSanityQuery<{
+    guides: GuideCategory[];
+    generalPages: SanityPageCategoryNavigationItem[];
+  }>(navigationQuery);
 
-  const { data: generalPages } = await useSanityQuery<GeneralPageNavigationItem[]>(
-    allGeneralPagesNavigationQuery,
-  );
+  const categories = computed(() => navData.value?.guides ?? []);
+  const contentCategories = computed(() => navData.value?.generalPages ?? []);
 
   const currentYear = new Date().getFullYear();
 </script>

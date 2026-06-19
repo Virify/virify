@@ -10,9 +10,12 @@
     }"
   >
     <template #headline>
-      <p class="text-secondary/90 font-bold" :class="{
-        'text-center': !features
-      }">
+      <p
+        class="text-secondary/90 font-bold"
+        :class="{
+          'text-center': !features,
+        }"
+      >
         {{ headline }}
       </p>
     </template>
@@ -27,11 +30,12 @@
     <template #default>
       <NuxtImg
         v-if="image?.asset._id"
-        :src="image?.asset._id"
-        class="w-full rounded-lg border object-cover"
-        :alt="image?.alt || 'Page section image'"
-        :placeholder="image?.asset.metadata?.lqip"
+        :src="image.asset._id"
+        class="w-full h-auto rounded-lg border"
         provider="sanity"
+        sizes="sm:100vw md:700px lg:900px xl:1000px"
+        densities="1x 2x"
+        fit="contain"
       />
     </template>
   </UPageSection>
@@ -79,7 +83,7 @@
   const styledLinks = computed(() => {
     return props.buttons?.map((button) => ({
       ...button,
-      class: 'rounded-full text-white! body-md',
+      class: "rounded-full text-white! body-md",
       icon: button.icon || "i-lucide-arrow-right",
       onClick: getClickHandler(button),
       to: getNavigationTarget(button),

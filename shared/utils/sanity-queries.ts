@@ -87,20 +87,32 @@ export const guideBySlugQuery = `*[_type == "guide" && slug.current == $slug][0]
   }
 }`;
 
-// Navigation query
-export const navigationQuery = `*[_type == "guideCategory" && isActive == true] | order(orderIndex asc) {
-  _id,
-  title,
-  slug,
-  description,
-  orderIndex,
-  "guides": *[_type == "guide" && isPublished == true && category._ref == ^._id] | order(orderIndex asc) {
+export const navigationQuery = `{
+  "guides": *[_type == "guideCategory" && isActive == true] | order(orderIndex asc) {
     _id,
     title,
     slug,
-    excerpt
-  }
-}[count(guides) > 0]`;
+    description,
+    orderIndex,
+    "guides": *[_type == "guide" && isPublished == true && category._ref == ^._id] | order(orderIndex asc) {
+      _id,
+      title,
+      slug,
+      excerpt
+    }
+  }[count(guides) > 0],
+
+  "generalPages": *[_type == "pageCategory"] | order(title asc) {
+    _id,
+    title,
+    slug,
+    "pages": *[_type == "generalPage" && references(^._id)] | order(title asc) {
+      _id,
+      title,
+      slug
+    }
+  }[count(pages) > 0]
+}`;
 
 // Policy pages
 export const termsQuery = `*[_type == "terms"][0] {
@@ -364,7 +376,7 @@ export const supportPageQuery = `*[_type == "supportPage"][0] {
   }
 }`;
 
-export const generalPageQuery = `*[_type == "generalPage" && slug.current == $slug][0] {
+export const informationPageQuery = `*[_type == "generalPage" && slug.current == $slug][0] {
   _id,
   _type,
   title,
@@ -468,8 +480,191 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
   }
 }`;
 
+export const generalPageQuery = `*[_type == "generalPage" && slug.current == $slug && category->slug.current == $category][0] {
+  _id,
+  _type,
+  title,
+  "slug": slug.current,
+  "category": category->slug.current, 
+  caption,
+  description,
+  
+  heroButtons[] {
+    _key,
+    label,
+    icon,
+    url,
+    signup,
+    login
+  },
+  
+  sections[] {
+    _key,
+    _type,
+    
+    _type == "pageSection" => {
+      headline,
+      title,
+      description,
+      reverse,
+      orientation,
+      image {
+        asset-> {
+          _id,
+          url,
+          metadata {
+            lqip,
+            dimensions
+          }
+        },
+        alt,
+      },
+      features[] {
+        _key,
+        title,
+        description,
+        icon,
+        iconColor
+      },
+      buttons[] {
+        _key,
+        label,
+        url,
+        signup,
+        login,
+        icon,
+        color,
+      }
+    },
+
+    _type == "pageFaq" => {
+      title,
+      highlight,
+      description,
+      faqs[]-> {
+        _id,
+        _type,
+        question,
+        answer,
+        active
+      }
+    },
+
+    _type == "pageGuidesGrid" => {
+      title,
+      description,
+      guides[]-> {
+        _id,
+        _updatedAt,
+        title,
+        slug,
+        excerpt,
+        heroImage,
+        icon,
+        readTime,
+        publishedAt,
+        orderIndex,
+        category-> {
+          _id,
+          title,
+          slug
+        }
+      }
+    }
+  },
+
+  "seo": {
+    "metaTitle": coalesce(seoTitle, title),
+    "metaDescription": coalesce(seoDescription, description),
+    "keywords": seoKeywords,
+    "ogTitle": coalesce(ogTitle, seoTitle, title),
+    "ogDescription": coalesce(ogDescription, seoDescription, description),
+    "twitterCard": coalesce(twitterCard, "summary_large_image"),
+    "canonicalUrl": canonicalUrl,
+    noIndex
+  }
+}`;
+
+export const generalPageCategoriesQuery = `*[_type == "pageCategory"] | order(title asc) {
+  _id,
+  title,
+  "slug": slug.current,
+  caption,
+  description,
+  
+  heroButtons[] {
+    _key,
+    label,
+    icon,
+    url,
+    signup,
+    login
+  },
+
+  "pages": *[_type == "generalPage" && references(^._id)] | order(title asc) {
+    _id,
+    title,
+    "slug": slug.current
+  },
+
+  "seo": {
+    "metaTitle": coalesce(seoTitle, title),
+    "metaDescription": coalesce(seoDescription, description),
+    "keywords": seoKeywords,
+    "ogTitle": coalesce(ogTitle, seoTitle, title),
+    "ogDescription": coalesce(ogDescription, seoDescription, description),
+    "twitterCard": coalesce(twitterCard, "summary_large_image"),
+    "canonicalUrl": canonicalUrl,
+    noIndex
+  }
+}[count(pages) > 0]`;
+
+export const singleCategoryQuery = `*[_type == "pageCategory" && slug.current == $category][0] {
+  _id,
+  title,
+  "slug": slug.current,
+  caption,
+  description,
+  heroButtons[] {
+    _key,
+    label,
+    icon,
+    url,
+    signup,
+    login
+  },
+  "pages": *[_type == "generalPage" && references(^._id)] | order(title asc) {
+    _id,
+    title,
+    "slug": slug.current
+  },
+  "seo": {
+    "metaTitle": coalesce(seoTitle, title),
+    "metaDescription": coalesce(seoDescription, description),
+    "keywords": seoKeywords,
+    "ogTitle": coalesce(ogTitle, seoTitle, title),
+    "ogDescription": coalesce(ogDescription, seoDescription, description),
+    "twitterCard": coalesce(twitterCard, "summary_large_image"),
+    "canonicalUrl": canonicalUrl,
+    noIndex
+  }
+}`;
+
 export const allGeneralPagesNavigationQuery = `*[_type == "generalPage"] {
   _id,
   title,
   "slug": slug.current
 }`;
+
+export const allContentCategoriesQuery = `*[_type == "pageCategory"] | order(title asc) {
+  _id,
+  title,
+  "slug": slug.current,
+  caption,
+  description,
+  "pages": *[_type == "generalPage" && references(^._id)] | order(title asc) {
+    _id,
+    title,
+    "slug": slug.current
+  }
+}[count(pages) > 0]`;

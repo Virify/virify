@@ -1,15 +1,25 @@
-import { type User, Reviewed, MembershipType, ActivationStatus } from "../database/prisma/generated/client";
+import {
+  type User,
+  Reviewed,
+  MembershipType,
+  ActivationStatus,
+} from "../database/prisma/generated/client";
 import type { ProfileSchemaType } from "~~/shared/utils/profile-schema";
 
 import { prisma } from "./prisma-client";
-import { UserWithVerification, UserWithVerificationAndMembership } from "~~/shared/types/user";
+import {
+  UserWithVerification,
+  UserWithVerificationAndMembership,
+} from "~~/shared/types/user";
 
 /**
  * Finds an user by email.
  * @param email - The email of the user to find.
  * @returns The user object if found, otherwise null.
  */
-export async function findUser(email: string): Promise<UserWithVerificationAndMembership | null> {
+export async function findUser(
+  email: string,
+): Promise<UserWithVerificationAndMembership | null> {
   return prisma.user.findUnique({
     where: {
       email: email.toLowerCase(),
@@ -26,7 +36,9 @@ export async function findUser(email: string): Promise<UserWithVerificationAndMe
  * @param id User ID
  * @returns User With Address
  */
-export async function findUserforProfileUpdate(id: number): Promise<UserWithAddress | null> {
+export async function findUserforProfileUpdate(
+  id: number,
+): Promise<UserWithAddress | null> {
   return prisma.user.findUnique({
     where: { id },
     include: {
@@ -135,7 +147,9 @@ export async function findUserById(id: number): Promise<User | null> {
  * @param id User Id
  * @returns User with Verification and Membership
  */
-export async function getUserWithVerificationAndMembershipById(id: number): Promise<UserWithVerificationAndMembership | null> {
+export async function getUserWithVerificationAndMembershipById(
+  id: number,
+): Promise<UserWithVerificationAndMembership | null> {
   return prisma.user.findUnique({
     where: { id },
     include: {
@@ -162,7 +176,9 @@ export async function findFirstUser(): Promise<User | null> {
  * @param email string
  * @returns user with Verification Relation
  */
-export async function finduUserWithVerification(email: string): Promise<UserWithVerification | null> {
+export async function finduUserWithVerification(
+  email: string,
+): Promise<UserWithVerification | null> {
   return prisma.user.findUnique({
     where: {
       email,
@@ -178,7 +194,10 @@ export async function finduUserWithVerification(email: string): Promise<UserWith
  *
  * @param token string
  */
-export async function findUserByActivationToken(token: string): Promise<UserWithVerification | null> {
+export async function findUserByActivationToken(
+  token: string,
+): Promise<UserWithVerification | null> {
+  if (!token) return null;
   return prisma.user.findFirst({
     where: {
       verification: {
@@ -197,7 +216,10 @@ export async function findUserByActivationToken(token: string): Promise<UserWith
  * @param token string
  * @returns user
  */
-export async function findUserByPasswordToken(token: string): Promise<UserWithVerification | null> {
+export async function findUserByPasswordToken(
+  token: string,
+): Promise<UserWithVerification | null> {
+  if (!token) return null;
   return prisma.user.findUnique({
     where: {
       passwordResetToken: token,
@@ -209,12 +231,19 @@ export async function findUserByPasswordToken(token: string): Promise<UserWithVe
 }
 
 /**
- * 
+ *
  * @param id User Id
  * @param data Data
  * @returns User
  */
-export async function updateUserById(id: number, username: string, hashedPassword: string, activate?: string, firstName?: string, lastName?: string): Promise<UserWithVerificationAndMembership> {
+export async function updateUserById(
+  id: number,
+  username: string,
+  hashedPassword: string,
+  activate?: string,
+  firstName?: string,
+  lastName?: string,
+): Promise<UserWithVerificationAndMembership> {
   return prisma.user.update({
     where: { id },
     data: {
@@ -222,28 +251,35 @@ export async function updateUserById(id: number, username: string, hashedPasswor
       password: hashedPassword,
       ...(firstName !== undefined ? { firstName } : {}),
       ...(lastName !== undefined ? { lastName } : {}),
-      ...(activate ? {
-        verification: {
-          update: {
-            activated: activate as ActivationStatus,
-          }
+      ...(activate ?
+        {
+          verification: {
+            update: {
+              activated: activate as ActivationStatus,
+            },
+          },
         }
-      } : {})
+      : {}),
     },
     include: {
       verification: true,
       membership: true,
-    }
+    },
   });
 }
 
 /**
  * Update user username by ID
- * @param id 
- * @param username 
+ * @param id
+ * @param username
  * @returns UserWithVerificationAndMembership
  */
-export async function updateUserUsernameById(id: number, username: string, firstName?: string, lastName?: string): Promise<UserWithVerificationAndMembership> {
+export async function updateUserUsernameById(
+  id: number,
+  username: string,
+  firstName?: string,
+  lastName?: string,
+): Promise<UserWithVerificationAndMembership> {
   return prisma.user.update({
     where: { id },
     data: {
@@ -254,7 +290,7 @@ export async function updateUserUsernameById(id: number, username: string, first
     include: {
       verification: true,
       membership: true,
-    }
+    },
   });
 }
 /**
@@ -264,6 +300,7 @@ export async function updateUserUsernameById(id: number, username: string, first
  * @returns user
  */
 export async function updateUserByToken(token: string, password: string) {
+  if (!token) throw new Error("Token is required");
   return prisma.user.update({
     where: {
       passwordResetToken: token,
@@ -291,7 +328,7 @@ export async function updateUserPasswordById(id: number, password: string) {
       passwordResetTokenExpiry: null,
       verification: {
         update: {
-          activated: 'ACTIVATED',
+          activated: "ACTIVATED",
         },
       },
     },
@@ -306,7 +343,11 @@ export async function updateUserPasswordById(id: number, password: string) {
  * @param email - The email of the user to find.
  * @returns The user object if found, otherwise null.
  */
-export async function updateUserPasswordToken(email: string, token: string, otpCode: string): Promise<User | null> {
+export async function updateUserPasswordToken(
+  email: string,
+  token: string,
+  otpCode: string,
+): Promise<User | null> {
   return prisma.user.update({
     where: { email },
     data: {
@@ -316,7 +357,7 @@ export async function updateUserPasswordToken(email: string, token: string, otpC
       passwordResetTokenExpiry: new Date(Date.now() + 3600000),
       verification: {
         update: {
-          activated: 'UNVERIFIED',
+          activated: "UNVERIFIED",
         },
       },
     },
@@ -332,7 +373,10 @@ export async function updateUserPasswordToken(email: string, token: string, otpC
  * @param token - The activation token of the user to find.
  * @returns The user object if found, otherwise null.
  */
-export async function findUserByToken(token: string): Promise<UserWithVerification | null> {
+export async function findUserByToken(
+  token: string,
+): Promise<UserWithVerification | null> {
+  if (!token) return null;
   return prisma.user.findFirst({
     where: {
       verification: {
@@ -359,7 +403,11 @@ export async function deleteUser(id: number): Promise<User> {
  * @param token string
  * @returns user <Promise>
  */
-export async function createUserWithTokens(email: string, token: string, otpCode: string): Promise<UserWithVerification> {
+export async function createUserWithTokens(
+  email: string,
+  token: string,
+  otpCode: string,
+): Promise<UserWithVerification> {
   return prisma.user.create({
     data: {
       email,
@@ -367,7 +415,7 @@ export async function createUserWithTokens(email: string, token: string, otpCode
       otpCodeExpiry: new Date(Date.now() + 3600000),
       verification: {
         create: {
-          activated: 'PENDING',
+          activated: "PENDING",
           activationToken: token,
           activationTokenExpiry: new Date(Date.now() + 3600000),
         },
@@ -388,7 +436,11 @@ export async function createUserWithTokens(email: string, token: string, otpCode
  * @param token string
  * @returns Promise<User>
  */
-export async function updateUserTokens(email: string, token: string, otpCode: string): Promise<UserWithVerification> {
+export async function updateUserTokens(
+  email: string,
+  token: string,
+  otpCode: string,
+): Promise<UserWithVerification> {
   return prisma.user.update({
     where: { email },
     data: {
@@ -413,7 +465,10 @@ export async function updateUserTokens(email: string, token: string, otpCode: st
  * @param password string
  * @returns Promise<User>
  */
-export async function updateUserAndActivate(userId: number, password?: string): Promise<UserWithVerificationAndMembership> {
+export async function updateUserAndActivate(
+  userId: number,
+  password?: string,
+): Promise<UserWithVerificationAndMembership> {
   return prisma.user.update({
     where: { id: userId },
     data: {
@@ -423,7 +478,7 @@ export async function updateUserAndActivate(userId: number, password?: string): 
         update: {
           activationToken: null,
           activationTokenExpiry: null,
-          activated: 'UNVERIFIED',
+          activated: "UNVERIFIED",
         },
       },
       membership: {
@@ -434,7 +489,7 @@ export async function updateUserAndActivate(userId: number, password?: string): 
     },
     include: {
       verification: true,
-      membership: true
+      membership: true,
     },
   });
 }
@@ -448,7 +503,11 @@ export async function updateUserAndActivate(userId: number, password?: string): 
  * @param token string
  * @returns user <Promise>
  */
-export async function updateUserAndReview(id: number, approval: Reviewed, token: string): Promise<UserWithVerification> {
+export async function updateUserAndReview(
+  id: number,
+  approval: Reviewed,
+  token: string,
+): Promise<UserWithVerification> {
   if (approval === Reviewed.APPROVED) {
     return prisma.user.update({
       where: { id: id },
@@ -457,7 +516,7 @@ export async function updateUserAndReview(id: number, approval: Reviewed, token:
           update: {
             activationToken: token,
             activationTokenExpiry: new Date(Date.now() + 3600000),
-            activated: 'UNVERIFIED',
+            activated: "UNVERIFIED",
             reviewed: approval,
             reviewToken: null,
             reviewTokenExpiry: null,
@@ -475,7 +534,7 @@ export async function updateUserAndReview(id: number, approval: Reviewed, token:
         verification: {
           update: {
             reviewed: approval,
-            activated: 'DENIED',
+            activated: "DENIED",
             reviewToken: null,
             reviewTokenExpiry: null,
           },
@@ -494,21 +553,26 @@ export async function updateUserAndReview(id: number, approval: Reviewed, token:
  * @param data User Pofile Data and Address
  * @returns User With Address
  */
-export async function updateUserProfileData(id: number, data: ProfileSchemaType): Promise<UserWithAddress> {
+export async function updateUserProfileData(
+  id: number,
+  data: ProfileSchemaType,
+): Promise<UserWithAddress> {
   const { address, ...userData } = data;
-  
+
   return await prisma.user.update({
     where: { id },
     data: {
       ...userData,
-      ...(address ? {
-        address: {
-          upsert: {
-            create: address,
-            update: address,
-          }
+      ...(address ?
+        {
+          address: {
+            upsert: {
+              create: address,
+              update: address,
+            },
+          },
         }
-      } : {}),
+      : {}),
     },
     include: {
       address: true,
@@ -517,23 +581,28 @@ export async function updateUserProfileData(id: number, data: ProfileSchemaType)
 }
 
 /**
- * 
+ *
  * @param id User ID
- * @param data 
- * @returns 
+ * @param data
+ * @returns
  */
-export async function updateUserSecurityById(id: number, email?: string, password?: string, activatedStatus?: string): Promise<UserWithVerificationAndMembership> {
+export async function updateUserSecurityById(
+  id: number,
+  email?: string,
+  password?: string,
+  activatedStatus?: string,
+): Promise<UserWithVerificationAndMembership> {
   const data: any = {};
   if (email !== undefined) data.email = email;
   if (password !== undefined) data.password = password;
-  
+
   const updateData: any = { ...data };
-  
+
   if (activatedStatus) {
     updateData.verification = {
       update: {
         activated: activatedStatus,
-      }
+      },
     };
   }
 
@@ -553,7 +622,10 @@ export async function updateUserSecurityById(id: number, email?: string, passwor
  * @returns Boolean
  */
 export function isActive(user: UserWithVerification): boolean {
-  return user.verification?.activated === 'UNVERIFIED' || user.verification?.activated === 'ACTIVATED';
+  return (
+    user.verification?.activated === "UNVERIFIED" ||
+    user.verification?.activated === "ACTIVATED"
+  );
 }
 
 /**
@@ -600,7 +672,7 @@ export async function getUserNotificationPreferences(userId: number) {
  */
 export async function findPublicProfileByUsername(username: string) {
   return prisma.user.findFirst({
-    where: { username: { equals: username, mode: 'insensitive' } },
+    where: { username: { equals: username, mode: "insensitive" } },
     select: {
       id: true,
       username: true,
@@ -614,7 +686,7 @@ export async function findPublicProfileByUsername(username: string) {
       },
       listings: {
         where: { published: true },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         select: {
           id: true,
           price: true,
@@ -674,4 +746,6 @@ export async function findPublicProfileByUsername(username: string) {
   });
 }
 
-export type PublicProfile = NonNullable<Awaited<ReturnType<typeof findPublicProfileByUsername>>>;
+export type PublicProfile = NonNullable<
+  Awaited<ReturnType<typeof findPublicProfileByUsername>>
+>;

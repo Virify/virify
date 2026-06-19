@@ -8,7 +8,7 @@
       <template #title>
         <span>{{ page?.title }}</span>
       </template>
-      
+
       <UButton
         v-for="(button, index) in page?.heroButtons || []"
         :key="index"
@@ -33,23 +33,25 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { 
-    ViewsDialogSignup, 
-    ViewsDialogLogin, 
-    OrganismsSanityPageSection, 
+  import {
+    ViewsDialogSignup,
+    ViewsDialogLogin,
+    OrganismsSanityPageSection,
     OrganismsSanityPageFaqSection,
-    OrganismsSanityPageGuidesGrid
+    OrganismsSanityPageGuidesGrid,
   } from "#components";
 
   const route = useRoute();
   const pageSlug = route.params.slug as string;
 
-  const { data: page } = await useSanityQuery<SanityGeneralPage>(generalPageQuery, { slug: pageSlug });
+  const { data: page } = await useSanityQuery<SanityGeneralPage>(informationPageQuery, {
+    slug: pageSlug,
+  });
 
   if (!page.value) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Page not found',
+      statusMessage: "Page not found",
       fatal: true,
     });
   }
@@ -58,12 +60,12 @@
     title: () => page.value?.seo?.metaTitle,
     description: () => page.value?.seo?.metaDescription,
     keywords: () => page.value?.seo?.keywords,
-    robots: () => page.value?.seo?.noIndex ? 'noindex, nofollow' : 'index, follow',
+    robots: () => (page.value?.seo?.noIndex ? "noindex, nofollow" : "index, follow"),
 
     // Open Graph Social Preview Tags
     ogTitle: () => page.value?.seo?.ogTitle,
     ogDescription: () => page.value?.seo?.ogDescription,
-    ogType: 'website',
+    ogType: "website",
 
     // Twitter / X Layout Rule Overrides
     twitterCard: () => page.value?.seo?.twitterCard,
@@ -74,7 +76,7 @@
   useHead({
     link: [
       {
-        rel: 'canonical',
+        rel: "canonical",
         href: () => page.value?.seo?.canonicalUrl || undefined,
       },
     ],

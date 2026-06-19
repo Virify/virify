@@ -6,13 +6,37 @@
  *          which should potentially replace this function in the future
  */
 export function mapToCardProps(result: ListingCardData) {
-  const { id, price, rentalListing, saleListing, updatedAt, createdAt, property, user, ListingPriceHistory } = result;
-  const { numberBedrooms, numberBathrooms, numberReceptions, type, classification, address, media, outdoorSpace, energyAndUtilities } = property;
+  const {
+    id,
+    price,
+    rentalListing,
+    saleListing,
+    updatedAt,
+    createdAt,
+    property,
+    user,
+    ListingPriceHistory,
+  } = result;
+  const {
+    numberBedrooms,
+    numberBathrooms,
+    numberReceptions,
+    type,
+    classification,
+    address,
+    media,
+    outdoorSpace,
+    energyAndUtilities,
+  } = property;
 
   const saleOrRent: "buy" | "rent" = rentalListing ? "rent" : "buy";
+  const listingType: "sale" | "rent" = saleListing ? "sale" : "rent";
   const propertyDesc = [classification?.name, type?.name].filter(Boolean).join(", ");
-  const overview = numberBedrooms ? `${numberBedrooms} Bed ${propertyDesc}` : propertyDesc;
-  const overviewAddress = [address.street, address.city, address.postcode?.split(" ")[0]].filter(Boolean).join(", ");
+  const overview =
+    numberBedrooms ? `${numberBedrooms} Bed ${propertyDesc}` : propertyDesc;
+  const overviewAddress = [address.street, address.city, address.postcode?.split(" ")[0]]
+    .filter(Boolean)
+    .join(", ");
 
   const labels: string[] = [];
   if (saleListing) {
@@ -24,14 +48,24 @@ export function mapToCardProps(result: ListingCardData) {
     if (furnished) labels.push(furnished);
   }
 
-  const hasGarden = isPopulatedArray(outdoorSpace?.garden) || isPopulatedArray(outdoorSpace?.yard) || isPopulatedArray(outdoorSpace?.land);
+  const hasGarden = isPopulatedArray(outdoorSpace?.garden);
+  const hasYard = isPopulatedArray(outdoorSpace?.yard);
+  const hasLand = isPopulatedArray(outdoorSpace?.land);
   const hasRenewables = isPopulatedArray(energyAndUtilities?.renewables);
 
   const icons = [
-    numberBedrooms ? { icon: "property/bedrooms", count: numberBedrooms, label: "Bedrooms" } : null,
-    numberBathrooms ? { icon: "property/bathrooms", count: numberBathrooms, label: "Bathrooms" } : null,
-    numberReceptions ? { icon: "property/receptions", count: numberReceptions, label: "Receptions" } : null,
+    numberBedrooms ?
+      { icon: "property/bedrooms", count: numberBedrooms, label: "Bedrooms" }
+    : null,
+    numberBathrooms ?
+      { icon: "property/bathrooms", count: numberBathrooms, label: "Bathrooms" }
+    : null,
+    numberReceptions ?
+      { icon: "property/receptions", count: numberReceptions, label: "Receptions" }
+    : null,
     hasGarden ? { icon: "property/land", label: "Garden" } : null,
+    hasYard ? { icon: "property/land", label: "Yard" } : null,
+    hasLand ? { icon: "property/land", label: "Land" } : null,
     hasRenewables ? { icon: "property/utility", label: "Renewables" } : null,
   ].filter(Boolean) as { icon: string; count?: number; label: string }[];
 
@@ -39,11 +73,13 @@ export function mapToCardProps(result: ListingCardData) {
 
   return {
     saleOrRent,
+    listingType,
     propertyImage: media?.[0]?.image ?? undefined,
-    carouselImages: media?.map(row => row?.image).filter(Boolean) as string[],
+    carouselImages: media?.map((row) => row?.image).filter(Boolean) as string[],
     propertyImageAlt: overview,
     price: numberToCurrency(Math.floor(price)),
-    rentFrequency: rentalListing ? convertEnumToString(rentalListing.rentFrequency) : undefined,
+    rentFrequency:
+      rentalListing ? convertEnumToString(rentalListing.rentFrequency) : undefined,
     priceLabel: saleListing ? convertEnumToString(saleListing.priceType) : undefined,
     currentPriceNumber: price,
     priceHistory: ListingPriceHistory ?? [],

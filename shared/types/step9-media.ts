@@ -7,6 +7,8 @@ import type { Ref } from "vue";
 
 /** Media assignment for property images */
 export interface MediaAssignment {
+  /** Database primary key — set after upload or on load. Used for reliable updates. */
+  id?: number;
   cloudflareId: string;
   filename?: string;
   description?: string | null;
