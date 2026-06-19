@@ -26,7 +26,7 @@
         variant: 'subtle',
         size: 'xs',
         class: ' body-sm cursor-pointer',
-        disabled: !(isAdmin || (createListing && (isAgent || isUser))),
+        disabled: !allowCreateListing,
         onClick: () => openConfirmOrCreateModal(ListingTier.BASIC),
       }"
     >
@@ -37,7 +37,7 @@
         </p>
         <span
           class="body-xs"
-          v-if="isUser"
+          v-if="isUser && createListing"
           >Please note, you must complete personal ID and property ownership verification
           checks to publish your listing.</span
         >
@@ -138,6 +138,14 @@
   }>();
 
   const confirmOwnershipModalOpen = ref<boolean>(false);
+
+  const allowCreateListing = computed(() => {
+    return (
+      isAdmin.value ||
+      (createListing.value && isAgent.value) ||
+      (isUser.value && createListing.value)
+    );
+  });
 
   const closeConfirmOwnershipModal = (tier: ListingTier) => {
     confirmOwnershipModalOpen.value = false;

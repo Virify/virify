@@ -228,7 +228,7 @@
           >
 
           <!-- Ownership verification status (USER role only) -->
-          <template v-if="!isExempt && !verificationLoading">
+          <template v-if="!isExempt && !verificationLoading && createListing">
             <UBadge
               v-if="isVerificationApproved"
               icon="i-lucide-shield-check"
@@ -438,8 +438,8 @@
       @confirm="handleRestoreConfirm"
     />
 
-    <!-- Ownership verification modals (draft listings, USER role only) -->
-    <template v-if="listing.isDraft && !isExempt">
+    <!-- Ownership verification modals (draft listings, USER role only AND feature flag enabled) -->
+    <template v-if="listing.isDraft && !isExempt && createListing">
       <LazyOrganismsOwnershipVerificationModal
         ref="verificationModal"
         :draft-listing-id="draftListingId"
@@ -478,6 +478,7 @@
   const { archiveListing, restoreListing, setPublished, setAvailabilityStatus } =
     useMyListings();
   const toast = useToast();
+  const { createListing } = useFeatureFlag();
 
   // Ownership verification (draft listings, non-exempt users only)
   const draftListingId = computed(() =>

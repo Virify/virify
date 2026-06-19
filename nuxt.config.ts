@@ -36,6 +36,7 @@ export default defineNuxtConfig({
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
         createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
+        userCreateListing: envIfExistOrDefault("ALLOW_USER_CREATE_LISTING", false),
       },
     },
   },
@@ -55,7 +56,7 @@ export default defineNuxtConfig({
     meta: {
       ogImage: "https://virify.co.uk/logo.png",
       twitterImage: "https://virify.co.uk/logo.png",
-    }
+    },
   },
   // Schema.org structured data
   schemaOrg: {
@@ -88,7 +89,7 @@ export default defineNuxtConfig({
       "/listing/*",
       "/profile/*",
       "/acceptable-use",
-      '/information/**',
+      "/information/**",
     ],
     disallow: [
       "/account",
@@ -236,18 +237,16 @@ export default defineNuxtConfig({
     // Falls back to memory driver if no Redis credentials are available (staging2/3/4, local dev).
     storage: {
       cache:
-        process.env.REDIS_URL || process.env.REDISHOST
-          ? {
-              driver: "redis",
-              url: process.env.REDIS_URL,
-              host: process.env.REDISHOST,
-              password: process.env.REDISPASSWORD,
-              port: process.env.REDISPORT
-                ? parseInt(process.env.REDISPORT)
-                : undefined,
-              username: process.env.REDISUSER,
-            }
-          : { driver: "memory" },
+        process.env.REDIS_URL || process.env.REDISHOST ?
+          {
+            driver: "redis",
+            url: process.env.REDIS_URL,
+            host: process.env.REDISHOST,
+            password: process.env.REDISPASSWORD,
+            port: process.env.REDISPORT ? parseInt(process.env.REDISPORT) : undefined,
+            username: process.env.REDISUSER,
+          }
+        : { driver: "memory" },
     },
     devStorage: {
       cache: { driver: "memory" },

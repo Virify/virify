@@ -6,7 +6,7 @@ export function useFeatureFlag() {
   const createListing = computed(() => {
     if (role.value === "ADMIN") return true;
     if (!flags.createListing) return false;
-    return role.value === "AGENT" || role.value === "USER";
+    return role.value === "AGENT" || (role.value === "USER" && flags.userCreateListing);
   });
 
   return {
