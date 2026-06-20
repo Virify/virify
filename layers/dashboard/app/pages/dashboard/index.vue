@@ -25,10 +25,6 @@
         />
       </h2>
 
-      <MoleculesDashboardPriceTier
-        v-if="isAdmin || (createListing && (isAgent || isUser))"
-        @select-tier="handleCreateListing"
-      />
       <!-- Quick Actions Grid -->
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick actions
@@ -40,8 +36,48 @@
 
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <UPageCard
+          title="My Listings"
+          description="View and manage your saved listings"
+          icon="i-lucide-heart"
+          to="/dashboard/my-listings"
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
+          :ui="{
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
+          }"
+        />
+        <UPageCard
+          title="Create a Listing"
+          description="Create a listing to showcase your property"
+          icon="i-lucide-plus"
+          :to="
+            !(isAdmin || (createListing && (isAgent || isUser))) ?
+              undefined
+            : '/dashboard/create-listing'
+          "
+          class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
+          :class="{
+            cursor:
+              !(isAdmin || (createListing && (isAgent || isUser))) ?
+                'not-allowed'
+              : 'pointer',
+          }"
+          :ui="{
+            root: 'bg-[#2b3945]! ring-0',
+            container: 'shadow-xl',
+            title: 'body-sm font-bold text-white',
+            leadingIcon: 'h-6 w-6 text-secondary',
+            description: 'body-xs text-white',
+            body: 'flex flex-col justify-evenly',
+          }"
+        />
+        <UPageCard
           title="My Favourites"
-          description="View and manage your saved properties"
+          description="View and manage your favourite properties"
           icon="i-lucide-heart"
           to="/dashboard/favourites"
           class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
@@ -173,11 +209,6 @@
 
   // Modal ref for creating listings
   const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(null);
-
-  function handleCreateListing(tier: ListingTier) {
-    listingModal.value?.openForNewListing(tier);
-  }
-
   // Get all recent data from useAnalytics (centralized dashboard data)
   const {
     recentlyViewedListings,
