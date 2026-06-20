@@ -5,6 +5,7 @@
     :description="description"
     :headline="highlight"
     :ui="{
+      container: 'max-w-none p-0! py-16!',
       description: 'max-w-200 mx-auto',
       headline: 'text-secondary/90 font-bold',
     }"
