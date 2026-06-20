@@ -19,18 +19,23 @@
     <template #body>
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick Listing Actions
-        <UIcon name="i-lucide-layers-plus" class="text-secondary" />
+        <UIcon
+          name="i-lucide-layers-plus"
+          class="text-secondary"
+        />
       </h2>
 
       <MoleculesDashboardPriceTier
         v-if="isAdmin || (createListing && (isAgent || isUser))"
         @select-tier="handleCreateListing"
       />
-
       <!-- Quick Actions Grid -->
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick actions
-        <UIcon name="i-lucide-rocket" class="text-secondary" />
+        <UIcon
+          name="i-lucide-rocket"
+          class="text-secondary"
+        />
       </h2>
 
       <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -98,7 +103,10 @@
 
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick analytics
-        <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
+        <UIcon
+          name="i-lucide-bar-chart-3"
+          class="text-secondary"
+        />
       </h2>
       <OrganismsDashboardAnalyticsCard />
 
@@ -147,65 +155,65 @@
   </UDashboardPanel>
 </template>
 <script lang="ts" setup>
-import type { AccordionItem } from "@nuxt/ui";
-import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/enums";
+  import type { AccordionItem } from "@nuxt/ui";
+  import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/enums";
 
-definePageMeta({
-  middleware: ["authenticated"],
-  head: {
-    title: "Home",
-    icon: "i-lucide-home",
-  },
-  layout: "dashboard",
-});
+  definePageMeta({
+    middleware: ["authenticated"],
+    head: {
+      title: "Home",
+      icon: "i-lucide-home",
+    },
+    layout: "dashboard",
+  });
 
-const { user } = useUserSession();
-const { isAgent, isAdmin, createListing, role } = useFeatureFlag();
-const isUser = computed(() => role.value === "USER");
+  const { user } = useUserSession();
+  const { isAgent, isAdmin, createListing, role } = useFeatureFlag();
+  const isUser = computed(() => role.value === "USER");
 
-// Modal ref for creating listings
-const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(
-  null,
-);
+  // Modal ref for creating listings
+  const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(null);
 
-function handleCreateListing(tier: ListingTier) {
-  listingModal.value?.openForNewListing(tier);
-}
+  function handleCreateListing(tier: ListingTier) {
+    listingModal.value?.openForNewListing(tier);
+  }
 
-// Get all recent data from useAnalytics (centralized dashboard data)
-const {
-  recentlyViewedListings,
-  recentFavourites,
-  recentUserNotes,
-  recentFavouritesStatus,
-  recentNotesStatus,
-  isAnalyticsLoading,
-} = useAnalytics();
+  // Get all recent data from useAnalytics (centralized dashboard data)
+  const {
+    recentlyViewedListings,
+    recentFavourites,
+    recentUserNotes,
+    recentFavouritesStatus,
+    recentNotesStatus,
+    isAnalyticsLoading,
+  } = useAnalytics();
 
-// Computed loading states from statuses
-const isFavouritesLoading = computed(
-  () => recentFavouritesStatus.value === "pending",
-);
-const isNotesLoading = computed(() => recentNotesStatus.value === "pending");
+  const { getRecentListings } = useMyListings();
 
-const accordionItems: AccordionItem[] = [
-  {
-    label: "Recent Favourite Listings",
-    icon: "i-lucide-heart",
-    slot: "favourite-listings",
-    value: "favourite-listings",
-  },
-  {
-    label: "Recent Notes Added",
-    icon: "i-lucide-sticky-note",
-    slot: "notes-added",
-    value: "notes-added",
-  },
-  {
-    label: "Viewed Listings",
-    icon: "i-lucide-eye",
-    slot: "viewed-listings",
-    value: "viewed-listings",
-  },
-];
+  const recentListings = await getRecentListings();
+
+  // Computed loading states from statuses
+  const isFavouritesLoading = computed(() => recentFavouritesStatus.value === "pending");
+  const isNotesLoading = computed(() => recentNotesStatus.value === "pending");
+
+  const accordionItems: AccordionItem[] = [
+    {
+      label: "Recent Favourite Listings",
+      icon: "i-lucide-heart",
+      slot: "favourite-listings",
+      value: "favourite-listings",
+    },
+    {
+      label: "Recent Notes Added",
+      icon: "i-lucide-sticky-note",
+      slot: "notes-added",
+      value: "notes-added",
+    },
+    {
+      label: "Viewed Listings",
+      icon: "i-lucide-eye",
+      slot: "viewed-listings",
+      value: "viewed-listings",
+    },
+  ];
 </script>

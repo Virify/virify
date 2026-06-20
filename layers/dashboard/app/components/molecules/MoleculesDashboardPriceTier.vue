@@ -44,6 +44,7 @@
       </template>
     </UPricingPlan>
     <UPricingPlan
+      v-if="showSubscription"
       title="Subscriptions"
       badge="Coming Soon"
       orientation="horizontal"
@@ -132,6 +133,14 @@
   import { ListingTier } from "~~/layers/database/server/database/prisma/generated/enums";
 
   const { isAgent, isAdmin, isUser, createListing } = useFeatureFlag();
+
+  interface Props {
+    showSubscription?: boolean;
+  }
+
+  const props = withDefaults(defineProps<Props>(), {
+    showSubscription: false,
+  });
 
   const emit = defineEmits<{
     "select-tier": [tier: ListingTier];
