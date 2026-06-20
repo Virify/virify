@@ -17,6 +17,17 @@
     </template>
 
     <template #body>
+      <UAlert
+        v-if="!(isAdmin || createListing)"
+        title="Create Listing Currently Disabled"
+        description="Create a listing is currently disabled during early beta testing. This will be releasing very soon - please check back later."
+        color="secondary"
+        variant="solid"
+        class="overflow-visible"
+        :ui="{
+          title: 'font-bold',
+        }"
+      />
       <!-- Quick Actions Grid -->
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick actions
@@ -46,18 +57,9 @@
           title="Create a Listing"
           description="Create a listing to showcase your property"
           icon="i-lucide-plus"
-          :to="
-            !(isAdmin || (createListing && (isAgent || isUser))) ?
-              undefined
-            : '/dashboard/create-listing'
-          "
+          :to="!(isAdmin || createListing) ? undefined : '/dashboard/create-listing'"
           class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
-          :class="{
-            cursor:
-              !(isAdmin || (createListing && (isAgent || isUser))) ?
-                'not-allowed'
-              : 'pointer',
-          }"
+          :class="!(isAdmin || createListing) ? 'opacity-80 cursor-not-allowed' : ''"
           :ui="{
             root: 'bg-[#2b3945]! ring-0',
             container: 'shadow-xl',
@@ -184,7 +186,6 @@
 </template>
 <script lang="ts" setup>
   import type { AccordionItem } from "@nuxt/ui";
-  import type { ListingTier } from "~~/layers/database/server/database/prisma/generated/enums";
 
   definePageMeta({
     middleware: ["authenticated"],
@@ -199,8 +200,6 @@
   const { isAgent, isAdmin, createListing, role } = useFeatureFlag();
   const isUser = computed(() => role.value === "USER");
 
-  // Modal ref for creating listings
-  const listingModal = ref<{ openForNewListing: (tier: any) => void } | null>(null);
   // Get all recent data from useAnalytics (centralized dashboard data)
   const {
     recentlyViewedListings,
@@ -210,10 +209,6 @@
     recentNotesStatus,
     isAnalyticsLoading,
   } = useAnalytics();
-
-  const { getRecentListings } = useMyListings();
-
-  const recentListings = await getRecentListings();
 
   // Computed loading states from statuses
   const isFavouritesLoading = computed(() => recentFavouritesStatus.value === "pending");
