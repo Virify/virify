@@ -30,7 +30,7 @@
         <UPageCard
           title="My Listings"
           description="View and manage your saved listings"
-          icon="i-lucide-heart"
+          icon="i-lucide-library"
           to="/dashboard/my-listings"
           class="bg-[url(/img/logo-background.svg)] bg-size-auto-180% bg-no-repeat bg-position-[right_0px_bottom_-50px]"
           :ui="{
