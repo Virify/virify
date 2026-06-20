@@ -17,14 +17,6 @@
     </template>
 
     <template #body>
-      <h2 class="title-xs mb-0! flex items-center gap-2">
-        Quick Listing Actions
-        <UIcon
-          name="i-lucide-layers-plus"
-          class="text-secondary"
-        />
-      </h2>
-
       <!-- Quick Actions Grid -->
       <h2 class="title-xs mb-0! flex items-center gap-2">
         Quick actions
