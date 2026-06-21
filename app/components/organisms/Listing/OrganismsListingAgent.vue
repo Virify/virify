@@ -24,8 +24,11 @@
           {{ agent?.username }}
         </h3>
         <!-- <p class="| body-xs">123 Agent Street, SM1 TWN</p> -->
-        <p class="| body-xs">{{ memberSince }}</p>
       </div>
+      <div>
+        <AtomsVerifiedBadge :verification="agent?.verification" />
+      </div>
+      <p class="o-listing-sidebar-agent__member-since | body-xs">{{ memberSince }}</p>
     </section>
   </NuxtLink>
   <section
@@ -48,8 +51,11 @@
       <h3 class="o-listing-sidebar-agent__name | title-xs">
         {{ agent?.username }}
       </h3>
-      <p class="| body-xs">{{ memberSince }}</p>
     </div>
+    <div>
+      <AtomsVerifiedBadge :verification="agent?.verification" />
+    </div>
+    <p class="o-listing-sidebar-agent__member-since| body-xs">{{ memberSince }}</p>
   </section>
 </template>
 
@@ -61,6 +67,11 @@
       id?: number | null;
       createdAt?: Date | String | null;
       avatar?: string | null;
+      verification?: {
+        name: boolean | null;
+        identity: boolean | null;
+        role: string | null;
+      } | null;
     };
   }
   const props = defineProps<Props>();
@@ -96,7 +107,7 @@
     padding: var(--size-16);
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: var(--size-12);
+    gap: var(--size-4);
     align-items: flex-start;
     text-align: left;
     flex: 1 0 auto;
@@ -130,6 +141,10 @@
     &__name {
       margin: 0;
       text-wrap: wrap;
+    }
+
+    &__member-since {
+      align-self: center;
     }
   }
 </style>

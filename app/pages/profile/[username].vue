@@ -59,6 +59,9 @@
                 color="primary"
                 >{{ roleLabel }}</UBadge
               >
+
+              <!-- verified badge -->
+              <AtomsVerifiedBadge :verification="profile.verification" />
             </div>
 
             <!-- Meta line -->

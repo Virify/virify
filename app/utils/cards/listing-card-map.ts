@@ -94,5 +94,6 @@ export function mapToCardProps(result: ListingCardData) {
     viewUrl: `/listing/${id}`,
     listingId: id,
     userId: user.id,
+    userVerification: user.verification ?? undefined,
   };
 }

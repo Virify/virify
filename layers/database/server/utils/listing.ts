@@ -12,6 +12,20 @@ import { propertyInclude } from "./property";
 import { getPropertyIdsByDistance, getPropertyIdsByPolygons } from "./location";
 import { getPriceFilter } from "./price";
 
+/** Shared user select used on all public listing queries — includes verification for the verified badge */
+const listingUserSelect = {
+  select: {
+    id: true,
+    username: true,
+    email: true,
+    createdAt: true,
+    avatar: true,
+    verification: {
+      select: { name: true, identity: true, role: true },
+    },
+  },
+} as const;
+
 /**
  * Get a listing by ID
  *
@@ -48,15 +62,7 @@ export async function getFullListingById(
           ...propertyInclude,
         },
       },
-      user: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          createdAt: true,
-          avatar: true,
-        },
-      },
+      user: listingUserSelect,
       ListingPriceHistory: {
         orderBy: { createdAt: "desc" as const },
         select: {
@@ -96,15 +102,7 @@ export async function getListingByIdForEdit(
           ...propertyInclude,
         },
       },
-      user: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          createdAt: true,
-          avatar: true,
-        },
-      },
+      user: listingUserSelect,
       ListingPriceHistory: {
         orderBy: { createdAt: "desc" as const },
         select: {
@@ -187,15 +185,7 @@ export async function getAllListingsByPropertyIds(
           ...propertyInclude,
         },
       },
-      user: {
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          createdAt: true,
-          avatar: true,
-        },
-      },
+      user: listingUserSelect,
       ListingPriceHistory: {
         orderBy: { createdAt: "desc" as const },
         select: {
@@ -397,15 +387,7 @@ const fullListingInclude = {
       ...propertyInclude,
     },
   },
-  user: {
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      createdAt: true,
-      avatar: true,
-    },
-  },
+  user: listingUserSelect,
   ListingPriceHistory: {
     orderBy: { createdAt: "desc" as const },
     select: {

@@ -16,10 +16,10 @@
     <div class="relative">
       <UAlert
         v-if="verificationRecord === null && !isExempt && listing.isDraft"
-        variant="soft"
+        variant="solid"
         icon="i-lucide-shield-alert"
-        color="error"
-        class="absolute z-1 opacity-90"
+        color="primary"
+        class="absolute z-1 opacity-95"
       >
         <template #description>
           <p class="body-xs">
