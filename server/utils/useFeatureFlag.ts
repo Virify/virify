@@ -1,12 +1,14 @@
-import type { H3Event, EventHandlerRequest } from 'h3'
-import { useRole } from './useRole'
+import type { H3Event, EventHandlerRequest } from "h3";
+import { useRole } from "./useRole";
 
 export async function useFeatureFlag(event: H3Event<EventHandlerRequest>) {
-  const flags = getFeatureFlagConfig()
-  const { role, roleActive, isAdmin, isAgent } = await useRole(event)
+  const flags = getFeatureFlagConfig();
+  const { role, roleActive, isAdmin, isAgent } = await useRole(event);
 
-  // Only ADMIN or AGENT (Estate Agent) roles can create a listing
-  const createListing: boolean = (role === 'ADMIN') || !!(flags.createListing && role === 'AGENT')
+  // ADMIN, AGENT, and USER (subject to ownership verification) can create a listing
+  const createListing: boolean =
+    role === "ADMIN" ||
+    !!(flags.createListing && (role === "AGENT" || role === "USER"));
 
   return {
     ...flags,
@@ -15,6 +17,6 @@ export async function useFeatureFlag(event: H3Event<EventHandlerRequest>) {
     roleActive,
     isAdmin,
     isAgent,
-    checkFeatureFlag
-  }
+    checkFeatureFlag,
+  };
 }

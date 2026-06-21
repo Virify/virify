@@ -53,4 +53,6 @@ enum NotificationType {
   VIEWING_REJECTED // Viewing request rejected by owner
   VIEWING_RESCHEDULED // Viewing time proposed to change
   VIEWING_CANCELLED // Viewing cancelled by either party
+  OWNERSHIP_VERIFIED // Ownership documents approved by admin
+  OWNERSHIP_DENIED // Ownership documents denied by admin
 }

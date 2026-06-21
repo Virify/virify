@@ -5,7 +5,7 @@
     color="secondary"
     :links="styledLinks"
     :ui="{
-      container: 'max-w-none',
+      container: 'max-w-none p-0! py-16! px-6!',
       wrapper: reverse ? 'lg:order-last' : 'md:order-first',
     }"
   >

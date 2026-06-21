@@ -25,6 +25,7 @@ export default defineNuxtConfig({
     "./layers/sanity",
     "./layers/dashboard",
     "./layers/admin",
+    "./layers/ownership",
   ],
   future: {
     compatibilityVersion: 4,
@@ -35,6 +36,7 @@ export default defineNuxtConfig({
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
         createListing: envIfExistOrDefault("ALLOW_CREATE_LISTING", true),
+        userCreateListing: envIfExistOrDefault("ALLOW_USER_CREATE_LISTING", false),
       },
     },
   },

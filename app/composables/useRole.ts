@@ -5,11 +5,13 @@ export function useRole() {
   const roleActive = computed(() => getRoleActive(user.value))
   const isAdmin = computed(() => role.value === 'ADMIN')
   const isAgent = computed(() => role.value === 'AGENT')
+  const isUser = computed(() => role.value === 'USER')
 
   return {
     role,
     roleActive,
     isAdmin,
-    isAgent
+    isAgent,
+    isUser,
   }
 }

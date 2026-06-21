@@ -1,9 +1,18 @@
 <template>
-  <div v-if="notifications.length === 0" class="flex flex-col items-center justify-center p-8 text-center">
-    <UIcon name="i-lucide-bell-off" class="w-8 h-8 mb-2 opacity-50" />
+  <div
+    v-if="notifications.length === 0"
+    class="flex flex-col items-center justify-center p-8 text-center"
+  >
+    <UIcon
+      name="i-lucide-bell-off"
+      class="w-8 h-8 mb-2 opacity-50"
+    />
     <p class="text-sm">No new notifications</p>
   </div>
-  <div v-else class="space-y-0">
+  <div
+    v-else
+    class="space-y-0"
+  >
     <UCard
       v-for="notification in notifications"
       :key="notification.id"
@@ -29,14 +38,14 @@
       <template #default>
         <UAvatar
           :src="notification.senderAvatar || undefined"
-          :alt="notification.senderUsername || 'User'"
+          :alt="notification.senderUsername || 'Virify'"
           size="sm"
           :ui="{
             root: 'border border-(--foreground-100)',
           }"
         />
         <p class="font-bold truncate mt-0.5!">
-          {{ notification.senderUsername || "Unknown" }}
+          {{ notification.senderUsername || "Virify" }}
         </p>
       </template>
       <template #footer>
@@ -44,8 +53,14 @@
           {{ notification.message }}
         </p>
         <!-- Minimal listing info if available -->
-        <div v-if="notification.listingAddress" class="flex items-center gap-1 mt-2 text-xs text-gray-500">
-          <UIcon name="i-lucide-home" class="w-3 h-3" />
+        <div
+          v-if="notification.listingAddress"
+          class="flex items-center gap-1 mt-2 text-xs text-gray-500"
+        >
+          <UIcon
+            name="i-lucide-home"
+            class="w-3 h-3"
+          />
           <span class="truncate">{{ notification.listingAddress }}</span>
         </div>
         <div class="flex justify-between items-center pt-2">
@@ -58,63 +73,66 @@
               target="_blank"
               @click.stop
               :ui="{
-                leadingIcon: 'text-error'
+                leadingIcon: 'text-error',
               }"
             />
           </UTooltip>
           <p class="text-xs italic font-light flex-1 text-right pt-3">
-          {{ formatMessageTimestamp(notification.createdAt) }}
+            {{ formatMessageTimestamp(notification.createdAt) }}
           </p>
         </div>
-        
       </template>
     </UCard>
     <!-- Infinite scroll sentinel -->
-    <div ref="sentinel" class="h-4"></div>
+    <div
+      ref="sentinel"
+      class="h-4"
+    ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useIntersectionObserver } from '@vueuse/core';
+  import { useIntersectionObserver } from "@vueuse/core";
 
-const props = defineProps<{
-  notifications: UserNotification[];
-  hasMore?: boolean;
-  loading?: boolean;
-}>();
+  const props = defineProps<{
+    notifications: UserNotification[];
+    hasMore?: boolean;
+    loading?: boolean;
+  }>();
 
-const emit = defineEmits<{
-  (e: "select", notification: UserNotification): void;
-  (e: "loadMore"): void;
-}>();
+  const emit = defineEmits<{
+    (e: "select", notification: UserNotification): void;
+    (e: "loadMore"): void;
+  }>();
 
-const { dismissNotification } = useNotifications();
+  const { dismissNotification } = useNotifications();
 
-const sentinel = ref<HTMLElement | null>(null);
-const handleSelect = async (notification: UserNotification) => {
-  emit('select', notification);
-};
+  const sentinel = ref<HTMLElement | null>(null);
+  const handleSelect = async (notification: UserNotification) => {
+    emit("select", notification);
+  };
 
-const handleDismiss = async (notificationId: number) => {
-  await dismissNotification(notificationId);
-};
+  const handleDismiss = async (notificationId: number) => {
+    await dismissNotification(notificationId);
+  };
 
-const loadMore = () => emit('loadMore');
+  const loadMore = () => emit("loadMore");
 
-// Trigger pagination when sentinel intersects
-const stopObserver = import.meta.client
-  ? useIntersectionObserver(
-      sentinel,
-      ([entry]) => {
-        if (entry?.isIntersecting && props.hasMore && !props.loading) {
-          loadMore();
-        }
-      },
-      { threshold: 0.1 }
-    ).stop
-  : null;
+  // Trigger pagination when sentinel intersects
+  const stopObserver =
+    import.meta.client ?
+      useIntersectionObserver(
+        sentinel,
+        ([entry]) => {
+          if (entry?.isIntersecting && props.hasMore && !props.loading) {
+            loadMore();
+          }
+        },
+        { threshold: 0.1 },
+      ).stop
+    : null;
 
-onBeforeUnmount(() => {
-  stopObserver?.();
-});
+  onBeforeUnmount(() => {
+    stopObserver?.();
+  });
 </script>

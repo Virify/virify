@@ -6,7 +6,19 @@
 /**
  * Notification types - matches the database model
  */
-export type NotificationType = "NEW_MESSAGE" | "NEW_ENQUIRY" | "ENQUIRY_REPLY" | "LISTING_UPDATE" | "SYSTEM" | "VIEWING_REQUEST" | "VIEWING_ACCEPTED" | "VIEWING_REJECTED" | "VIEWING_RESCHEDULED" | "VIEWING_CANCELLED";
+export type NotificationType =
+  | "NEW_MESSAGE"
+  | "NEW_ENQUIRY"
+  | "ENQUIRY_REPLY"
+  | "LISTING_UPDATE"
+  | "SYSTEM"
+  | "VIEWING_REQUEST"
+  | "VIEWING_ACCEPTED"
+  | "VIEWING_REJECTED"
+  | "VIEWING_RESCHEDULED"
+  | "VIEWING_CANCELLED"
+  | "OWNERSHIP_VERIFIED"
+  | "OWNERSHIP_DENIED";
 
 /**
  * User notification type - matches the database model

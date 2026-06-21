@@ -7,79 +7,105 @@ const publishSchema = z.object({
 });
 
 // Comprehensive validation schema for a publishable draft listing
-const publishableDraftSchema = z.object({
-  // Core listing fields (Step 1, 3)
-  price: z.number().positive("Price must be greater than 0"),
-  listingTier: z.enum(["BASIC", "PREMIUM", "FEATURED"]),
-  
-  // Must have either sale or rental listing (Step 1)
-  saleListing: z.object({
-    tenureType: z.enum(["FREEHOLD", "LEASEHOLD", "COMMONHOLD"]),
-    priceType: z.enum(["FIXED", "OFFERS_OVER", "GUIDE_PRICE"]).nullable().optional(),
-  }).nullable().optional(),
-  
-  rentalListing: z.object({
-    isBillsIncluded: z.boolean(),
-    furnishedStatus: z.enum(["FURNISHED", "UNFURNISHED", "PART_FURNISHED"]).nullable().optional(),
-    rentFrequency: z.enum(["WEEKLY", "MONTHLY"]).nullable().optional(),
-  }).nullable().optional(),
-  
-  // Property is required
-  property: z.object({
-    // Step 2: Property basics
-    type: z.object({
-      id: z.number().int().positive(),
-    }).nullable(),
-    classification: z.object({
-      id: z.number().int().positive(),
-    }).nullable(),
-    constructionType: z.enum(["STANDARD", "NON_STANDARD"]).nullable().optional(),
-    yearBuilt: z.string().nullable().optional(),
-    size: z.number().positive().nullable().optional(),
-    description: z.string().nullable().optional(),
-    totalFloors: z.number().int().min(0).nullable().optional(),
-    
-    // Step 2: Address (required - now part of Property Basics)
-    address: z.object({
-      number: z.string().nullable().optional(),
-      street: z.string().min(1, "Street is required"),
-      city: z.string().min(1, "City is required"),
-      postcode: z.string().min(1, "Postcode is required"),
-      country: z.string().min(1, "Country is required"),
-      lat: z.number(),
-      lon: z.number(),
+const publishableDraftSchema = z
+  .object({
+    // Core listing fields (Step 1, 3)
+    price: z.number().positive("Price must be greater than 0"),
+    listingTier: z.enum(["BASIC", "PREMIUM", "FEATURED"]),
+
+    // Must have either sale or rental listing (Step 1)
+    saleListing: z
+      .object({
+        tenureType: z.enum(["FREEHOLD", "LEASEHOLD", "COMMONHOLD"]),
+        priceType: z
+          .enum(["FIXED", "OFFERS_OVER", "GUIDE_PRICE"])
+          .nullable()
+          .optional(),
+      })
+      .nullable()
+      .optional(),
+
+    rentalListing: z
+      .object({
+        isBillsIncluded: z.boolean(),
+        furnishedStatus: z
+          .enum(["FURNISHED", "UNFURNISHED", "PART_FURNISHED"])
+          .nullable()
+          .optional(),
+        rentFrequency: z.enum(["WEEKLY", "MONTHLY"]).nullable().optional(),
+      })
+      .nullable()
+      .optional(),
+
+    // Property is required
+    property: z.object({
+      // Step 2: Property basics
+      type: z
+        .object({
+          id: z.number().int().positive(),
+        })
+        .nullable(),
+      classification: z
+        .object({
+          id: z.number().int().positive(),
+        })
+        .nullable(),
+      constructionType: z
+        .enum(["STANDARD", "NON_STANDARD"])
+        .nullable()
+        .optional(),
+      yearBuilt: z.string().nullable().optional(),
+      size: z.number().positive().nullable().optional(),
+      description: z.string().nullable().optional(),
+      totalFloors: z.number().int().min(0).nullable().optional(),
+
+      // Step 2: Address (required - now part of Property Basics)
+      address: z.object({
+        number: z.string().nullable().optional(),
+        street: z.string().min(1, "Street is required"),
+        city: z.string().min(1, "City is required"),
+        postcode: z.string().min(1, "Postcode is required"),
+        country: z.string().min(1, "Country is required"),
+        lat: z.number(),
+        lon: z.number(),
+      }),
+
+      // Step 4: Room counts
+      numberBedrooms: z.number().int().min(0).nullable().optional(),
+      numberBathrooms: z.number().int().min(0).nullable().optional(),
+
+      // Step 9: Media (at least 1 image required, with sortOrder for ordering)
+      // Note: image field can be null for video tours/floor plans, so we filter for images with actual image values
+      media: z
+        .array(
+          z.object({
+            image: z.string().nullable().optional(),
+            sortOrder: z.number().int().min(0).optional(),
+          }),
+        )
+        .refine(
+          (mediaArray) => mediaArray.some((m) => m.image && m.image.length > 0),
+          { message: "At least one image is required" },
+        ),
     }),
-    
-    // Step 4: Room counts
-    numberBedrooms: z.number().int().min(0).nullable().optional(),
-    numberBathrooms: z.number().int().min(0).nullable().optional(),
-    
-    // Step 9: Media (at least 1 image required, with sortOrder for ordering)
-    // Note: image field can be null for video tours/floor plans, so we filter for images with actual image values
-    media: z.array(z.object({
-      image: z.string().nullable().optional(),
-      sortOrder: z.number().int().min(0).optional(),
-    })).refine(
-      (mediaArray) => mediaArray.some(m => m.image && m.image.length > 0),
-      { message: "At least one image is required" }
-    ),
-  }),
-  
-  // Must have completed all 9 steps (new flow)
-  completedSteps: z.array(z.number().int().min(1).max(9)).length(9, "All 9 steps must be completed"),
-}).refine(
-  (data) => data.saleListing !== null || data.rentalListing !== null,
-  {
+
+    // Must have completed all 9 steps (new flow)
+    completedSteps: z
+      .array(z.number().int().min(1).max(9))
+      .length(9, "All 9 steps must be completed"),
+  })
+  .refine((data) => data.saleListing !== null || data.rentalListing !== null, {
     message: "Either saleListing or rentalListing must be present",
     path: ["saleListing"],
-  }
-).refine(
-  (data) => data.property?.type !== null && data.property?.classification !== null,
-  {
-    message: "Property type and classification are required",
-    path: ["property", "type"],
-  }
-);
+  })
+  .refine(
+    (data) =>
+      data.property?.type !== null && data.property?.classification !== null,
+    {
+      message: "Property type and classification are required",
+      path: ["property", "type"],
+    },
+  );
 
 /**
  * POST /api/listing/publish
@@ -170,14 +196,36 @@ export default defineEventHandler(async (event) => {
       return errorResponse(
         createError({
           statusCode: 404,
-          statusMessage: "Draft listing not found or you don't have permission to publish it",
+          statusMessage:
+            "Draft listing not found or you don't have permission to publish it",
         }),
-        event
+        event,
       );
     }
 
+    // Ownership verification gate: USER role must have an APPROVED verification for this specific draft
+    const userRole = (user as any).role as string | undefined;
+    const isExemptFromVerification =
+      userRole === "ADMIN" || userRole === "AGENT";
+    if (!isExemptFromVerification) {
+      const ownershipRecord = await prisma.ownershipVerification.findUnique({
+        where: { draftListingId: draftId },
+        select: { status: true },
+      });
+      if (!ownershipRecord || ownershipRecord.status !== "APPROVED") {
+        return errorResponse(
+          createError({
+            statusCode: 403,
+            statusMessage:
+              "Ownership verification required. Please submit and get your ownership documents approved before publishing.",
+          }),
+          event,
+        );
+      }
+    }
+
     // Log draft structure for debugging
-    console.log('Draft structure before validation:', {
+    console.log("Draft structure before validation:", {
       price: draft.price,
       listingTier: draft.listingTier,
       hasSaleListing: !!draft.saleListing,
@@ -194,25 +242,30 @@ export default defineEventHandler(async (event) => {
     try {
       publishableDraftSchema.parse(draft);
     } catch (validationError: any) {
-      console.error('Draft listing validation failed:', JSON.stringify(validationError, null, 2));
-      
+      console.error(
+        "Draft listing validation failed:",
+        JSON.stringify(validationError, null, 2),
+      );
+
       // Zod errors are in the `issues` property, not `errors`
       const issues = validationError.issues || validationError.errors || [];
-      
-      const errorMessages = issues.map((err: any) => 
-        `${err.path.join('.')}: ${err.message}`
-      ).join(', ') || 'Draft listing validation failed - no details available';
-      
-      console.error('Formatted error messages:', errorMessages);
-      console.error('Issues:', issues);
-      
+
+      const errorMessages =
+        issues
+          .map((err: any) => `${err.path.join(".")}: ${err.message}`)
+          .join(", ") ||
+        "Draft listing validation failed - no details available";
+
+      console.error("Formatted error messages:", errorMessages);
+      console.error("Issues:", issues);
+
       return errorResponse(
         createError({
           statusCode: 400,
           statusMessage: `Cannot publish listing: ${errorMessages}`,
           data: issues,
         }),
-        event
+        event,
       );
     }
 
@@ -223,7 +276,7 @@ export default defineEventHandler(async (event) => {
           statusCode: 400,
           statusMessage: "Property is required to publish a listing",
         }),
-        event
+        event,
       );
     }
 
@@ -288,9 +341,18 @@ export default defineEventHandler(async (event) => {
 
     // Send WebSocket aggregate updates: draft removed, listing added
     try {
-      const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
-      sendMessage(createAggregateUpdateMessage("draftListings", "remove", user.id as number));
-      sendMessage(createAggregateUpdateMessage("listings", "add", user.id as number));
+      const { sendMessage, createAggregateUpdateMessage } =
+        useWebSocketServer();
+      sendMessage(
+        createAggregateUpdateMessage(
+          "draftListings",
+          "remove",
+          user.id as number,
+        ),
+      );
+      sendMessage(
+        createAggregateUpdateMessage("listings", "add", user.id as number),
+      );
     } catch {
       // Non-critical
     }
@@ -301,8 +363,10 @@ export default defineEventHandler(async (event) => {
     if (address?.lat && address?.lon && draft.propertyId) {
       // Safety-net: ensure PostGIS geometry column is set so the listing appears in spatial search.
       // This is a no-op if step 2 already wrote the geometry; it's cheap and idempotent.
-      updateLocationByAddressId(address.id, address.lon, address.lat)
-        .catch((err) => console.error("[Publish] Failed to update PostGIS location:", err));
+      updateLocationByAddressId(address.id, address.lon, address.lat).catch(
+        (err) =>
+          console.error("[Publish] Failed to update PostGIS location:", err),
+      );
 
       const { findNearbyAmenities } = useMapSearch();
       findNearbyAmenities(address.lat, address.lon)
@@ -311,7 +375,9 @@ export default defineEventHandler(async (event) => {
             return createAmenitiesForProperty(draft.propertyId!, amenitiesData);
           }
         })
-        .catch((err) => console.error("[Publish] Failed to fetch/save amenities:", err));
+        .catch((err) =>
+          console.error("[Publish] Failed to fetch/save amenities:", err),
+        );
     }
 
     return {

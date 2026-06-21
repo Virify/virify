@@ -17,6 +17,7 @@ model DraftListing {
   user              User?              @relation("DraftListingOwner", fields: [userId], references: [id])
   property          Property?          @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   sharedUsers       User[]             @relation("DraftListingSharedUsers")
+  ownershipVerification OwnershipVerification?
 
   @@index([userId])
   @@index([propertyId])

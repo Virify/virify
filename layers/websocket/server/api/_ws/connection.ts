@@ -3,14 +3,23 @@ import { useWebSocketServer } from "~~/layers/websocket/composables/useWebSocket
 // Initialize the WebSocket server composable
 const { addPeer, removePeer, handleIncomingMessages } = useWebSocketServer();
 
+// Track peer → userId so we can clean up on close even if the session is gone
+const peerUserMap = new Map<object, number>();
+
 // Cache conversation participant lookups per (userId, conversationId) to avoid a DB hit on
 // every high-frequency typing / message_read frame. Entries expire after 60 seconds.
-const participantCache = new Map<string, { otherParticipantId: number; expiresAt: number }>();
+const participantCache = new Map<
+  string,
+  { otherParticipantId: number; expiresAt: number }
+>();
 const PARTICIPANT_CACHE_TTL_MS = 60_000;
 const PARTICIPANT_CACHE_CLEANUP_INTERVAL_MS = 10_000;
 let lastParticipantCacheCleanupAt = 0;
 
-function setCachedParticipant(key: string, value: { otherParticipantId: number; expiresAt: number }) {
+function setCachedParticipant(
+  key: string,
+  value: { otherParticipantId: number; expiresAt: number },
+) {
   const now = Date.now();
   // Clean up memory periodically instead of on every cache write.
   if (now - lastParticipantCacheCleanupAt >= PARTICIPANT_CACHE_CLEANUP_INTERVAL_MS) {
@@ -36,6 +45,7 @@ export default defineWebSocketHandler({
   async open(peer) {
     const { user } = await requireUserSession(peer);
     addPeer(user.id!, peer);
+    peerUserMap.set(peer, user.id!);
   },
 
   /**
@@ -43,8 +53,12 @@ export default defineWebSocketHandler({
    */
   async close(peer) {
     try {
-      const { user } = await requireUserSession(peer);
-      removePeer(user.id!, peer);
+      // Use the stored userId — session may already be gone on logout
+      const userId = peerUserMap.get(peer);
+      if (userId !== undefined) {
+        removePeer(userId, peer);
+        peerUserMap.delete(peer);
+      }
     } catch (error) {
       console.warn("Failed to remove peer on close:", error);
     }
@@ -54,7 +68,6 @@ export default defineWebSocketHandler({
    * Handle incoming WebSocket messages
    */
   async message(peer, message) {
-
     // manage ping/pong before authentication - we don't want to block the connection
     if (String(message) === "ping") {
       peer.send("pong");
@@ -90,8 +103,9 @@ export default defineWebSocketHandler({
           });
           // Drop if sender is not a participant
           if (!conversation) return;
-          const otherParticipantId = conversation.senderId === user.id
-            ? conversation.receiverId
+          const otherParticipantId =
+            conversation.senderId === user.id ?
+              conversation.receiverId
             : conversation.senderId;
           cached = { otherParticipantId, expiresAt: now + PARTICIPANT_CACHE_TTL_MS };
           setCachedParticipant(cacheKey, cached);

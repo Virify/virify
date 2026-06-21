@@ -57,6 +57,18 @@ export interface AggregateUpdateMessage extends BaseWebSocketMessage {
 }
 
 /**
+ * Ownership verification result - emitted after admin approves/denies documents
+ * Carries the persisted notification so the client can update the panel and badge.
+ */
+export interface OwnershipVerificationResultMessage extends BaseWebSocketMessage {
+  type: "ownership_verification_result";
+  notification: UserNotification;
+  draftListingId: number;
+  approved: boolean;
+  to: number;
+}
+
+/**
  * Notification created message - emitted after server persists a notification
  */
 export interface NotificationNewMessage extends BaseWebSocketMessage {
@@ -78,12 +90,30 @@ export interface ConversationPresenceMessage extends BaseWebSocketMessage {
 /**
  * Union type of all possible WebSocket messages
  */
-export type WebSocketMessage = TypingMessage | NewMessageMessage | NewConversationMessage | MessageReadMessage | ConnectionStatusMessage | AggregateUpdateMessage | NotificationNewMessage | ConversationPresenceMessage;
+export type WebSocketMessage =
+  | TypingMessage
+  | NewMessageMessage
+  | NewConversationMessage
+  | MessageReadMessage
+  | ConnectionStatusMessage
+  | AggregateUpdateMessage
+  | NotificationNewMessage
+  | OwnershipVerificationResultMessage
+  | ConversationPresenceMessage;
 
 /**
  * Message types - determined by the 'type' field
  */
-export type WebSocketMessageType = "new_message" | "new_conversation" | "typing" | "message_read" | "connection_status" | "aggregate_update" | "notification_new" | "conversation_presence";
+export type WebSocketMessageType =
+  | "new_message"
+  | "new_conversation"
+  | "typing"
+  | "message_read"
+  | "connection_status"
+  | "aggregate_update"
+  | "notification_new"
+  | "ownership_verification_result"
+  | "conversation_presence";
 
 /**
  * Handler function type for processing messages
@@ -93,4 +123,6 @@ export type WebSocketMessageHandler = (message: WebSocketMessage) => void | Prom
 /**
  * Handlers map for different message types
  */
-export type WebSocketHandlers = Partial<Record<WebSocketMessageType, WebSocketMessageHandler>>;
+export type WebSocketHandlers = Partial<
+  Record<WebSocketMessageType, WebSocketMessageHandler>
+>;

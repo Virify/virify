@@ -14,6 +14,19 @@
   >
     <!-- Image with placeholder for drafts without images -->
     <div class="relative">
+      <UAlert
+        v-if="verificationRecord === null && !isExempt && listing.isDraft"
+        variant="solid"
+        icon="i-lucide-shield-alert"
+        color="primary"
+        class="absolute z-1 opacity-95"
+      >
+        <template #description>
+          <p class="body-xs">
+            You have not completed the verification process. Click verify ownership below
+          </p>
+        </template>
+      </UAlert>
       <AtomsCloudFlareImage
         v-if="hasImage"
         :src="getMainImage(listing?.property)!"
@@ -213,6 +226,48 @@
             variant="outline"
             >{{ completedStepsCount }}/9 Steps</UBadge
           >
+
+          <!-- Ownership verification status (USER role only) -->
+          <template v-if="!isExempt && !verificationLoading && createListing">
+            <UBadge
+              v-if="isVerificationApproved"
+              icon="i-lucide-shield-check"
+              size="md"
+              color="success"
+              variant="solid"
+              >Ownership Verified</UBadge
+            >
+            <UBadge
+              v-else-if="isVerificationPending"
+              icon="i-lucide-clock"
+              size="md"
+              color="warning"
+              variant="solid"
+              class="cursor-pointer"
+              @click="openStatusModal"
+              >Verification Pending</UBadge
+            >
+            <UBadge
+              v-else-if="isVerificationDenied"
+              icon="i-lucide-shield-x"
+              size="md"
+              color="error"
+              variant="solid"
+              class="cursor-pointer"
+              @click="openStatusModal"
+              >Verification Denied</UBadge
+            >
+            <UBadge
+              v-else-if="verificationRecord === null"
+              icon="i-lucide-shield-alert"
+              size="md"
+              color="primary"
+              variant="solid"
+              class="cursor-pointer"
+              @click="openVerificationModal"
+              >Verify Ownership</UBadge
+            >
+          </template>
         </div>
 
         <!-- Publish toggle + availability status (only for completed non-archived listings) -->
@@ -294,7 +349,11 @@
               class="font-semibold flex-1 justify-center text-white!"
               icon="i-lucide-rocket"
               label="Publish"
-              :disabled="!isAllStepsCompleted || isPublishing"
+              :disabled="
+                !isAllStepsCompleted ||
+                isPublishing ||
+                (!isExempt && !verificationLoading && !isVerificationApproved)
+              "
               :loading="isPublishing"
               @click="handlePublish"
             />
@@ -390,6 +449,22 @@
       :loading="isRestoring"
       @confirm="handleRestoreConfirm"
     />
+
+    <!-- Ownership verification modals (draft listings, USER role only AND feature flag enabled) -->
+    <template v-if="listing.isDraft && !isExempt && createListing">
+      <LazyOrganismsOwnershipVerificationModal
+        ref="verificationModal"
+        :draft-listing-id="draftListingId"
+        @submitted="refreshVerification"
+      />
+      <LazyOrganismsOwnershipStatusModal
+        ref="statusModal"
+        :draft-listing-id="draftListingId"
+        :is-pending="isVerificationPending"
+        :is-denied="isVerificationDenied"
+        @resubmit="openVerificationModal"
+      />
+    </template>
   </UPageCard>
 </template>
 
@@ -416,6 +491,55 @@
     useMyListings();
   const { user: currentUser } = useUserSession();
   const toast = useToast();
+  const { createListing } = useFeatureFlag();
+
+  // Ownership verification (draft listings, non-exempt users only)
+  const draftListingId = computed(() =>
+    props.listing.isDraft ? ((props.listing as any).draftId ?? props.listing.id) : null,
+  );
+  const {
+    record: verificationRecord,
+    loading: verificationLoading,
+    isExempt,
+    isApproved: isVerificationApproved,
+    isPending: isVerificationPending,
+    isDenied: isVerificationDenied,
+    refresh: refreshVerification,
+  } = useOwnershipVerification(draftListingId);
+
+  const verificationModal = ref<{ open: () => void } | null>(null);
+  const statusModal = ref<{ open: () => void } | null>(null);
+
+  // Load verification status on mount for draft cards
+  onMounted(() => {
+    if (props.listing.isDraft && !isExempt.value) {
+      refreshVerification();
+    }
+  });
+
+  // Re-fetch verification status when a WS ownership toast arrives for this listing.
+  // We watch lastNotification (the toast payload) rather than the notifications panel list
+  // so that online users only get a toast — the panel entry is fetched from DB when opened.
+  if (import.meta.client) {
+    const { lastNotification } = useNotifications();
+    watch(lastNotification, (notif) => {
+      if (
+        notif &&
+        (notif.type === "OWNERSHIP_VERIFIED" || notif.type === "OWNERSHIP_DENIED") &&
+        notif.listingId === draftListingId.value
+      ) {
+        refreshVerification();
+      }
+    });
+  }
+
+  function openVerificationModal() {
+    verificationModal.value?.open();
+  }
+
+  function openStatusModal() {
+    statusModal.value?.open();
+  }
 
   // Dialog refs
   const archiveDialog = ref<InstanceType<typeof OrganismsDashboardConfirmDialog> | null>(

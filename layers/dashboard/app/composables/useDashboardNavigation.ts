@@ -7,7 +7,7 @@ import { createSharedComposable } from "@vueuse/core";
  */
 export const useDashboardNavigation = createSharedComposable(() => {
   const { aggregates } = useNotifications();
-  const { isAgent, isAdmin, createListing } = useFeatureFlag()
+  const { isAgent, isAdmin, createListing } = useFeatureFlag();
 
   const dashboardNavigationitems = computed<NavigationMenuItem[]>(() => [
     {
@@ -19,6 +19,17 @@ export const useDashboardNavigation = createSharedComposable(() => {
         text: "Dashboard Home",
       },
     },
+    ...[
+      !!(isAdmin || (createListing && isAgent)) && {
+        label: "Create Listing",
+        type: "link",
+        to: "/dashboard/create-listing",
+        icon: "i-lucide-square-plus",
+        tooltip: {
+          text: "Create a new listing",
+        },
+      },
+    ].filter(Boolean),
     // {
     //   label: "Pricing & Tiers",
     //   icon: "i-lucide-badge-pound-sterling",
@@ -44,7 +55,8 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "View all your listings",
           },
-          badge: aggregates.value.listings ? String(aggregates.value.listings) : undefined,
+          badge:
+            aggregates.value.listings ? String(aggregates.value.listings) : undefined,
         },
         {
           label: "Draft Listings",
@@ -54,7 +66,10 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "View draft listings",
           },
-          badge: aggregates.value.draftListings ? String(aggregates.value.draftListings) : undefined,
+          badge:
+            aggregates.value.draftListings ?
+              String(aggregates.value.draftListings)
+            : undefined,
         },
         {
           label: "Archived Listings",
@@ -64,19 +79,11 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "View archived listings",
           },
-          badge: aggregates.value.archivedListings ? String(aggregates.value.archivedListings) : undefined,
+          badge:
+            aggregates.value.archivedListings ?
+              String(aggregates.value.archivedListings)
+            : undefined,
         },
-        ...[
-          !!(isAdmin || (createListing && isAgent)) && {
-            label: "Create Listing",
-            type: "link",
-            to: "/dashboard/create-listing",
-            icon: "i-lucide-square-plus",
-            tooltip: {
-              text: "Create a new listing",
-            },
-          }
-        ].filter(Boolean),
         // {
         //   label: "Offers",
         //   type: "link",
@@ -94,7 +101,8 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "Schedule viewings",
           },
-          badge: aggregates.value.viewings > 0 ? String(aggregates.value.viewings) : undefined,
+          badge:
+            aggregates.value.viewings > 0 ? String(aggregates.value.viewings) : undefined,
         },
         {
           label: "Enquiries",
@@ -104,7 +112,10 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "View enquiries",
           },
-          badge: aggregates.value.unreadConversations ? String(aggregates.value.unreadConversations) : undefined,
+          badge:
+            aggregates.value.unreadConversations ?
+              String(aggregates.value.unreadConversations)
+            : undefined,
         },
         {
           label: "Favourites",
@@ -114,7 +125,8 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "Your favourite properties",
           },
-          badge: aggregates.value.favourites ? String(aggregates.value.favourites) : undefined,
+          badge:
+            aggregates.value.favourites ? String(aggregates.value.favourites) : undefined,
         },
         {
           label: "Notes",
@@ -122,7 +134,9 @@ export const useDashboardNavigation = createSharedComposable(() => {
           to: "/dashboard/notes",
           icon: "i-lucide-sticky-note",
           tooltip: {
-            text: "Your saved notes" + (aggregates.value.notes ? ` (${aggregates.value.notes})` : ""),
+            text:
+              "Your saved notes" +
+              (aggregates.value.notes ? ` (${aggregates.value.notes})` : ""),
           },
           badge: aggregates.value.notes ? String(aggregates.value.notes) : undefined,
         },
@@ -132,9 +146,16 @@ export const useDashboardNavigation = createSharedComposable(() => {
           to: "/dashboard/hidden-listings",
           icon: "i-lucide-eye-off",
           tooltip: {
-            text: "Your hidden listings" + (aggregates.value.hiddenListings ? ` (${aggregates.value.hiddenListings})` : ""),
+            text:
+              "Your hidden listings" +
+              (aggregates.value.hiddenListings ?
+                ` (${aggregates.value.hiddenListings})`
+              : ""),
           },
-          badge: aggregates.value.hiddenListings ? String(aggregates.value.hiddenListings) : undefined,
+          badge:
+            aggregates.value.hiddenListings ?
+              String(aggregates.value.hiddenListings)
+            : undefined,
         },
         {
           label: "Viewed",
@@ -142,9 +163,16 @@ export const useDashboardNavigation = createSharedComposable(() => {
           to: "/dashboard/viewed",
           icon: "i-lucide-eye",
           tooltip: {
-            text: "Recently viewed properties" + (aggregates.value.viewedListings ? ` (${aggregates.value.viewedListings})` : ""),
+            text:
+              "Recently viewed properties" +
+              (aggregates.value.viewedListings ?
+                ` (${aggregates.value.viewedListings})`
+              : ""),
           },
-          badge: aggregates.value.viewedListings ? String(aggregates.value.viewedListings) : undefined,
+          badge:
+            aggregates.value.viewedListings ?
+              String(aggregates.value.viewedListings)
+            : undefined,
         },
         {
           label: "Analytics",
@@ -173,7 +201,8 @@ export const useDashboardNavigation = createSharedComposable(() => {
           tooltip: {
             text: "Your saved search locations",
           },
-          badge: aggregates.value.locations ? String(aggregates.value.locations) : undefined,
+          badge:
+            aggregates.value.locations ? String(aggregates.value.locations) : undefined,
         },
         // {
         //   label: "Saved Searches",

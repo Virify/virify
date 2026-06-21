@@ -88,16 +88,22 @@
       role="presentation"
     >
       <h2 class="property-card-root__price">
-        <PropertyCardPill
-          v-if="priceLabel"
-          :content="priceLabel"
-          variant="orange"
-        />
-        <PropertyCardPill
-          v-if="rentFrequency"
-          :content="rentFrequency"
-          variant="orange"
-        />
+        <div class="property-card-root__price-labels">
+          <AtomsVerifiedBadge
+            v-if="sellerName"
+            :verification="userVerification"
+          />
+          <PropertyCardPill
+            v-if="priceLabel"
+            :content="priceLabel"
+            variant="orange"
+          />
+          <PropertyCardPill
+            v-if="rentFrequency"
+            :content="rentFrequency"
+            variant="orange"
+          />
+        </div>
 
         <span class="property-card-root__price-amount | title-md">
           <PropertyCardMaybeLink :href="viewLinkUrl">
@@ -248,6 +254,11 @@
     viewUrl?: string;
     listingId?: number;
     userId?: number;
+    userVerification?: {
+      name?: boolean | null;
+      identity?: boolean | null;
+      role?: "AGENT" | "OWNER" | "USER" | "ADMIN" | null;
+    };
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -454,6 +465,13 @@
       flex-direction: column;
       gap: var(--size-2);
       margin: 0 0 var(--size-4);
+    }
+
+    &__price-labels {
+      display: flex;
+      flex-direction: row;
+      gap: var(--size-4);
+      align-items: center;
     }
 
     &__price-amount {
