@@ -16,6 +16,11 @@
       :listing-id="listingId"
     />
 
+    <AtomsReportButton
+      v-if="!isDraft"
+      :listing-id="listingId"
+    />
+
     <AtomsEnquireButton
       v-if="!isDraft && agent?.id"
       :listing-id="listingId"

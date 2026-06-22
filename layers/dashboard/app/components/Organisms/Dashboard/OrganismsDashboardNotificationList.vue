@@ -64,19 +64,6 @@
           <span class="truncate">{{ notification.listingAddress }}</span>
         </div>
         <div class="flex justify-between items-center pt-2">
-          <UTooltip text="Report message">
-            <UButton
-              size="md"
-              variant="ghost"
-              icon="i-lucide-triangle-alert"
-              to="/support"
-              target="_blank"
-              @click.stop
-              :ui="{
-                leadingIcon: 'text-error',
-              }"
-            />
-          </UTooltip>
           <p class="text-xs italic font-light flex-1 text-right pt-3">
             {{ formatMessageTimestamp(notification.createdAt) }}
           </p>
