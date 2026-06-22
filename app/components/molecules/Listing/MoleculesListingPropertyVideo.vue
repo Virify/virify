@@ -34,7 +34,11 @@
 
   const showPlayOverlay = ref(true);
 
-  function onStateChange(event: YT.OnStateChangeEvent) {
+  interface YouTubeStateChangeEvent {
+    data?: number;
+  }
+
+  function onStateChange(event: YouTubeStateChangeEvent) {
     // YT.PlayerState.PLAYING === 1
     showPlayOverlay.value = event.data !== 1;
   }

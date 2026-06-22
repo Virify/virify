@@ -32,13 +32,16 @@
     >
       <template #content>
         <div class="p-floorplans__modal">
-          <button
-            type="button"
-            class="p-floorplans__close"
-            @click="isModalOpen = false"
-          >
-            <UIcon name="i-lucide-x" />
-          </button>
+          <div class="p-floorplans__header">
+            <h3 class="p-floorplans__modal-title title-md">Floor Plans</h3>
+            <button
+              type="button"
+              class="p-floorplans__close"
+              @click="isModalOpen = false"
+            >
+              <UIcon name="i-lucide-x" />
+            </button>
+          </div>
 
           <div class="p-floorplans__active-wrap">
             <img
@@ -158,24 +161,39 @@
     &__modal {
       width: 100%;
       height: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
       background: color-mix(in srgb, var(--background-100) 94%, black 6%);
       display: grid;
-      grid-template-rows: 1fr auto;
+      grid-template-rows: auto 1fr auto;
       gap: var(--size-16);
       padding: var(--size-16);
       position: relative;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--size-12);
+    }
+
+    &__modal-title {
+      margin: 0;
     }
 
     &__active-wrap {
       min-height: 0;
       display: grid;
       place-items: center;
-      overflow: auto;
+      overflow: hidden;
     }
 
     &__active-image {
-      max-width: min(1400px, 100%);
-      max-height: calc(100dvh - 12rem);
+      width: min(1800px, 96vw);
+      max-width: 100%;
+      max-height: calc(100dvh - 8rem);
+      height: auto;
       object-fit: contain;
       border-radius: var(--border-radius-lg);
       background: var(--background-200);
@@ -211,10 +229,7 @@
     }
 
     &__close {
-      position: absolute;
-      top: var(--size-12);
-      right: var(--size-12);
-      z-index: 2;
+      position: static;
       width: 2.5rem;
       height: 2.5rem;
       border-radius: 999px;
