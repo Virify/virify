@@ -157,6 +157,7 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
       xFrameOptions: "SAMEORIGIN",
     },
     nonce: false,
