@@ -1,6 +1,7 @@
 <template>
   <UModal
-    v-model:open="isOpen"
+    v-model:open="guardedOpen"
+    :modal="!isGlobalDialogOpen"
     :fullscreen="isMobile"
     :style="
       isMobile ?
@@ -120,6 +121,17 @@
   }>();
 
   const isOpen = usePropModel(props, "open", emit);
+  const { dialog } = useDialog();
+  const isGlobalDialogOpen = computed(() => !!dialog?.value);
+
+  const guardedOpen = computed({
+    get: () => isOpen.value,
+    set: (value: boolean) => {
+      // Keep enquiry modal open while a global dialog (e.g. report dialog) is active.
+      if (!value && dialog?.value) return;
+      isOpen.value = value;
+    },
+  });
 
   // Constrain fullscreen modal to the visual viewport so the input isn't
   // covered when the on-screen keyboard opens (interactive-widget=overlays-content).
