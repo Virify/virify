@@ -82,8 +82,8 @@ export default defineNuxtConfig({
   scripts: {
     registry: {
       youtubePlayer: {
-        // Disables the proxy backend server layer cleanly for everyone
         proxy: false,
+        host: "https://www.youtube.com",
       },
     },
   },
@@ -165,18 +165,7 @@ export default defineNuxtConfig({
     },
     headers: {
       permissionsPolicy: false,
-      // youtube-nocookie.com is needed for the external media player handshake to work in Chrome/Edge
-      contentSecurityPolicy: {
-        "frame-src": ["'self'", "https://youtube-nocookie.com", "https://youtube.com"],
-        "child-src": ["'self'", "https://youtube-nocookie.com", "https://youtube.com"],
-        "script-src": [
-          "'self'",
-          "'unsafe-inline'",
-          "https://youtube.com",
-          "https://ytimg.com",
-        ],
-      },
-      crossOriginEmbedderPolicy: "unsafe-none",
+      contentSecurityPolicy: false,
       xFrameOptions: "SAMEORIGIN",
     },
     nonce: false,
