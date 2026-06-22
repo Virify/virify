@@ -46,6 +46,15 @@
       </UFileUpload>
     </UFormField>
 
+    <!-- Upload Progress -->
+    <MoleculesUploadProgressBar
+      :is-uploading="isUploading"
+      :upload-progress="uploadProgress"
+      :uploading-count="uploadingCount"
+      item-type="floor plan"
+      completed-label="Upload complete"
+    />
+
     <div
       v-if="floorPlans.length > 0"
       class="grid gap-3 sm:grid-cols-2"
@@ -90,6 +99,8 @@
     isUploading: boolean;
     isProcessing: boolean;
     maxFloorPlans: number;
+    uploadProgress: number;
+    uploadingCount: number;
     getImageUrl: (id: string, variant?: string) => string;
   }
 

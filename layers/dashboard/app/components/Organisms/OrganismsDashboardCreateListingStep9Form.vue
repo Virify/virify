@@ -98,6 +98,8 @@
         :is-uploading="isUploadingFloorPlans"
         :is-processing="isProcessingFloorPlans"
         :max-floor-plans="maxFloorPlans"
+        :upload-progress="uploadProgress"
+        :uploading-count="uploadingCount"
         :get-image-url="getImageUrl"
         @files-selected="handleFloorPlanFilesSelected"
         @remove-floor-plan="removeFloorPlanById"
