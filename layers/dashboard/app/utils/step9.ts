@@ -140,31 +140,7 @@ export function generateAccordionItems(groups: ImageGroup[]): ImageAccordionItem
  * General images are sorted first, then room-assigned images
  */
 export function formatMediaForSubmission(media: MediaAssignment[]) {
-  // Sort: general images first (preserving their order), then room-assigned images
-  const sorted = [...media].sort((a, b) => {
-    const aGeneral = a.isGeneral === true;
-    const bGeneral = b.isGeneral === true;
-    if (aGeneral && !bGeneral) return -1;
-    if (!aGeneral && bGeneral) return 1;
-    return 0; // Preserve original order within each group
-  });
-
-  return sorted.map((img) => ({
-    id: img.id,
-    cloudflareId: img.cloudflareId,
-    filename: img.filename || null,
-    description: img.description || null,
-    bedroomId: img.bedroomId || null,
-    bathroomId: img.bathroomId || null,
-    kitchenId: img.kitchenId || null,
-    receptionId: img.receptionId || null,
-    otherRoomId: img.otherRoomId || null,
-    gardenId: img.gardenId || null,
-    yardId: img.yardId || null,
-    landId: img.landId || null,
-    outdoorSpaceId: null,
-    isGeneral: img.isGeneral ?? true,
-  }));
+  return mapPropertyImagesForSubmission(media);
 }
 
 /**

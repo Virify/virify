@@ -1,5 +1,10 @@
 import { z } from "zod";
-import type { MediaAssignment, Step9FormState } from "../types/step9-media";
+import type { Step9FormState } from "../types/step9-media";
+import {
+  parseFloorPlansFromMediaRecords,
+  parseImageMediaFromMediaRecords,
+  parseVideoTourFromMediaRecords,
+} from "./step9-media-mappers";
 
 /**
  * Step 9: Property Images Schema
@@ -31,6 +36,14 @@ export const mediaAssignmentSchema = z.object({
   isGeneral: z.boolean().optional().default(true),
 });
 
+export const floorPlanAssignmentSchema = z.object({
+  id: z.number().int().positive().optional(),
+  cloudflareId: z.string().min(1, "Floor plan ID is required"),
+  filename: z.string().optional(),
+});
+
+const YOUTUBE_URL_REGEX = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/i;
+
 // Property schema for Step 9
 export const step9PropertySchema = z.object({
   description: z
@@ -42,6 +55,16 @@ export const step9PropertySchema = z.object({
       message: "Description cannot exceed 5000 characters",
     }),
   media: z.array(mediaAssignmentSchema).optional().default([]),
+  videoTour: z
+    .string()
+    .trim()
+    .max(2048, "Video URL cannot exceed 2048 characters")
+    .optional()
+    .default("")
+    .refine((url) => url.length === 0 || YOUTUBE_URL_REGEX.test(url), {
+      message: "Please enter a valid YouTube URL",
+    }),
+  floorPlans: z.array(floorPlanAssignmentSchema).optional().default([]),
 });
 
 // Step 9 form schema
@@ -55,41 +78,16 @@ export const step9Schema = z.object({
 export function createInitialStep9Values(draftData?: any): Step9FormState {
   const property = draftData?.property;
   const existingMedia = property?.media || [];
-
-  // Map existing media to our format
-  const media: MediaAssignment[] = existingMedia.map((m: any) => {
-    const metadata = m.metadata ? JSON.parse(m.metadata) : {};
-    const isGeneral =
-      !m.bedroomId &&
-      !m.bathroomId &&
-      !m.kitchenId &&
-      !m.receptionId &&
-      !m.otherRoomId &&
-      !m.gardenId &&
-      !m.yardId &&
-      !m.landId;
-
-    return {
-      cloudflareId: m.image || "",
-      filename: metadata.cloudflareImageId || m.image || "",
-      description: (metadata.description ?? metadata.alt ?? "").substring(0, 100),
-      bedroomId: m.bedroomId || null,
-      bathroomId: m.bathroomId || null,
-      kitchenId: m.kitchenId || null,
-      receptionId: m.receptionId || null,
-      otherRoomId: m.otherRoomId || null,
-      gardenId: m.gardenId || null,
-      yardId: m.yardId || null,
-      landId: m.landId || null,
-      outdoorSpaceId: m.outdoorSpaceId || null,
-      isGeneral,
-    };
-  });
+  const videoTour = parseVideoTourFromMediaRecords(existingMedia);
+  const media = parseImageMediaFromMediaRecords(existingMedia);
+  const floorPlans = parseFloorPlansFromMediaRecords(existingMedia);
 
   return {
     property: {
       description: draftData?.property?.description ?? "",
       media,
+      videoTour,
+      floorPlans,
     },
   };
 }

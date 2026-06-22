@@ -40,7 +40,13 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
+  modules: [
+    "@nuxt/image",
+    "nuxt-security",
+    "@nuxtjs/seo",
+    "@nuxtjs/sanity",
+    "@nuxt/scripts",
+  ],
 
   // Nuxt SEO Configuration
   site: {
@@ -72,7 +78,12 @@ export default defineNuxtConfig({
       ],
     },
   },
-
+  // scripts
+  scripts: {
+    registry: {
+      youtubePlayer: true,
+    },
+  },
   // Robots configuration
   robots: {
     allow: [

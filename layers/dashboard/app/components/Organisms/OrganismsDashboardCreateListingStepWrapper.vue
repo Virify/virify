@@ -28,6 +28,7 @@
           color="neutral"
           size="sm"
           @click="onCancel"
+          :disabled="hasPendingEdits || isSaving || isModerating"
           class="body-sm cursor-pointer"
         >
           Cancel
@@ -54,6 +55,7 @@
             color="secondary"
             size="sm"
             @click="previousStep"
+            :disabled="hasPendingEdits || isSaving || isModerating"
             icon="i-lucide-arrow-left"
             class="body-sm cursor-pointer text-white!"
           >
@@ -103,7 +105,14 @@
     completed: [];
   }>();
 
-  const { saveStep, isSaving, previousStep, getStepData } = useCreateListingSteps();
+  const {
+    saveStep,
+    isSaving,
+    previousStep,
+    getStepData,
+    isStepDirty,
+    setStepPendingEdits,
+  } = useCreateListingSteps();
   const closeModal = inject<() => void>("closeModal");
   const toast = useToast();
   const { moderateFields, isModerating } = useModerateFields();
@@ -112,6 +121,22 @@
   const canSave = computed(() =>
     props.isSaveValid !== undefined ? props.isSaveValid : props.isValid,
   );
+
+  const hasPendingEdits = computed(() =>
+    isStepDirty(props.stepNumber, props.getSubmissionData()),
+  );
+
+  watch(
+    hasPendingEdits,
+    (hasPending) => {
+      setStepPendingEdits(props.stepNumber, hasPending);
+    },
+    { immediate: true },
+  );
+
+  onUnmounted(() => {
+    setStepPendingEdits(props.stepNumber, false);
+  });
 
   // Ref to the UForm so we can call setErrors() for moderation failures
   const formRef = ref<{
@@ -126,6 +151,16 @@
 
   // Cancel handler
   function onCancel() {
+    if (hasPendingEdits.value) {
+      toast.add({
+        title: "Unsaved changes",
+        description: "Please save your progress before leaving this step.",
+        color: "warning",
+        icon: "i-lucide-triangle-alert",
+      });
+      return;
+    }
+
     closeModal?.();
   }
 

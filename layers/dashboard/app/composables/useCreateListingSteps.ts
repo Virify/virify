@@ -194,6 +194,52 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
   // Track which steps have been visited (for lazy mounting)
   const visitedSteps = ref(new Set<number>([1])); // Step 1 always visited initially
+  const pendingEditsByStep = ref<Record<number, boolean>>({});
+
+  function setStepPendingEdits(stepNumber: number, hasPendingEdits: boolean) {
+    pendingEditsByStep.value[stepNumber] = hasPendingEdits;
+  }
+
+  function hasCurrentStepPendingEdits() {
+    return Boolean(pendingEditsByStep.value[currentStep.value]);
+  }
+
+  function notifyPendingEditsBlocked() {
+    toast.add({
+      title: "Unsaved changes",
+      description: "Please save your progress before leaving this step.",
+      color: "warning",
+      duration: 2500,
+      icon: "i-lucide-triangle-alert",
+    });
+  }
+
+  function getFriendlySaveErrorMessage(error: any): string {
+    const raw = String(
+      error?.data?.message ||
+        error?.data?.statusMessage ||
+        error?.statusMessage ||
+        error?.message ||
+        "",
+    ).trim();
+
+    if (!raw) {
+      return "We couldn't save your changes. Please try again.";
+    }
+
+    // Common noisy transport format: [PATCH] "/api/...": 400 Bad Request
+    const looksLikeTransportNoise =
+      raw.includes("/api/") ||
+      /^\[\w+\]/.test(raw) ||
+      /^\d{3}\s+/i.test(raw) ||
+      /Bad Request/i.test(raw);
+
+    if (looksLikeTransportNoise) {
+      return "Please check the highlighted fields and try again.";
+    }
+
+    return raw;
+  }
 
   /**
    * Check if step data has changed since last save.
@@ -215,7 +261,12 @@ export const useCreateListingSteps = createSharedComposable(() => {
     },
     set: (value: string | undefined) => {
       if (value !== undefined) {
-        currentStep.value = parseInt(value); // Convert back to number
+        const requestedStep = parseInt(value);
+        if (requestedStep !== currentStep.value && hasCurrentStepPendingEdits()) {
+          notifyPendingEditsBlocked();
+          return;
+        }
+        currentStep.value = requestedStep; // Convert back to number
       }
     },
   });
@@ -533,7 +584,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       console.error(`Failed to save step ${stepNumber}:`, error);
       toast.add({
         title: "Error",
-        description: error?.data?.message || error?.message || "Failed to save progress",
+        description: getFriendlySaveErrorMessage(error),
         color: "error",
         duration: 3000,
         icon: "i-lucide-circle-x",
@@ -613,7 +664,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       // Still show error toast for failures
       toast.add({
         title: "Error",
-        description: error?.data?.message || error?.message || "Failed to save room",
+        description: getFriendlySaveErrorMessage(error),
         color: "error",
         duration: 3000,
         icon: "i-lucide-circle-x",
@@ -673,6 +724,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
   const canNavigateToStep = (stepId: number): boolean => {
     const step = steps.value.find((s) => s.id === stepId);
     if (!step) return false;
+    if (stepId !== currentStep.value && hasCurrentStepPendingEdits()) return false;
     return !step.locked;
   };
 
@@ -699,6 +751,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
    * Navigate to a specific step (if allowed).
    */
   const goToStep = (stepId: number) => {
+    if (stepId !== currentStep.value && hasCurrentStepPendingEdits()) {
+      notifyPendingEditsBlocked();
+      return;
+    }
+
     if (stepId >= 1 && stepId <= steps.value.length) {
       const step = steps.value.find((s) => s.id === stepId);
       if (step && !step.locked) {
@@ -743,6 +800,11 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
   // Go to previous step
   const previousStep = () => {
+    if (hasCurrentStepPendingEdits()) {
+      notifyPendingEditsBlocked();
+      return;
+    }
+
     if (currentStep.value > 1) {
       currentStep.value--;
     }
@@ -788,6 +850,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
       10: {},
     };
     visitedSteps.value = new Set<number>([1]);
+    pendingEditsByStep.value = {};
   };
 
   // Initialize with an existing draft or create new
@@ -829,6 +892,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     hasActiveDraft,
     firstIncompleteStep,
     visitedSteps,
+    pendingEditsByStep,
 
     // Static data (cached)
     propertyTypes,
@@ -859,6 +923,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     validateStep,
     nextStep,
     previousStep,
+    setStepPendingEdits,
     resetSteps,
   };
 });
