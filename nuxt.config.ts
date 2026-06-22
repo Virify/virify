@@ -81,7 +81,9 @@ export default defineNuxtConfig({
   // scripts
   scripts: {
     registry: {
-      youtubePlayer: true,
+      youtubePlayer: {
+        proxy: false,
+      },
     },
   },
   // Robots configuration

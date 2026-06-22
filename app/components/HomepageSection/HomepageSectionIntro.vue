@@ -1,6 +1,9 @@
 <template>
-  <div class="homepage-section-intro | flow flow-lg" aria-role="presentation">
-    <h2 class="homepage-section-intro__title | title-xl">
+  <div
+    class="homepage-section-intro | flow flow-lg"
+    aria-role="presentation"
+  >
+    <h2 class="homepage-section-intro__title | title-2xl">
       {{ title }}
     </h2>
 
@@ -13,32 +16,22 @@
 </template>
 
 <script setup lang="ts">
-interface Props {
-  title?: string
-  description?: string
-}
+  interface Props {
+    title?: string;
+    description?: string;
+  }
 
-defineProps<Props>()
+  defineProps<Props>();
 </script>
 
 <style lang="scss">
-@use '#styles/_utils/media' as mq;
+  @use "#styles/_utils/media" as mq;
 
-.homepage-section-intro {
-
-  &__title {
-    font-size: var(--font-6xl);
-    width: min(100%, 12ch);
-    line-height: var(--lineheight-xs);
-    margin: 0 0 var(--size-32);
-
-    @include mq.notebook {
-      font-size: var(--font-7xl);
-    }
-
-    @include mq.desktop {
-      font-size: var(--font-8xl);
+  .homepage-section-intro {
+    &__title {
+      width: min(100%, 12ch);
+      line-height: var(--lineheight-xs);
+      margin: 0 0 var(--size-32);
     }
   }
-}
 </style>
