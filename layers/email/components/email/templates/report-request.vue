@@ -71,6 +71,10 @@
           <Text style="color: #4a5568; font-size: 16px; margin: 0">
             {{ listingId }}
           </Text>
+
+          <Text style="color: #4a5568; font-size: 16px; margin: 0">
+            https://virify.co.uk/listing/{{ listingId }}
+          </Text>
         </Section>
 
         <Section
