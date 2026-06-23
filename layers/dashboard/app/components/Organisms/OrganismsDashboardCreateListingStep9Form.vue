@@ -543,7 +543,11 @@
   }
 
   function onStepCompleted() {
-    navigateTo("/dashboard/draft-listings");
+    if (draftListingId.value) {
+      navigateTo(`/dashboard/draft-listings`);
+      return;
+    }
+    navigateTo("/dashboard/my-listings");
   }
 
   function onStepSaved() {}
