@@ -550,6 +550,12 @@ export const generalPageQuery = `*[_type == "generalPage" && slug.current == $sl
       }
     },
 
+    _type == "pageFeaturedListings" => {
+      title,
+      description,
+      displayFeaturedListings
+    },
+
     _type == "pageGuidesGrid" => {
       title,
       description,
