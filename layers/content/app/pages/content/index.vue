@@ -24,11 +24,11 @@
           </nuxt-link>
           <p
             v-if="category.description"
-            class="mb-3 text-sm max-w-prose"
+            class="mb-2 text-sm max-w-prose"
           >
             {{ category.description }}
           </p>
-          <ul class="flex flex-col gap-2 list-none mt-2">
+          <ul class="flex flex-col list-none mt-2">
             <li
               v-for="page in category.pages"
               :key="page._id"
@@ -40,6 +40,7 @@
                 icon="i-lucide-file"
                 class="pl-0"
                 :ui="{
+                  base: 'p-0',
                   label: 'underline decoration-secondary',
                   leadingIcon: 'text-secondary',
                 }"
