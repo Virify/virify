@@ -40,7 +40,13 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@nuxt/image", "nuxt-security", "@nuxtjs/seo", "@nuxtjs/sanity"],
+  modules: [
+    "@nuxt/image",
+    "nuxt-security",
+    "@nuxtjs/seo",
+    "@nuxtjs/sanity",
+    "@nuxt/scripts",
+  ],
 
   // Nuxt SEO Configuration
   site: {
@@ -72,7 +78,6 @@ export default defineNuxtConfig({
       ],
     },
   },
-
   // Robots configuration
   robots: {
     allow: [
@@ -152,6 +157,7 @@ export default defineNuxtConfig({
     headers: {
       permissionsPolicy: false,
       contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
       xFrameOptions: "SAMEORIGIN",
     },
     nonce: false,

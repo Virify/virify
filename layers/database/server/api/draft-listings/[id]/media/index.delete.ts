@@ -11,6 +11,7 @@ import { z } from "zod";
 
 const requestSchema = z.object({
   cloudflareIds: z.array(z.string()).min(1),
+  mediaType: z.enum(["image", "floorPlan"]).optional().default("image"),
   draftId: z.number().int().positive().optional(),
   listingId: z.number().int().positive().optional(),
 });
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
 
     const body = await readBody(event);
     const parsed = requestSchema.parse(body);
-    const { cloudflareIds } = parsed;
+    const { cloudflareIds, mediaType } = parsed;
 
     // Use body params if provided, otherwise fall back to route param (draft)
     const draftId = parsed.draftId ?? (parsed.listingId ? undefined : routeId);
@@ -79,7 +80,9 @@ export default defineEventHandler(async (event) => {
     const deleteResult = await prisma.media.deleteMany({
       where: {
         propertyId,
-        image: { in: cloudflareIds },
+        ...(mediaType === "floorPlan" ?
+          { floorPlan: { in: cloudflareIds } }
+        : { image: { in: cloudflareIds } }),
       },
     });
 

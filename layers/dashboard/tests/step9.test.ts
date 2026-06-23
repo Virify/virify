@@ -236,6 +236,16 @@ describe("createInitialStep9Values", () => {
     const state = createInitialStep9Values();
     expect(state.property.media).toEqual([]);
   });
+
+  it("video tour starts empty when no draft data provided", () => {
+    const state = createInitialStep9Values();
+    expect(state.property.videoTour).toBe("");
+  });
+
+  it("floor plans start empty when no draft data provided", () => {
+    const state = createInitialStep9Values();
+    expect(state.property.floorPlans).toEqual([]);
+  });
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -247,6 +257,8 @@ describe("isStep9Valid", () => {
     property: {
       description: "A lovely property in the city centre area.",
       media: [],
+      videoTour: "",
+      floorPlans: [],
     },
   };
 

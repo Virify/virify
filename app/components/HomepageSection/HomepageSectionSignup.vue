@@ -8,8 +8,9 @@
 
     <template v-else-if="!signupAndLoggedIn">
       <p class="homepage-section-signup__content">
-        Create an account or log in to enquire about properties listed by property agents.
-        And now live, create your listing and search for other properties to buy and rent
+        Create an account or log in to enquire about properties listed by property agents
+        or other users. And now live, create your own listings for free. We are excited to
+        welcome everyone to early access.
       </p>
 
       <HeaderActionsGuest class="homepage-section-signup__buttons" />

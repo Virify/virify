@@ -35,10 +35,8 @@ export default defineEventHandler(async (event) => {
 
   const updated = await removeSharedUserFromDraftListing(draftIdNum, userId);
 
-  // Bust the owner's draft listings cache so the removed shared user is reflected immediately
-  const storage = useStorage("cache");
-  const keys = await storage.getKeys(`draft-listings:${user.id}:`);
-  await Promise.all(keys.map((k) => storage.removeItem(k)));
+  // Bust owner and admin draft listing caches so sharing changes are reflected immediately.
+  await invalidateDraftListingsCache(user.id as number);
 
   return {
     success: true,

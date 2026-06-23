@@ -26,10 +26,19 @@ export interface MediaAssignment {
   isGeneral?: boolean;
 }
 
+/** Floor plan media assignment (stored separately from property photos) */
+export interface FloorPlanAssignment {
+  id?: number;
+  cloudflareId: string;
+  filename?: string;
+}
+
 /** Step 9 property data */
 export interface Step9PropertyData {
   description: string;
   media: MediaAssignment[];
+  videoTour: string;
+  floorPlans: FloorPlanAssignment[];
 }
 
 /** Step 9 form data (API submission) */
@@ -42,6 +51,8 @@ export interface Step9FormState {
   property: {
     description: string;
     media: MediaAssignment[];
+    videoTour: string;
+    floorPlans: FloorPlanAssignment[];
   };
 }
 

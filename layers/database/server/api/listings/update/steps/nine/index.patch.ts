@@ -121,6 +121,48 @@ function buildMediaData(
   };
 }
 
+function buildVideoTourOperations(propertyId: number, videoTour: string) {
+  const trimmedVideoTour = videoTour.trim();
+
+  const operations: any[] = [
+    prisma.media.deleteMany({
+      where: {
+        propertyId,
+        videoTour: { not: null },
+      },
+    }),
+  ];
+
+  if (trimmedVideoTour.length > 0) {
+    operations.push(
+      prisma.media.create({
+        data: {
+          propertyId,
+          image: null,
+          floorPlan: null,
+          videoTour: trimmedVideoTour,
+          metadata: JSON.stringify({
+            kind: "videoTour",
+            url: trimmedVideoTour,
+          }),
+          sortOrder: 0,
+          bedroomId: null,
+          bathroomId: null,
+          kitchenId: null,
+          receptionId: null,
+          otherRoomId: null,
+          gardenId: null,
+          yardId: null,
+          landId: null,
+          outdoorSpaceId: null,
+        },
+      }),
+    );
+  }
+
+  return operations;
+}
+
 export default defineEventHandler(async (event) => {
   const { errorResponse } = useResponse();
   const { user } = await requireUserSession(event);
@@ -129,7 +171,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { draftId, listingId, property } = stepDataSchema.parse(body);
 
-    const { media, description } = property;
+    const { media, description, videoTour } = property;
 
     // LIVE LISTING - update Listing table
     if (listingId) {
@@ -165,6 +207,7 @@ export default defineEventHandler(async (event) => {
           where: { id: propertyId },
           data: { description },
         }),
+        ...buildVideoTourOperations(propertyId, videoTour),
         ...media.map((mediaItem, i) => {
           const data = buildMediaData(mediaItem as any, i, rooms);
           const id = (mediaItem as any).id as number | undefined;
@@ -244,6 +287,7 @@ export default defineEventHandler(async (event) => {
         where: { id: propertyId },
         data: { description },
       }),
+      ...buildVideoTourOperations(propertyId, videoTour),
       ...media.map((mediaItem, i) => {
         const data = buildMediaData(mediaItem as any, i, rooms);
         const id = (mediaItem as any).id as number | undefined;

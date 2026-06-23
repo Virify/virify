@@ -101,6 +101,13 @@
           </div>
 
           <div
+            v-if="youtubeVideoId"
+            class="p-listing__section"
+          >
+            <MoleculesListingPropertyVideo :video-id="youtubeVideoId" />
+          </div>
+
+          <div
             v-if="hasRooms"
             class="p-listing__section"
           >
@@ -155,6 +162,10 @@
               :yards="yardsWithDetails"
               :lands="landsWithDetails"
             />
+          </div>
+
+          <div class="p-listing__section">
+            <MoleculesListingFloorPlans :floor-plans="floorPlans" />
           </div>
 
           <!-- Energy & Utilities -->
@@ -582,6 +593,16 @@
       outdoorSpaceId: item.outdoorSpaceId,
       globalIndex: index,
     }));
+  });
+
+  const propertyVideoUrl = computed(() => {
+    return getPropertyVideoTourUrl(property.value?.media);
+  });
+
+  const youtubeVideoId = computed(() => extractYoutubeVideoId(propertyVideoUrl.value));
+
+  const floorPlans = computed(() => {
+    return getListingFloorPlans(property.value?.media);
   });
 
   /**

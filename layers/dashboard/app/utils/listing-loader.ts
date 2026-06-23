@@ -345,44 +345,16 @@ export function loadStep9(listing: EditableListing) {
   const existingMedia = [...(property?.media || [])].sort(
     (a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
   );
-
-  // Map existing media to our format, filtering out records without a Cloudflare image ID
-  const media = existingMedia
-    .filter((m: any) => m.image)
-    .map((m: any) => {
-      const metadata = m.metadata ? JSON.parse(m.metadata) : {};
-      const isGeneral =
-        !m.bedroomId &&
-        !m.bathroomId &&
-        !m.kitchenId &&
-        !m.receptionId &&
-        !m.otherRoomId &&
-        !m.gardenId &&
-        !m.yardId &&
-        !m.landId;
-
-      return {
-        id: m.id as number | undefined,
-        cloudflareId: m.image || "",
-        filename: metadata.cloudflareImageId || m.image || "",
-        description: (metadata.description ?? metadata.alt ?? "").substring(0, 100),
-        bedroomId: m.bedroomId || null,
-        bathroomId: m.bathroomId || null,
-        kitchenId: m.kitchenId || null,
-        receptionId: m.receptionId || null,
-        otherRoomId: m.otherRoomId || null,
-        gardenId: m.gardenId || null,
-        yardId: m.yardId || null,
-        landId: m.landId || null,
-        outdoorSpaceId: m.outdoorSpaceId || null,
-        isGeneral,
-      };
-    });
+  const videoTour = parseVideoTourFromMediaRecords(existingMedia);
+  const floorPlans = parseFloorPlansFromMediaRecords(existingMedia);
+  const media = parseImageMediaFromMediaRecords(existingMedia);
 
   return {
     property: {
       description: property?.description ?? "",
       media,
+      videoTour,
+      floorPlans,
     },
   };
 }

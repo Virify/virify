@@ -25,6 +25,7 @@ const mediaItemSchema = z.object({
 
 const requestSchema = z.object({
   media: z.array(mediaItemSchema).min(1),
+  mediaType: z.enum(["image", "floorPlan"]).optional().default("image"),
   draftId: z.number().int().positive().optional(),
   listingId: z.number().int().positive().optional(),
 });
@@ -36,7 +37,12 @@ export default defineEventHandler(async (event) => {
   try {
     const routeId = parseInt(getRouterParam(event, "id") || "0");
     const body = await readBody(event);
-    const { media, draftId: bodyDraftId, listingId } = requestSchema.parse(body);
+    const {
+      media,
+      mediaType,
+      draftId: bodyDraftId,
+      listingId,
+    } = requestSchema.parse(body);
 
     // Use body params if provided, otherwise fall back to route param (draft)
     const draftId = bodyDraftId ?? (listingId ? undefined : routeId);
@@ -49,6 +55,7 @@ export default defineEventHandler(async (event) => {
     }
 
     let propertyId: number;
+    let propertyTotalFloors = 0;
 
     if (listingId) {
       // LIVE LISTING
@@ -65,6 +72,7 @@ export default defineEventHandler(async (event) => {
       }
 
       propertyId = existingListing.property.id;
+      propertyTotalFloors = existingListing.property.totalFloors;
     } else {
       // DRAFT LISTING
       const existingDraft = await prisma.draftListing.findUnique({
@@ -80,28 +88,72 @@ export default defineEventHandler(async (event) => {
       }
 
       propertyId = existingDraft.property.id;
+      propertyTotalFloors = existingDraft.property.totalFloors;
+    }
+
+    if (mediaType === "floorPlan") {
+      const existingFloorPlanCount = await prisma.media.count({
+        where: {
+          propertyId,
+          floorPlan: { not: null },
+        },
+      });
+
+      const requestedCount = media.length;
+      if (existingFloorPlanCount + requestedCount > propertyTotalFloors) {
+        throw createError({
+          statusCode: 400,
+          statusMessage: `Floor plan limit exceeded: max ${propertyTotalFloors} allowed`,
+        });
+      }
     }
 
     // Create media records
-    const mediaToCreate = media.map((m) => ({
-      propertyId,
-      image: m.cloudflareId,
-      metadata: JSON.stringify({
-        alt: m.description || "Property image",
-        description: m.description ?? "Property image",
-        cloudflareImageId: m.cloudflareId,
-        filename: m.filename || null,
-      }),
-      bedroomId: m.bedroomId || null,
-      bathroomId: m.bathroomId || null,
-      kitchenId: m.kitchenId || null,
-      receptionId: m.receptionId || null,
-      otherRoomId: m.otherRoomId || null,
-      gardenId: m.gardenId || null,
-      yardId: m.yardId || null,
-      landId: m.landId || null,
-      outdoorSpaceId: null,
-    }));
+    const mediaToCreate = media.map((m) => {
+      if (mediaType === "floorPlan") {
+        return {
+          propertyId,
+          image: null,
+          floorPlan: m.cloudflareId,
+          metadata: JSON.stringify({
+            alt: "Floor plan",
+            description: m.description ?? "Floor plan",
+            cloudflareImageId: m.cloudflareId,
+            filename: m.filename || null,
+          }),
+          bedroomId: null,
+          bathroomId: null,
+          kitchenId: null,
+          receptionId: null,
+          otherRoomId: null,
+          gardenId: null,
+          yardId: null,
+          landId: null,
+          outdoorSpaceId: null,
+        };
+      }
+
+      return {
+        propertyId,
+        image: m.cloudflareId,
+        floorPlan: null,
+        metadata: JSON.stringify({
+          alt: m.description || "Property image",
+          description: m.description ?? "Property image",
+          cloudflareImageId: m.cloudflareId,
+          filename: m.filename || null,
+        }),
+        bedroomId: m.bedroomId || null,
+        bathroomId: m.bathroomId || null,
+        kitchenId: m.kitchenId || null,
+        receptionId: m.receptionId || null,
+        otherRoomId: m.otherRoomId || null,
+        gardenId: m.gardenId || null,
+        yardId: m.yardId || null,
+        landId: m.landId || null,
+        outdoorSpaceId: null,
+      };
+    });
 
     // Bulk create
     await prisma.media.createMany({
@@ -117,7 +169,9 @@ export default defineEventHandler(async (event) => {
     const createdMedia = await prisma.media.findMany({
       where: {
         propertyId,
-        image: { in: media.map((m) => m.cloudflareId) },
+        ...(mediaType === "floorPlan" ?
+          { floorPlan: { in: media.map((m) => m.cloudflareId) } }
+        : { image: { in: media.map((m) => m.cloudflareId) } }),
       },
     });
 

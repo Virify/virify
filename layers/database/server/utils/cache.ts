@@ -34,7 +34,10 @@ export async function invalidateAggregatesCache(userId: number): Promise<void> {
 // These sweep all pagination variants for a user using a key prefix so every
 // page/filter/sort combination is invalidated together on mutation.
 
-async function sweepPrefix(storage: ReturnType<typeof useStorage>, prefix: string): Promise<void> {
+async function sweepPrefix(
+  storage: ReturnType<typeof useStorage>,
+  prefix: string,
+): Promise<void> {
   const keys = await storage.getKeys(prefix);
   await Promise.all(keys.map((k) => storage.removeItem(k)));
 }
@@ -64,9 +67,17 @@ export async function invalidateHiddenListingsFullCache(userId: number): Promise
   await sweepPrefix(useStorage("cache"), `hidden:full:${userId}:`);
 }
 
-/** Bust all paginated draft-listings cache entries for a user. */
+/**
+ * Bust all paginated draft-listings cache entries for a user.
+ * Also clears admin owner-scope variants because admin draft listing pages are
+ * cached under shared keys like draft-listings:admin-all:* rather than per-admin IDs.
+ */
 export async function invalidateDraftListingsCache(userId: number): Promise<void> {
-  await sweepPrefix(useStorage("cache"), `draft-listings:${userId}:`);
+  const storage = useStorage("cache");
+  await Promise.all([
+    sweepPrefix(storage, `draft-listings:${userId}:`),
+    sweepPrefix(storage, "draft-listings:admin-"),
+  ]);
 }
 
 /** Bust all viewings cache entries for a user. */
