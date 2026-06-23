@@ -57,7 +57,7 @@
     </UFormField>
 
     <!-- Upload Progress -->
-    <MoleculesUploadProgressBar
+    <MoleculesDashboardCreateListingMoleculesUploadProgressBar
       :is-uploading="isUploading"
       :upload-progress="uploadProgress"
       :uploading-count="uploadingCount"

@@ -47,8 +47,8 @@
     </UFormField>
 
     <!-- Upload Progress -->
-    <MoleculesUploadProgressBar
-      :is-uploading="isUploading"
+    <MoleculesDashboardCreateListingMoleculesUploadProgressBar
+      :is-uploading="showUploadProgress"
       :upload-progress="uploadProgress"
       :uploading-count="uploadingCount"
       item-type="floor plan"
@@ -105,6 +105,8 @@
   }
 
   const props = defineProps<Props>();
+
+  const showUploadProgress = computed(() => props.isUploading || props.isProcessing);
 
   const emit = defineEmits<{
     "files-selected": [files: File[]];

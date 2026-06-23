@@ -36,7 +36,7 @@
 
   interface YouTubeStateChangeEvent {
     data?: number;
-  }
+  } 
 
   function onStateChange(event: YouTubeStateChangeEvent) {
     // YT.PlayerState.PLAYING === 1

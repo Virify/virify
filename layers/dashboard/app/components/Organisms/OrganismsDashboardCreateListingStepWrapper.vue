@@ -98,7 +98,9 @@
     getFieldsToModerate?: () => ModerationField[];
   }
 
-  const props = defineProps<Props>();
+  const props = withDefaults(defineProps<Props>(), {
+    isSaveValid: undefined,
+  });
 
   const emit = defineEmits<{
     saved: [];
@@ -111,20 +113,28 @@
     previousStep,
     getStepData,
     isStepDirty,
+    primeStepSnapshot,
     setStepPendingEdits,
   } = useCreateListingSteps();
   const closeModal = inject<() => void>("closeModal");
   const toast = useToast();
   const { moderateFields, isModerating } = useModerateFields();
 
-  // canSave uses the step-specific save validity if provided, otherwise falls back to isValid
-  const canSave = computed(() =>
-    props.isSaveValid !== undefined ? props.isSaveValid : props.isValid,
-  );
-
   const hasPendingEdits = computed(() =>
     isStepDirty(props.stepNumber, props.getSubmissionData()),
   );
+
+  const saveValidity = computed(() =>
+    props.isSaveValid !== undefined ? props.isSaveValid : props.isValid,
+  );
+
+  // Save Progress button follows unsaved edits only.
+  // Validity is enforced at click time with explicit feedback.
+  const canSave = computed(() => hasPendingEdits.value);
+
+  onMounted(() => {
+    primeStepSnapshot(props.stepNumber, props.getSubmissionData());
+  });
 
   watch(
     hasPendingEdits,
@@ -197,8 +207,27 @@
 
   // Delegate to composable's saveStep
   async function handleSave(advance: boolean) {
-    const validityCheck = advance ? props.isValid : canSave.value;
-    if (!validityCheck || isSaving.value) return;
+    if (isSaving.value) return;
+
+    if (advance && !props.isValid) {
+      return;
+    }
+
+    if (!advance && !canSave.value) {
+      return;
+    }
+
+    if (!advance && !saveValidity.value) {
+      toast.add({
+        title: "Validation Error",
+        description: "Please check highlighted fields before saving progress.",
+        color: "error",
+        icon: "i-lucide-circle-x",
+      });
+      return;
+    }
+
+    const submissionData = props.getSubmissionData();
 
     // Only moderate fields whose values have changed since the last save
     if (props.getFieldsToModerate) {
@@ -216,7 +245,7 @@
     const result = await saveStep(
       props.stepNumber,
       props.apiEndpoint,
-      props.getSubmissionData(),
+      submissionData,
       advance,
     );
 

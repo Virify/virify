@@ -248,10 +248,16 @@ export const useCreateListingSteps = createSharedComposable(() => {
   const isStepDirty = (stepNumber: number, currentData: Record<string, any>): boolean => {
     const lastSaved = lastSavedStepData.value[stepNumber];
     if (!lastSaved || Object.keys(lastSaved).length === 0) {
-      // Never saved before - always dirty
-      return true;
+      return false;
     }
     return JSON.stringify(currentData) !== JSON.stringify(lastSaved);
+  };
+
+  const primeStepSnapshot = (stepNumber: number, currentData: Record<string, any>) => {
+    // Always sync the baseline to the mounted step's current submission shape.
+    // This prevents false-dirty states when loaded draft data shape differs slightly
+    // from the wrapper's getSubmissionData() shape.
+    lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(currentData));
   };
 
   // Computed: Current accordion/stepper value
@@ -446,6 +452,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     apiEndpoint: string,
     stepFormData: Record<string, any>,
     advance: boolean = false,
+    dirtySnapshot: Record<string, any> = stepFormData,
   ): Promise<boolean | { success: boolean; draftComplete: boolean }> => {
     if (isSaving.value) return false;
 
@@ -533,7 +540,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
       // Step 3: Save to local state and snapshot for dirty checking
       saveStepData(stepNumber, stepFormData);
-      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData));
+      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(dirtySnapshot));
+      setStepPendingEdits(stepNumber, false);
 
       // Step 4: Mark step complete and unlock next (regardless of advance flag)
       // This allows users to navigate to next step after saving progress
@@ -604,6 +612,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     apiEndpoint: string,
     stepFormData: Record<string, any>,
     successMessage?: string,
+    dirtySnapshot: Record<string, any> = stepFormData,
   ): Promise<boolean> => {
     if (isSaving.value) return false;
 
@@ -647,7 +656,8 @@ export const useCreateListingSteps = createSharedComposable(() => {
 
       // Save to local state
       saveStepData(stepNumber, stepFormData);
-      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(stepFormData));
+      lastSavedStepData.value[stepNumber] = JSON.parse(JSON.stringify(dirtySnapshot));
+      setStepPendingEdits(stepNumber, false);
 
       if (successMessage) {
         toast.add({
@@ -920,6 +930,7 @@ export const useCreateListingSteps = createSharedComposable(() => {
     saveStepData,
     getStepData,
     isStepDirty,
+    primeStepSnapshot,
     validateStep,
     nextStep,
     previousStep,

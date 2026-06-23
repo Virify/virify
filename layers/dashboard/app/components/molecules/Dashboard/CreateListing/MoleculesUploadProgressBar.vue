@@ -14,8 +14,15 @@
       <span class="body-sm font-medium">{{ Math.round(uploadProgress) }}%</span>
     </div>
     <UProgress
-      :value="uploadProgress"
+      :model-value="uploadProgress"
       color="secondary"
+      size="md"
+      class="w-full"
+      :ui="{
+        base: 'relative overflow-hidden rounded-full bg-accented h-2',
+        indicator:
+          'rounded-full size-full bg-secondary transition-transform duration-200 ease-out',
+      }"
     />
   </div>
 </template>

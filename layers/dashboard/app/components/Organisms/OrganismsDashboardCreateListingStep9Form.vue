@@ -223,8 +223,7 @@
     () =>
       !hasSchemaErrors.value &&
       state.property.description.length >= 10 &&
-      (state.property.media.length === 0 || allImagesHaveDescriptions.value) &&
-      isStepDirty(9, getSubmissionData()),
+      (state.property.media.length === 0 || allImagesHaveDescriptions.value),
   );
 
   const {
