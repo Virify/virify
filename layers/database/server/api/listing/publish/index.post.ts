@@ -17,10 +17,7 @@ const publishableDraftSchema = z
     saleListing: z
       .object({
         tenureType: z.enum(["FREEHOLD", "LEASEHOLD", "COMMONHOLD"]),
-        priceType: z
-          .enum(["FIXED", "OFFERS_OVER", "GUIDE_PRICE"])
-          .nullable()
-          .optional(),
+        priceType: z.enum(["FIXED", "OFFERS_OVER", "GUIDE_PRICE"]).nullable().optional(),
       })
       .nullable()
       .optional(),
@@ -50,10 +47,7 @@ const publishableDraftSchema = z
           id: z.number().int().positive(),
         })
         .nullable(),
-      constructionType: z
-        .enum(["STANDARD", "NON_STANDARD"])
-        .nullable()
-        .optional(),
+      constructionType: z.enum(["STANDARD", "NON_STANDARD"]).nullable().optional(),
       yearBuilt: z.string().nullable().optional(),
       size: z.number().positive().nullable().optional(),
       description: z.string().nullable().optional(),
@@ -83,10 +77,9 @@ const publishableDraftSchema = z
             sortOrder: z.number().int().min(0).optional(),
           }),
         )
-        .refine(
-          (mediaArray) => mediaArray.some((m) => m.image && m.image.length > 0),
-          { message: "At least one image is required" },
-        ),
+        .refine((mediaArray) => mediaArray.some((m) => m.image && m.image.length > 0), {
+          message: "At least one image is required",
+        }),
     }),
 
     // Must have completed all 9 steps (new flow)
@@ -99,8 +92,7 @@ const publishableDraftSchema = z
     path: ["saleListing"],
   })
   .refine(
-    (data) =>
-      data.property?.type !== null && data.property?.classification !== null,
+    (data) => data.property?.type !== null && data.property?.classification !== null,
     {
       message: "Property type and classification are required",
       path: ["property", "type"],
@@ -205,8 +197,7 @@ export default defineEventHandler(async (event) => {
 
     // Ownership verification gate: USER role must have an APPROVED verification for this specific draft
     const userRole = (user as any).role as string | undefined;
-    const isExemptFromVerification =
-      userRole === "ADMIN" || userRole === "AGENT";
+    const isExemptFromVerification = userRole === "ADMIN" || userRole === "AGENT";
     if (!isExemptFromVerification) {
       const ownershipRecord = await prisma.ownershipVerification.findUnique({
         where: { draftListingId: draftId },
@@ -224,20 +215,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Log draft structure for debugging
-    console.log("Draft structure before validation:", {
-      price: draft.price,
-      listingTier: draft.listingTier,
-      hasSaleListing: !!draft.saleListing,
-      hasRentalListing: !!draft.rentalListing,
-      hasProperty: !!draft.property,
-      hasAddress: !!draft.property?.address,
-      hasType: !!draft.property?.type,
-      hasClassification: !!draft.property?.classification,
-      mediaCount: draft.property?.media?.length || 0,
-      completedSteps: draft.completedSteps,
-    });
-
     // Comprehensive validation using Zod schema
     try {
       publishableDraftSchema.parse(draft);
@@ -251,9 +228,7 @@ export default defineEventHandler(async (event) => {
       const issues = validationError.issues || validationError.errors || [];
 
       const errorMessages =
-        issues
-          .map((err: any) => `${err.path.join(".")}: ${err.message}`)
-          .join(", ") ||
+        issues.map((err: any) => `${err.path.join(".")}: ${err.message}`).join(", ") ||
         "Draft listing validation failed - no details available";
 
       console.error("Formatted error messages:", errorMessages);
@@ -341,18 +316,11 @@ export default defineEventHandler(async (event) => {
 
     // Send WebSocket aggregate updates: draft removed, listing added
     try {
-      const { sendMessage, createAggregateUpdateMessage } =
-        useWebSocketServer();
+      const { sendMessage, createAggregateUpdateMessage } = useWebSocketServer();
       sendMessage(
-        createAggregateUpdateMessage(
-          "draftListings",
-          "remove",
-          user.id as number,
-        ),
+        createAggregateUpdateMessage("draftListings", "remove", user.id as number),
       );
-      sendMessage(
-        createAggregateUpdateMessage("listings", "add", user.id as number),
-      );
+      sendMessage(createAggregateUpdateMessage("listings", "add", user.id as number));
     } catch {
       // Non-critical
     }
@@ -363,9 +331,8 @@ export default defineEventHandler(async (event) => {
     if (address?.lat && address?.lon && draft.propertyId) {
       // Safety-net: ensure PostGIS geometry column is set so the listing appears in spatial search.
       // This is a no-op if step 2 already wrote the geometry; it's cheap and idempotent.
-      updateLocationByAddressId(address.id, address.lon, address.lat).catch(
-        (err) =>
-          console.error("[Publish] Failed to update PostGIS location:", err),
+      updateLocationByAddressId(address.id, address.lon, address.lat).catch((err) =>
+        console.error("[Publish] Failed to update PostGIS location:", err),
       );
 
       const { findNearbyAmenities } = useMapSearch();
@@ -375,9 +342,7 @@ export default defineEventHandler(async (event) => {
             return createAmenitiesForProperty(draft.propertyId!, amenitiesData);
           }
         })
-        .catch((err) =>
-          console.error("[Publish] Failed to fetch/save amenities:", err),
-        );
+        .catch((err) => console.error("[Publish] Failed to fetch/save amenities:", err));
     }
 
     return {
