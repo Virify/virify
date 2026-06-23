@@ -55,6 +55,7 @@
             :to="link.to"
             icon="i-lucide-file"
             :ui="{
+              base: 'p-0',
               label: 'underline decoration-secondary',
               leadingIcon: 'text-secondary',
             }"
