@@ -138,7 +138,12 @@ export const generalPageType = defineType({
       title: 'Page Sections',
       type: 'array',
       group: 'content',
-      of: [{type: 'pageSection'}, {type: 'pageFaq'}, {type: 'pageGuidesGrid'}],
+      of: [
+        {type: 'pageSection'},
+        {type: 'pageFaq'},
+        {type: 'pageGuidesGrid'},
+        {type: 'pageFeaturedListings'},
+      ],
       validation: (Rule) => Rule.required().min(1),
     }),
 

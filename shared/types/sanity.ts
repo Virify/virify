@@ -436,7 +436,11 @@ export interface SanityGeneralPage {
     login: boolean;
     url?: string;
   }[];
-  sections: SanityPageSection[] | SanityPageFaqSection[] | SanityPageGuidesGrid[];
+  sections:
+    | SanityPageSection[]
+    | SanityPageFaqSection[]
+    | SanityPageGuidesGrid[]
+    | SanityPageFeaturedListings[];
   seo?: SanityGeneralPageSeo;
 }
 
@@ -490,6 +494,13 @@ export interface SanityPageGuidesGrid {
   guides: (Omit<Guide, "category"> & {
     category: GuideCategory;
   })[];
+}
+
+export interface SanityPageFeaturedListings {
+  _type: "pageFeaturedListings";
+  title: string;
+  description?: string;
+  displayFeaturedListings: boolean;
 }
 
 export interface GeneralPageNavigationItem {

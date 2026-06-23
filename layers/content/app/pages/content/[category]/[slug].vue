@@ -59,6 +59,7 @@
     OrganismsSanityPageSection,
     OrganismsSanityPageFaqSection,
     OrganismsSanityPageGuidesGrid,
+    HomepageSectionBrowseCarousel,
   } from "#components";
 
   const route = useRoute();
@@ -118,6 +119,7 @@
     pageSection: OrganismsSanityPageSection,
     pageFaq: OrganismsSanityPageFaqSection,
     pageGuidesGrid: OrganismsSanityPageGuidesGrid,
+    pageFeaturedListings: HomepageSectionBrowseCarousel,
   };
 
   function resolveComponent(section: any) {
