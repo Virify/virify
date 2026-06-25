@@ -11,6 +11,34 @@
       </template>
 
       <template v-else-if="data">
+        <!-- Site page views -->
+        <h2 class="title-xs mb-0! flex items-center gap-2">
+          Site Page Views
+          <UIcon name="i-lucide-file-chart-column" class="text-secondary" />
+        </h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <UPageCard title="Total Page Views" :description="fmt(data.pageViews.total)" icon="i-lucide-file-chart-column" :ui="cardUi" />
+          <UPageCard title="Authenticated" :description="fmt(data.pageViews.authenticated)" icon="i-lucide-user" :ui="cardUi" />
+          <UPageCard title="Anonymous" :description="fmt(data.pageViews.anonymous)" icon="i-lucide-user-x" :ui="cardUi" />
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h2 class="title-xs mb-2! flex items-center gap-2">
+              Top Pages
+              <UIcon name="i-lucide-list-ordered" class="text-secondary" />
+            </h2>
+            <UTable :data="data.topPages" :columns="[{ accessorKey: 'path', header: 'Path' }, { accessorKey: 'views', header: 'Views' }]" />
+          </div>
+          <div>
+            <h2 class="title-xs mb-2! flex items-center gap-2">
+              Page View Sources
+              <UIcon name="i-lucide-globe" class="text-secondary" />
+            </h2>
+            <UTable :data="data.pageViewSources" :columns="[{ accessorKey: 'source', header: 'Source' }, { accessorKey: 'count', header: 'Views' }]" />
+          </div>
+        </div>
+
         <!-- Views -->
         <h2 class="title-xs mb-0! flex items-center gap-2">
           Listing Views

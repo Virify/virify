@@ -2,6 +2,12 @@
  * GET /api/admin/engagement
  * Listing engagement, traffic, and conversion signals. Admin only.
  */
+import {
+  getPageViewSources,
+  getPageViewSummary,
+  getTopPages,
+} from "~~/layers/analytics/server/utils/page-view-queries";
+
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
@@ -22,6 +28,9 @@ export default defineEventHandler(async (event) => {
     topViewedListings,
     topSharedListings,
     enquiryTotals,
+    pageViews,
+    pageViewSources,
+    topPages,
   ] = await Promise.all([
     prisma.listingView.count(),
     prisma.listingView.count({ where: { userId: { not: null } } }),
@@ -69,6 +78,10 @@ export default defineEventHandler(async (event) => {
     prisma.dailyListingStats.aggregate({
       _sum: { impressions: true, views: true, enquiries: true, clicks: true },
     }),
+
+    getPageViewSummary(),
+    getPageViewSources(),
+    getTopPages(10),
   ]);
 
   const ctr =
@@ -98,6 +111,9 @@ export default defineEventHandler(async (event) => {
     .slice(0, 10);
 
   return {
+    pageViews,
+    pageViewSources,
+    topPages,
     views: {
       total: totalViews,
       authenticated: authedViews,

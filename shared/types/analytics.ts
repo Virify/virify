@@ -20,7 +20,8 @@ export type AnalyticsEventType =
   | "enquiry" // User sends an enquiry
   | "share" // User shares a listing
   | "search" // User performs a search
-  | "mortgage_calc"; // User uses mortgage calculator
+  | "mortgage_calc" // User uses mortgage calculator
+  | "page_view"; // User views a site page
 
 /**
  * Base payload for all tracking events
@@ -118,6 +119,17 @@ export interface TrackingMortgageCalcPayload extends TrackingBasePayload {
   rateType: string;
   usedDefaultRates: boolean;
   usedCustomRate: boolean;
+}
+
+/**
+ * Site page view payload
+ */
+export interface TrackingPageViewPayload extends TrackingBasePayload {
+  path: string;
+  fullPath: string;
+  title?: string;
+  routeName?: string;
+  source?: TrafficSourceType;
 }
 
 // ============================================================================

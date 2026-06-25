@@ -416,6 +416,27 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     sendBeaconEvent("/api/analytics/mortgage/track", payload);
   };
 
+  /**
+   * Track a first-party site page view in internal analytics.
+   * GA page views are left to GA enhanced measurement to avoid double-counting.
+   */
+  const trackPageView = (data: {
+    path: string;
+    fullPath: string;
+    title?: string;
+    routeName?: string;
+  }) => {
+    if (!import.meta.client) return;
+
+    const payload: TrackingPageViewPayload = {
+      ...getBasePayload(),
+      ...data,
+      source: detectSource(),
+    };
+
+    sendBeaconEvent("/api/analytics/track/page-view", payload);
+  };
+
   // Initialize view history from localStorage on client
   if (import.meta.client) {
     try {
@@ -454,6 +475,7 @@ export const useAnalyticsTracking = createSharedComposable(() => {
 
     // Utility events
     trackMortgageCalc,
+    trackPageView,
 
     // Utilities
     detectSource,

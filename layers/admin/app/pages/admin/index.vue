@@ -45,6 +45,9 @@
           <UIcon name="i-lucide-bar-chart-3" class="text-secondary" />
         </h2>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <UPageCard title="Page Views" :description="fmt(data.totalPageViews)" icon="i-lucide-file-chart-column" :ui="cardUi" />
+          <UPageCard title="Authed Page Views" :description="fmt(data.authenticatedPageViews)" icon="i-lucide-user-check" :ui="cardUi" />
+          <UPageCard title="Anon Page Views" :description="fmt(data.anonymousPageViews)" icon="i-lucide-user-x" :ui="cardUi" />
           <UPageCard title="Total Searches" :description="fmt(data.totalSearchesRun)" icon="i-lucide-search" :ui="cardUi" />
           <UPageCard title="Mortgage Calcs" :description="fmt(data.totalMortgageCalculations)" icon="i-lucide-calculator" :ui="cardUi" />
           <UPageCard title="Conversations" :description="fmt(data.totalConversations)" icon="i-lucide-message-square" :ui="cardUi" />
