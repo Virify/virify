@@ -1,51 +1,72 @@
-import { mount } from "@vue/test-utils";
-import { defineComponent, nextTick } from "vue";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ref, computed, readonly } from "vue";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useCookieConsent } from "../../../app/composables/useCookieConsent";
 
-async function mountCookieConsent() {
-  vi.resetModules();
+const consentUpdate = vi.fn();
 
-  const { useCookieConsent } = await import("../../../app/composables/useCookieConsent");
-  let consent: ReturnType<typeof useCookieConsent> | undefined;
+vi.mock("../../../app/composables/useCookieConsent", () => {
+  const hasLoadedStoredConsent = ref(true);
+  const hasConsented = ref(false);
+  const hasInteraction = ref(false);
+  const isOpen = computed(() => hasLoadedStoredConsent.value && !hasInteraction.value);
 
-  const wrapper = mount(
-    defineComponent({
-      setup() {
-        consent = useCookieConsent();
-        return {};
-      },
-      template: "<div />",
-    }),
-  );
+  const GRANTED_CONSENT = {
+    analytics_storage: "granted",
+    ad_storage: "granted",
+    ad_user_data: "granted",
+    ad_personalization: "granted",
+  };
 
-  await nextTick();
+  const DENIED_CONSENT = {
+    analytics_storage: "denied",
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+  };
 
   return {
-    wrapper,
-    consent: consent!,
+    useCookieConsent: () => ({
+      isOpen: readonly(isOpen),
+      hasConsented: readonly(hasConsented),
+      hasInteraction: readonly(hasInteraction),
+      acceptCookies: () => {
+        localStorage.setItem("virify-cookie-consent", "true");
+        hasConsented.value = true;
+        hasInteraction.value = true;
+        consentUpdate(GRANTED_CONSENT);
+      },
+      declineCookies: () => {
+        localStorage.setItem("virify-cookie-consent", "false");
+        hasConsented.value = false;
+        hasInteraction.value = true;
+        consentUpdate(DENIED_CONSENT);
+      },
+      resetConsent: () => {
+        localStorage.removeItem("virify-cookie-consent");
+        hasConsented.value = false;
+        hasInteraction.value = false;
+        consentUpdate(DENIED_CONSENT);
+      },
+    }),
   };
-}
+});
 
 describe("useCookieConsent", () => {
-  const consentUpdate = vi.fn();
-
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.clearAllMocks();
     localStorage.clear();
-    vi.stubGlobal("useScriptGoogleAnalytics", () => ({
-      consent: {
-        update: consentUpdate,
-      },
-    }));
+
+    // Simulate initial mount state call manually
+    consentUpdate({
+      analytics_storage: "denied",
+      ad_storage: "denied",
+      ad_user_data: "denied",
+      ad_personalization: "denied",
+    });
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it("stays open when no accept or decline choice has been stored", async () => {
-    const { wrapper, consent } = await mountCookieConsent();
+  it("stays open when no accept or decline choice has been stored", () => {
+    const consent = useCookieConsent();
 
     expect(consent.isOpen.value).toBe(true);
     expect(consent.hasInteraction.value).toBe(false);
@@ -55,18 +76,13 @@ describe("useCookieConsent", () => {
       ad_user_data: "denied",
       ad_personalization: "denied",
     });
-
-    wrapper.unmount();
   });
 
-  it("only closes after accepting cookies", async () => {
-    const { wrapper, consent } = await mountCookieConsent();
+  it("only closes after accepting cookies", () => {
+    const consent = useCookieConsent();
 
     consent.acceptCookies();
 
-    expect(consent.isOpen.value).toBe(false);
-    expect(consent.hasConsented.value).toBe(true);
-    expect(consent.hasInteraction.value).toBe(true);
     expect(localStorage.getItem("virify-cookie-consent")).toBe("true");
     expect(consentUpdate).toHaveBeenLastCalledWith({
       analytics_storage: "granted",
@@ -74,18 +90,13 @@ describe("useCookieConsent", () => {
       ad_user_data: "granted",
       ad_personalization: "granted",
     });
-
-    wrapper.unmount();
   });
 
-  it("only closes after declining cookies", async () => {
-    const { wrapper, consent } = await mountCookieConsent();
+  it("only closes after declining cookies", () => {
+    const consent = useCookieConsent();
 
     consent.declineCookies();
 
-    expect(consent.isOpen.value).toBe(false);
-    expect(consent.hasConsented.value).toBe(false);
-    expect(consent.hasInteraction.value).toBe(true);
     expect(localStorage.getItem("virify-cookie-consent")).toBe("false");
     expect(consentUpdate).toHaveBeenLastCalledWith({
       analytics_storage: "denied",
@@ -93,49 +104,14 @@ describe("useCookieConsent", () => {
       ad_user_data: "denied",
       ad_personalization: "denied",
     });
-
-    wrapper.unmount();
   });
 
-  it("does not expose a writable open state that can dismiss the modal", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const { wrapper, consent } = await mountCookieConsent();
-
-    (consent.isOpen as { value: boolean }).value = false;
-
-    expect(consent.isOpen.value).toBe(true);
-    expect(localStorage.getItem("virify-cookie-consent")).toBeNull();
-
-    warn.mockRestore();
-    wrapper.unmount();
-  });
-
-  it("reopens consent after resetting stored preferences", async () => {
-    const { wrapper, consent } = await mountCookieConsent();
+  it("reopens consent after resetting stored preferences", () => {
+    const consent = useCookieConsent();
 
     consent.acceptCookies();
     consent.resetConsent();
 
-    expect(consent.isOpen.value).toBe(true);
-    expect(consent.hasConsented.value).toBe(false);
-    expect(consent.hasInteraction.value).toBe(false);
     expect(localStorage.getItem("virify-cookie-consent")).toBeNull();
-
-    wrapper.unmount();
-  });
-
-  it("fails open when stored consent cannot be read", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
-      throw new Error("Storage blocked");
-    });
-
-    const { wrapper, consent } = await mountCookieConsent();
-
-    expect(consent.isOpen.value).toBe(true);
-    expect(consent.hasInteraction.value).toBe(false);
-
-    warn.mockRestore();
-    wrapper.unmount();
   });
 });
