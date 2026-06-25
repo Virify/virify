@@ -4,6 +4,11 @@ import { defineNuxtConfig } from "nuxt/config";
 const googleAnalyticsId = process.env.NUXT_PUBLIC_GTAG_ID || process.env.G_TAG;
 
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      gtagId: googleAnalyticsId,
+    },
+  },
   scripts: {
     registry: {
       googleAnalytics: {
