@@ -4,6 +4,7 @@ type DialogStateReturn = string | { returnValue?: unknown }
 
 interface DialogState extends Record<string, unknown> {
   component?: Component
+  componentName?: string
   onClose?: (arg0: DialogStateReturn) => void
   className?: string
   wrapperClassName?: string

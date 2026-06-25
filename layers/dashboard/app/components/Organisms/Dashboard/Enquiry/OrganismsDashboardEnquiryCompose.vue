@@ -142,6 +142,7 @@
     closeConversation,
   } = useGlobalEnquiryModal();
   const { startConversation, hasContactedListing, openEnquiry } = useEnquiries();
+  const { trackEnquirySent } = useEnquiryGaFunnel();
   const toast = useToast();
 
   const composeMessage = ref("");
@@ -176,6 +177,7 @@
       );
 
       if (conversation) {
+        trackEnquirySent();
         composeMessage.value = "";
         sharedNewEnquiryData.value = null;
         openEnquiry(conversation);

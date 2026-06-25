@@ -179,6 +179,7 @@
           :listing-id="listingId"
           :listing-type="listingType"
           :user-id="userId"
+          analytics-location="property_card"
           class="property-card-root__button property-card-root__button--enquire | body-sm"
         />
       </div>

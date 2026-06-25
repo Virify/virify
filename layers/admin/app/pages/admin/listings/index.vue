@@ -11,6 +11,29 @@
       </template>
 
       <template v-else-if="data">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div class="w-full sm:max-w-md">
+            <label class="body-sm font-bold mb-2 block">Search listing analytics</label>
+            <UInput
+              v-model="listingSearch"
+              icon="i-lucide-search"
+              placeholder="Listing ID, owner, street, city, postcode"
+              @keydown.enter="refresh"
+            />
+          </div>
+          <UButton icon="i-lucide-search" color="primary" @click="refresh">
+            Search
+          </UButton>
+        </div>
+
+        <div>
+          <h2 class="title-xs mb-2! flex items-center gap-2">
+            Listing Performance
+            <UIcon name="i-lucide-chart-no-axes-combined" class="text-secondary" />
+          </h2>
+          <UTable :data="data.listingPerformance" :columns="listingPerformanceColumns" />
+        </div>
+
         <!-- Listing Funnel -->
         <h2 class="title-xs mb-0! flex items-center gap-2">
           Listing Funnel
@@ -142,9 +165,29 @@ definePageMeta({
   layout: "admin",
 });
 
-const { data, status } = await useAsyncData("admin-listings", () =>
-  useRequestFetch()("/api/admin/listings"),
-);
+const listingSearch = ref("");
+const listingPerformanceColumns = [
+  { accessorKey: "id", header: "ID" },
+  { accessorKey: "address", header: "Listing" },
+  { accessorKey: "owner", header: "Owner" },
+  { accessorKey: "status", header: "Status" },
+  { accessorKey: "views", header: "Views" },
+  { accessorKey: "impressions", header: "Impressions" },
+  { accessorKey: "clicks", header: "Clicks" },
+  { accessorKey: "ctr", header: "CTR %" },
+  { accessorKey: "favourites", header: "Favourites" },
+  { accessorKey: "enquiries", header: "Enquiries" },
+];
+
+const { data, status, refresh } = await useAsyncData("admin-listings", () => {
+  const params = new URLSearchParams();
+  if (listingSearch.value.trim()) {
+    params.set("search", listingSearch.value.trim());
+  }
+
+  const query = params.toString();
+  return useRequestFetch()(`/api/admin/listings${query ? `?${query}` : ""}`);
+});
 
 const fmt = (n: number | undefined) => (n ?? 0).toLocaleString("en-GB");
 

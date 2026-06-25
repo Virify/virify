@@ -2,6 +2,8 @@
  * GET /api/admin/overview
  * Platform-wide KPI summary. Admin only.
  */
+import { getPageViewSummary } from "~~/layers/analytics/server/utils/page-view-queries";
+
 export default defineEventHandler(async (event) => {
   const { user } = await requireUserSession(event);
 
@@ -38,6 +40,7 @@ export default defineEventHandler(async (event) => {
     totalListingImpressions,
     totalListingClicks,
     totalListingShares,
+    pageViews,
   ] = await Promise.all([
     prisma.user.count({ where: { deletedAt: null } }),
     prisma.user.count({ where: { lastLogin: { gte: startOfToday }, deletedAt: null } }),
@@ -60,6 +63,7 @@ export default defineEventHandler(async (event) => {
     prisma.listingImpression.count(),
     prisma.listingClick.count(),
     prisma.listingShare.count(),
+    getPageViewSummary(),
   ]);
 
   return {
@@ -84,5 +88,8 @@ export default defineEventHandler(async (event) => {
     totalListingImpressions,
     totalListingClicks,
     totalListingShares,
+    totalPageViews: pageViews.total,
+    authenticatedPageViews: pageViews.authenticated,
+    anonymousPageViews: pageViews.anonymous,
   };
 });

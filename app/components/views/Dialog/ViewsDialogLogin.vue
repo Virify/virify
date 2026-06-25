@@ -42,6 +42,7 @@ defineProps({
 const { fetch } = useUserSession();
 const { hideDialog } = useDialog();
 const { signup } = useFeatureFlag();
+const { trackFunnelEvent } = useEnquiryGaFunnel();
 
 /**
  *  Modal control
@@ -63,6 +64,7 @@ async function formSuccess() {
   const redirectCookie = useCookie('redirect');
   const destination = redirectCookie.value;
 
+  trackFunnelEvent("login_success");
   hideDialog({ loginSuccess: true });
 
   // Navigate to the intended destination if there's a redirect cookie
