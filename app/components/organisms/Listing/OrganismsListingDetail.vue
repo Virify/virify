@@ -294,10 +294,7 @@
             />
           </div>
 
-          <div
-            class="p-listing__section"
-            v-if="!loggedIn"
-          >
+          <div class="p-listing__section">
             <MoleculesListingAdvert
               :title="advertTitle"
               :description="advertDescription"

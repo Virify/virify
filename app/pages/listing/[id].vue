@@ -4,6 +4,11 @@
     :key="listing.id"
     :listing="listing"
   />
+
+  <HomepageSectionBrowseCarousel
+    title="More Properties"
+    class="py-16 | container"
+  />
 </template>
 
 <script setup lang="ts">
