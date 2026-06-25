@@ -1,6 +1,9 @@
 import { createSharedComposable } from "@vueuse/core";
 
 type GoogleConsentStatus = "granted" | "denied";
+type StoredCookieConsent = "true" | "false" | null;
+
+const CONSENT_STORAGE_KEY = "virify-cookie-consent";
 
 const GRANTED_CONSENT = {
   analytics_storage: "granted",
@@ -40,79 +43,96 @@ function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
  * - Accepted = sessionId sent (can track unique users, paths, funnels)
  * - Declined = sessionId null (only aggregate counts like total views)
  */
-/**
- * Cookie Consent Composable
- *
- * Manages GDPR/ePrivacy compliance for analytics tracking:
- * - When ACCEPTED: Full analytics with sessionId (unique visitors, funnels, session tracking)
- * - When DECLINED: Anonymous analytics only (total counts, no session/user tracking)
- * - When NO CHOICE: Banner shows until user makes a decision
- *
- * All tracking happens regardless of choice, but data granularity differs:
- * - Accepted = sessionId sent (can track unique users, paths, funnels)
- * - Declined = sessionId null (only aggregate counts like total views)
- */
 export const useCookieConsent = createSharedComposable(() => {
-  // State
-  const isOpen = ref(false);
+  const hasLoadedStoredConsent = ref(false);
   const hasConsented = ref(false);
-  const hasInteraction = ref(false); // Whether user has made a choice
+  const hasInteraction = ref(false);
+  const isOpen = computed(() => hasLoadedStoredConsent.value && !hasInteraction.value);
 
-  // Initialize from localStorage
+  function readStoredConsent(): StoredCookieConsent {
+    if (!import.meta.client) return null;
+
+    try {
+      const storedConsent = localStorage.getItem(CONSENT_STORAGE_KEY);
+      return storedConsent === "true" || storedConsent === "false" ? storedConsent : null;
+    } catch (error) {
+      console.warn("[analytics] Failed to read cookie consent", error);
+      return null;
+    }
+  }
+
+  function writeStoredConsent(value: Exclude<StoredCookieConsent, null>) {
+    if (!import.meta.client) return;
+
+    try {
+      localStorage.setItem(CONSENT_STORAGE_KEY, value);
+    } catch (error) {
+      console.warn("[analytics] Failed to store cookie consent", error);
+    }
+  }
+
+  function clearStoredConsent() {
+    if (!import.meta.client) return;
+
+    try {
+      localStorage.removeItem(CONSENT_STORAGE_KEY);
+    } catch (error) {
+      console.warn("[analytics] Failed to reset cookie consent", error);
+    }
+  }
+
   onMounted(() => {
     if (import.meta.client) {
-      const storedConsent = localStorage.getItem("virify-cookie-consent");
+      const storedConsent = readStoredConsent();
 
       if (storedConsent === "true") {
         hasConsented.value = true;
         hasInteraction.value = true;
-        isOpen.value = false;
         updateGoogleAnalyticsConsent("granted");
       } else if (storedConsent === "false") {
         hasConsented.value = false;
         hasInteraction.value = true;
-        isOpen.value = false;
         updateGoogleAnalyticsConsent("denied");
       } else {
-        // No choice made yet
-        isOpen.value = true;
+        hasConsented.value = false;
+        hasInteraction.value = false;
+        updateGoogleAnalyticsConsent("denied");
       }
+
+      hasLoadedStoredConsent.value = true;
     }
   });
 
-  // Actions
   function acceptCookies() {
     if (import.meta.client) {
-      localStorage.setItem("virify-cookie-consent", "true");
+      writeStoredConsent("true");
       hasConsented.value = true;
       hasInteraction.value = true;
-      isOpen.value = false;
-
-      // Grant GA consent
       updateGoogleAnalyticsConsent("granted");
     }
   }
 
   function declineCookies() {
     if (import.meta.client) {
-      localStorage.setItem("virify-cookie-consent", "false");
+      writeStoredConsent("false");
       hasConsented.value = false;
       hasInteraction.value = true;
-      isOpen.value = false;
-
-      // Ensure GA consent remains denied
       updateGoogleAnalyticsConsent("denied");
     }
   }
 
   function resetConsent() {
-    isOpen.value = true;
+    clearStoredConsent();
+    hasConsented.value = false;
+    hasInteraction.value = false;
+    hasLoadedStoredConsent.value = true;
+    updateGoogleAnalyticsConsent("denied");
   }
 
   return {
-    isOpen,
-    hasConsented,
-    hasInteraction,
+    isOpen: readonly(isOpen),
+    hasConsented: readonly(hasConsented),
+    hasInteraction: readonly(hasInteraction),
     acceptCookies,
     declineCookies,
     resetConsent,
