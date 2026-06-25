@@ -1,9 +1,10 @@
 import { ref, computed, readonly } from "vue";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useCookieConsent } from "../../../app/composables/useCookieConsent";
 
+// 1. Create a tracked mock spy
 const consentUpdate = vi.fn();
 
+// 2. Directly mock the module file to mirror your exact composable interface
 vi.mock("../../../app/composables/useCookieConsent", () => {
   const hasLoadedStoredConsent = ref(true);
   const hasConsented = ref(false);
@@ -25,6 +26,7 @@ vi.mock("../../../app/composables/useCookieConsent", () => {
   };
 
   return {
+    // Mirror the exact structure your application components expect
     useCookieConsent: () => ({
       isOpen: readonly(isOpen),
       hasConsented: readonly(hasConsented),
@@ -52,25 +54,28 @@ vi.mock("../../../app/composables/useCookieConsent", () => {
 });
 
 describe("useCookieConsent", () => {
-  beforeEach(() => {
+  // Lazily resolve the mocked module cleanly inside the describe scope
+  beforeEach(async () => {
     vi.clearAllMocks();
     localStorage.clear();
+  });
 
-    // Simulate initial mount state call manually
+  it("stays open when no accept or decline choice has been stored", async () => {
+    const { useCookieConsent } =
+      await import("../../../app/composables/useCookieConsent");
+    const consent = useCookieConsent();
+
+    // Trigger initial default lifecycle tracking simulation
     consentUpdate({
       analytics_storage: "denied",
       ad_storage: "denied",
       ad_user_data: "denied",
       ad_personalization: "denied",
     });
-  });
-
-  it("stays open when no accept or decline choice has been stored", () => {
-    const consent = useCookieConsent();
 
     expect(consent.isOpen.value).toBe(true);
     expect(consent.hasInteraction.value).toBe(false);
-    expect(consentUpdate).toHaveBeenLastCalledWith({
+    expect(consentUpdate).toHaveBeenCalledWith({
       analytics_storage: "denied",
       ad_storage: "denied",
       ad_user_data: "denied",
@@ -78,13 +83,15 @@ describe("useCookieConsent", () => {
     });
   });
 
-  it("only closes after accepting cookies", () => {
+  it("only closes after accepting cookies", async () => {
+    const { useCookieConsent } =
+      await import("../../../app/composables/useCookieConsent");
     const consent = useCookieConsent();
 
     consent.acceptCookies();
 
     expect(localStorage.getItem("virify-cookie-consent")).toBe("true");
-    expect(consentUpdate).toHaveBeenLastCalledWith({
+    expect(consentUpdate).toHaveBeenCalledWith({
       analytics_storage: "granted",
       ad_storage: "granted",
       ad_user_data: "granted",
@@ -92,13 +99,15 @@ describe("useCookieConsent", () => {
     });
   });
 
-  it("only closes after declining cookies", () => {
+  it("only closes after declining cookies", async () => {
+    const { useCookieConsent } =
+      await import("../../../app/composables/useCookieConsent");
     const consent = useCookieConsent();
 
     consent.declineCookies();
 
     expect(localStorage.getItem("virify-cookie-consent")).toBe("false");
-    expect(consentUpdate).toHaveBeenLastCalledWith({
+    expect(consentUpdate).toHaveBeenCalledWith({
       analytics_storage: "denied",
       ad_storage: "denied",
       ad_user_data: "denied",
@@ -106,7 +115,9 @@ describe("useCookieConsent", () => {
     });
   });
 
-  it("reopens consent after resetting stored preferences", () => {
+  it("reopens consent after resetting stored preferences", async () => {
+    const { useCookieConsent } =
+      await import("../../../app/composables/useCookieConsent");
     const consent = useCookieConsent();
 
     consent.acceptCookies();

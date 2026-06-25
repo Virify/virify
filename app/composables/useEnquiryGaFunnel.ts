@@ -23,11 +23,10 @@ export function useEnquiryGaFunnel() {
     "enquiry-ga-funnel-context",
     () => null,
   );
-  const { trackEvent } = useGoogleAnalyticsEvents();
+  const gaEvents = useGoogleAnalyticsEvents();
 
   function clearContext() {
     context.value = null;
-
     if (import.meta.client) {
       localStorage.removeItem(STORAGE_KEY);
     }
@@ -73,13 +72,13 @@ export function useEnquiryGaFunnel() {
     const current = getContext();
     if (!current) return;
 
-    trackEvent(`enquiry_${event}`, {
+    gaEvents.trackEvent(`enquiry_${event}`, {
       event_category: "engagement",
       click_id: current.clickId,
       listing_id: current.listingId,
       listing_type: current.listingType,
       button_location: current.location,
-      authenticated_at_click: current.authenticated,
+      authenticated_at_click: current.authenticated ? "yes" : "no",
       close_reason: reason,
     });
 
@@ -98,13 +97,13 @@ export function useEnquiryGaFunnel() {
     const current = getContext();
     if (!current) return;
 
-    trackEvent("listing_enquiry_sent", {
+    gaEvents.trackEvent("listing_enquiry_sent", {
       event_category: "engagement",
       click_id: current.clickId,
       listing_id: current.listingId,
       listing_type: current.listingType,
       button_location: current.location,
-      authenticated_at_click: current.authenticated,
+      authenticated_at_click: current.authenticated ? "yes" : "no",
     });
 
     clearContext();

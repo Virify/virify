@@ -10,9 +10,7 @@ function envIfExistOrDefault(key: string, defaultValue: boolean): boolean {
   return defaultValue;
 }
 
-const googleAnalyticsId =
-  process.env.NUXT_PUBLIC_GTAG_ID ||
-  process.env.G_TAG;
+const googleAnalyticsId = process.env.NUXT_PUBLIC_GTAG_ID || process.env.G_TAG;
 
 export default defineNuxtConfig({
   extends: [
@@ -60,7 +58,7 @@ export default defineNuxtConfig({
     registry: {
       googleAnalytics: {
         id: googleAnalyticsId,
-        trigger: "onNuxtReady",
+        trigger: "init",
         defaultConsent: {
           analytics_storage: "denied",
           ad_storage: "denied",
