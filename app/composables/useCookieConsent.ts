@@ -24,26 +24,14 @@ function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
 
   try {
     const { consent } = useScriptGoogleAnalytics();
-
     consent?.update(status === "granted" ? GRANTED_CONSENT : DENIED_CONSENT);
   } catch (error) {
     console.warn("[analytics] Failed to update Google Analytics consent", error);
   }
 }
 
-/**
- * Cookie Consent Composable
- *
- * Manages GDPR/ePrivacy compliance for analytics tracking:
- * - When ACCEPTED: Full analytics with sessionId (unique visitors, funnels, session tracking)
- * - When DECLINED: Anonymous analytics only (total counts, no session/user tracking)
- * - When NO CHOICE: Banner shows until user makes a decision
- *
- * All tracking happens regardless of choice, but data granularity differs:
- * - Accepted = sessionId sent (can track unique users, paths, funnels)
- * - Declined = sessionId null (only aggregate counts like total views)
- */
-export const useCookieConsent = createSharedComposable(() => {
+// Exported internal version specifically for isolation in unit tests
+export const _useCookieConsentInternal = () => {
   const hasLoadedStoredConsent = ref(false);
   const hasConsented = ref(false);
   const hasInteraction = ref(false);
@@ -137,4 +125,7 @@ export const useCookieConsent = createSharedComposable(() => {
     declineCookies,
     resetConsent,
   };
-});
+};
+
+// Global shared composable for cross-route page state consistency
+export const useCookieConsent = createSharedComposable(_useCookieConsentInternal);

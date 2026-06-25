@@ -1,13 +1,17 @@
 type AnalyticsEventParams = Record<string, string | number | boolean | null | undefined>;
 
 export function useGoogleAnalyticsEvents() {
-  const { proxy } = useScriptGoogleAnalytics();
+  const instance = useScriptGoogleAnalytics();
 
   function trackEvent(eventName: string, params: AnalyticsEventParams = {}) {
     if (!import.meta.client) return;
 
     try {
-      proxy.gtag("event", eventName, params);
+      if (instance.proxy && typeof instance.proxy.gtag === "function") {
+        instance.proxy.gtag("event", eventName, params);
+      } else {
+        console.warn(`[analytics] GA4 proxy not ready yet for event: ${eventName}`);
+      }
     } catch (error) {
       console.warn(`[analytics] Failed to track GA event "${eventName}"`, error);
     }
@@ -26,7 +30,7 @@ export function useGoogleAnalyticsEvents() {
       listing_id: params.listingId,
       listing_type: params.listingType,
       button_location: params.location,
-      authenticated: params.authenticated,
+      authenticated: params.authenticated ? "yes" : "no",
     });
   }
 
