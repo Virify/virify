@@ -7,7 +7,7 @@
         <component :is="dialog.component" v-bind="dialog.props" />
 
         <button class="o-dialog-close | button button-quiet" aria-label="Close modal" aria-controls="modal"
-          @click.prevent="close">
+          @click.prevent="handleCloseButtonClick">
           <AtomsIcon icon="cross" aria-hidden class="o-dialog-close-icon" />
         </button>
       </section>
@@ -17,6 +17,8 @@
 
 <script setup>
 const $root = useTemplateRef('root')
+const closeReason = ref('unknown')
+const { trackSignupModalClose } = useGoogleAnalyticsEvents()
 
 /**
  *  Monitor changes in dialog content
@@ -51,6 +53,12 @@ function open() {
 function handleBackdropClick() {
   if (!dialog?.value || dialog.value.backdropClose === false) return
 
+  closeReason.value = 'backdrop'
+  close()
+}
+
+function handleCloseButtonClick() {
+  closeReason.value = 'button'
   close()
 }
 
@@ -61,6 +69,12 @@ function afterClosed() {
   // Avoid duplicate close events
   if (!dialog.value) return
 
+  if (dialog.value.componentName === 'ViewsDialogSignup') {
+    trackSignupModalClose(closeReason.value)
+  }
+
+  closeReason.value = 'unknown'
+
   // Clean up any existing state
   hideDialog()
 }
@@ -68,7 +82,10 @@ function afterClosed() {
 /**
  *  Close modal on route change
  */
-watch(useRoute(), close)
+watch(useRoute(), () => {
+  closeReason.value = 'route'
+  close()
+})
 </script>
 
 <style lang="scss">

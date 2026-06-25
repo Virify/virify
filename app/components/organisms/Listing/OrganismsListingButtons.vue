@@ -26,6 +26,7 @@
       :listing-id="listingId"
       :listing-type="listingType"
       :user-id="agent.id"
+      analytics-location="listing_detail"
       class="o-listing-buttons__contact | button button-secondary button-full"
     >
       Enquire

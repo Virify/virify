@@ -5,6 +5,27 @@
         title: 'title-sm m-0!',
       }">
         <template #right>
+          <USelect
+            v-model="selectedListingId"
+            :items="listingOptions"
+            option-attribute="label"
+            value-attribute="value"
+            icon="i-lucide-home"
+            color="primary"
+            variant="ghost"
+            size="md"
+            class="body-sm min-w-52 text-white"
+            :ui="{
+              base: 'cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
+              value: 'text-white',
+              leadingIcon: 'text-white',
+              trailingIcon: 'text-white',
+              group: 'bg-(--background-100) text-(--foreground-100) p-1',
+              item: 'hover:bg-(--background-200)',
+            }"
+            trailing-icon="i-lucide-chevron-down"
+            @update:model-value="changeListing"
+          />
           <USelect v-model="selectedPeriod" :items="PERIOD_OPTIONS" option-attribute="label" value-attribute="value"
             icon="i-lucide-calendar" color="primary" variant="ghost" size="md" class="body-sm text-white" :ui="{
               base: 'capitalize cursor-pointer bg-(--blue-400)! hover:bg-(--blue-500)!',
@@ -51,7 +72,10 @@
       </div>
 
       <!-- Top Performing Listings -->
-      <MoleculesDashboardAnalyticsTopListings :listings="comprehensiveAnalytics?.topListings || []"
+      <MoleculesDashboardAnalyticsTopListings
+        :title="selectedListingId ? 'Listing Performance' : 'Top Performing Listings'"
+        :description="selectedListingId ? 'Metrics for the selected listing' : 'Sorted by views'"
+        :listings="comprehensiveAnalytics?.topListings || []"
         :loading="isComprehensiveLoading" />
     </template>
   </UDashboardPanel>
@@ -66,15 +90,44 @@ definePageMeta({
   middleware: ['authenticated'],
 });
 
-const { comprehensiveAnalytics, isComprehensiveLoading, selectedPeriod, fetchComprehensiveAnalytics } = useAnalytics();
+const {
+  comprehensiveAnalytics,
+  isComprehensiveLoading,
+  selectedPeriod,
+  selectedListingId,
+  allUserListings,
+  fetchAnalytics,
+  fetchComprehensiveAnalytics,
+} = useAnalytics();
 
 const periodLabel = computed(() => getPeriodLabel(selectedPeriod.value));
+const listingOptions = computed(() => [
+  { label: 'All listings', value: null },
+  ...allUserListings.value
+    .filter((listing) => !listing.isDraft)
+    .map((listing) => ({
+      label: formatListingLabel(listing),
+      value: listing.id,
+    })),
+]);
 
 onMounted(() => {
+  fetchAnalytics();
   fetchComprehensiveAnalytics();
 });
 
 const changePeriod = (period: AnalyticsPeriod) => {
-  fetchComprehensiveAnalytics(period);
+  fetchComprehensiveAnalytics(period, selectedListingId.value);
 };
+
+const changeListing = (listingId: number | null) => {
+  fetchComprehensiveAnalytics(selectedPeriod.value, listingId);
+};
+
+function formatListingLabel(listing: OwnedListingWithAnalytics) {
+  const address = listing.property?.address;
+  const fallback = `Listing #${listing.id}`;
+
+  return [address?.street, address?.city].filter(Boolean).join(', ') || fallback;
+}
 </script>

@@ -45,6 +45,7 @@ export const useAnalytics = createSharedComposable(() => {
   const comprehensiveAnalytics = useState<ComprehensiveAnalytics | null>("analytics-comprehensive", () => null);
   const isComprehensiveLoading = useState("analytics-comprehensive-loading", () => false);
   const selectedPeriod = useState<'7d' | '30d' | '90d'>("analytics-period", () => '30d');
+  const selectedListingId = useState<number | null>("analytics-listing-id", () => null);
   
   // Loading states
   const isAnalyticsLoading = useState("analytics-is-loading", () => true);
@@ -81,17 +82,26 @@ export const useAnalytics = createSharedComposable(() => {
    * Fetch COMPREHENSIVE analytics for full analytics page
    * Includes time-series, per-listing breakdowns, traffic sources
    */
-  const fetchComprehensiveAnalytics = async (period?: '7d' | '30d' | '90d') => {
+  const fetchComprehensiveAnalytics = async (
+    period?: '7d' | '30d' | '90d',
+    listingId: number | null = selectedListingId.value,
+  ) => {
     if (!loggedIn.value) return;
     
     const fetchPeriod = period || selectedPeriod.value;
     selectedPeriod.value = fetchPeriod;
+    selectedListingId.value = listingId;
     
     isComprehensiveLoading.value = true;
     
     try {
+      const params = new URLSearchParams({ period: fetchPeriod });
+      if (listingId) {
+        params.set("listingId", String(listingId));
+      }
+
       const data = await useRequestFetch()<ComprehensiveAnalytics>(
-        `/api/analytics/comprehensive?period=${fetchPeriod}`
+        `/api/analytics/comprehensive?${params.toString()}`
       );
       comprehensiveAnalytics.value = data;
     } catch (error) {
@@ -194,6 +204,7 @@ export const useAnalytics = createSharedComposable(() => {
     comprehensiveAnalytics,
     isComprehensiveLoading,
     selectedPeriod,
+    selectedListingId,
     fetchComprehensiveAnalytics,
   };
 });

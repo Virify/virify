@@ -69,6 +69,7 @@ export default function useDialog(): UseDialogResponse {
    */
   const showDialog = (config: DialogState = {}) => {
     const { component, ...content } = asObject(config)
+    const componentWithName = component as Component & { __name?: string }
 
     if (!component) {
       console.error('No component supplied to Dialog')
@@ -79,6 +80,7 @@ export default function useDialog(): UseDialogResponse {
     state.value = {
       ...content,
       component: shallowRef(component),
+      componentName: componentWithName.name || componentWithName.__name,
     }
   }
 

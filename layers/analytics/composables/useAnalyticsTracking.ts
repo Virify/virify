@@ -18,6 +18,10 @@ import { createSharedComposable } from "@vueuse/core";
  * Provides fire-and-forget tracking methods using sendBeacon
  */
 export const useAnalyticsTracking = createSharedComposable(() => {
+  const {
+    trackEvent: trackGoogleAnalyticsEvent,
+  } = useGoogleAnalyticsEvents();
+
   // Persistent session ID for tracking
   const sessionId = useState("analytics-session-id", () => nanoid());
 
@@ -171,6 +175,11 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       source: options?.source || detectSource(),
     };
 
+    trackGoogleAnalyticsEvent("listing_view", {
+      event_category: "listing",
+      listing_id: listingId,
+      source: payload.source,
+    });
     sendBeaconEvent("/api/analytics/track/view", payload);
   };
 
@@ -203,6 +212,12 @@ export const useAnalyticsTracking = createSharedComposable(() => {
         source: options?.source,
         searchQuery: options?.searchQuery,
       };
+      trackGoogleAnalyticsEvent("listing_impressions", {
+        event_category: "listing",
+        impression_count: chunk.length,
+        source: options?.source,
+        search_query: options?.searchQuery,
+      });
       sendBeaconEvent("/api/analytics/track/impressions", payload);
     }
   };
@@ -230,6 +245,12 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       position: options?.position,
     };
 
+    trackGoogleAnalyticsEvent("listing_click", {
+      event_category: "listing",
+      listing_id: listingId,
+      source: payload.source,
+      position: options?.position,
+    });
     sendBeaconEvent("/api/analytics/track/click", payload);
   };
 
@@ -248,6 +269,11 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       action,
     };
 
+    trackGoogleAnalyticsEvent("listing_favourite", {
+      event_category: "listing",
+      listing_id: listingId,
+      action,
+    });
     sendBeaconEvent("/api/analytics/track/favourite", payload);
   };
 
@@ -263,6 +289,11 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       source: detectSource(),
     };
 
+    trackGoogleAnalyticsEvent("listing_enquiry_sent", {
+      event_category: "listing",
+      listing_id: listingId,
+      source: payload.source,
+    });
     sendBeaconEvent("/api/analytics/track/enquiry", payload);
   };
 
@@ -278,6 +309,11 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       platform,
     };
 
+    trackGoogleAnalyticsEvent("listing_share", {
+      event_category: "listing",
+      listing_id: listingId,
+      platform,
+    });
     sendBeaconEvent("/api/analytics/track/share", payload);
   };
 
@@ -320,6 +356,17 @@ export const useAnalyticsTracking = createSharedComposable(() => {
     };
 
     sendBeaconEvent("/api/analytics/search", payload);
+    trackGoogleAnalyticsEvent("search", {
+      event_category: "search",
+      search_term: params.query,
+      listing_type: params.listingType,
+      search_type: payload.searchType,
+      location: payload.location.placeName,
+      radius: params.radius,
+      result_count: params.resultCount,
+      used_terms_count: params.usedTerms?.length ?? 0,
+      ignored_terms_count: params.ignoredTerms?.length ?? 0,
+    });
     console.log(
       "[analytics] trackSearch beacon sent, payload:",
       JSON.stringify(payload),
@@ -354,6 +401,18 @@ export const useAnalyticsTracking = createSharedComposable(() => {
       ...data,
     };
 
+    trackGoogleAnalyticsEvent("mortgage_calculation", {
+      event_category: "mortgage",
+      listing_id: data.listingId,
+      property_price: data.propertyPrice,
+      deposit: data.deposit,
+      loan_amount: data.loanAmount,
+      ltv: data.ltv,
+      ltv_bracket: data.ltvBracket,
+      buyer_type: data.buyerType,
+      rate_type: data.rateType,
+      used_custom_rate: data.usedCustomRate,
+    });
     sendBeaconEvent("/api/analytics/mortgage/track", payload);
   };
 

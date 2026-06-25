@@ -1,7 +1,7 @@
 <template>
-  <UPageCard title="Top Performing Listings" :ui="{ title: 'title-xs' }">
+  <UPageCard :title="title" :ui="{ title: 'title-xs' }">
     <template #description>
-      <span class="body-sm text-muted-foreground">Sorted by views</span>
+      <span class="body-sm text-muted-foreground">{{ description }}</span>
     </template>
     <div class="overflow-x-auto">
       <!-- Skeleton loading -->
@@ -99,9 +99,13 @@ interface TopListing {
 }
 
 withDefaults(defineProps<{
+  title?: string;
+  description?: string;
   listings?: TopListing[];
   loading?: boolean;
 }>(), {
+  title: 'Top Performing Listings',
+  description: 'Sorted by views',
   listings: () => [],
   loading: false,
 });

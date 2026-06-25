@@ -15,9 +15,12 @@
     listingType: "sale" | "rent";
     userId?: number | null;
     disabled?: boolean;
+    analyticsLocation?: string;
   }
 
-  const props = defineProps<Props>();
+  const props = withDefaults(defineProps<Props>(), {
+    analyticsLocation: "unknown",
+  });
 
   /**
    *  Validate user, viewer IDs
@@ -44,8 +47,16 @@
 
   const { showDialog } = useDialog();
   const { openNewEnquiry } = useGlobalEnquiryModal();
+  const { trackEnquiryButtonClick } = useGoogleAnalyticsEvents();
 
   function handleEnquire() {
+    trackEnquiryButtonClick({
+      listingId: props.listingId,
+      listingType: props.listingType,
+      location: props.analyticsLocation,
+      authenticated: !!sessionId.value,
+    });
+
     if (!sessionId.value) {
       showDialog({
         component: ViewsDialogLogin,
