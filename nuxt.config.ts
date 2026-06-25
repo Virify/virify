@@ -10,6 +10,10 @@ function envIfExistOrDefault(key: string, defaultValue: boolean): boolean {
   return defaultValue;
 }
 
+const googleAnalyticsId =
+  process.env.NUXT_PUBLIC_GTAG_ID ||
+  process.env.G_TAG;
+
 export default defineNuxtConfig({
   extends: [
     "./layers/cloudflare",
@@ -32,6 +36,11 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      scripts: {
+        googleAnalytics: {
+          id: googleAnalyticsId,
+        },
+      },
       featureFlags: {
         search: envIfExistOrDefault("ALLOW_SEARCH", false),
         signup: envIfExistOrDefault("ALLOW_SIGNUP", true),
@@ -47,6 +56,21 @@ export default defineNuxtConfig({
     "@nuxtjs/sanity",
     "@nuxt/scripts",
   ],
+  scripts: {
+    registry: {
+      googleAnalytics: {
+        id: googleAnalyticsId,
+        trigger: "onNuxtReady",
+        defaultConsent: {
+          analytics_storage: "denied",
+          ad_storage: "denied",
+          ad_user_data: "denied",
+          ad_personalization: "denied",
+          wait_for_update: 500,
+        },
+      },
+    },
+  },
 
   // Nuxt SEO Configuration
   site: {

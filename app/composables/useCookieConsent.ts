@@ -2,12 +2,19 @@ import { createSharedComposable } from "@vueuse/core";
 
 type GoogleConsentStatus = "granted" | "denied";
 
-const GOOGLE_CONSENT_FIELDS = [
-  "analytics_storage",
-  "ad_storage",
-  "ad_user_data",
-  "ad_personalization",
-] as const;
+const GRANTED_CONSENT = {
+  analytics_storage: "granted",
+  ad_storage: "granted",
+  ad_user_data: "granted",
+  ad_personalization: "granted",
+} as const;
+
+const DENIED_CONSENT = {
+  analytics_storage: "denied",
+  ad_storage: "denied",
+  ad_user_data: "denied",
+  ad_personalization: "denied",
+} as const;
 
 function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
   if (!import.meta.client) return;
@@ -15,9 +22,7 @@ function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
   try {
     const { consent } = useScriptGoogleAnalytics();
 
-    consent?.update(
-      Object.fromEntries(GOOGLE_CONSENT_FIELDS.map((field) => [field, status])),
-    );
+    consent?.update(status === "granted" ? GRANTED_CONSENT : DENIED_CONSENT);
   } catch (error) {
     console.warn("[analytics] Failed to update Google Analytics consent", error);
   }
