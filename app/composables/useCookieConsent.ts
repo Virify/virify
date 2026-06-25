@@ -1,9 +1,11 @@
 import { createSharedComposable } from "@vueuse/core";
+import { ref, computed, readonly, onMounted } from "vue";
 
 type GoogleConsentStatus = "granted" | "denied";
 type StoredCookieConsent = "true" | "false" | null;
 
-const CONSENT_STORAGE_KEY = "virify-cookie-consent";
+// BUMP THIS TO V2: This forces a clean slate for existing users on deployment!
+const CONSENT_STORAGE_KEY = "virify-cookie-consent-v2";
 
 const GRANTED_CONSENT = {
   analytics_storage: "granted",
@@ -30,7 +32,6 @@ function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
   }
 }
 
-// Exported internal version specifically for isolation in unit tests
 export const _useCookieConsentInternal = () => {
   const hasLoadedStoredConsent = ref(false);
   const hasConsented = ref(false);
@@ -71,6 +72,9 @@ export const _useCookieConsentInternal = () => {
 
   onMounted(() => {
     if (import.meta.client) {
+      // Clean up the old legacy key from users' browsers to keep storage clean
+      localStorage.removeItem("virify-cookie-consent");
+
       const storedConsent = readStoredConsent();
 
       if (storedConsent === "true") {
@@ -127,5 +131,4 @@ export const _useCookieConsentInternal = () => {
   };
 };
 
-// Global shared composable for cross-route page state consistency
 export const useCookieConsent = createSharedComposable(_useCookieConsentInternal);
