@@ -110,9 +110,6 @@ importers:
       nuxt-auth-utils:
         specifier: ^0.5.27
         version: 0.5.27(magicast@0.5.1)
-      nuxt-gtag:
-        specifier: 3.0.2
-        version: 3.0.2(magicast@0.5.1)
       nuxt-security:
         specifier: 2.4.0
         version: 2.4.0(magicast@0.5.1)(rollup@4.55.1)
@@ -6597,9 +6594,6 @@ packages:
 
   nuxt-csurf@1.6.5:
     resolution: {integrity: sha512-/DMNTON8LIVhntamKbBmAuM879B0QnuSJa7ZAkmkZe+21m+1QGcjVUxtSkizaM48NUvkuAGYOG0ncn+kqEgrzw==}
-
-  nuxt-gtag@3.0.2:
-    resolution: {integrity: sha512-0Spu/rffPxW7REebkjE22qQOuVZIQuyIuvd61InDdJU+d+gRIqWhrUuKBWdk43N/J1elj+cTK2kEdk5FQX7vdQ==}
 
   nuxt-link-checker@4.3.9:
     resolution: {integrity: sha512-iYJU+A/xUhk62v4tol9cdjJS1+ZOSl0+tdUObgifdeSts6IqAUByUAiX4H6yOY2tdQYKjahMFbQr1GJ+/4LYnQ==}
@@ -17194,15 +17188,6 @@ snapshots:
       '@nuxt/kit': 3.20.2(magicast@0.5.1)
       defu: 6.1.4
       uncsrf: 1.2.0
-    transitivePeerDependencies:
-      - magicast
-
-  nuxt-gtag@3.0.2(magicast@0.5.1):
-    dependencies:
-      '@nuxt/kit': 3.20.2(magicast@0.5.1)
-      defu: 6.1.4
-      pathe: 1.1.2
-      ufo: 1.6.3
     transitivePeerDependencies:
       - magicast
 

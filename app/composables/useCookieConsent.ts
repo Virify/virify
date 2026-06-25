@@ -1,5 +1,28 @@
 import { createSharedComposable } from "@vueuse/core";
 
+type GoogleConsentStatus = "granted" | "denied";
+
+const GOOGLE_CONSENT_FIELDS = [
+  "analytics_storage",
+  "ad_storage",
+  "ad_user_data",
+  "ad_personalization",
+] as const;
+
+function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
+  if (!import.meta.client) return;
+
+  try {
+    const { consent } = useScriptGoogleAnalytics();
+
+    consent?.update(
+      Object.fromEntries(GOOGLE_CONSENT_FIELDS.map((field) => [field, status])),
+    );
+  } catch (error) {
+    console.warn("[analytics] Failed to update Google Analytics consent", error);
+  }
+}
+
 /**
  * Cookie Consent Composable
  *
@@ -39,14 +62,12 @@ export const useCookieConsent = createSharedComposable(() => {
         hasConsented.value = true;
         hasInteraction.value = true;
         isOpen.value = false;
-        useGtag().gtag("consent", "update", {
-          analytics_storage: "granted",
-          ad_storage: "granted",
-        });
+        updateGoogleAnalyticsConsent("granted");
       } else if (storedConsent === "false") {
         hasConsented.value = false;
         hasInteraction.value = true;
         isOpen.value = false;
+        updateGoogleAnalyticsConsent("denied");
       } else {
         // No choice made yet
         isOpen.value = true;
@@ -63,10 +84,7 @@ export const useCookieConsent = createSharedComposable(() => {
       isOpen.value = false;
 
       // Grant GA consent
-      useGtag().gtag("consent", "update", {
-        analytics_storage: "granted",
-        ad_storage: "granted",
-      });
+      updateGoogleAnalyticsConsent("granted");
     }
   }
 
@@ -78,10 +96,7 @@ export const useCookieConsent = createSharedComposable(() => {
       isOpen.value = false;
 
       // Ensure GA consent remains denied
-      useGtag().gtag("consent", "update", {
-        analytics_storage: "denied",
-        ad_storage: "denied",
-      });
+      updateGoogleAnalyticsConsent("denied");
     }
   }
 
