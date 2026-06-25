@@ -6,7 +6,7 @@
     <h2
       class="homepage-section-browse-carousel__title | text-3xl sm:text-4xl lg:text-5xl text-pretty tracking-tight font-bold text-highlighted text-center"
     >
-      Featured properties
+      {{ title }}
     </h2>
 
     <MoleculesCarousel
@@ -40,7 +40,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+  interface Props {
+    title?: string;
+  }
+  withDefaults(defineProps<Props>(), {
+    title: "Featured properties",
+  });
+
   const { results, isPending } = useViewAllListings({
     limit: 10,
   });
