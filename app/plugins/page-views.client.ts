@@ -1,7 +1,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter();
   const route = useRoute();
-  const { trackPageView } = useAnalyticsTracking();
+  const { trackPageView: trackInternalPageView } = useAnalyticsTracking();
   const lastTrackedFullPath = ref<string | null>(null);
 
   function trackCurrentPage() {
@@ -13,7 +13,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     lastTrackedFullPath.value = currentRoute.fullPath;
 
-    trackPageView({
+    trackInternalPageView({
       path: currentRoute.path,
       fullPath: currentRoute.fullPath,
       title: document.title,
