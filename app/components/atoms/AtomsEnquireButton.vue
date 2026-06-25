@@ -48,16 +48,29 @@
   const { showDialog } = useDialog();
   const { openNewEnquiry } = useGlobalEnquiryModal();
   const { trackEnquiryButtonClick } = useGoogleAnalyticsEvents();
+  const { setContext } = useEnquiryGaFunnel();
 
   function handleEnquire() {
+    const clickId = crypto.randomUUID();
+    const authenticated = !!sessionId.value;
+
     trackEnquiryButtonClick({
+      clickId,
       listingId: props.listingId,
       listingType: props.listingType,
       location: props.analyticsLocation,
-      authenticated: !!sessionId.value,
+      authenticated,
     });
 
-    if (!sessionId.value) {
+    setContext({
+      clickId,
+      listingId: props.listingId,
+      listingType: props.listingType,
+      location: props.analyticsLocation,
+      authenticated,
+    });
+
+    if (!authenticated) {
       showDialog({
         component: ViewsDialogLogin,
       });

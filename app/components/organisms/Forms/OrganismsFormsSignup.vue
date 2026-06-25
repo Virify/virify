@@ -28,6 +28,7 @@ const emits = defineEmits(["form-success", "form-error", "form-clear-error"]);
 const { isPending, setPendingWhile } = usePending();
 const { turnstileEl, initializeTurnstile, executeTurnstile, resetTurnstile, cleanupTurnstile } = useTurnstile();
 const { trackSignup } = useGoogleAnalyticsEvents();
+const { trackFunnelEvent } = useEnquiryGaFunnel();
 
 /**
  *  Form data
@@ -82,6 +83,7 @@ async function createAccount({ target }: SubmitEvent) {
     })
       .then((response) => {
         trackSignup();
+        trackFunnelEvent("signup_submitted");
         emits("form-success", response);
       })
       .catch((error) => {

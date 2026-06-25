@@ -19,6 +19,7 @@
 const $root = useTemplateRef('root')
 const closeReason = ref('unknown')
 const { trackSignupModalClose } = useGoogleAnalyticsEvents()
+const { trackFunnelEvent } = useEnquiryGaFunnel()
 
 /**
  *  Monitor changes in dialog content
@@ -69,8 +70,20 @@ function afterClosed() {
   // Avoid duplicate close events
   if (!dialog.value) return
 
-  if (dialog.value.componentName === 'ViewsDialogSignup') {
+  const returnValue = $root.value?.returnValue
+  const closedAfterSuccess = returnValue.includes('Success')
+
+  if (dialog.value.componentName === 'ViewsDialogSignup' && !closedAfterSuccess) {
     trackSignupModalClose(closeReason.value)
+    trackFunnelEvent('signup_modal_closed', closeReason.value)
+  }
+
+  if (dialog.value.componentName === 'ViewsDialogLogin' && !closedAfterSuccess) {
+    trackFunnelEvent('login_modal_closed', closeReason.value)
+  }
+
+  if (dialog.value.componentName === 'ViewsDialogVerifyOtp' && !closedAfterSuccess) {
+    trackFunnelEvent('otp_modal_closed', closeReason.value)
   }
 
   closeReason.value = 'unknown'

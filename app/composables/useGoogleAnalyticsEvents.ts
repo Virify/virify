@@ -14,6 +14,7 @@ export function useGoogleAnalyticsEvents() {
   }
 
   function trackEnquiryButtonClick(params: {
+    clickId: string;
     listingId: number | string;
     listingType: "sale" | "rent";
     location: string;
@@ -21,6 +22,7 @@ export function useGoogleAnalyticsEvents() {
   }) {
     trackEvent("enquiry_button_click", {
       event_category: "engagement",
+      click_id: params.clickId,
       listing_id: params.listingId,
       listing_type: params.listingType,
       button_location: params.location,

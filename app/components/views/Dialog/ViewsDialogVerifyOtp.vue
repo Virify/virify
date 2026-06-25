@@ -30,6 +30,7 @@ const otpCode = ref([]);
  *  Modal control
  */
 const { hideDialog, showDialog } = useDialog();
+const { trackFunnelEvent } = useEnquiryGaFunnel();
 
 /**
  * We need need to send the token OR passwordToken to the server
@@ -50,6 +51,7 @@ async function registerCompletion() {
       });
     });
   } else {
+    trackFunnelEvent("signup_verified");
     // useViewTransition(() => {
     //   showDialog({
     //     component: ViewsDialogPasswordSet,
