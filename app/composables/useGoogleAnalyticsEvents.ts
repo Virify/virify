@@ -7,11 +7,9 @@ export function useGoogleAnalyticsEvents() {
     if (!import.meta.client) return;
 
     try {
-      if (instance.proxy && typeof instance.proxy.gtag === "function") {
-        instance.proxy.gtag("event", eventName, params);
-      } else {
-        console.warn(`[analytics] GA4 proxy not ready yet for event: ${eventName}`);
-      }
+      // Use the native proxy directly. It safely records everything
+      // even if the script hasn't loaded or consent is pending.
+      instance.proxy.gtag("event", eventName, params);
     } catch (error) {
       console.warn(`[analytics] Failed to track GA event "${eventName}"`, error);
     }
