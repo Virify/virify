@@ -79,7 +79,6 @@
     "nuxi": "^3.32.0",
     "nuxt": "^4.2.2",
     "nuxt-auth-utils": "^0.5.27",
-    "nuxt-gtag": "3.0.2",
     "nuxt-security": "2.4.0",
     "openai": "^5.23.2",
     "pdf-parse": "^2.4.5",

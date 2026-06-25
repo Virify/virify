@@ -1,13 +1,13 @@
 type AnalyticsEventParams = Record<string, string | number | boolean | null | undefined>;
 
 export function useGoogleAnalyticsEvents() {
-  const track = useTrackEvent;
+  const { proxy } = useScriptGoogleAnalytics();
 
   function trackEvent(eventName: string, params: AnalyticsEventParams = {}) {
     if (!import.meta.client) return;
 
     try {
-      track(eventName, params);
+      proxy.gtag("event", eventName, params);
     } catch (error) {
       console.warn(`[analytics] Failed to track GA event "${eventName}"`, error);
     }
