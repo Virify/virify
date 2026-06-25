@@ -1,11 +1,9 @@
-import { createSharedComposable } from "@vueuse/core";
 import { ref, computed, readonly, onMounted } from "vue";
 
 type GoogleConsentStatus = "granted" | "denied";
 type StoredCookieConsent = "true" | "false" | null;
 
-// BUMP THIS TO V2: This forces a clean slate for existing users on deployment!
-const CONSENT_STORAGE_KEY = "virify-cookie-consent-v2";
+const CONSENT_STORAGE_KEY = "virify-cookie-consent-v3";
 
 const GRANTED_CONSENT = {
   analytics_storage: "granted",
@@ -32,15 +30,15 @@ function updateGoogleAnalyticsConsent(status: GoogleConsentStatus) {
   }
 }
 
-export const _useCookieConsentInternal = () => {
-  const hasLoadedStoredConsent = ref(false);
-  const hasConsented = ref(false);
-  const hasInteraction = ref(false);
+export const useCookieConsent = () => {
+  const hasLoadedStoredConsent = useState<boolean>("cookie_consent_loaded", () => false);
+  const hasConsented = useState<boolean>("cookie_consent_granted", () => false);
+  const hasInteraction = useState<boolean>("cookie_consent_interacted", () => false);
+
   const isOpen = computed(() => hasLoadedStoredConsent.value && !hasInteraction.value);
 
   function readStoredConsent(): StoredCookieConsent {
     if (!import.meta.client) return null;
-
     try {
       const storedConsent = localStorage.getItem(CONSENT_STORAGE_KEY);
       return storedConsent === "true" || storedConsent === "false" ? storedConsent : null;
@@ -52,7 +50,6 @@ export const _useCookieConsentInternal = () => {
 
   function writeStoredConsent(value: Exclude<StoredCookieConsent, null>) {
     if (!import.meta.client) return;
-
     try {
       localStorage.setItem(CONSENT_STORAGE_KEY, value);
     } catch (error) {
@@ -62,7 +59,6 @@ export const _useCookieConsentInternal = () => {
 
   function clearStoredConsent() {
     if (!import.meta.client) return;
-
     try {
       localStorage.removeItem(CONSENT_STORAGE_KEY);
     } catch (error) {
@@ -72,7 +68,7 @@ export const _useCookieConsentInternal = () => {
 
   onMounted(() => {
     if (import.meta.client) {
-      // Clean up the old legacy key from users' browsers to keep storage clean
+      // Clean up legacy key
       localStorage.removeItem("virify-cookie-consent");
 
       const storedConsent = readStoredConsent();
@@ -86,11 +82,13 @@ export const _useCookieConsentInternal = () => {
         hasInteraction.value = true;
         updateGoogleAnalyticsConsent("denied");
       } else {
+        // Incognito / No V2 Cookie -> Keeps flags open for popup display
         hasConsented.value = false;
         hasInteraction.value = false;
         updateGoogleAnalyticsConsent("denied");
       }
 
+      // Explicitly flip the load flag cleanly on the client post-hydration
       hasLoadedStoredConsent.value = true;
     }
   });
@@ -130,5 +128,3 @@ export const _useCookieConsentInternal = () => {
     resetConsent,
   };
 };
-
-export const useCookieConsent = createSharedComposable(_useCookieConsentInternal);
