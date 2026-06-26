@@ -5,6 +5,7 @@ const listingPpdSchema = z.object({
   address: z.object({
     number: z.string().nullable().optional(),
     flat: z.string().nullable().optional(),
+    fullAddress: z.string().nullable().optional(),
     street: z.string(),
     city: z.string(),
     postcode: z.string(),
@@ -16,7 +17,8 @@ export default defineEventHandler(async (event) => {
   try {
     const { listingId, address } = await readValidatedBody(event, listingPpdSchema.parse);
 
-    const { number, flat, street, city, postcode } = address;
+    const { street, city, postcode } = address;
+    const { number, flat } = resolvePricePaidAddressParts(address);
 
     if (!postcode) {
       throw createError({
@@ -42,7 +44,7 @@ export default defineEventHandler(async (event) => {
     const bucket = `${bucketMonth.getUTCFullYear()}-${String(bucketMonth.getUTCMonth() + 1).padStart(2, '0')}`;
 
     // Create cache key from listing ID + monthly bucket
-    const cacheKey = `ppd:listing:${listingId}:${bucket}`;
+    const cacheKey = `ppd:listing:v5:${listingId}:${bucket}`;
 
     // Try to get from cache first
     const startTime = Date.now();
@@ -57,6 +59,14 @@ export default defineEventHandler(async (event) => {
     // Sort sales by date (newest first)
     const sortedSales = ppdData
       .sort((a, b) => new Date(b.transfer_date).getTime() - new Date(a.transfer_date).getTime());
+
+    if (sortedSales.length === 0 && flat) {
+      await logPricePaidFlatMissDiagnostics({
+        listingId,
+        address,
+        resolvedAddress: { number, flat, street, city, postcode },
+      });
+    }
 
     // Calculate market context using utility function
     let latestPrice = sortedSales.length > 0 && sortedSales[0] ? sortedSales[0].price : 0;
@@ -137,3 +147,39 @@ export default defineEventHandler(async (event) => {
     });
   }
 });
+
+async function logPricePaidFlatMissDiagnostics(input: {
+  listingId: number;
+  address: z.infer<typeof listingPpdSchema>["address"];
+  resolvedAddress: {
+    number: string;
+    flat: string;
+    street: string;
+    city: string;
+    postcode: string;
+  };
+}) {
+  try {
+    const { postcode, street, city, number, flat } = input.resolvedAddress;
+    const nearby = await getPricePaidFlatMissDiagnostics(postcode, street, city, number, flat);
+
+    console.warn("[price-paid] flat exact match missed", {
+      listingId: input.listingId,
+      submittedAddress: input.address,
+      resolvedAddress: input.resolvedAddress,
+      nearbyCount: nearby.length,
+      nearby: nearby.map((row) => ({
+        paon: row.paon,
+        saon: row.saon,
+        price: row.price,
+        transfer_date: row.transfer_date.toISOString(),
+        property_type: row.property_type,
+      })),
+    });
+  } catch (error) {
+    console.warn("[price-paid] flat miss diagnostics failed", {
+      listingId: input.listingId,
+      error,
+    });
+  }
+}
