@@ -2,23 +2,172 @@
  * Get price paid data for a property by address
  */
 export async function getPricePaidByAddress(postcode: string, street: string, city: string, number: string, flat?: string | null): Promise<PricePaidSale[]> {
-  const whereConditions: any = {
-    postcode: postcode.toUpperCase(),
-    street: street.toUpperCase(),
-    town_city: city.toUpperCase(),
-    paon: number.toUpperCase(),
+  const baseWhere: any = {
+    postcode: normalisePpdAddressPart(postcode),
+    street: normalisePpdAddressPart(street),
+    town_city: normalisePpdAddressPart(city),
   };
 
-  if (flat) {
-    whereConditions.saon = flat.toUpperCase();
-  }
+  const addressMatches = buildPricePaidAddressMatches(number, flat);
 
   return await ppdPrisma.pricePaid.findMany({
-    where: whereConditions,
+    where: {
+      ...baseWhere,
+      OR: addressMatches,
+    },
     orderBy: {
       transfer_date: "desc",
     },
   });
+}
+
+export async function getPricePaidFlatMissDiagnostics(postcode: string, street: string, city: string, number: string, flat: string): Promise<Array<Pick<PricePaidSale, "price" | "transfer_date" | "paon" | "saon" | "property_type">>> {
+  const diagnosticMatches = buildPricePaidDiagnosticMatches(number, flat);
+
+  return await ppdPrisma.pricePaid.findMany({
+    where: {
+      postcode: normalisePpdAddressPart(postcode),
+      street: normalisePpdAddressPart(street),
+      town_city: normalisePpdAddressPart(city),
+      ...(diagnosticMatches.length > 0 ? { OR: diagnosticMatches } : {}),
+    },
+    select: {
+      price: true,
+      transfer_date: true,
+      paon: true,
+      saon: true,
+      property_type: true,
+    },
+    orderBy: {
+      transfer_date: "desc",
+    },
+    take: 25,
+  });
+}
+
+export function resolvePricePaidAddressParts(address: {
+  number?: string | null;
+  flat?: string | null;
+  street: string;
+  fullAddress?: string | null;
+}): { number: string | null; flat: string | null } {
+  const number = normaliseNullableAddressPart(address.number);
+  const flat = normaliseNullableAddressPart(address.flat);
+
+  if (!address.fullAddress) {
+    return { number, flat };
+  }
+
+  const addressBeforeStreet = getAddressBeforeStreet(address.fullAddress, address.street);
+  if (!addressBeforeStreet) {
+    return { number, flat };
+  }
+
+  const match = addressBeforeStreet.match(/\b\d+[A-Z]?(?:\s*-\s*\d+[A-Z]?)?\b(?!.*\b\d+[A-Z]?(?:\s*-\s*\d+[A-Z]?)?\b)/i);
+  if (!match) {
+    return { number, flat };
+  }
+
+  const inferredNumber = normalisePpdAddressPart(match[0]);
+  const inferredFlat = normaliseNullableAddressPart(
+    `${addressBeforeStreet.slice(0, match.index)} ${addressBeforeStreet.slice((match.index ?? 0) + match[0].length)}`,
+  );
+  const resolvedFlat = inferredFlat && (!flat || inferredFlat.includes(flat)) ? inferredFlat : flat;
+
+  return {
+    number: number ?? inferredNumber,
+    flat: resolvedFlat,
+  };
+}
+
+export function buildPricePaidAddressMatches(number: string, flat?: string | null): Array<{ paon: string; saon?: string }> {
+  const paonCandidates = [normalisePpdAddressPart(number)];
+  const saonCandidates = flat ? buildSaonCandidates(flat) : [];
+  const flatParts = flat ? splitPpdAddressParts(flat) : [];
+  const buildingParts = flatParts.slice(1);
+
+  for (const building of buildingParts) {
+    paonCandidates.push(
+      normalisePpdAddressPart(`${building}, ${number}`),
+      normalisePpdAddressPart(`${building} ${number}`),
+    );
+  }
+
+  const paons = uniquePopulated(paonCandidates);
+
+  if (saonCandidates.length === 0) {
+    return paons.map((paon) => ({ paon }));
+  }
+
+  return paons.flatMap((paon) => saonCandidates.map((saon) => ({ paon, saon })));
+}
+
+export function buildPricePaidDiagnosticMatches(number: string, flat?: string | null): Array<{ paon?: { contains: string }; saon?: { contains: string } }> {
+  const candidates = buildPricePaidAddressMatches(number, flat);
+  const parts = flat ? splitPpdAddressParts(flat) : [];
+  const buildingParts = parts.slice(1);
+  const searchableParts = uniquePopulated([
+    ...buildingParts,
+    ...candidates.map((candidate) => candidate.paon),
+  ]).filter((value) => value !== normalisePpdAddressPart(number));
+
+  return searchableParts.flatMap((part) => [
+    { paon: { contains: part } },
+    { saon: { contains: part } },
+  ]);
+}
+
+function buildSaonCandidates(flat: string): string[] {
+  const parts = splitPpdAddressParts(flat);
+  const candidates = [
+    normalisePpdAddressPart(flat),
+    normalisePpdAddressPart(flat.replace(/,/g, " ")),
+    ...parts,
+  ];
+
+  for (const part of parts) {
+    candidates.push(...buildFlatSynonyms(part));
+  }
+
+  return uniquePopulated(candidates);
+}
+
+function buildFlatSynonyms(value: string): string[] {
+  const match = value.match(/^(APARTMENT|APT|FLAT)\s+(.+)$/i);
+  if (!match?.[2]) return [];
+
+  return [
+    normalisePpdAddressPart(`APARTMENT ${match[2]}`),
+    normalisePpdAddressPart(`APT ${match[2]}`),
+    normalisePpdAddressPart(`FLAT ${match[2]}`),
+  ];
+}
+
+function splitPpdAddressParts(value: string): string[] {
+  return value.split(",").map(normalisePpdAddressPart).filter(Boolean);
+}
+
+function normalisePpdAddressPart(value: string): string {
+  return value.toUpperCase().replace(/\s*,\s*/g, ", ").replace(/\s+/g, " ").trim();
+}
+
+function normaliseNullableAddressPart(value?: string | null): string | null {
+  if (!value) return null;
+  return normalisePpdAddressPart(value) || null;
+}
+
+function uniquePopulated(values: string[]): string[] {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function getAddressBeforeStreet(fullAddress: string, street: string): string | null {
+  const normalisedFullAddress = normalisePpdAddressPart(fullAddress);
+  const normalisedStreet = normalisePpdAddressPart(street);
+  const streetIndex = normalisedFullAddress.lastIndexOf(normalisedStreet);
+
+  if (streetIndex === -1) return null;
+
+  return normalisedFullAddress.slice(0, streetIndex).replace(/[,\s]+$/g, "").trim() || null;
 }
 
 /**

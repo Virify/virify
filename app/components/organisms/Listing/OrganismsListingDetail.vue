@@ -253,6 +253,7 @@
               :address="{
                 number: property.address.number,
                 flat: property.address.flat,
+                fullAddress: property.address.fullAddress,
                 street: property.address.street,
                 city: property.address.city,
                 postcode: property.address.postcode,

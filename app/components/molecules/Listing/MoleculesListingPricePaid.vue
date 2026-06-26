@@ -62,6 +62,7 @@ interface Props {
   address: {
     number?: string | null;
     flat?: string | null;
+    fullAddress?: string | null;
     street: string;
     city: string;
     postcode: string;
