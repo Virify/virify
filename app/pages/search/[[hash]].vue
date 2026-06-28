@@ -126,7 +126,7 @@ useSeoMeta({
   twitterTitle: seoTitle,
   twitterDescription: seoDescription,
   twitterImage: "/img/og-search.jpg",
-  robots: "index, follow",
+  robots: "noindex, nofollow",
 });
 
 /**

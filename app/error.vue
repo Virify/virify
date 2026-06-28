@@ -1,6 +1,14 @@
 <script setup lang="ts">
 const error = useError();
 
+useHead({
+  title: () => `${error.value?.statusCode ?? "Error"} - Something went wrong | Virify`,
+});
+
+useSeoMeta({
+  robots: "noindex, nofollow",
+});
+
 // Report errors to the server so they appear in Railway / production logs.
 // error.vue console.error only shows in browser devtools, not server logs.
 onMounted(() => {

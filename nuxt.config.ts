@@ -32,6 +32,9 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
+  experimental: {
+    emitRouteChunkError: "automatic",
+  },
   runtimeConfig: {
     public: {
       scripts: {
@@ -102,30 +105,18 @@ export default defineNuxtConfig({
   },
   // Robots configuration
   robots: {
-    allow: [
-      "/",
-      "/mortgage-calculator",
-      "/price-paid",
-      "/contact",
-      "/guides",
-      "/guides/*",
-      "/privacy",
-      "/terms",
-      "/cookie",
-      "/support",
-      "/listing/*",
-      "/profile/*",
-      "/acceptable-use",
-      "/information/**",
-      "/content/**",
-    ],
+    allow: ["/"],
     disallow: [
       "/account",
       "/account/*",
       "/dashboard",
       "/dashboard/*",
+      "/admin",
+      "/admin/*",
       "/api",
       "/api/*",
+      "/auth",
+      "/auth/*",
       "/auth/update-admin-password",
       "/listing/preview",
       "/listing/preview/*",
@@ -145,10 +136,17 @@ export default defineNuxtConfig({
       "/login",
       "/signup",
       "/account/**",
+      "/admin",
+      "/admin/**",
+      "/auth",
+      "/auth/**",
+      "/dashboard",
+      "/dashboard/**",
       "/search/**",
       "/ai-search/**",
       "/review/**",
       "/auth/update-admin-password",
+      "/listing/preview/**",
     ],
     sources: [
       "/api/__sitemap__/guides",
