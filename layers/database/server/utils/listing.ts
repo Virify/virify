@@ -49,10 +49,11 @@ export async function getListingById(id: number): Promise<Listing | null> {
 export async function getFullListingById(
   id: number,
 ): Promise<ListingWithFullProperty | null> {
-  return await prisma.listing.findUnique({
+  return await prisma.listing.findFirst({
     where: {
       id,
       published: true,
+      archived: false,
     },
     include: {
       rentalListing: true,

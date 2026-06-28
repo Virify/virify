@@ -14,15 +14,24 @@ export default defineEventHandler(async (event) => {
       });
     }
 
+    const listingId = Number(id);
+
+    if (!Number.isInteger(listingId) || listingId < 1) {
+      throw createError({
+        statusCode: 404,
+        statusMessage: "listing not found",
+      });
+    }
+
     const storage = useStorage("cache:listing");
-    const cacheKey = `listing:${id}`;
+    const cacheKey = `listing:${listingId}`;
 
     // Try to get from cache first
     let listing = await storage.getItem(cacheKey);
 
     if (!listing) {
       // Fetch from database if not in cache
-      listing = await getFullListingById(Number(id));
+      listing = await getFullListingById(listingId);
 
       if (listing) {
         // Cache for 24 hours. TTL is in seconds (unstorage convention).
@@ -39,7 +48,7 @@ export default defineEventHandler(async (event) => {
     if (!listing) {
       const session = await getUserSession(event);
       if (session?.user) {
-        listing = await getListingByIdForEdit(Number(id), session.user as any);
+        listing = await getListingByIdForEdit(listingId, session.user as any);
       }
     }
 
