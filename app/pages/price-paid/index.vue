@@ -170,7 +170,7 @@ async function search() {
     if (err instanceof z.ZodError) {
       error.value = err.issues[0]?.message || "Invalid postcode format";
     } else {
-      error.value = getPricePaidSearchErrorMessage(err);
+      error.value = "Price paid data isn't available right now. Please try again later.";
     }
     searched.value = false;
   }
@@ -185,25 +185,6 @@ function formatTimelineItems(sales: PricePaidGroupedSale[]) {
     title: `Price Sold: £${sale.price.toLocaleString()}`,
     date: sale.transfer_date,
   }));
-}
-
-/**
- * Extract a user-facing search error message from a Nuxt fetch error.
- */
-function getPricePaidSearchErrorMessage(error: unknown): string {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "data" in error &&
-    typeof error.data === "object" &&
-    error.data !== null &&
-    "statusMessage" in error.data &&
-    typeof error.data.statusMessage === "string"
-  ) {
-    return error.data.statusMessage;
-  }
-
-  return "Failed to search price paid data. Please try again.";
 }
 
 // SEO - Nuxt SEO auto-generates WebPage schema from this

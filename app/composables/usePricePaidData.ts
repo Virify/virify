@@ -25,8 +25,8 @@ export function usePricePaidData() {
 
       pricePaidData.value = response;
       return response;
-    } catch (err: unknown) {
-      error.value = getPricePaidFetchErrorMessage(err, "Failed to fetch price paid data");
+    } catch (err) {
+      error.value = "Price paid data isn't available right now. Please try again later.";
       pricePaidData.value = null;
       throw err;
     } finally {
@@ -55,8 +55,8 @@ export function usePricePaidData() {
 
       ppdGroups.value = response.data ?? null;
       return response.data ?? [];
-    } catch (err: unknown) {
-      error.value = getPricePaidFetchErrorMessage(err, "Failed to search price paid data");
+    } catch (err) {
+      error.value = "Price paid data isn't available right now. Please try again later.";
       ppdGroups.value = null;
       throw err;
     } finally {
@@ -82,23 +82,4 @@ export function usePricePaidData() {
     fetchPricePaidGroups,
     reset,
   };
-}
-
-/**
- * Extract a Nuxt fetch status message from an unknown error.
- */
-function getPricePaidFetchErrorMessage(error: unknown, fallback: string): string {
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "data" in error &&
-    typeof error.data === "object" &&
-    error.data !== null &&
-    "statusMessage" in error.data &&
-    typeof error.data.statusMessage === "string"
-  ) {
-    return error.data.statusMessage;
-  }
-
-  return fallback;
 }

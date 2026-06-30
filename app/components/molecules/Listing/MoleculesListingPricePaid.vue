@@ -88,8 +88,8 @@ const fetchPricePaidData = async () => {
       listingId: props.listingId,
       address: props.address,
     });
-  } catch (err) {
-    console.error("Error fetching price paid data:", err);
+  } catch {
+    // The section falls back to hidden when price-paid data is unavailable.
   }
 };
 
