@@ -126,6 +126,9 @@ import { ViewsDialogSignup } from '#components'
 
 const { showDialog } = useDialog()
 
+/**
+ * Open the signup dialog from the price-paid teaser section.
+ */
 function showSignup() {
   showDialog({ component: ViewsDialogSignup })
 }
@@ -133,17 +136,24 @@ function showSignup() {
 import { z } from "zod";
 
 const searchQuery = ref<string>("");
-const results = ref<any[]>([]);
-const loading = ref(false);
-const error = ref<string | null>(null);
 const searched = ref(false);
+const {
+  ppdGroups,
+  loading,
+  error,
+  fetchPricePaidGroups,
+} = usePricePaidData();
 
+const results = computed(() => ppdGroups.value ?? []);
+
+/**
+ * Validate the postcode input and fetch grouped PPD results.
+ */
 async function search() {
   if (searchQuery.value.trim() === "") {
     return;
   }
 
-  loading.value = true;
   error.value = null;
   searched.value = false;
 
@@ -151,34 +161,49 @@ async function search() {
     // Validate and format the postcode
     const validatedPostcode = postcodeSchema.parse(searchQuery.value.trim());
 
-    const response = await $fetch<any>("/api/price-paid/", {
-      method: "POST",
-      body: { postcode: validatedPostcode },
-    });
-    results.value = response.data || [];
+    await fetchPricePaidGroups({ postcode: validatedPostcode });
     searched.value = true;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Error searching price paid data:", err);
 
     // Check if it's a validation error from Zod
     if (err instanceof z.ZodError) {
       error.value = err.issues[0]?.message || "Invalid postcode format";
     } else {
-      error.value = err.data?.statusMessage || "Failed to search price paid data. Please try again.";
+      error.value = getPricePaidSearchErrorMessage(err);
     }
-    results.value = [];
     searched.value = false;
-  } finally {
-    loading.value = false;
   }
 }
 
-function formatTimelineItems(sales: any[]) {
+/**
+ * Convert grouped PPD sales into timeline component items.
+ */
+function formatTimelineItems(sales: PricePaidGroupedSale[]) {
   return sales.map((sale) => ({
     id: sale.transaction_id,
     title: `Price Sold: £${sale.price.toLocaleString()}`,
     date: sale.transfer_date,
   }));
+}
+
+/**
+ * Extract a user-facing search error message from a Nuxt fetch error.
+ */
+function getPricePaidSearchErrorMessage(error: unknown): string {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof error.data === "object" &&
+    error.data !== null &&
+    "statusMessage" in error.data &&
+    typeof error.data.statusMessage === "string"
+  ) {
+    return error.data.statusMessage;
+  }
+
+  return "Failed to search price paid data. Please try again.";
 }
 
 // SEO - Nuxt SEO auto-generates WebPage schema from this

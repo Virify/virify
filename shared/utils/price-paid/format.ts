@@ -1,19 +1,19 @@
 /**
- * Format percentage change with + or - prefix
+ * Format percentage change with + or - prefix.
  */
 export function formatPercentageChange(change: number): string {
   return `${change > 0 ? "+" : ""}${change}%`;
 }
 
 /**
- * Format date string to UK locale
+ * Format date string to UK locale.
  */
 export function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString("en-GB");
 }
 
 /**
- * Format property price vs average comparison
+ * Format property price vs average comparison.
  */
 export function formatVsAverage(propertyPrice: number, average: number): string {
   const diff = propertyPrice - average;
@@ -24,21 +24,21 @@ export function formatVsAverage(propertyPrice: number, average: number): string 
 }
 
 /**
- * Format property type code to readable name
+ * Format property type code to readable name.
  */
 export function formatPropertyTypeName(type: string): string {
   const typeMap: Record<string, string> = {
     D: "Detached",
-    S: "Semi-Detached", 
+    S: "Semi-Detached",
     T: "Terraced",
     F: "Flat",
-    O: "Other"
+    O: "Other",
   };
   return typeMap[type] || type;
 }
 
 /**
- * Format yearly trend percentage
+ * Format yearly trend percentage.
  */
 export function formatTrend(trend: number): string {
   const prefix = trend > 0 ? "+" : "";

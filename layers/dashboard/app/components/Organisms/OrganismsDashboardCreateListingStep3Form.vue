@@ -310,7 +310,7 @@
     : null,
   );
 
-  // PPD: street context via composable
+  // PPD: street context fetched once when this step opens
   const postcode = computed(
     () =>
       (
@@ -327,7 +327,36 @@
           | undefined
       )?.property?.address?.street ?? null,
   );
-  const { summary: ppdSummary, loading: ppdLoading } = usePpdStreetData(postcode, street);
+  const {
+    ppdGroups,
+    loading: ppdLoading,
+    fetchPricePaidGroups,
+    reset: resetPricePaidData,
+  } = usePricePaidData();
+  const ppdSummary = computed<PricePaidStreetSummary | null>(() => createPricePaidStreetSummary(ppdGroups.value));
+
+  /**
+   * Fetch PPD street context for the address from Step 2.
+   */
+  async function fetchPpdStreetContext() {
+    if (!postcode.value) {
+      resetPricePaidData();
+      return;
+    }
+
+    try {
+      await fetchPricePaidGroups({
+        postcode: postcode.value,
+        street: street.value,
+      });
+    } catch (error) {
+      console.error("[price-paid] street context fetch failed", error);
+    }
+  }
+
+  onMounted(() => {
+    fetchPpdStreetContext();
+  });
 
   // Use constrained schema when editing a live listing to show inline Zod errors before submit
   const activeSchema = computed(() =>

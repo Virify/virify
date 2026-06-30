@@ -74,31 +74,22 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const pricePaidData = ref<PricePaidResponse | null>(null);
-const loading = ref(false);
-const error = ref(false);
+const {
+  pricePaidData,
+  loading,
+  fetchListingPricePaidData,
+} = usePricePaidData();
 
 const fetchPricePaidData = async () => {
   if (!props.listingId || !props.address) return;
 
-  loading.value = true;
-  error.value = false;
-
   try {
-    const response = await $fetch<PricePaidResponse>("/api/price-paid/" + props.listingId, {
-      method: "POST",
-      body: {
-        listingId: props.listingId,
-        address: props.address,
-      },
+    await fetchListingPricePaidData({
+      listingId: props.listingId,
+      address: props.address,
     });
-
-    pricePaidData.value = response;
   } catch (err) {
     console.error("Error fetching price paid data:", err);
-    error.value = true;
-  } finally {
-    loading.value = false;
   }
 };
 
