@@ -34,7 +34,7 @@
 
       <!-- Render the no more history card (always visible at the end of the timeline) -->
       <li class="timeline__item timeline__item--no-history">
-        <p class="timeline__no-history-message | body-sm">No more property history available</p>
+        <p class="timeline__no-history-message | body-sm">{{ emptyMessage }}</p>
       </li>
     </ol>
 
@@ -61,10 +61,12 @@ interface Props {
   note?: string
   loading?: boolean
   skeletonCount?: number
+  emptyMessage?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  skeletonCount: 3
+  skeletonCount: 3,
+  emptyMessage: "No more property history available",
 })
 
 const displayItems = computed(() => {
