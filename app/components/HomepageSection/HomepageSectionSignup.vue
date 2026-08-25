@@ -8,9 +8,7 @@
 
     <template v-else-if="!signupAndLoggedIn">
       <p class="homepage-section-signup__content">
-        Create an account or log in to enquire about properties listed by property agents
-        or other users. And now live, create your own listings for free. We are excited to
-        welcome everyone to early access.
+        We’re reviewing everything you’ve told us and making improvements, keep an eye out for what’s next.
       </p>
 
       <HeaderActionsGuest class="homepage-section-signup__buttons" />
@@ -20,8 +18,7 @@
       <p
         class="homepage-section-signup__content homepage-section-signup__content--no-button"
       >
-        We’re excited to welcome you to early access. A few key features are still being
-        switched on - but we’re moving quickly and updates are landing regularly.
+        We’re reviewing everything you’ve told us and making improvements, keep an eye out for what’s next.
       </p>
     </template>
   </OrganismsBannerHero>
@@ -43,7 +40,7 @@
       return "Launching Summer 2026";
     }
 
-    return "Now live for early testing";
+    return "Early access testing is now over";
   });
 
   const title = computed(() => {
@@ -55,7 +52,7 @@
       return "Join the waiting list for the property platform that works for everyone";
     }
 
-    return "Sign up now for the property platform that works for everyone";
+    return "Thank you to everyone who took part - your feedback is helping shape Virify";
   });
 </script>
 
