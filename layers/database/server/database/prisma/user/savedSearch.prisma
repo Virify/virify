@@ -1,9 +1,0 @@
-model SavedSearch {
-  id                Int             @id @default(autoincrement())
-  userPreferencesId Int
-  name              String
-  criteria          Json // serialized search filters
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  userPreferences   UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
-}

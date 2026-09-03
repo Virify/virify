@@ -1,13 +1,13 @@
 {
   "name": "Virify",
   "short_name": "Virify",
-  "description": "Market privately, search with AI, and connect directly. Save time, cut costs, take control of your property journey.",
+  "description": "Virify is making updates. Check back soon.",
   "dir": "auto",
   "lang": "en-GB",
   "display": "standalone",
   "orientation": "any",
   "start_url": "/",
-  "background_color": "#0F0F25",
+  "background_color": "#0c1317",
   "theme_color": "#fff",
   "icons": [
     {
